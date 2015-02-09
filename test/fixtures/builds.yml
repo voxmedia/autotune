@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  slug: MyString
+  data: MyText
+  status: MyString
+  output: MyText
+  blueprint_id: 
+
+two:
+  title: MyString
+  slug: MyString
+  data: MyText
+  status: MyString
+  output: MyText
+  blueprint_id: 
