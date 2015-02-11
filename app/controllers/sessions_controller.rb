@@ -1,3 +1,4 @@
+# Handle authentication and user sessions
 class SessionsController < ApplicationController
   skip_before_action :require_login, :only => [:new, :create, :failure]
 
@@ -17,12 +18,12 @@ class SessionsController < ApplicationController
 
   def destroy
     self.current_user = nil
-    redirect_to(login_path, :notice => "You have been logged out.")
+    redirect_to(login_path, :notice => 'You have been logged out.')
   end
 
   private
 
   def omniauth
-    request.env["omniauth.auth"]
+    request.env['omniauth.auth']
   end
 end
