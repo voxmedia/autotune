@@ -11,3 +11,6 @@ AllCops:
 Style/HashSyntax:
   Enabled: false
   EnforcedStyle: hash_rockets
+
+Metrics/LineLength:
+  Max: 99
