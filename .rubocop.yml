@@ -12,5 +12,14 @@ Style/HashSyntax:
   Enabled: false
   EnforcedStyle: hash_rockets
 
-Metrics/LineLength:
-  Max: 99
+Style/LineLength:
+  Max: 100
+
+Style/NumericLiterals:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact
+
+Style/SignalException:
+  EnforcedStyle: only_raise
