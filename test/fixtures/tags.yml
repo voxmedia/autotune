@@ -1,9 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  title: MyString
-  slug: MyString
+app:
+  title: App
+  slug: app
 
-two:
-  title: MyString
-  slug: MyString
+map:
+  title: Map
+  slug: map
+
+chart:
+  title: Chart
+  slug: chart
+
+gallery:
+  title: Gallery
+  slug: gallery

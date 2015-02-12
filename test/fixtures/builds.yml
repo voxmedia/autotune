@@ -1,17 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  title: MyString
-  slug: MyString
-  data: MyText
-  status: MyString
-  output: MyText
-  blueprint_id: 
+example_one:
+  title: Example build one
+  slug: example-build-one
+  blueprint_id: example
 
-two:
-  title: MyString
-  slug: MyString
-  data: MyText
-  status: MyString
-  output: MyText
-  blueprint_id: 
+example_two:
+  title: Example build two
+  slug: example-build-two
+  blueprint_id: example

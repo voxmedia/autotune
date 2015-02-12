@@ -1,11 +1,6 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  title: MyString
-  status: MyString
-  repo_url: MyString
-
-two:
-  title: MyString
-  status: MyString
-  repo_url: MyString
+example:
+  slug: example-blueprint
+  title: Example blueprint
+  repo_url: https://github.com/ryanmark/autotune-example-blueprint.git

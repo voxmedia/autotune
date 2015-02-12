@@ -1,17 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user_id: 
-  provider: MyString
-  uid: MyString
-  info: 
-  credentials: 
-  extra: 
-
-two:
-  user_id: 
-  provider: MyString
-  uid: MyString
-  info: 
-  credentials: 
-  extra: 
+developer:
+  user_id: developer
+  provider: developer
+  uid: test@example.com
+  info: '{"name": "test", "email": "test@example.com"}'

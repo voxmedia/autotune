@@ -6,9 +6,11 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-# Application...
+# Ground level module
 module Autotune
-  # Application...
+  VERSION = '0.0.1'
+
+  # Autotune rails application
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -24,5 +26,9 @@ module Autotune
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    # Figure out where we build our blueprints
+    config.working_dir = File.expand_path(ENV['WORKING_DIR'] || './working', Rails.root)
+    Dir.mkdir(config.working_dir) unless Dir.exist?(config.working_dir)
   end
 end

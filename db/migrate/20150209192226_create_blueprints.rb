@@ -5,6 +5,7 @@ class CreateBlueprints < ActiveRecord::Migration
       t.string :title
       t.string :status
       t.string :repo_url
+      t.text :config
 
       t.timestamps null: false
     end

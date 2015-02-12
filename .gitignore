@@ -18,3 +18,5 @@
 
 # Ignore environment vars
 /.env*
+
+/working

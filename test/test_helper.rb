@@ -11,9 +11,6 @@ OmniAuth.config.add_mock(:developer, OmniAuth::AuthHash.new(
 
 # Add more helper methods to be used by all tests here...
 class ActiveSupport::TestCase
-  # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-  fixtures :all
-
   def mock_auth
     OmniAuth.config.mock_auth
   end

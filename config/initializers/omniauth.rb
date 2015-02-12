@@ -1,3 +1,5 @@
+OmniAuth.config.logger = Rails.logger
+
 # Look at our environment vars in order to decide which providers to load
 if ENV['AUTH_PROVIDERS']
   Rails.configuration.omniauth_providers = ENV['AUTH_PROVIDERS']

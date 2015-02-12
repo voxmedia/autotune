@@ -1,9 +1,5 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  blueprint_id: 
-  tag_id: 
-
-two:
-  blueprint_id: 
-  tag_id: 
+example_app:
+  blueprint_id: example
+  tag_id: app

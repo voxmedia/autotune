@@ -1,5 +1,6 @@
 require 'test_helper'
 
+# Test the builds
 class BuildTest < ActiveSupport::TestCase
   test 'creating a build' do
     assert_raises ActiveRecord::RecordInvalid do
@@ -12,5 +13,6 @@ class BuildTest < ActiveSupport::TestCase
 
     b = Build.create!(:title => 'new build', :blueprint => bp)
     assert_equal b.blueprint, bp
+    assert_equal 'new', b.status
   end
 end

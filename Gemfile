@@ -38,6 +38,8 @@ gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-google-oauth2'
 
+gem 'octokit'
+
 group :development, :test do
   gem 'pry-rails'
 

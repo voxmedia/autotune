@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20150210191559) do
     t.string   "title"
     t.string   "status"
     t.string   "repo_url"
+    t.text     "config"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
