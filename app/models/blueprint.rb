@@ -1,7 +1,3 @@
-require 'fileutils'
-
-BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
-
 # Blueprint
 class Blueprint < ActiveRecord::Base
   include Slugged
@@ -37,37 +33,12 @@ class Blueprint < ActiveRecord::Base
     status == 'building'
   end
 
-  # TODO: figure out where this stuff should go
-  def install!
-    # Clone the repo
-    out, s = Open3.capture2e(
-      'git', 'clone', '--recursive', repo_url, working_dir)
-    unless s.success?
-      logger.error(out)
-      update!(:status => 'broken')
-      return false
+  def repo
+    if working_dir_exist?
+      Repo.open working_dir
+    else
+      Repo.clone repo_url, working_dir
     end
-
-    # Load the blueprint config file into the DB
-    Dir.chdir(working_dir) do
-      File.open(BLUEPRINT_CONFIG_FILENAME) do |f|
-        self.config = ActiveSupport::JSON.decode(f.read)
-      end
-    end
-    # look in the config for stuff like descriptions, sample images, tags
-    # TODO: load stuff from config
-
-    # Blueprint is now ready for testing
-    self.status = 'testing'
-    save!
-  rescue JSON::ParserError => exc
-    logger.error(exc)
-    update!(:status => 'broken')
-    false
-  end
-
-  def uninstall!
-    FileUtils.rm_rf(working_dir) && update!(:status => 'new', :config => nil)
   end
 
   private

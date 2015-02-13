@@ -6,7 +6,7 @@ class InstallBlueprintJobTest < ActiveJob::TestCase
 
   test 'install blueprint' do
     bp = blueprints(:example)
-    bp.uninstall! if bp.installed?
+    bp.repo.rm if bp.installed?
 
     assert_performed_jobs 0
 
