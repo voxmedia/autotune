@@ -18,7 +18,7 @@ class Blueprint < ActiveRecord::Base
   end
 
   def installed?
-    working_dir_exist? && !installing?
+    %w(testing ready building).include? status
   end
 
   def installing?
@@ -34,10 +34,12 @@ class Blueprint < ActiveRecord::Base
   end
 
   def repo
-    if working_dir_exist?
-      Repo.open working_dir
-    else
-      Repo.clone repo_url, working_dir
+    @_repo ||= begin
+      if working_dir_exist?
+        Repo.open working_dir
+      else
+        Repo.clone repo_url, working_dir
+      end
     end
   end
 

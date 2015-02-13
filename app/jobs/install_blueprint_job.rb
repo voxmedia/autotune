@@ -6,7 +6,7 @@ class InstallBlueprintJob < ActiveJob::Base
     raise 'Blueprint already installed' if blueprint.installed?
 
     # Clone the repo, and setup the environment
-    puts blueprint.repo.setup_environment
+    blueprint.repo.setup_environment
 
     # Load the blueprint config file into the DB
     blueprint.config = blueprint.repo.config
