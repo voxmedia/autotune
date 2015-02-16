@@ -40,6 +40,10 @@ gem 'omniauth-google-oauth2'
 
 gem 'octokit'
 
+group :test do
+  gem 'rubocop', '~> 0.26', :require => false
+end
+
 group :development, :test do
   gem 'pry-rails'
 
