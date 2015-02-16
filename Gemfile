@@ -44,7 +44,7 @@ group :test do
   gem 'rubocop', '~> 0.26', :require => false
 end
 
-group :development, :test do
+group :development do
   gem 'pry-rails'
 
   # Access an IRB console on exception pages or by using <%= console %> in views

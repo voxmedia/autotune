@@ -4,6 +4,7 @@ class CreateBuilds < ActiveRecord::Migration
       t.string :slug, :index => true
       t.string :title
       t.string :status
+      t.string :blueprint_version
       t.text :data
       t.text :output
       t.references :blueprint, :index => true

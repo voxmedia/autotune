@@ -54,11 +54,12 @@ ActiveRecord::Schema.define(version: 20150210191559) do
     t.string   "slug"
     t.string   "title"
     t.string   "status"
+    t.string   "blueprint_version"
     t.text     "data"
     t.text     "output"
     t.integer  "blueprint_id"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   add_index "builds", ["blueprint_id"], name: "index_builds_on_blueprint_id"

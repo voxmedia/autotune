@@ -35,8 +35,8 @@ class Repo
   # Update the repo on disk
   def update
     working_dir do
-      git 'checkout', @branch
       git 'fetch', 'origin'
+      git 'checkout', @branch
       git 'reset', '--hard', "origin/#{@branch}"
       git 'submodule', 'update', '--init'
     end
@@ -93,6 +93,12 @@ class Repo
     logger.error(exc)
     nil
   end
+
+  # Get the current commit hash
+  def commit_hash(branch_or_tag = nil)
+    git 'rev-parse', branch_or_tag || 'HEAD'
+  end
+  alias_method :version, :commit_hash
 
   # Get the path for or chdir into this repo
   def working_dir(&block)

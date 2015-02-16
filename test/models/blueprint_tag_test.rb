@@ -7,7 +7,7 @@ class BlueprintTagTest < ActiveSupport::TestCase
 
     b = Blueprint.create!(
       :title => 'new blueprint',
-      :repo_url => 'https://github.com/voxmedia/autotune-example-blueprint.git',
+      :repo_url => repo_url,
       :tags => [t])
     assert_equal b.tags.first, t
   end

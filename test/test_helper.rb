@@ -14,6 +14,10 @@ class ActiveSupport::TestCase
   def mock_auth
     OmniAuth.config.mock_auth
   end
+
+  def repo_url
+    'https://github.com/ryanmark/autotune-example-blueprint.git'
+  end
 end
 
 # Helpers for controller tests

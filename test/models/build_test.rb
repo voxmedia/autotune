@@ -9,7 +9,7 @@ class BuildTest < ActiveSupport::TestCase
 
     bp = Blueprint.create!(
       :title => 'new blueprint',
-      :repo_url => 'https://github.com/voxmedia/autotune-example-blueprint.git')
+      :repo_url => repo_url)
 
     b = Build.create!(:title => 'new build', :blueprint => bp)
     assert_equal b.blueprint, bp

@@ -8,7 +8,7 @@ class BlueprintTest < ActiveSupport::TestCase
     end
     b = Blueprint.create!(
       :title => 'new blueprint',
-      :repo_url => 'https://github.com/voxmedia/autotune-example-blueprint.git')
+      :repo_url => repo_url)
     assert_equal b.status, 'new'
     assert_equal b.slug, 'new-blueprint'
   end
@@ -16,7 +16,7 @@ class BlueprintTest < ActiveSupport::TestCase
   test "that slugs don't change" do
     b = Blueprint.create!(
       :title => 'new blueprint',
-      :repo_url => 'https://github.com/voxmedia/autotune-example-blueprint.git')
+      :repo_url => repo_url)
     assert_equal b.slug, 'new-blueprint'
     b.title = 'updated blueprint'
     b.save!
@@ -27,7 +27,7 @@ class BlueprintTest < ActiveSupport::TestCase
   test 'custom slugs' do
     b = Blueprint.create!(
       :title => 'new blueprint',
-      :repo_url => 'https://github.com/voxmedia/autotune-example-blueprint.git',
+      :repo_url => repo_url,
       :slug => 'foobar')
     assert_equal b.slug, 'foobar'
   end
@@ -35,12 +35,12 @@ class BlueprintTest < ActiveSupport::TestCase
   test 'automatic slugs are unique' do
     b = Blueprint.create!(
       :title => 'new blueprint',
-      :repo_url => 'https://github.com/voxmedia/autotune-example-blueprint.git')
+      :repo_url => repo_url)
     assert_equal b.slug, 'new-blueprint'
 
     b = Blueprint.create!(
       :title => 'new blueprint',
-      :repo_url => 'https://github.com/voxmedia/autotune-example-blueprint.git')
+      :repo_url => repo_url)
     assert_equal b.slug, 'new-blueprint-1'
   end
 end
