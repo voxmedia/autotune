@@ -3,7 +3,7 @@ ENV['RAILS_ENV'] ||= 'test'
 # Set the working dir to a temp location
 require 'tmpdir'
 require 'fileutils'
-ENV['WORKING_DIR'] = Dir.tmpdir
+ENV['WORKING_DIR'] = File.expand_path('../../tmp/working-test', __FILE__)
 FileUtils.rm_rf(ENV['WORKING_DIR'])
 
 require File.expand_path('../../config/environment', __FILE__)
