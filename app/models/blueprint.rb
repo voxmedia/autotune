@@ -10,7 +10,7 @@ class Blueprint < ActiveRecord::Base
   after_initialize :defaults
 
   def working_dir
-    File.join(Rails.configuration.working_dir, slug)
+    File.join(Rails.configuration.blueprints_dir, slug)
   end
 
   def working_dir_exist?

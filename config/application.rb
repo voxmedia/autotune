@@ -27,11 +27,15 @@ module Autotune
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
 
-    # Figure out where we build our blueprints
-    config.working_dir = File.expand_path(ENV['WORKING_DIR'] || './working', Rails.root)
-    Dir.mkdir(config.working_dir) unless Dir.exist?(config.working_dir)
-
     # Autoload
     config.autoload_paths += %W(#{config.root}/lib)
+
+    # Figure out where we build our blueprints
+    config.working_dir = File.expand_path(ENV['WORKING_DIR'] || './working', Rails.root)
+    config.blueprints_dir = File.join(config.working_dir, 'blueprints')
+    config.builds_dir = File.join(config.working_dir, 'builds')
+    [:working_dir, :blueprints_dir, :builds_dir].each do |s|
+      Dir.mkdir(config.try(s)) unless Dir.exist?(config.try(s))
+    end
   end
 end

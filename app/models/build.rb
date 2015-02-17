@@ -8,6 +8,24 @@ class Build < ActiveRecord::Base
   validates :status, :inclusion => { :in => %w(new building built broken) }
   before_validation :defaults
 
+  def working_dir
+    File.join(Rails.configuration.builds_dir, slug)
+  end
+
+  def working_dir_exist?
+    Dir.exist?(working_dir)
+  end
+
+  def snapshot
+    @_snapshot ||= begin
+      if working_dir_exist?
+        Snapshot.open working_dir
+      else
+        Snapshot.create blueprint.repo, working_dir
+      end
+    end
+  end
+
   private
 
   def defaults
