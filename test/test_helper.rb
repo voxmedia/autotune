@@ -1,4 +1,11 @@
 ENV['RAILS_ENV'] ||= 'test'
+
+# Set the working dir to a temp location
+require 'tmpdir'
+require 'fileutils'
+ENV['WORKING_DIR'] = Dir.tmpdir
+FileUtils.rm_rf(ENV['WORKING_DIR'])
+
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 

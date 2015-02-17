@@ -1,5 +1,3 @@
-require 'fileutils'
-
 BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
 
 # Repo

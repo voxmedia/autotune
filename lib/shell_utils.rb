@@ -1,3 +1,5 @@
+require 'fileutils'
+
 # Thin API for doing shell stuff
 module ShellUtils
   extend ActiveSupport::Concern
