@@ -1,5 +1,6 @@
 require 'fileutils'
 
+# These vars are allowed to leak through to commands run in the working dir
 ALLOWED_ENV = %w(PATH LANG USER LOGNAME LC_CTYPE SHELL LD_LIBRARY_PATH ARCHFLAGS)
 
 # Thin API for doing shell stuff
@@ -14,7 +15,7 @@ class WorkDir
   # Create a new shell object with a working directory and environment vars
   def initialize(working_dir, env = {})
     @working_dir = working_dir
-    @env = ENV.to_h.select { |k, _| ALLOWED_ENV.include? k }
+    @env = ENV.select { |k, _| ALLOWED_ENV.include? k }
     @env.update env
   end
 

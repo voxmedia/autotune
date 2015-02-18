@@ -27,6 +27,9 @@ module Autotune
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
 
+    # Setup jobs
+    config.active_job.queue_adapter = :resque
+
     # Autoload
     config.autoload_paths += %W(#{config.root}/lib)
 

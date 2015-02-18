@@ -2,6 +2,7 @@
 class InstallBlueprintJob < ActiveJob::Base
   queue_as :default
 
+  # do the deed
   def perform(blueprint)
     raise 'Blueprint already installed' if blueprint.installed?
 
@@ -13,6 +14,9 @@ class InstallBlueprintJob < ActiveJob::Base
 
     # look in the config for stuff like descriptions, sample images, tags
     # TODO: load stuff from config
+    blueprint.config['tags'].each do |t|
+      blueprint.tags << Tag.find_or_create_by(:title => t)
+    end
 
     # Blueprint is now ready for testing
     blueprint.status = 'testing'

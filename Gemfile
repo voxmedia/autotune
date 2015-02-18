@@ -38,7 +38,7 @@ gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-google-oauth2'
 
-gem 'octokit'
+gem 'resque', '~> 1.25.2'
 
 group :test do
   gem 'rubocop', '~> 0.26', :require => false
