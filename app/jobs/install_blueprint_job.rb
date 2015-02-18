@@ -17,7 +17,7 @@ class InstallBlueprintJob < ActiveJob::Base
     # Blueprint is now ready for testing
     blueprint.status = 'testing'
     blueprint.save!
-  rescue ShellUtils::CommandError => exc
+  rescue WorkDir::CommandError => exc
     logger.error(exc)
     blueprint.update!(:status => 'broken')
     false
