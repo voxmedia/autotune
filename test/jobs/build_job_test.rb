@@ -23,5 +23,8 @@ class BuildJobTest < ActiveJob::TestCase
 
     assert_equal 'built', b.status
     assert_match(/Build data:/, b.output)
+
+    assert b.working_dir_exist?, 'Snapshot should exist'
+    assert !b.snapshot.git?, 'Snapshot should not be a git repo'
   end
 end

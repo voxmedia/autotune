@@ -1,9 +1,7 @@
 BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
 
 # Repo
-class Repo
-  include ShellUtils
-
+class Repo < WorkDir
   def branch
     @branch ||= 'master'
   end
