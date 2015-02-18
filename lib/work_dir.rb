@@ -1,5 +1,7 @@
 require 'fileutils'
 
+ALLOWED_ENV = %w(PATH LANG USER LOGNAME LC_CTYPE SHELL LD_LIBRARY_PATH ARCHFLAGS)
+
 # Thin API for doing shell stuff
 class WorkDir
   class CommandError < StandardError; end
@@ -10,9 +12,10 @@ class WorkDir
   end
 
   # Create a new shell object with a working directory and environment vars
-  def initialize(working_dir, env = { 'foo' => 'bar' })
+  def initialize(working_dir, env = {})
     @working_dir = working_dir
-    @env = env
+    @env = ENV.to_h.select { |k, _| ALLOWED_ENV.include? k }
+    @env.update env
   end
 
   # Is this a ruby project?

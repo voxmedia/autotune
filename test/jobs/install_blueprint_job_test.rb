@@ -16,7 +16,7 @@ class InstallBlueprintJobTest < ActiveJob::TestCase
 
     assert_performed_jobs 1
 
-    assert bp.installed?
+    assert bp.installed?, 'Blueprint should be installed'
     assert_equal 'testing', bp.status
   end
 end
