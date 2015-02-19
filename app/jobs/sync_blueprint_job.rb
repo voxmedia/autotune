@@ -1,21 +1,22 @@
 # setup the blueprint
-class InstallBlueprintJob < ActiveJob::Base
+class SyncBlueprintJob < ActiveJob::Base
   queue_as :default
 
   # do the deed
   def perform(blueprint)
-    raise 'Blueprint already installed' if blueprint.installed?
+    # Clone the repo
+    blueprint.repo
 
-    # Clone the repo, and setup the environment
+    # Setup the environment
     blueprint.repo.setup_environment
 
     # Load the blueprint config file into the DB
     blueprint.config = blueprint.repo.config
 
     # look in the config for stuff like descriptions, sample images, tags
-    # TODO: load stuff from config
     blueprint.config['tags'].each do |t|
-      blueprint.tags << Tag.find_or_create_by(:title => t)
+      tag = Tag.find_or_create_by(:title => t)
+      blueprint.tags << tag unless blueprint.tags.include?(tag)
     end
 
     # Blueprint is now ready for testing

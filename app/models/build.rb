@@ -5,7 +5,7 @@ class Build < ActiveRecord::Base
   belongs_to :blueprint
 
   validates :title, :blueprint, :blueprint_version, :presence => true
-  validates :status, :inclusion => { :in => %w(new building built broken) }
+  validates :status, :inclusion => { :in => %w(new updating updated building built broken) }
   before_validation :defaults
 
   def working_dir
@@ -17,13 +17,17 @@ class Build < ActiveRecord::Base
   end
 
   def snapshot
-    @_snapshot ||= begin
-      if working_dir_exist?
-        Snapshot.open working_dir
-      else
-        Snapshot.create blueprint.repo, working_dir
-      end
-    end
+    @_snapshot ||= Snapshot.new working_dir
+  end
+
+  def update_snapshot
+    update(:status => 'updating')
+    SyncBuildJob.perform_later(self)
+  end
+
+  def build
+    update(:status => 'building')
+    BuildJob.perform_later(self)
   end
 
   private

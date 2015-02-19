@@ -6,7 +6,7 @@ class Blueprint < ActiveRecord::Base
   has_many :tags, :through => :blueprint_tags
 
   validates :title, :repo_url, :presence => true
-  validates :status, :inclusion => { :in => %w(new installing testing ready building broken) }
+  validates :status, :inclusion => { :in => %w(new updating testing ready building broken) }
   after_initialize :defaults
 
   def working_dir
@@ -18,11 +18,11 @@ class Blueprint < ActiveRecord::Base
   end
 
   def installed?
-    %w(testing ready building).include? status
+    %w(updating testing ready building).include? status
   end
 
-  def installing?
-    status == 'installing'
+  def updating?
+    status == 'updating'
   end
 
   def ready?
@@ -34,13 +34,12 @@ class Blueprint < ActiveRecord::Base
   end
 
   def repo
-    @_repo ||= begin
-      if working_dir_exist?
-        Repo.open working_dir
-      else
-        Repo.clone repo_url, working_dir
-      end
-    end
+    @_repo ||= Repo.new working_dir
+  end
+
+  def update_repo
+    update(:status => 'updating')
+    SyncBlueprintJob.perform_later bp
   end
 
   private

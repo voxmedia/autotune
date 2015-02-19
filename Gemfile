@@ -34,9 +34,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-gem 'omniauth'
-gem 'omniauth-github'
-gem 'omniauth-google-oauth2'
+gem 'omniauth', '~> 1.2.2'
+gem 'omniauth-github', '~> 1.1.2'
+gem 'omniauth-google-oauth2', '~> 0.2.6'
 
 gem 'resque', '~> 1.25.2'
 

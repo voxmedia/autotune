@@ -1,7 +1,7 @@
 require 'test_helper'
 
 # Test the install blueprint job
-class InstallBlueprintJobTest < ActiveJob::TestCase
+class SyncBlueprintJobTest < ActiveJob::TestCase
   fixtures :blueprints
 
   test 'install blueprint' do
@@ -11,7 +11,7 @@ class InstallBlueprintJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      InstallBlueprintJob.perform_later bp
+      SyncBlueprintJob.perform_later bp
     end
 
     assert_performed_jobs 1

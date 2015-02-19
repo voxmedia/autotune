@@ -7,11 +7,6 @@ ALLOWED_ENV = %w(PATH LANG USER LOGNAME LC_CTYPE SHELL LD_LIBRARY_PATH ARCHFLAGS
 class WorkDir
   class CommandError < StandardError; end
 
-  # shortcut for .new
-  def self.open(working_dir, env = {})
-    new(working_dir, env)
-  end
-
   # Create a new shell object with a working directory and environment vars
   def initialize(working_dir, env = {})
     @working_dir = working_dir

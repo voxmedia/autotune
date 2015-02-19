@@ -35,6 +35,17 @@ class WorkDirTest < ActionDispatch::IntegrationTest
       r.setup_environment
 
       assert r.environment?, 'Should have an environment'
+
+      # update repo
+      r.update
+
+      # checkout a branch
+      r.switch 'test'
+
+      assert r.exist?('testfile'), 'Should have a test file'
+
+      # update bundle
+      r.setup_environment
     end
   end
 
@@ -54,6 +65,7 @@ class WorkDirTest < ActionDispatch::IntegrationTest
         assert !s.git?, "Shouldn't have git"
         assert !s.exist?, "Shouldn't exist"
         assert !s.dir?, "Shouldn't be a dir"
+        assert !s.environment?, 'Should not have an environment'
 
         # create a snapshot!
         s.sync(r)
@@ -68,6 +80,21 @@ class WorkDirTest < ActionDispatch::IntegrationTest
         assert s.environment?, 'Should have environment'
 
         s.build(:foo => 'bar')
+
+        # checkout a different branch in the repo
+        r.switch 'test'
+        assert r.exist?('testfile'), 'Should have a test file'
+
+        # update the snapshot
+        s.sync(r)
+        assert s.exist?('testfile'), 'Should have a test file'
+
+        # update the bundle
+        FileUtils.rm_rf(s.expand '.bundle')
+        assert !s.environment?, 'Should not have an environment'
+
+        s.setup_environment
+        assert s.environment?, 'Should have environment'
       end
     end
   end

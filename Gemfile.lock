@@ -207,9 +207,9 @@ DEPENDENCIES
   dotenv-rails
   jbuilder (~> 2.0)
   jquery-rails
-  omniauth
-  omniauth-github
-  omniauth-google-oauth2
+  omniauth (~> 1.2.2)
+  omniauth-github (~> 1.1.2)
+  omniauth-google-oauth2 (~> 0.2.6)
   pry-rails
   rails (= 4.2.0)
   resque (~> 1.25.2)

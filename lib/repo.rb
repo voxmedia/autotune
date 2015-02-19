@@ -7,13 +7,6 @@ class Repo < WorkDir
   end
   attr_writer :branch
 
-  # Create a new repo object from a newly cloned repo
-  def self.clone(repo_url, working_dir, env = {})
-    r = new(working_dir, env)
-    r.clone(repo_url)
-    r
-  end
-
   # Update the repo on disk
   def update
     working_dir do
@@ -22,6 +15,12 @@ class Repo < WorkDir
       git 'reset', '--hard', "origin/#{branch}"
       git 'submodule', 'update', '--init'
     end
+  end
+
+  # Checkout a different branch
+  def switch(new_branch)
+    self.branch = new_branch
+    update
   end
 
   # Clone a repo to disk from the url

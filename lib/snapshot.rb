@@ -2,13 +2,7 @@ BLUEPRINT_BUILD_COMMAND = './autotune-build'
 
 # A snapshot of a git repo
 class Snapshot < WorkDir
-  # Create a new snapshot
-  def self.create(source, working_dir, env = {})
-    r = new(working_dir, env)
-    r.sync(source)
-    r
-  end
-
+  # Rsync files from the source working dir, skip .git
   def sync(source)
     cmd 'rsync', '-a', '--exclude', '.git', "#{source.working_dir}/", "#{working_dir}/"
   end
