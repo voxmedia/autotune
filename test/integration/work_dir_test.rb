@@ -1,6 +1,4 @@
 require 'test_helper'
-require 'tmpdir'
-require 'fileutils'
 
 # Test the WorkDir classes; Repo and Snapshot
 class WorkDirTest < ActionDispatch::IntegrationTest

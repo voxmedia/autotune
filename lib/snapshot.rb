@@ -4,6 +4,7 @@ BLUEPRINT_BUILD_COMMAND = './autotune-build'
 class Snapshot < WorkDir
   # Rsync files from the source working dir, skip .git
   def sync(source)
+    raise "Can't sync from non-existant #{source.working_dir}" unless source.exist?
     cmd 'rsync', '-a', '--exclude', '.git', "#{source.working_dir}/", "#{working_dir}/"
   end
 

@@ -13,10 +13,6 @@ class Blueprint < ActiveRecord::Base
     File.join(Rails.configuration.blueprints_dir, slug)
   end
 
-  def working_dir_exist?
-    Dir.exist?(working_dir)
-  end
-
   def installed?
     %w(updating testing ready building).include? status
   end
@@ -40,6 +36,16 @@ class Blueprint < ActiveRecord::Base
   def update_repo
     update(:status => 'updating')
     SyncBlueprintJob.perform_later bp
+  end
+
+  # only call these from a job
+
+  def create_repo
+    repo.clone(repo_url)
+  end
+
+  def sync_repo
+    repo.update
   end
 
   private

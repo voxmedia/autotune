@@ -12,12 +12,8 @@ class Build < ActiveRecord::Base
     File.join(Rails.configuration.builds_dir, slug)
   end
 
-  def working_dir_exist?
-    Dir.exist?(working_dir)
-  end
-
   def snapshot
-    @_snapshot ||= Snapshot.new working_dir
+    @snapshot ||= Snapshot.new working_dir
   end
 
   def update_snapshot
@@ -28,6 +24,13 @@ class Build < ActiveRecord::Base
   def build
     update(:status => 'building')
     BuildJob.perform_later(self)
+  end
+
+  # only call these from a job
+
+  def sync_snapshot
+    snapshot.sync(blueprint.repo)
+    update(:blueprint_version => blueprint.repo.version)
   end
 
   private

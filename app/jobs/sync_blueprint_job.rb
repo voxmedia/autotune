@@ -5,7 +5,7 @@ class SyncBlueprintJob < ActiveJob::Base
   # do the deed
   def perform(blueprint)
     # Clone the repo
-    blueprint.repo
+    blueprint.create_repo
 
     # Setup the environment
     blueprint.repo.setup_environment
