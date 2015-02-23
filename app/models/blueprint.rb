@@ -6,7 +6,7 @@ class Blueprint < ActiveRecord::Base
   has_many :tags, :through => :blueprint_tags
 
   validates :title, :repo_url, :presence => true
-  validates :status, :inclusion => { :in => %w(new updating testing ready building broken) }
+  validates :status, :inclusion => { :in => %w(new updating testing ready broken) }
   after_initialize :defaults
 
   def working_dir
@@ -14,7 +14,7 @@ class Blueprint < ActiveRecord::Base
   end
 
   def installed?
-    %w(updating testing ready building).include? status
+    %w(updating testing ready).include? status
   end
 
   def updating?
@@ -25,8 +25,8 @@ class Blueprint < ActiveRecord::Base
     status == 'ready'
   end
 
-  def building?
-    status == 'building'
+  def testing?
+    status == 'testing'
   end
 
   def repo
