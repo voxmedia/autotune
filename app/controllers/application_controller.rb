@@ -1,3 +1,5 @@
+AUTH_KEY_RE = /API-KEY\s+auth="?([^"]+)"?/
+
 # Base class for all the controllers
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
@@ -9,7 +11,6 @@ class ApplicationController < ActionController::Base
   helper_method :current_user, :signed_in?, :omniauth_path
 
   def index
-    #binding.pry
   end
 
   protected
@@ -27,10 +28,15 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    if session[:current_user_id].present?
-      User.find_by_id(session[:current_user_id])
-    else
-      nil
+    @current_user ||= begin
+      if session[:current_user_id].present?
+        User.find_by_id(session[:current_user_id])
+      elsif request.headers['Authorization'] =~ AUTH_KEY_RE
+        api_key_m = AUTH_KEY_RE.match(request.headers['Authorization'])
+        User.find_by_api_key(api_key_m[1])
+      else
+        nil
+      end
     end
   end
 

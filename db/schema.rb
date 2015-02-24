@@ -77,11 +77,13 @@ ActiveRecord::Schema.define(version: 20150210191559) do
   create_table "users", force: :cascade do |t|
     t.string   "email"
     t.string   "name"
+    t.string   "api_key"
     t.text     "meta"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  add_index "users", ["api_key"], name: "index_users_on_api_key"
   add_index "users", ["email"], name: "index_users_on_email"
 
 end
