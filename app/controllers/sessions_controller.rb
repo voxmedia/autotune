@@ -2,8 +2,6 @@
 class SessionsController < ApplicationController
   skip_before_action :require_login, :only => [:new, :create, :failure]
 
-  def new; end
-
   def create
     self.current_user = User.find_or_create_by_auth_hash(omniauth)
     flash[:notice] = "Welcome #{current_user.name}!"

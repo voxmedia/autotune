@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
   validates :email, :api_key, :uniqueness => true
   validates :email,
             :uniqueness => { :case_sensitive => false },
-            :format => { :with => /\A[^@]+@[^@]+\z/ }
+            :format => { :with => /@/ }
   after_initialize :defaults
 
   def self.generate_api_key
@@ -23,9 +23,9 @@ class User < ActiveRecord::Base
     verify_auth_hash(auth_hash)
     a = Authorization.new(
       auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
-    a.user = User.create!(
-      :name => auth_hash['info']['name'],
-      :email => auth_hash['info']['email'])
+    a.user = User
+      .create_with(:name => auth_hash['info']['name'])
+      .find_or_create_by!(:email => auth_hash['info']['email'])
     a.save!
     a.user
   end

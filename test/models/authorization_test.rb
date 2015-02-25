@@ -18,7 +18,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
 
     a = Authorization.new(@auth_hash)
-    a.user = User.create!(@auth_hash['info'])
+    a.user = User
+      .create_with(:name => 'test')
+      .find_or_create_by!(:email => 'test@example.com')
 
     assert a.save!
   end

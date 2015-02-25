@@ -16,6 +16,9 @@ Rails.configuration.working_dir = File.expand_path "#{Dir.tmpdir}/#{Time.now.to_
 Rails.configuration.blueprints_dir = File.join(Rails.configuration.working_dir, 'blueprints')
 Rails.configuration.builds_dir = File.join(Rails.configuration.working_dir, 'builds')
 
+# pretty print
+require 'pp'
+
 # Add more helper methods to be used by all tests here...
 class ActiveSupport::TestCase
   def setup
@@ -39,15 +42,29 @@ end
 
 # Helpers for controller tests
 class ActionController::TestCase
-  def valid_auth(provider = :developer)
-    @request.env['omniauth.auth'] = mock_auth[provider]
+  def valid_auth_header!
+    @request.headers['Authorization'] = "API-KEY auth=#{users(:developer).api_key}"
   end
 
-  def no_auth
-    @request.env['omniauth.auth'] = nil
+  def accept_json!
+    @request.headers['Accept'] = 'application/json'
   end
 
-  def invalid_auth
-    @request.env['omniauth.auth'] = :invalid_credentials
+  def decoded_response
+    ActiveSupport::JSON.decode(@response.body)
+  end
+
+  # Take an array of keys and assert that those keys exist in decoded_response
+  def assert_data(*args)
+    assert_keys decoded_response, *args
+  end
+
+  # Take a hash and an array of keys and assert that those keys exist
+  def assert_keys(data, *args)
+    assert_instance_of Hash, data
+    keys = args.first.is_a?(Array) ? args.first : args
+    keys.each do |k|
+      assert decoded_response.key?(k), "Should have #{k}"
+    end
   end
 end

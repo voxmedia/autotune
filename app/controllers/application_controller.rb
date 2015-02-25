@@ -10,16 +10,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user, :signed_in?, :omniauth_path
 
-  def index
-  end
-
   protected
-
-  def append_info_to_payload(payload)
-    super
-    payload[:host] = request.host
-    payload[:remote_ip] = request.remote_ip
-  end
 
   def omniauth_path(provider, origin = nil)
     path = "/auth/#{provider}"
@@ -55,6 +46,21 @@ class ApplicationController < ActionController::Base
   private
 
   def require_login
-    redirect_to omniauth_path(:developer, request.fullpath) unless signed_in?
+    return true if signed_in?
+    respond_to do |format|
+      format.html do
+        redirect_to(omniauth_path(
+          Rails.configuration.omniauth_preferred_provider,
+          request.fullpath))
+      end
+      format.json { render :json => { 'error' => 'Unauthorized' }, :status => :unauthorized }
+    end
+  end
+
+  def respond_to_html
+    return unless request.format == 'text/html'
+    respond_to do |format|
+      format.html { render 'index' }
+    end
   end
 end
