@@ -48,12 +48,8 @@ class ApplicationController < ActionController::Base
   def require_login
     return true if signed_in?
     respond_to do |format|
-      format.html do
-        redirect_to(omniauth_path(
-          Rails.configuration.omniauth_preferred_provider,
-          request.fullpath))
-      end
-      format.json { render :json => { 'error' => 'Unauthorized' }, :status => :unauthorized }
+      format.html { redirect_to login_path }
+      format.json { render_error 'Unauthorized', :unauthorized }
     end
   end
 
@@ -62,5 +58,16 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { render 'index' }
     end
+  end
+
+  def render_error(message, status = :internal_server_error)
+    render(
+      :error,
+      :locals => { :message => message },
+      :status => status)
+  end
+
+  def login_path
+    omniauth_path(Rails.configuration.omniauth_preferred_provider, request.fullpath)
   end
 end

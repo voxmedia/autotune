@@ -3,7 +3,7 @@ class BlueprintsController < ApplicationController
   before_action :respond_to_html
 
   rescue_from ActiveRecord::UnknownAttributeError do |exc|
-    render :json => { :error => exc.message }, :status => :bad_request
+    render_error exc.message, :bad_request
   end
 
   def index
@@ -25,7 +25,7 @@ class BlueprintsController < ApplicationController
       @blueprint.save
       render :show, :status => :created
     else
-      render :json => { :error => @blueprint.errors.messages }, :status => :bad_request
+      render_error @blueprint.errors.messages, :bad_request
     end
   end
 
@@ -36,7 +36,7 @@ class BlueprintsController < ApplicationController
       @blueprint.save
       render :show, :status => :created
     else
-      render :json => { :error => @blueprint.errors.messages }, :status => :bad_request
+      render_error @blueprint.errors.messages, :bad_request
     end
   end
 
