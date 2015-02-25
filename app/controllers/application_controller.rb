@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
 
   before_action :require_login
 
-  helper_method :current_user, :signed_in?, :omniauth_path
+  helper_method :current_user, :signed_in?, :omniauth_path, :login_path
 
   protected
 
@@ -16,6 +16,10 @@ class ApplicationController < ActionController::Base
     path = "/auth/#{provider}"
     path += "?origin=#{CGI.escape(origin)}" unless origin.blank?
     path
+  end
+
+  def login_path(origin = nil)
+    omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
   end
 
   def current_user
@@ -48,7 +52,7 @@ class ApplicationController < ActionController::Base
   def require_login
     return true if signed_in?
     respond_to do |format|
-      format.html { redirect_to login_path }
+      format.html { redirect_to login_path(request.fullpath) }
       format.json { render_error 'Unauthorized', :unauthorized }
     end
   end
@@ -65,9 +69,5 @@ class ApplicationController < ActionController::Base
       :error,
       :locals => { :message => message },
       :status => status)
-  end
-
-  def login_path
-    omniauth_path(Rails.configuration.omniauth_preferred_provider, request.fullpath)
   end
 end

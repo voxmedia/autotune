@@ -3,9 +3,9 @@
 example_one:
   title: Example build one
   slug: example-build-one
-  blueprint_id: example
+  blueprint: example
 
 example_two:
   title: Example build two
   slug: example-build-two
-  blueprint_id: example
+  blueprint: example
