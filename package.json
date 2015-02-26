@@ -1,0 +1,64 @@
+{
+  "name": "autotune",
+  "description": "Platform and UI for creating new websites and html snippets from templates stored in git repos.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/voxmedia/autotune",
+  "author": {
+    "name": "Ryan Mark",
+    "email": "ryan.mark@voxmedia.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/voxmedia/autotune.git"
+  },
+  "bugs": {
+    "url": "https://github.com/voxmedia/autotune/issues"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "https://github.com/voxmedia/autotune/blob/master/LICENSE-BSD"
+    }
+  ],
+  "main": "lib/autotune",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "grunt nodeunit"
+  },
+  "devDependencies": {
+    "browserify": "~5.12.1",
+    "browserify-shim": "~3.8.0",
+    "grunt": "~0.4.5",
+    "grunt-babel": "^4.0.0",
+    "grunt-browserify": "^3.4.0",
+    "grunt-contrib-jshint": "~0.11.0",
+    "grunt-contrib-nodeunit": "~0.4.1",
+    "grunt-contrib-uglify": "~0.8.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "node-underscorify": "~0.0.14",
+    "watchify": "~1.0.6"
+  },
+  "keywords": [],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "underscore": "~1.7.0",
+    "backbone": "~1.1.2",
+    "bootstrap": "~3.2.0"
+  },
+  "browser": {
+    "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js"
+  },
+  "browserify": {
+    "transform": [
+      [ "node-underscorify", {
+          "extensions": [ "ejs" ],
+          "requires": [ { "variable": "_", "module": "underscore" } ]
+      } ],
+      "browserify-shim" ]
+  },
+  "browserify-shim": {
+    "bootstrap": { "depends": [ "jquery:jQuery" ] }
+  }
+}
