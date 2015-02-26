@@ -26,10 +26,7 @@ module.exports = function(grunt) {
       dist: {
         src: 'public/app.js',
         dest: 'public/app.min.js'
-      },
-    },
-    nodeunit: {
-      files: ['test/js/**/*_test.js']
+      }
     },
     jshint: {
       options: {
@@ -43,10 +40,7 @@ module.exports = function(grunt) {
           jshintrc: 'lib/js/.jshintrc'
         },
         src: ['lib/js/**/*.js']
-      },
-      test: {
-        src: ['test/js/**/*.js']
-      },
+      }
     },
     watch: {
       gruntfile: {
@@ -56,22 +50,17 @@ module.exports = function(grunt) {
       lib: {
         files: '<%= jshint.lib.src %>',
         tasks: ['jshint:lib', 'browserify']
-      },
-      test: {
-        files: '<%= jshint.test.src %>',
-        tasks: ['jshint:test', 'nodeunit']
-      },
+      }
     },
   });
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'browserify', 'nodeunit', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'browserify', 'uglify']);
 
 };
