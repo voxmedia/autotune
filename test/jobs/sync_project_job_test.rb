@@ -1,11 +1,11 @@
 require 'test_helper'
 
-# test the job for updating builds
-class SyncBuildJobTest < ActiveJob::TestCase
-  fixtures :blueprints, :builds
+# test the job for updating projects
+class SyncProjectJobTest < ActiveJob::TestCase
+  fixtures :blueprints, :projects
 
   test 'update snapshot' do
-    b = builds(:example_one)
+    b = projects(:example_one)
 
     # why must i do this?
     b.blueprint = blueprints(:example)
@@ -17,7 +17,7 @@ class SyncBuildJobTest < ActiveJob::TestCase
 
     perform_enqueued_jobs do
       SyncBlueprintJob.perform_later b.blueprint
-      SyncBuildJob.perform_later b
+      SyncProjectJob.perform_later b
     end
 
     assert_performed_jobs 2

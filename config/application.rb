@@ -33,11 +33,11 @@ module Autotune
     # Autoload
     config.autoload_paths += %W(#{config.root}/lib)
 
-    # Figure out where we build our blueprints
+    # Figure out where we project our blueprints
     config.working_dir = File.expand_path(ENV['WORKING_DIR'] || './working', Rails.root)
     config.blueprints_dir = File.join(config.working_dir, 'blueprints')
-    config.builds_dir = File.join(config.working_dir, 'builds')
-    [:working_dir, :blueprints_dir, :builds_dir].each do |s|
+    config.projects_dir = File.join(config.working_dir, 'projects')
+    [:working_dir, :blueprints_dir, :projects_dir].each do |s|
       Dir.mkdir(config.try(s)) unless Dir.exist?(config.try(s))
     end
   end

@@ -1,3 +1,4 @@
+require 'uri'
 # Blueprint
 class Blueprint < ActiveRecord::Base
   include Slugged
@@ -7,6 +8,8 @@ class Blueprint < ActiveRecord::Base
 
   validates :title, :repo_url, :presence => true
   validates :status, :inclusion => { :in => %w(new updating testing ready broken) }
+  validates :repo_url,
+            :format => { :with => URI.regexp }
   after_initialize :defaults
 
   def working_dir
@@ -35,7 +38,7 @@ class Blueprint < ActiveRecord::Base
 
   def update_repo
     update(:status => 'updating')
-    SyncBlueprintJob.perform_later bp
+    SyncBlueprintJob.perform_later self
   end
 
   # only call these from a job

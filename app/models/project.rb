@@ -1,5 +1,5 @@
 # Blueprints get built
-class Build < ActiveRecord::Base
+class Project < ActiveRecord::Base
   include Slugged
   serialize :data, Hash
   belongs_to :blueprint
@@ -9,7 +9,7 @@ class Build < ActiveRecord::Base
   before_validation :defaults
 
   def working_dir
-    File.join(Rails.configuration.builds_dir, slug)
+    File.join(Rails.configuration.projects_dir, slug)
   end
 
   def snapshot
@@ -18,10 +18,10 @@ class Build < ActiveRecord::Base
 
   def update_snapshot
     update(:status => 'updating')
-    SyncBuildJob.perform_later(self)
+    SyncProjectJob.perform_later(self)
   end
 
-  def build
+  def project
     update(:status => 'building')
     BuildJob.perform_later(self)
   end

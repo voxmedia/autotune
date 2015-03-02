@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 20150210191559) do
 
   add_index "blueprints", ["slug"], name: "index_blueprints_on_slug"
 
-  create_table "builds", force: :cascade do |t|
+  create_table "projects", force: :cascade do |t|
     t.string   "slug"
     t.string   "title"
     t.string   "status"
@@ -62,8 +62,8 @@ ActiveRecord::Schema.define(version: 20150210191559) do
     t.datetime "updated_at",        null: false
   end
 
-  add_index "builds", ["blueprint_id"], name: "index_builds_on_blueprint_id"
-  add_index "builds", ["slug"], name: "index_builds_on_slug"
+  add_index "projects", ["blueprint_id"], name: "index_projects_on_blueprint_id"
+  add_index "projects", ["slug"], name: "index_projects_on_slug"
 
   create_table "tags", force: :cascade do |t|
     t.string   "slug"

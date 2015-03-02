@@ -1,6 +1,17 @@
+SLUG_OR_ID_REGEX = /([-\w]+|\d+)/
+
 Rails.application.routes.draw do
-  resources :blueprints
-  resources :builds
+  resources :blueprints,
+            :constraints => { :id => SLUG_OR_ID_REGEX }
+  get 'blueprints/:id/thumb',
+      :to => 'blueprints#thumb',
+      :constraints => { :id => SLUG_OR_ID_REGEX }
+  resources :projects,
+            :constraints => { :id => SLUG_OR_ID_REGEX }
+
+  get 'blueprints/:id/new_project',
+      :to => 'application#index',
+      :constraints => { :id => SLUG_OR_ID_REGEX }
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
@@ -62,4 +73,8 @@ Rails.application.routes.draw do
   get '/logout'                    => 'sessions#destroy', :as => :logout
   get '/login'                     => 'sessions#new',     :as => :login
 
+  unless Rails.env.production?
+    require 'resque/server'
+    mount Resque::Server.new, :at => '/resque'
+  end
 end

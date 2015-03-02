@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'mime/types'
 
 # These vars are allowed to leak through to commands run in the working dir
 ALLOWED_ENV = %w(PATH LANG USER LOGNAME LC_CTYPE SHELL LD_LIBRARY_PATH ARCHFLAGS)
@@ -96,9 +97,16 @@ class WorkDir
     FileUtils.rm_rf(@working_dir)
   end
 
+  # Get mime for a file
+  def mime(path)
+    MIME::Types.type_for(path).first
+  end
+
   # Read and parse a file
   def read(path)
-    return read_json(path) if path != /\.json\z/
+    m = mime(path)
+    return read_json(path) if m.content_type == 'application/json'
+    return read_binary(path) if m.binary?
     read_text(path)
   end
 
@@ -115,6 +123,15 @@ class WorkDir
   def read_text(path)
     if exist? path
       File.read(expand path)
+    else
+      nil
+    end
+  end
+
+  # return the binary contents of a local path
+  def read_binary(path)
+    if exist? path
+      File.binread(expand path)
     else
       nil
     end

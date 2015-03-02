@@ -1,0 +1,30 @@
+<h3>
+  <%=attributes.title %>
+  <% if(attributes.status == 'built') { %>
+  <span class="label label-success"><%=attributes.status %></span></h4>
+  <% } else { %>
+  <span class="label label-warning"><%=attributes.status %></span></h4>
+  <% } %>
+</h3>
+<div class="row">
+  <div class="col-md-6">
+    <p><div class="btn-group" role="group" aria-label="blueprint actions">
+      <a class="btn btn-default" href="<%=url() %>/new_project">New project</a>
+      <a class="btn btn-default" href="<%=url() %>/edit">Edit</a>
+      <button type="button" class="btn btn-default"
+              data-action="update" data-model="Blueprint"
+              data-model-id="<%= attributes.slug %>">Update</button>
+      <button type="button" class="btn btn-danger"
+              data-action="delete" data-model="Blueprint"
+              data-model-id="<%= attributes.slug %>">Delete</button>
+    </div></p>
+    <p><strong>Repo:</strong><br>
+    <input value="<%=attributes.repo_url %>" style="width:100%;"></p>
+    <% if(attributes.config) { %>
+    <p><%=attributes.config.description %></p>
+    <% } %>
+  </div>
+  <div class="col-md-6">
+    <img src="<%=thumbUrl() %>" alt="<%=attributes.title %>" height="200" width="355">
+  </div>
+</div>

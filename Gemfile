@@ -40,6 +40,8 @@ gem 'omniauth-google-oauth2', '~> 0.2.6'
 
 gem 'resque', '~> 1.25.2'
 
+gem 'foreman', '~> 0.77.0'
+
 group :test do
   gem 'rubocop', '~> 0.26', :require => false
 end

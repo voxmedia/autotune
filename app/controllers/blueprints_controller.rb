@@ -1,10 +1,14 @@
 # API for blueprints
 class BlueprintsController < ApplicationController
-  before_action :respond_to_html
+  before_action :respond_to_html, :except => [:thumb]
 
   rescue_from ActiveRecord::UnknownAttributeError do |exc|
     render_error exc.message, :bad_request
   end
+
+  def new; end
+
+  def edit; end
 
   def index
     if params.key? :status
@@ -15,7 +19,11 @@ class BlueprintsController < ApplicationController
   end
 
   def show
-    @blueprint = Blueprint.find params[:id]
+    if params[:id] =~ /^\d+$/
+      @blueprint = Blueprint.find params[:id]
+    else
+      @blueprint = Blueprint.find_by_slug params[:id]
+    end
   end
 
   def create
@@ -23,26 +31,61 @@ class BlueprintsController < ApplicationController
     @blueprint.attributes = request.POST
     if @blueprint.valid?
       @blueprint.save
+      @blueprint.update_repo
       render :show, :status => :created
     else
-      render_error @blueprint.errors.messages, :bad_request
+      render_error @blueprint.errors.full_messages.join(', '), :bad_request
     end
   end
 
   def update
-    @blueprint = Blueprint.find params[:id]
+    if params[:id] =~ /^\d+$/
+      @blueprint = Blueprint.find params[:id]
+    else
+      @blueprint = Blueprint.find_by_slug params[:id]
+    end
     @blueprint.attributes = request.POST
     if @blueprint.valid?
       @blueprint.save
       render :show, :status => :created
     else
-      render_error @blueprint.errors.messages, :bad_request
+      render_error @blueprint.errors.full_messages.join(', '), :bad_request
     end
   end
 
   def destroy
-    @blueprint = Blueprint.find params[:id]
+    if params[:id] =~ /^\d+$/
+      @blueprint = Blueprint.find params[:id]
+    else
+      @blueprint = Blueprint.find_by_slug params[:id]
+    end
     @blueprint.destroy
     head :no_content
+  end
+
+  def thumb
+    if instance.config.key?('thumbnail') && instance.repo.exist?(instance.config['thumbnail'])
+      mime = instance.repo.mime(instance.config['thumbnail'])
+      if mime.nil?
+        content_type = 'text/plain'
+      else
+        content_type = mime.content_type
+      end
+      send_data(
+        instance.repo.read(instance.config['thumbnail']),
+        :type => content_type,
+        :filename => instance.config['thumbnail'],
+        :disposition => 'inline')
+    else
+      head :not_found
+    end
+  end
+
+  def instance
+    if params[:id] =~ /^\d+$/
+      @blueprint = Blueprint.find params[:id]
+    else
+      @blueprint = Blueprint.find_by_slug params[:id]
+    end
   end
 end

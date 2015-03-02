@@ -1,0 +1,52 @@
+<h3>Projects
+    <a id="new-project" class="btn btn-primary btn-xs"
+       href="/projects/new">New project</a></h3>
+<div class="row">
+  <div class="col-sm-5">
+    <form class="form-inline">
+      <div class="form-group">
+        <label class="sr-only" for="search">Search query</label>
+        <input type="text" class="form-control"
+               name="search" id="search" placeholder="Search">
+      </div>
+    </form>
+  </div>
+  <div class="col-sm-7 text-right">
+    <form class="form-inline">
+      Filter:
+      <select name="type" id="type" class="form-control">
+        <option>Blueprint</option>
+      </select>
+      <select name="status" id="status" class="form-control">
+        <option>Status</option>
+      </select>
+    </form>
+  </div>
+</div>
+<br>
+<table class="table">
+  <tbody>
+<% if(models.length == 0) { %>
+    <td class="text-center"><h4>No projects yet!</h4></td>
+<% }
+   _.each(models, function(item) { %>
+    <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
+    <td class="text-right">
+    <% if(item.attributes.status == 'built') { %>
+      <span class="label label-success text-capitalize"><%= item.attributes.status %></span>
+    <% } else { %>
+      <span class="label label-warning text-capitalize"><%= item.attributes.status %></span>
+    <% } %>
+      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">
+        <a class="btn btn-default" href="<%=item.url() %>">Edit</a>
+        <button type="button" class="btn btn-default"
+                data-action="update" data-model="Project"
+                data-model-id="<%= item.attributes.slug %>">Update</button>
+        <button type="button" class="btn btn-danger"
+                data-action="delete" data-model="Project"
+                data-model-id="<%= item.attributes.slug %>">Delete</button>
+      </div>
+    </td>
+<% }); %>
+  </tbody>
+</table>

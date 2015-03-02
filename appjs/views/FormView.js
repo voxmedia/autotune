@@ -43,25 +43,22 @@ module.exports = Backbone.View.extend({
 
   handleForm: function(eve) {
     eve.preventDefault();
+    eve.stopPropagation();
     var inst, Model,
-        fields = {},
         $form = $(eve.currentTarget),
+        fields = this._formData(eve.currentTarget),
         model_class = $form.data('model'),
         model_id = $form.data('model-id'),
         action = $form.data('action');
 
-    if(model_class) {
-      if(action === 'new') {
-        Model = models[model_class];
-        this.hook('beforeSubmit', $form, fields, action, Model);
-        inst = new Model();
-      } else { return this.render(); }
-    } else if(_.isObject(this.model)) {
-      if(action === 'edit') {
+    if(model_class && action === 'new') {
+      Model = models[model_class];
+      this.hook('beforeSubmit', $form, fields, action, Model);
+      inst = new Model();
+    } else if(_.isObject(this.model) && action === 'edit') {
         this.hook('beforeSubmit', $form, fields, action, this.model);
         inst = this.model;
-      } else { return this.render(); }
-    } else { return this.render(); }
+    } else { throw "Don't know how to handle this form"; }
 
     inst.set(fields);
     if(!inst.isValid()) { return this.render(); }
@@ -72,18 +69,29 @@ module.exports = Backbone.View.extend({
           this.collection.fetch();
         } else if(_.isObject(this.model)) {
           this.model.fetch();
-        } else {
-          this.render();
         }
       }, this))
-      .fail(_.bind(function(promise, status, error){
-        $form.parent('.modal').modal('close');
+      .fail(_.bind(function(xhr, status, error){
+        if(error === 'Bad Request') {
+          var data = $.parseJSON(xhr.responseText);
+          $form
+            .find('.alert-danger')
+            .text(data.error)
+            .show();
+        } else {
+          $form
+            .find('.alert-danger')
+            .text('Something bad happened... Please reload and try again')
+            .show();
+        }
         console.log("SAVE FAILED!!");
-        console.log(status, error);
-        this.render();
+        console.log(xhr.responseText, status, error);
       }, this));
 
-    return this;
+    this.success('New blueprint saved');
+    Backbone.history.navigate(
+      $(eve.currentTarget).data('next'),
+      {trigger: true});
   },
 
   handleDelete: function(eve) {
@@ -125,7 +133,7 @@ module.exports = Backbone.View.extend({
 
   alert: function(message) {
     var level = arguments[1] || 'info';
-    $('#notice').html('<div class="alert alert-' + level + '" role="alert">' + message + '</div>');
+    $('#flash').html('<div class="alert alert-' + level + '" role="alert">' + message + '</div>');
   },
 
   hook: function() {
@@ -140,8 +148,13 @@ module.exports = Backbone.View.extend({
     else if(_.isObject(this.model)) { return this.model; }
   },
 
-  //_formData: function(ele) {
-    //_.each($form.find(":input").serializeArray(), function(i) { fields[i.name] = i.value; });
-  //}
+  _formData: function(ele) {
+    var fields = {};
+    _.each(
+      $(ele).find(":input").serializeArray(),
+      function(i) { fields[i.name] = i.value; }
+    );
+    return fields;
+  }
 });
 

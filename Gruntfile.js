@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     browserify: {
       dist: {
         files: {
-          'public/app.js': ['lib/js/app.js']
+          'app/assets/javascripts/application.js': ['appjs/app.js']
         }
       }
     },
@@ -24,22 +24,24 @@ module.exports = function(grunt) {
         banner: '<%= banner %>'
       },
       dist: {
-        src: 'public/app.js',
+        src: 'app/assets/javascripts/application.js',
         dest: 'public/app.min.js'
       }
     },
     jshint: {
       options: {
-        jshintrc: '.jshintrc'
+        jshintrc: '.jshintrc',
+        ignores: ['appjs/vendor/*']
       },
       gruntfile: {
         src: 'Gruntfile.js'
       },
       lib: {
         options: {
-          jshintrc: 'lib/js/.jshintrc'
+          jshintrc: 'appjs/.jshintrc',
+          ignores: ['appjs/vendor/*']
         },
-        src: ['lib/js/**/*.js']
+        src: ['appjs/**/*.js']
       }
     },
     watch: {
@@ -48,7 +50,7 @@ module.exports = function(grunt) {
         tasks: ['jshint:gruntfile']
       },
       lib: {
-        files: '<%= jshint.lib.src %>',
+        files: ['appjs/*.js', 'appjs/**/*.js', 'appjs/**/*.ejs'],
         tasks: ['jshint:lib', 'browserify']
       }
     },
@@ -61,6 +63,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-browserify');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'browserify', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'browserify']);
 
 };

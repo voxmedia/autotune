@@ -1,0 +1,19 @@
+<h3>Choose a blueprint</h3>
+<% var index = 0 %>
+<% _.each(models, function(blueprint) { %>
+  <% if(index % 3 == 0) { %>
+  <% if(index != 0) { %></div><% } %>
+<div class="row">
+  <% } %>
+  <div class="col-md-4">
+    <div class="thumbnail">
+      <img src="<%=blueprint.thumbUrl() %>" alt="<%=blueprint.get('title') %>">
+      <div class="caption">
+        <h4><%=blueprint.get('title') %></h4>
+        <p><a href="<%=blueprint.url() %>/new_project"
+              class="btn btn-sm btn-primary" role="button">Use this</a></p>
+      </div>
+    </div>
+  </div>
+<% index++; }); %>
+</div>

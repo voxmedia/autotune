@@ -1,11 +1,11 @@
 require 'test_helper'
 
-# test the build job
+# test the project job
 class BuildJobTest < ActiveJob::TestCase
-  fixtures :blueprints, :builds
+  fixtures :blueprints, :projects
 
   test 'building' do
-    b = builds(:example_one)
+    b = projects(:example_one)
 
     # why must i do this?
     b.blueprint = blueprints(:example)

@@ -1,10 +1,10 @@
-# build a blueprint
+# project a blueprint
 class BuildJob < ActiveJob::Base
   queue_as :default
 
-  def perform(build)
-    build.sync_snapshot unless build.snapshot.exist?
-    out = build.snapshot.build(build.data)
-    build.update!(:output => out, :status => 'built')
+  def perform(project)
+    project.sync_snapshot unless project.snapshot.exist?
+    out = project.snapshot.build(project.data)
+    project.update!(:output => out, :status => 'built')
   end
 end

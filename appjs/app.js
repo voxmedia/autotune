@@ -10,14 +10,16 @@
 var $ = require('jquery'),
     Backbone = require('backbone');
 
-Backbone.$ = $;
+window.$ = Backbone.$ = $;
 
-var bootstrap = require('bootstrap');
+var bootstrap = require('bootstrap'),
+    Alpaca = require('./vendor/alpaca');
 
 // Load our components and run the app
 var Router = require('./router');
 
 var router = new Router();
+window.router = router;
 
 $(document).ready(function() {
   Backbone.history.start({pushState: true});

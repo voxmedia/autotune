@@ -1,6 +1,6 @@
-class CreateBuilds < ActiveRecord::Migration
+class CreateProjects < ActiveRecord::Migration
   def change
-    create_table :builds do |t|
+    create_table :projects do |t|
       t.string :slug, :index => true
       t.string :title
       t.string :status
@@ -11,6 +11,6 @@ class CreateBuilds < ActiveRecord::Migration
 
       t.timestamps :null => false
     end
-    add_foreign_key :builds, :blueprints
+    add_foreign_key :projects, :blueprints
   end
 end
