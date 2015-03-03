@@ -1,1 +1,20 @@
-<h3><%= attributes.title %></h3>
+<h3><%= get('title') %></h3>
+<p><div class="btn-group" role="group" aria-label="project actions">
+  <a class="btn btn-default" href="<%=url() %>/edit">Edit</a>
+  <button type="button" class="btn btn-default"
+          data-action="update" data-model="Project"
+          data-model-id="<%=get('slug') %>">Upgrade</button>
+  <button type="button" class="btn btn-danger"
+          data-action="delete" data-model="Project"
+          data-model-id="<%=get('slug') %>">Delete</button>
+</div></p>
+
+<h4>Blueprint data:</h4>
+<pre>
+<%=JSON.stringify(get('data'), null, 2) %>
+</pre>
+
+<h4>Output from last build:</h4>
+<pre>
+<%=get('output') %>
+</pre>

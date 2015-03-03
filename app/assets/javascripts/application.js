@@ -238,15 +238,15 @@ module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3>\n  '+
-((__t=(attributes.title ))==null?'':__t)+
+((__t=(get('title') ))==null?'':__t)+
 '\n  ';
- if(attributes.status == 'built') { 
+ if(get('status') == 'built') { 
 __p+='\n  <span class="label label-success">'+
-((__t=(attributes.status ))==null?'':__t)+
+((__t=(get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
  } else { 
 __p+='\n  <span class="label label-warning">'+
-((__t=(attributes.status ))==null?'':__t)+
+((__t=(get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
  } 
 __p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="btn-group" role="group" aria-label="blueprint actions">\n      <a class="btn btn-default" href="'+
@@ -254,21 +254,21 @@ __p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="b
 '/new_project">New project</a>\n      <a class="btn btn-default" href="'+
 ((__t=(url() ))==null?'':__t)+
 '/edit">Edit</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-model-id="'+
-((__t=( attributes.slug ))==null?'':__t)+
+((__t=(get('slug') ))==null?'':__t)+
 '">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-model-id="'+
-((__t=( attributes.slug ))==null?'':__t)+
+((__t=(get('slug') ))==null?'':__t)+
 '">Delete</button>\n    </div></p>\n    <p><strong>Repo:</strong><br>\n    <input value="'+
-((__t=(attributes.repo_url ))==null?'':__t)+
+((__t=(get('repo_url') ))==null?'':__t)+
 '" style="width:100%;"></p>\n    ';
- if(attributes.config) { 
+ if(has('config')) { 
 __p+='\n    <p>'+
-((__t=(attributes.config.description ))==null?'':__t)+
+((__t=(get('config').description ))==null?'':__t)+
 '</p>\n    ';
  } 
 __p+='\n  </div>\n  <div class="col-md-6">\n    <img src="'+
 ((__t=(thumbUrl() ))==null?'':__t)+
 '" alt="'+
-((__t=(attributes.title ))==null?'':__t)+
+((__t=(get('title') ))==null?'':__t)+
 '" height="200" width="355">\n  </div>\n</div>\n';
 }
 return __p;
@@ -377,8 +377,18 @@ module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3>'+
-((__t=( attributes.title ))==null?'':__t)+
-'</h3>\n';
+((__t=( get('title') ))==null?'':__t)+
+'</h3>\n<p><div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" href="'+
+((__t=(url() ))==null?'':__t)+
+'/edit">Edit</a>\n  <button type="button" class="btn btn-default"\n          data-action="update" data-model="Project"\n          data-model-id="'+
+((__t=(get('slug') ))==null?'':__t)+
+'">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-model-id="'+
+((__t=(get('slug') ))==null?'':__t)+
+'">Delete</button>\n</div></p>\n\n<h4>Blueprint data:</h4>\n<pre>\n'+
+((__t=(JSON.stringify(get('data'), null, 2) ))==null?'':__t)+
+'\n</pre>\n\n<h4>Output from last build:</h4>\n<pre>\n'+
+((__t=(get('output') ))==null?'':__t)+
+'\n</pre>\n';
 }
 return __p;
 };

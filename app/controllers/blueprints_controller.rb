@@ -69,8 +69,12 @@ class BlueprintsController < ApplicationController
     else
       @blueprint = Blueprint.find_by_slug params[:id]
     end
-    @blueprint.destroy
-    head :no_content
+    if @blueprint.destroy
+      head :no_content
+      DestroyBlueprintJob.perform_later(@blueprint)
+    else
+      render_error @blueprint.errors.full_messages.join(', '), :bad_request
+    end
   end
 
   def thumb

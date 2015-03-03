@@ -35,6 +35,7 @@ class ProjectsController < ApplicationController
     )
     if @project.valid?
       @project.save
+      @project.build
       render :show, :status => :created
     else
       render_error @project.errors.full_messages.join(', '), :bad_request
@@ -57,13 +58,27 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def update_snapshot
+    if params[:id] =~ /^\d+$/
+      @project = Blueprint.find params[:id]
+    else
+      @project = Blueprint.find_by_slug params[:id]
+    end
+    @project.update_snapshot
+    head :accepted
+  end
+
   def destroy
     if params[:id] =~ /^\d+$/
       @project = Project.find params[:id]
     else
       @project = Project.find_by_slug params[:id]
     end
-    @project.destroy
-    head :no_content
+    if @project.destroy
+      head :no_content
+      DestroyBlueprintJob.perform_later(@project)
+    else
+      render_error @project.errors.full_messages.join(', '), :bad_request
+    end
   end
 end

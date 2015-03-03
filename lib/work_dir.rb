@@ -93,14 +93,19 @@ class WorkDir
     File.expand_path(path, working_dir)
   end
 
+  # Delete a path in the working directory
+  def rm(path)
+    FileUtils.rm_rf(expand path)
+  end
+
   # Delete the working directory
-  def rm
+  def destroy
     FileUtils.rm_rf(@working_dir)
   end
 
   # Get mime for a file
   def mime(path)
-    MIME::Types.type_for(path).first
+    MIME::Types.type_for(expand path).first
   end
 
   # Read and parse a file

@@ -9,6 +9,7 @@ Bundler.require(*Rails.groups)
 # Ground level module
 module Autotune
   VERSION = '0.0.1'
+  SLUG_OR_ID_REGEX = /([-\w]+|\d+)/
 
   # Autotune rails application
   class Application < Rails::Application

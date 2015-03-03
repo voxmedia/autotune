@@ -1,9 +1,9 @@
 <h3>
-  <%=attributes.title %>
-  <% if(attributes.status == 'built') { %>
-  <span class="label label-success"><%=attributes.status %></span></h4>
+  <%=get('title') %>
+  <% if(get('status') == 'built') { %>
+  <span class="label label-success"><%=get('status') %></span></h4>
   <% } else { %>
-  <span class="label label-warning"><%=attributes.status %></span></h4>
+  <span class="label label-warning"><%=get('status') %></span></h4>
   <% } %>
 </h3>
 <div class="row">
@@ -13,18 +13,18 @@
       <a class="btn btn-default" href="<%=url() %>/edit">Edit</a>
       <button type="button" class="btn btn-default"
               data-action="update" data-model="Blueprint"
-              data-model-id="<%= attributes.slug %>">Update</button>
+              data-model-id="<%=get('slug') %>">Update</button>
       <button type="button" class="btn btn-danger"
               data-action="delete" data-model="Blueprint"
-              data-model-id="<%= attributes.slug %>">Delete</button>
+              data-model-id="<%=get('slug') %>">Delete</button>
     </div></p>
     <p><strong>Repo:</strong><br>
-    <input value="<%=attributes.repo_url %>" style="width:100%;"></p>
-    <% if(attributes.config) { %>
-    <p><%=attributes.config.description %></p>
+    <input value="<%=get('repo_url') %>" style="width:100%;"></p>
+    <% if(has('config')) { %>
+    <p><%=get('config').description %></p>
     <% } %>
   </div>
   <div class="col-md-6">
-    <img src="<%=thumbUrl() %>" alt="<%=attributes.title %>" height="200" width="355">
+    <img src="<%=thumbUrl() %>" alt="<%=get('title') %>" height="200" width="355">
   </div>
 </div>
