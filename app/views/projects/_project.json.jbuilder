@@ -1,3 +1,3 @@
 json.extract!(
   project,
-  :status, :id, :slug, :title, :created_at, :updated_at)
+  :status, :id, :blueprint_id, :data, :slug, :title, :created_at, :updated_at)

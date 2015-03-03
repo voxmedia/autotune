@@ -30,13 +30,14 @@ class ProjectsController < ApplicationController
     @project = Project.new(
       :title => request.POST['title'],
       :slug => request.POST['slug'],
+      :blueprint => Blueprint.find(request.POST['blueprint_id'].to_i),
       :data => request.POST
     )
     if @project.valid?
       @project.save
       render :show, :status => :created
     else
-      render_error @project.errors.messages, :bad_request
+      render_error @project.errors.full_messages.join(', '), :bad_request
     end
   end
 
@@ -52,7 +53,7 @@ class ProjectsController < ApplicationController
       :data => request.POST)
       render :show, :status => :created
     else
-      render_error @project.errors.messages, :bad_request
+      render_error @project.errors.full_messages.join(', '), :bad_request
     end
   end
 

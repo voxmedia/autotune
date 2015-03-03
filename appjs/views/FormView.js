@@ -58,8 +58,8 @@ module.exports = Backbone.View.extend({
       this.hook('beforeSubmit', $form, fields, action, Model);
       inst = new Model();
     } else if(_.isObject(this.model) && action === 'edit') {
-        this.hook('beforeSubmit', $form, fields, action, this.model);
-        inst = this.model;
+      this.hook('beforeSubmit', $form, fields, action, this.model);
+      inst = this.model;
     } else { throw "Don't know how to handle this form"; }
 
     inst.set(fields);
@@ -67,7 +67,11 @@ module.exports = Backbone.View.extend({
 
     inst.save()
       .done(_.bind(function() {
-        this.success('New '+model_class+' saved');
+        if(action === 'new') {
+          this.success('New '+model_class+' saved');
+        } else {
+          this.success(model_class+' updates saved');
+        }
         if(next){
           Backbone.history.navigate(next, {trigger: true});
         } else {

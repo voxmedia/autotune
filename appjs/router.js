@@ -123,7 +123,7 @@ module.exports = Backbone.Router.extend({
   showProject: function(slug) {
     console.log("showProject");
     setTab('');
-    var project = new models.Project({slug: slug});
+    var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {
       display( new views.ShowProject({ model: project }) );
@@ -134,11 +134,14 @@ module.exports = Backbone.Router.extend({
   editProject: function( slug) {
     console.log("editProject");
     setTab('');
-    var project = new models.project({slug: slug});
+    var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {
-      display( new views.EditProject({ model: project }) );
-      spinStop();
+      project.blueprint = new models.Blueprint({id: project.get('blueprint_id')});
+      project.blueprint.fetch().always(function() {
+        display( new views.EditProject({ model: project }) );
+        spinStop();
+      });
     });
   }
 });

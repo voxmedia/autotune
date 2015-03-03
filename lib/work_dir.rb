@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'mime/types'
+require 'open3'
 
 # These vars are allowed to leak through to commands run in the working dir
 ALLOWED_ENV = %w(PATH LANG USER LOGNAME LC_CTYPE SHELL LD_LIBRARY_PATH ARCHFLAGS)

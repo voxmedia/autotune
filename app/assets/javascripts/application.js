@@ -46,8 +46,8 @@ exports.Project = Backbone.Model.extend({
   },
   url: function() {
     if(this.isNew()) { return this.urlRoot; }
-    if(this.attributes.slug) {
-      return [this.urlRoot, this.attributes.slug].join('/');
+    if(this.has('slug')) {
+      return [this.urlRoot, this.get('slug')].join('/');
     } else {
       return [this.urlRoot, this.id].join('/');
     }
@@ -209,7 +209,7 @@ module.exports = Backbone.Router.extend({
   showProject: function(slug) {
     console.log("showProject");
     setTab('');
-    var project = new models.Project({slug: slug});
+    var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {
       display( new views.ShowProject({ model: project }) );
@@ -220,11 +220,14 @@ module.exports = Backbone.Router.extend({
   editProject: function( slug) {
     console.log("editProject");
     setTab('');
-    var project = new models.project({slug: slug});
+    var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {
-      display( new views.EditProject({ model: project }) );
-      spinStop();
+      project.blueprint = new models.Blueprint({id: project.get('blueprint_id')});
+      project.blueprint.fetch().always(function() {
+        display( new views.EditProject({ model: project }) );
+        spinStop();
+      });
     });
   }
 });
@@ -27117,6 +27120,7 @@ module.exports = {
         this.error('This blueprint does not have a form!');
       } else {
         var schema_properties = {
+              "blueprint_id": { "type": "integer" },
               "title": {
                 "title": "Title",
                 "description": "hello world?",
@@ -27137,42 +27141,15 @@ module.exports = {
               },
               "buttons": { "submit": { "value": "Save" } }
             },
-            options_fields = {};
+            options_fields = {
+              "blueprint_id": { "type": "hidden" }
+            };
 
         _.extend(schema_properties, form_config['schema']['properties'] || {});
-        //_.extend(options_form, form_config['options']['form'] || {});
-        //_.extend(options_fields, form_config['options']['fields'] || {});
-
-        var otherthing = {
-          "schema": {
-            "title": this.model.blueprint.get('title'),
-            "description": this.model.blueprint.get('config').description,
-            "type": "object",
-            "properties": {
-              "title": {
-                "title": "Title",
-                "description": "hello world?",
-                "type": "string",
-                "required": true
-              },
-              "slug": {
-                "title": "Slug",
-                "description": "hello world?",
-                "type": "string"
-              },
-              "vertical": {
-                "title": "Vertical",
-                "description": "hello world?",
-                "type": "string",
-                "required": true,
-                "enum": ["Vox", "The Verge", "Eater"]
-              }
-            }
-          },
-          "options": {
-            "form": options_form
-          }
-        };
+        if(form_config['options']) {
+          _.extend(options_form, form_config['options']['form'] || {});
+          _.extend(options_fields, form_config['options']['fields'] || {});
+        }
 
         var opts = {
           "schema": {
@@ -27186,7 +27163,17 @@ module.exports = {
             "fields": options_fields
           }
         };
-        if(!this.model.isNew()) { opts.data = this.model.attributes; }
+        if(this.model.isNew()) {
+          opts.data = {'blueprint_id': this.model.blueprint.get('id')};
+        } else {
+          opts.data = {
+            'blueprint_id': this.model.blueprint.get('id'),
+            'title': this.model.get('title'),
+            'slug': this.model.get('slug')
+          };
+          _.extend(opts.data, this.model.get('data'));
+        }
+        console.log(opts);
         $form.alpaca(opts);
       }
     }
@@ -27257,8 +27244,8 @@ module.exports = Backbone.View.extend({
       this.hook('beforeSubmit', $form, fields, action, Model);
       inst = new Model();
     } else if(_.isObject(this.model) && action === 'edit') {
-        this.hook('beforeSubmit', $form, fields, action, this.model);
-        inst = this.model;
+      this.hook('beforeSubmit', $form, fields, action, this.model);
+      inst = this.model;
     } else { throw "Don't know how to handle this form"; }
 
     inst.set(fields);
@@ -27266,7 +27253,11 @@ module.exports = Backbone.View.extend({
 
     inst.save()
       .done(_.bind(function() {
-        this.success('New '+model_class+' saved');
+        if(action === 'new') {
+          this.success('New '+model_class+' saved');
+        } else {
+          this.success(model_class+' updates saved');
+        }
         if(next){
           Backbone.history.navigate(next, {trigger: true});
         } else {
