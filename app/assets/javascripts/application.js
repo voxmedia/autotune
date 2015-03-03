@@ -27061,7 +27061,24 @@ var $ = require('jquery'),
 
 module.exports = {
   ListBlueprints: FormView.extend({
-    template: require('./templates/blueprint_list.ejs')
+    template: require('./templates/blueprint_list.ejs'),
+    handleUpdateAction: function(eve) {
+      var $btn = $(eve.currentTarget),
+          model_class = $btn.data('model'),
+          model_id = $btn.data('model-id'),
+          inst = new models[model_class]({id: model_id});
+
+      Backbone.ajax({
+        type: 'GET',
+        url: inst.url() + '/update_repo'
+      })
+        .done(_.bind(function() {
+          this.success('Updating blueprint repo');
+          inst.fetch();
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
+    }
+
   }),
   EditBlueprint: FormView.extend({
     template: require('./templates/blueprint_form.ejs')
@@ -27120,9 +27137,7 @@ module.exports = {
               },
               "buttons": { "submit": { "value": "Save" } }
             },
-            options_fields = {
-              "vertical": { "type": "select"}
-            };
+            options_fields = {};
 
         _.extend(schema_properties, form_config['schema']['properties'] || {});
         //_.extend(options_form, form_config['options']['form'] || {});

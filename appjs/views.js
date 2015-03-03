@@ -84,9 +84,7 @@ module.exports = {
               },
               "buttons": { "submit": { "value": "Save" } }
             },
-            options_fields = {
-              "vertical": { "type": "select"}
-            };
+            options_fields = {};
 
         _.extend(schema_properties, form_config['schema']['properties'] || {});
         //_.extend(options_form, form_config['options']['form'] || {});
