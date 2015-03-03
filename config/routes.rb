@@ -3,15 +3,19 @@ SLUG_OR_ID_REGEX = /([-\w]+|\d+)/
 Rails.application.routes.draw do
   resources :blueprints,
             :constraints => { :id => SLUG_OR_ID_REGEX }
+
   get 'blueprints/:id/thumb',
       :to => 'blueprints#thumb',
       :constraints => { :id => SLUG_OR_ID_REGEX }
-  resources :projects,
-            :constraints => { :id => SLUG_OR_ID_REGEX }
-
+  get 'blueprints/:id/update_repo',
+      :to => 'blueprints#update_repo',
+      :constraints => { :id => SLUG_OR_ID_REGEX }
   get 'blueprints/:id/new_project',
       :to => 'application#index',
       :constraints => { :id => SLUG_OR_ID_REGEX }
+
+  resources :projects,
+            :constraints => { :id => SLUG_OR_ID_REGEX }
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

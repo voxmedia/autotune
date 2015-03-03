@@ -6,10 +6,9 @@ class Blueprint < ActiveRecord::Base
   has_many :blueprint_tags
   has_many :tags, :through => :blueprint_tags
 
-  validates :title, :repo_url, :presence => true
+  validates :title, :repo_url, :presence => true, :uniqueness => true
   validates :status, :inclusion => { :in => %w(new updating testing ready broken) }
-  validates :repo_url,
-            :format => { :with => URI.regexp }
+  validates :repo_url, :format => { :with => URI.regexp }
   after_initialize :defaults
 
   def working_dir
@@ -32,16 +31,16 @@ class Blueprint < ActiveRecord::Base
     status == 'testing'
   end
 
-  def repo
-    @_repo ||= Repo.new working_dir
-  end
-
   def update_repo
     update(:status => 'updating')
     SyncBlueprintJob.perform_later self
   end
 
   # only call these from a job
+
+  def repo
+    @_repo ||= Repo.new working_dir
+  end
 
   def create_repo
     repo.clone(repo_url)

@@ -24,3 +24,6 @@
 #nav {
   margin-bottom:20px;
 }
+
+.alpaca-field-array.alpaca-top,
+.alpaca-field-object.alpaca-top { padding:10px 0; }

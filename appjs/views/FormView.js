@@ -3,13 +3,14 @@
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    models = require('../models');
+    models = require('../models'),
+    camelize = require('underscore.string/camelize');
 
 module.exports = Backbone.View.extend({
   events: {
     'click a': 'handleLink',
     'submit form': 'handleForm',
-    'click button[data-action=delete]': 'handleDelete'
+    'click button[data-action]': 'handleAction'
   },
 
   initialize: function() {
@@ -49,7 +50,8 @@ module.exports = Backbone.View.extend({
         fields = this._formData(eve.currentTarget),
         model_class = $form.data('model'),
         model_id = $form.data('model-id'),
-        action = $form.data('action');
+        action = $form.data('action'),
+        next = $form.data('next');
 
     if(model_class && action === 'new') {
       Model = models[model_class];
@@ -65,46 +67,59 @@ module.exports = Backbone.View.extend({
 
     inst.save()
       .done(_.bind(function() {
-        if(_.isObject(this.collection)) {
-          this.collection.fetch();
-        } else if(_.isObject(this.model)) {
-          this.model.fetch();
+        this.success('New '+model_class+' saved');
+        if(next){
+          Backbone.history.navigate(next, {trigger: true});
+        } else {
+          if(_.isObject(this.collection)) {
+            this.collection.fetch();
+          } else if(_.isObject(this.model)) {
+            this.model.fetch();
+          }
         }
       }, this))
-      .fail(_.bind(function(xhr, status, error){
-        if(error === 'Bad Request') {
-          var data = $.parseJSON(xhr.responseText);
-          $form
-            .find('.alert-danger')
-            .text(data.error)
-            .show();
-        } else {
-          $form
-            .find('.alert-danger')
-            .text('Something bad happened... Please reload and try again')
-            .show();
-        }
-        console.log("SAVE FAILED!!");
-        console.log(xhr.responseText, status, error);
-      }, this));
-
-    this.success('New blueprint saved');
-    Backbone.history.navigate(
-      $(eve.currentTarget).data('next'),
-      {trigger: true});
+      .fail(_.bind(this.handleRequestError, this));
   },
 
-  handleDelete: function(eve) {
+  handleAction: function(eve) {
+    eve.preventDefault();
+    eve.stopPropagation();
+    var $btn = $(eve.currentTarget),
+        action = $btn.data('action');
+    this.hook(camelize('handle-' + action + '-action'), eve);
+  },
+
+  handleDeleteAction: function(eve) {
     var inst,
         $btn = $(eve.currentTarget),
         model_class = $btn.data('model'),
-        model_id = $btn.data('model-id');
+        model_id = $btn.data('model-id'),
+        next = $btn.data('next');
 
     if(window.confirm('Are you sure you want to delete this?')) {
       inst = new models[model_class]({id: model_id});
-      inst.destroy();
-      this._modelOrCollection().fetch();
+      inst.destroy()
+        .done(_.bind(function() {
+          this.success('Deleted '+model_class);
+          if(_.isObject(this.model)) {
+            Backbone.history.navigate(this.model.urlRoot, {trigger: true});
+          } else {
+            this.collection.fetch();
+          }
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
     }
+  },
+
+  handleRequestError: function(xhr, status, error){
+    if(error === 'Bad Request') {
+      var data = $.parseJSON(xhr.responseText);
+      this.error(data.error);
+    } else {
+      this.error('Something bad happened... Please reload and try again');
+    }
+    console.log("REQUEST FAILED!!");
+    console.log(xhr, status, error);
   },
 
   render: function() {
@@ -139,7 +154,7 @@ module.exports = Backbone.View.extend({
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
-    if(_.isFunction(this[name])) { return this[name](args); }
+    if(_.isFunction(this[name])) { return this[name].apply(this, args); }
     this.trigger(name, args);
   },
 

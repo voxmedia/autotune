@@ -4,8 +4,13 @@ class SyncBlueprintJob < ActiveJob::Base
 
   # do the deed
   def perform(blueprint)
-    # Clone the repo
-    blueprint.create_repo
+    if blueprint.repo.exist?
+      # Update the repo
+      blueprint.sync_repo
+    else
+      # Clone the repo
+      blueprint.create_repo
+    end
 
     # Setup the environment
     blueprint.repo.setup_environment
@@ -25,6 +30,6 @@ class SyncBlueprintJob < ActiveJob::Base
   rescue WorkDir::CommandError => exc
     logger.error(exc)
     blueprint.update!(:status => 'broken')
-    false
+    raise
   end
 end

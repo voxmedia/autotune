@@ -53,6 +53,16 @@ class BlueprintsController < ApplicationController
     end
   end
 
+  def update_repo
+    if params[:id] =~ /^\d+$/
+      @blueprint = Blueprint.find params[:id]
+    else
+      @blueprint = Blueprint.find_by_slug params[:id]
+    end
+    @blueprint.update_repo
+    head :accepted
+  end
+
   def destroy
     if params[:id] =~ /^\d+$/
       @blueprint = Blueprint.find params[:id]

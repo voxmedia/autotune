@@ -19,12 +19,19 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    @project = Project.find params[:id]
+    if params[:id] =~ /^\d+$/
+      @project = Project.find params[:id]
+    else
+      @project = Project.find_by_slug params[:id]
+    end
   end
 
   def create
-    @project = Project.new
-    @project.attributes = request.POST
+    @project = Project.new(
+      :title => request.POST['title'],
+      :slug => request.POST['slug'],
+      :data => request.POST
+    )
     if @project.valid?
       @project.save
       render :show, :status => :created
@@ -34,10 +41,15 @@ class ProjectsController < ApplicationController
   end
 
   def update
-    @project = Project.find params[:id]
-    @project.attributes = request.POST
-    if @project.valid?
-      @project.save
+    if params[:id] =~ /^\d+$/
+      @project = Project.find params[:id]
+    else
+      @project = Project.find_by_slug params[:id]
+    end
+    if @project.update(
+      :title => request.POST['title'],
+      :slug => request.POST['slug'],
+      :data => request.POST)
       render :show, :status => :created
     else
       render_error @project.errors.messages, :bad_request
@@ -45,7 +57,11 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    @project = Project.find params[:id]
+    if params[:id] =~ /^\d+$/
+      @project = Project.find params[:id]
+    else
+      @project = Project.find_by_slug params[:id]
+    end
     @project.destroy
     head :no_content
   end
