@@ -4,7 +4,8 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
-    camelize = require('underscore.string/camelize');
+    camelize = require('underscore.string/camelize'),
+    alert_template = require('../templates/alert.ejs');
 
 module.exports = Backbone.View.extend({
   events: {
@@ -152,7 +153,7 @@ module.exports = Backbone.View.extend({
 
   alert: function(message) {
     var level = arguments[1] || 'info';
-    $('#flash').html('<div class="alert alert-' + level + '" role="alert">' + message + '</div>');
+    $('#flash').html(alert_template({ level: level, message: message }));
   },
 
   hook: function() {

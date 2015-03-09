@@ -41,7 +41,6 @@
     "handlebars": "^1.3.0",
     "jquery": "~2.1.1",
     "node-underscorify": "~0.0.14",
-    "spin.js": "^2.0.2",
     "underscore": "~1.7.0"
   },
   "browser": {

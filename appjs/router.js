@@ -3,8 +3,7 @@
 var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('./models'),
-    views = require('./views'),
-    Spinner = require('spin.js');
+    views = require('./views');
 
 function display(view) {
   $('#main')
@@ -12,15 +11,12 @@ function display(view) {
     .append(view.$el);
 }
 
-var spinner = new Spinner({color:'#333', lines: 12});
-
 function spinStart() {
-  spinner.spin(
-    document.getElementById('spinner'));
+  $('#spinner').fadeOut('fast');
 }
 
 function spinStop() {
-  spinner.stop();
+  $('#spinner').show();
 }
 
 function setTab(name) {
