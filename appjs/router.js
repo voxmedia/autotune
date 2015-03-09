@@ -87,7 +87,7 @@ module.exports = Backbone.Router.extend({
     setTab('');
     var blueprints = new models.BlueprintCollection();
     spinStart();
-    blueprints.fetch().always(function() {
+    blueprints.fetch({data: {status: 'ready'}}).always(function() {
       display( new views.ChooseBlueprint({ collection: blueprints }) );
       spinStop();
     });

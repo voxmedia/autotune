@@ -173,7 +173,7 @@ module.exports = Backbone.Router.extend({
     setTab('');
     var blueprints = new models.BlueprintCollection();
     spinStart();
-    blueprints.fetch().always(function() {
+    blueprints.fetch({data: {status: 'ready'}}).always(function() {
       display( new views.ChooseBlueprint({ collection: blueprints }) );
       spinStop();
     });
@@ -326,7 +326,15 @@ __p+='New';
  } else { 
 __p+='Edit';
  } 
-__p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n      data-model="Blueprint" data-action="new" data-next="/blueprints">\n  <div class="form-group">\n    <label for="title">Title</label>\n    <input type="text" required class="form-control"\n           ';
+__p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n  ';
+ if(isNew()) { 
+__p+='\n  data-model="Blueprint" data-action="new" data-next="/blueprints"\n  ';
+ } else { 
+__p+='\n  data-model="Blueprint" data-action="edit"\n  data-model-id="'+
+((__t=(get('id') ))==null?'':__t)+
+'"\n  ';
+ } 
+__p+='\n  >\n  <div class="form-group">\n    <label for="title">Title</label>\n    <input type="text" required class="form-control"\n           ';
  if(!isNew()) { 
 __p+='value="'+
 ((__t=(attributes.title ))==null?'':__t)+
@@ -338,7 +346,29 @@ __p+='value="'+
 ((__t=(attributes.repo_url ))==null?'':__t)+
 '"';
  } 
-__p+='\n           id="repo_url" name="repo_url" placeholder="Enter repo url">\n  </div>\n  <button type="submit" class="btn btn-primary">Save changes</button>\n</form>\n';
+__p+='\n           id="repo_url" name="repo_url" placeholder="Enter repo url">\n  </div>\n  ';
+ if(!isNew()) { 
+__p+='\n  <div class="form-group">\n    <label for="status">Status</label>\n    <select id="status" name="status" class="form-control"\n      ';
+ if(get('status') != 'testing'
+            && get('status') != 'broken'
+            && get('status') != 'ready') { 
+__p+='disabled';
+ } 
+__p+='>\n      <option value="testing"\n        ';
+ if(get('status') == 'testing') { 
+__p+='selected';
+ } 
+__p+='\n        >Testing</option>\n      <option value="broken"\n        ';
+ if(get('status') == 'broken') { 
+__p+='selected';
+ } 
+__p+='\n        >Broken</option>\n      <option value="ready"\n        ';
+ if(get('status') == 'ready') { 
+__p+='selected';
+ } 
+__p+='\n        >Ready</option>\n    </select>\n  </div>\n  ';
+ } 
+__p+='\n  <button type="submit" class="btn btn-primary">Save changes</button>\n</form>\n';
 }
 return __p;
 };
