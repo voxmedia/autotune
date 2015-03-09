@@ -64,7 +64,6 @@ module.exports = {
         this.error('This blueprint does not have a form!');
       } else {
         var schema_properties = {
-              "blueprint_id": { "type": "integer" },
               "title": {
                 "title": "Title",
                 "description": "hello world?",
@@ -81,13 +80,12 @@ module.exports = {
               "attributes": {
                 "data-model": "Project",
                 "data-model-id": this.model.isNew() ? '' : this.model.id,
-                "data-action": this.model.isNew() ? 'new' : 'edit'
+                "data-action": this.model.isNew() ? 'new' : 'edit',
+                "data-next": "/projects"
               },
               "buttons": { "submit": { "value": "Save" } }
             },
-            options_fields = {
-              "blueprint_id": { "type": "hidden" }
-            };
+            options_fields = {};
 
         _.extend(schema_properties, form_config['schema']['properties'] || {});
         if(form_config['options']) {
@@ -107,11 +105,8 @@ module.exports = {
             "fields": options_fields
           }
         };
-        if(this.model.isNew()) {
-          opts.data = {'blueprint_id': this.model.blueprint.get('id')};
-        } else {
+        if(!this.model.isNew()) {
           opts.data = {
-            'blueprint_id': this.model.blueprint.get('id'),
             'title': this.model.get('title'),
             'slug': this.model.get('slug')
           };
@@ -120,6 +115,9 @@ module.exports = {
         console.log(opts);
         $form.alpaca(opts);
       }
+    },
+    beforeSubmit: function($form, fields, action, Model) {
+      fields.blueprint_id = this.model.blueprint.get('id');
     }
   }),
   ShowProject: FormView.extend({

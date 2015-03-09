@@ -98,11 +98,11 @@ function display(view) {
 }
 
 function spinStart() {
-  $('#spinner').fadeOut('fast');
+  $('#spinner').show();
 }
 
 function spinStop() {
-  $('#spinner').show();
+  $('#spinner').fadeOut('fast');
 }
 
 function setTab(name) {
@@ -115,7 +115,6 @@ function clearError() {
 }
 
 module.exports = Backbone.Router.extend({
-
   routes: {
     "": "listProjects",
     "blueprints": "listBlueprints",
@@ -265,7 +264,7 @@ __p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="b
 ((__t=(url() ))==null?'':__t)+
 '/edit">Edit</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-model-id="'+
 ((__t=(get('slug') ))==null?'':__t)+
-'">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-model-id="'+
+'">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-model-id="'+
 ((__t=(get('slug') ))==null?'':__t)+
 '">Delete</button>\n    </div></p>\n    <p><strong>Repo:</strong><br>\n    <input value="'+
 ((__t=(get('repo_url') ))==null?'':__t)+
@@ -327,7 +326,7 @@ __p+='New';
  } else { 
 __p+='Edit';
  } 
-__p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n      data-model="Blueprint" data-action="new">\n  <div class="form-group">\n    <label for="title">Title</label>\n    <input type="text" required class="form-control"\n           ';
+__p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n      data-model="Blueprint" data-action="new" data-next="/blueprints">\n  <div class="form-group">\n    <label for="title">Title</label>\n    <input type="text" required class="form-control"\n           ';
  if(!isNew()) { 
 __p+='value="'+
 ((__t=(attributes.title ))==null?'':__t)+
@@ -392,7 +391,7 @@ __p+='<h3>'+
 ((__t=(url() ))==null?'':__t)+
 '/edit">Edit</a>\n  <button type="button" class="btn btn-default"\n          data-action="update" data-model="Project"\n          data-model-id="'+
 ((__t=(get('slug') ))==null?'':__t)+
-'">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-model-id="'+
+'">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
 ((__t=(get('slug') ))==null?'':__t)+
 '">Delete</button>\n</div></p>\n\n<h4>Blueprint data:</h4>\n<pre>\n'+
 ((__t=(JSON.stringify(get('data'), null, 2) ))==null?'':__t)+
@@ -27140,7 +27139,6 @@ module.exports = {
         this.error('This blueprint does not have a form!');
       } else {
         var schema_properties = {
-              "blueprint_id": { "type": "integer" },
               "title": {
                 "title": "Title",
                 "description": "hello world?",
@@ -27157,13 +27155,12 @@ module.exports = {
               "attributes": {
                 "data-model": "Project",
                 "data-model-id": this.model.isNew() ? '' : this.model.id,
-                "data-action": this.model.isNew() ? 'new' : 'edit'
+                "data-action": this.model.isNew() ? 'new' : 'edit',
+                "data-next": "/projects"
               },
               "buttons": { "submit": { "value": "Save" } }
             },
-            options_fields = {
-              "blueprint_id": { "type": "hidden" }
-            };
+            options_fields = {};
 
         _.extend(schema_properties, form_config['schema']['properties'] || {});
         if(form_config['options']) {
@@ -27183,11 +27180,8 @@ module.exports = {
             "fields": options_fields
           }
         };
-        if(this.model.isNew()) {
-          opts.data = {'blueprint_id': this.model.blueprint.get('id')};
-        } else {
+        if(!this.model.isNew()) {
           opts.data = {
-            'blueprint_id': this.model.blueprint.get('id'),
             'title': this.model.get('title'),
             'slug': this.model.get('slug')
           };
@@ -27196,6 +27190,9 @@ module.exports = {
         console.log(opts);
         $form.alpaca(opts);
       }
+    },
+    beforeSubmit: function($form, fields, action, Model) {
+      fields.blueprint_id = this.model.blueprint.get('id');
     }
   }),
   ShowProject: FormView.extend({

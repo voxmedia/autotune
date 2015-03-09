@@ -12,11 +12,11 @@ function display(view) {
 }
 
 function spinStart() {
-  $('#spinner').fadeOut('fast');
+  $('#spinner').show();
 }
 
 function spinStop() {
-  $('#spinner').show();
+  $('#spinner').fadeOut('fast');
 }
 
 function setTab(name) {
@@ -29,7 +29,6 @@ function clearError() {
 }
 
 module.exports = Backbone.Router.extend({
-
   routes: {
     "": "listProjects",
     "blueprints": "listBlueprints",

@@ -1,7 +1,7 @@
 <h3><% if(isNew()) { %>New<% } else { %>Edit<% } %> Blueprint</h3>
 <div class="alert alert-danger" role="alert" style="display:none;"></div>
 <form id="new-blueprint" role="form"
-      data-model="Blueprint" data-action="new">
+      data-model="Blueprint" data-action="new" data-next="/blueprints">
   <div class="form-group">
     <label for="title">Title</label>
     <input type="text" required class="form-control"
