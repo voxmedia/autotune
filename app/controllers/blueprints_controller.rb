@@ -71,7 +71,7 @@ class BlueprintsController < ApplicationController
     end
     if @blueprint.destroy
       head :no_content
-      DestroyBlueprintJob.perform_later(@blueprint)
+      DeleteWorkDirJob.perform_later(@blueprint.working_dir)
     else
       render_error @blueprint.errors.full_messages.join(', '), :bad_request
     end
@@ -96,10 +96,12 @@ class BlueprintsController < ApplicationController
   end
 
   def instance
-    if params[:id] =~ /^\d+$/
-      @blueprint = Blueprint.find params[:id]
-    else
-      @blueprint = Blueprint.find_by_slug params[:id]
+    @blueprint ||= begin
+      if params[:id] =~ /^\d+$/
+        Blueprint.find params[:id]
+      else
+        Blueprint.find_by_slug params[:id]
+      end
     end
   end
 end

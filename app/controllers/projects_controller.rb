@@ -76,7 +76,7 @@ class ProjectsController < ApplicationController
     end
     if @project.destroy
       head :no_content
-      DestroyBlueprintJob.perform_later(@project)
+      DeleteWorkDirJob.perform_later(@project.working_dir)
     else
       render_error @project.errors.full_messages.join(', '), :bad_request
     end
