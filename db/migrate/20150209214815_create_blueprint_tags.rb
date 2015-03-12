@@ -1,6 +1,6 @@
 class CreateBlueprintTags < ActiveRecord::Migration
   def change
-    create_table :blueprint_tags do |t|
+    create_table :autotune_blueprint_tags do |t|
       t.references :blueprint, index: true
       t.references :tag, index: true
 

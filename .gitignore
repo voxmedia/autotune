@@ -10,14 +10,20 @@
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-journal
+/test/dummy/db/*.sqlite3
+/test/dummy/db/*.sqlite3-journal
 
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep
 /tmp
+/test/dummy/log/*
+!/test/dummy/log/.keep
+/test/dummy/tmp
 
 # Ignore environment vars
 /.env*
 
 /working
+/test/dummy/working
 /node_modules/

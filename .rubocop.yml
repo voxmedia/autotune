@@ -19,7 +19,7 @@ Style/NumericLiterals:
   Enabled: false
 
 Style/ClassAndModuleChildren:
-  EnforcedStyle: compact
+  Enabled: false
 
 Style/SignalException:
   EnforcedStyle: only_raise

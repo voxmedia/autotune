@@ -1,3 +1,5 @@
+require 'work_dir'
+
 BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
 
 # Repo

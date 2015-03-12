@@ -13,19 +13,13 @@ module.exports = function(grunt) {
       ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
     // Task configuration.
     browserify: {
-      dist: {
-        files: {
-          'app/assets/javascripts/application.js': ['appjs/app.js']
-        }
-      }
-    },
-    uglify: {
       options: {
         banner: '<%= banner %>'
       },
       dist: {
-        src: 'app/assets/javascripts/application.js',
-        dest: 'public/app.min.js'
+        files: {
+          'app/assets/javascripts/application.js': ['appjs/app.js']
+        }
       }
     },
     jshint: {

@@ -1,6 +1,6 @@
 class CreateBlueprints < ActiveRecord::Migration
   def change
-    create_table :blueprints do |t|
+    create_table :autotune_blueprints do |t|
       t.string :slug, :index => true
       t.string :title
       t.string :status

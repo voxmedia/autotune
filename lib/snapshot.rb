@@ -1,3 +1,4 @@
+require 'work_dir'
 BLUEPRINT_BUILD_COMMAND = './autotune-build'
 
 # A snapshot of a git repo

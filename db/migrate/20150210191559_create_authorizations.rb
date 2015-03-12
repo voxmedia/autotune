@@ -1,6 +1,6 @@
 class CreateAuthorizations < ActiveRecord::Migration
   def change
-    create_table :authorizations do |t|
+    create_table :autotune_authorizations do |t|
       t.references :user, index: true
       t.string :provider, index: true
       t.string :uid, index: true

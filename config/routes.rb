@@ -1,4 +1,4 @@
-Rails.application.routes.draw do
+Autotune::Engine.routes.draw do
   resources :blueprints,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
 
