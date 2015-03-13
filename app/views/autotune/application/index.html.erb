@@ -1,13 +1,19 @@
 <div class="container-fluid">
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
-    <div class="pull-right"><div id="spinner">
-      <img src="<%=image_url 'spinner.gif' %>"></div></div>
-    <h4>Autotune</h4>
-    <ul class="nav nav-tabs" id="nav">
-      <li role="tabpanel" data-tab="projects"><a href="/projects">Projects</a></li>
-      <li role="tabpanel" data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>
-    </ul>
+    <nav class="navbar navbar-default" id="nav">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Autotune</a>
+        <ul class="nav navbar-nav">
+          <li data-tab="projects"><a href="/projects">Projects</a></li>
+          <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><div class="navbar-text" id="spinner">
+            <img src="<%=image_url 'autotune/spinner.gif' %>"></div></li>
+        </ul>
+      </div>
+    </nav>
     <div id="flash"></div>
   </div>
 </div>

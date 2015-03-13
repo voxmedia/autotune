@@ -1,3 +1,7 @@
+/*! autotune - v0.1.0 - 2015-03-12
+* https://github.com/voxmedia/autotune
+* Copyright (c) 2015 Ryan Mark; Licensed BSD */
+
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
  * autotune
@@ -142,13 +146,14 @@ module.exports = Backbone.Router.extend({
 
   newBlueprint: function() {
     console.log("newBlueprint");
-    setTab('');
+    setTab('blueprints');
     display( new views.EditBlueprint({ model: new models.Blueprint() }));
+    spinStop();
   },
 
   showBlueprint: function(slug) {
     console.log("showBlueprint");
-    setTab('');
+    setTab('blueprints');
     var blueprint = new models.Blueprint({id: slug});
     spinStart();
     blueprint.fetch().always(function() {
@@ -159,7 +164,7 @@ module.exports = Backbone.Router.extend({
 
   editBlueprint: function(slug) {
     console.log("editBlueprint");
-    setTab('');
+    setTab('blueprints');
     var blueprint = new models.Blueprint({id: slug});
     spinStart();
     blueprint.fetch().always(function() {
@@ -170,7 +175,7 @@ module.exports = Backbone.Router.extend({
 
   chooseBlueprint: function() {
     console.log("chooseBlueprint");
-    setTab('');
+    setTab('projects');
     var blueprints = new models.BlueprintCollection();
     spinStart();
     blueprints.fetch({data: {status: 'ready'}}).always(function() {
@@ -192,7 +197,7 @@ module.exports = Backbone.Router.extend({
 
   newProject: function(slug) {
     console.log("newProject");
-    setTab('');
+    setTab('projects');
     var blueprint = new models.Blueprint({id: slug});
     spinStart();
     blueprint.fetch().always(function() {
@@ -203,7 +208,7 @@ module.exports = Backbone.Router.extend({
 
   showProject: function(slug) {
     console.log("showProject");
-    setTab('');
+    setTab('projects');
     var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {
@@ -214,7 +219,7 @@ module.exports = Backbone.Router.extend({
 
   editProject: function( slug) {
     console.log("editProject");
-    setTab('');
+    setTab('projects');
     var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {

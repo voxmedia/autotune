@@ -18,14 +18,13 @@
   width:20px;
   height:20px;
   position:relative;
-  margin-top:5px;
 }
 #spinner img {
   max-width:100%;
 }
 
 #nav {
-  margin-bottom:20px;
+  margin:10px 0;
 }
 
 .alpaca-field-array.alpaca-top,

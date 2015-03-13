@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'app/assets/javascripts/application.js': ['appjs/app.js']
+          'app/assets/javascripts/autotune/application.js': ['appjs/app.js']
         }
       }
     },

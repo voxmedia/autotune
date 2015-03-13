@@ -56,13 +56,14 @@ module.exports = Backbone.Router.extend({
 
   newBlueprint: function() {
     console.log("newBlueprint");
-    setTab('');
+    setTab('blueprints');
     display( new views.EditBlueprint({ model: new models.Blueprint() }));
+    spinStop();
   },
 
   showBlueprint: function(slug) {
     console.log("showBlueprint");
-    setTab('');
+    setTab('blueprints');
     var blueprint = new models.Blueprint({id: slug});
     spinStart();
     blueprint.fetch().always(function() {
@@ -73,7 +74,7 @@ module.exports = Backbone.Router.extend({
 
   editBlueprint: function(slug) {
     console.log("editBlueprint");
-    setTab('');
+    setTab('blueprints');
     var blueprint = new models.Blueprint({id: slug});
     spinStart();
     blueprint.fetch().always(function() {
@@ -84,7 +85,7 @@ module.exports = Backbone.Router.extend({
 
   chooseBlueprint: function() {
     console.log("chooseBlueprint");
-    setTab('');
+    setTab('projects');
     var blueprints = new models.BlueprintCollection();
     spinStart();
     blueprints.fetch({data: {status: 'ready'}}).always(function() {
@@ -106,7 +107,7 @@ module.exports = Backbone.Router.extend({
 
   newProject: function(slug) {
     console.log("newProject");
-    setTab('');
+    setTab('projects');
     var blueprint = new models.Blueprint({id: slug});
     spinStart();
     blueprint.fetch().always(function() {
@@ -117,7 +118,7 @@ module.exports = Backbone.Router.extend({
 
   showProject: function(slug) {
     console.log("showProject");
-    setTab('');
+    setTab('projects');
     var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {
@@ -128,7 +129,7 @@ module.exports = Backbone.Router.extend({
 
   editProject: function( slug) {
     console.log("editProject");
-    setTab('');
+    setTab('projects');
     var project = new models.Project({id: slug});
     spinStart();
     project.fetch().always(function() {
