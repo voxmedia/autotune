@@ -7,7 +7,21 @@ Basically a fancy thing for turning templates into web pages.
 
 ## Getting started
 
-TKTK
+You'll need to setup a new Rails app to start. First make sure you have redis, sqlite, some sort
+of ruby, and rails.
+
+```sh
+gem install rails
+```
+
+Then create a new rails app:
+
+```sh
+rails new autotune_app -m https://raw.githubusercontent.com/voxmedia/autotune/master/rails_template.rb
+
+cd autotune_app
+bundle exec foreman start
+```
 
 ## Documentation
 
