@@ -10,6 +10,6 @@ class CreateAuthorizations < ActiveRecord::Migration
 
       t.timestamps null: false
     end
-    add_foreign_key :authorizations, :users
+    add_foreign_key :autotune_authorizations, :autotune_users, column: :user_id
   end
 end

@@ -11,6 +11,6 @@ class CreateProjects < ActiveRecord::Migration
 
       t.timestamps :null => false
     end
-    add_foreign_key :projects, :blueprints
+    add_foreign_key :autotune_projects, :autotune_blueprints, column: :blueprint_id
   end
 end
