@@ -1,3 +1,4 @@
+# create omniauth authorizations table
 class CreateAuthorizations < ActiveRecord::Migration
   def change
     create_table :autotune_authorizations do |t|

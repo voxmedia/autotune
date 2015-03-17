@@ -40,20 +40,25 @@ ActiveRecord::Schema.define(version: 20150210191559) do
 
   create_table "autotune_blueprints", force: :cascade do |t|
     t.string   "slug"
-    t.string   "title"
+    t.string   "type"
     t.string   "status"
+    t.string   "title"
     t.string   "repo_url"
+    t.string   "version"
     t.text     "config"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   add_index "autotune_blueprints", ["slug"], name: "index_autotune_blueprints_on_slug"
+  add_index "autotune_blueprints", ["status"], name: "index_autotune_blueprints_on_status"
+  add_index "autotune_blueprints", ["type"], name: "index_autotune_blueprints_on_type"
 
   create_table "autotune_projects", force: :cascade do |t|
     t.string   "slug"
-    t.string   "title"
+    t.string   "theme"
     t.string   "status"
+    t.string   "title"
     t.string   "blueprint_version"
     t.text     "data"
     t.text     "output"
@@ -64,6 +69,8 @@ ActiveRecord::Schema.define(version: 20150210191559) do
 
   add_index "autotune_projects", ["blueprint_id"], name: "index_autotune_projects_on_blueprint_id"
   add_index "autotune_projects", ["slug"], name: "index_autotune_projects_on_slug"
+  add_index "autotune_projects", ["status"], name: "index_autotune_projects_on_status"
+  add_index "autotune_projects", ["theme"], name: "index_autotune_projects_on_theme"
 
   create_table "autotune_tags", force: :cascade do |t|
     t.string   "slug"

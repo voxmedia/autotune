@@ -1,9 +1,11 @@
+# create projects table
 class CreateProjects < ActiveRecord::Migration
   def change
     create_table :autotune_projects do |t|
       t.string :slug, :index => true
+      t.string :theme, :index => true
+      t.string :status, :index => true
       t.string :title
-      t.string :status
       t.string :blueprint_version
       t.text :data
       t.text :output

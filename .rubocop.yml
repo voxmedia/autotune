@@ -23,3 +23,9 @@ Style/ClassAndModuleChildren:
 
 Style/SignalException:
   EnforcedStyle: only_raise
+
+Style/ClassLength:
+  Enabled: false
+
+Style/MethodLength:
+  Enabled: false

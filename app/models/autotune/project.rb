@@ -8,7 +8,8 @@ module Autotune
     belongs_to :blueprint
 
     validates :title, :blueprint, :presence => true
-    validates :status, :inclusion => { :in => %w(new updating updated building built broken) }
+    validates :status,
+              :inclusion => { :in => %w(new updating updated building built broken) }
     before_validation :defaults
 
     def working_dir
@@ -33,13 +34,14 @@ module Autotune
 
     def sync_snapshot
       snapshot.sync(blueprint.repo)
-      update(:blueprint_version => blueprint.repo.version)
+      update(:blueprint_version => blueprint.version)
     end
 
     private
 
     def defaults
       self.status ||= 'new'
+      self.theme ||= 'default'
     end
   end
 end

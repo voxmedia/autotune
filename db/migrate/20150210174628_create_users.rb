@@ -1,3 +1,4 @@
+# create users table
 class CreateUsers < ActiveRecord::Migration
   def change
     create_table :autotune_users do |t|

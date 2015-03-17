@@ -25,6 +25,9 @@ module Autotune
         blueprint.tags << tag unless blueprint.tags.include?(tag)
       end
 
+      # Track the current commit version
+      blueprint.version = blueprint.repo.version
+
       # Blueprint is now ready for testing
       blueprint.status = 'testing'
       blueprint.save!

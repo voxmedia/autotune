@@ -1,3 +1,4 @@
+# create the blueprints/tags relation table
 class CreateBlueprintTags < ActiveRecord::Migration
   def change
     create_table :autotune_blueprint_tags do |t|

@@ -1,3 +1,4 @@
+# create the tags table
 class CreateTags < ActiveRecord::Migration
   def change
     create_table :autotune_tags do |t|

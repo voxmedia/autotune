@@ -11,7 +11,9 @@ module Autotune
 
     validates :title, :repo_url, :presence => true
     validates :status, :inclusion => { :in => %w(new updating testing ready broken) }
-    validates :repo_url, :format => { :with => URI.regexp }, :uniqueness => true
+    validates :repo_url,
+              :format => { :with => Autotune::REPO_URL_RE },
+              :uniqueness => true
     after_initialize :defaults
 
     def working_dir
@@ -53,10 +55,17 @@ module Autotune
       repo.update
     end
 
+    # Rails reserves the column `type` for itself. Here we tell Rails to use a
+    # different name
+    def self.inheritance_column
+      'class'
+    end
+
     private
 
     def defaults
       self.status ||= 'new'
+      self.type ||= 'app'
     end
   end
 end
