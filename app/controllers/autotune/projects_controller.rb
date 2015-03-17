@@ -30,11 +30,13 @@ module Autotune
     end
 
     def create
+      data = request.POST.dup
+      blueprint = Blueprint.find(data.delete 'blueprint_id')
       @project = Project.new(
-        :title => request.POST['title'],
-        :slug => request.POST['slug'],
-        :blueprint => Blueprint.find(request.POST['blueprint_id'].to_i),
-        :data => request.POST
+        :title => data['title'],
+        :slug => data['slug'],
+        :blueprint => blueprint,
+        :data => data
       )
       if @project.valid?
         @project.save
@@ -51,10 +53,12 @@ module Autotune
       else
         @project = Project.find_by_slug params[:id]
       end
+      data = request.POST.dup
+      data.delete 'blueprint_id'
       if @project.update(
-        :title => request.POST['title'],
-        :slug => request.POST['slug'],
-        :data => request.POST)
+        :title => data['title'],
+        :slug => data['slug'],
+        :data => data)
         render :show, :status => :created
       else
         render_error @project.errors.full_messages.join(', '), :bad_request

@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-03-12
+/*! autotune - v0.1.0 - 2015-03-17
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -271,7 +271,9 @@ __p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="b
 ((__t=(get('slug') ))==null?'':__t)+
 '">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-model-id="'+
 ((__t=(get('slug') ))==null?'':__t)+
-'">Delete</button>\n    </div></p>\n    <p><strong>Repo:</strong><br>\n    <input value="'+
+'">Delete</button>\n    </div></p>\n    <p><strong>Type:</strong> '+
+((__t=(get('type') ))==null?'':__t)+
+'</p>\n    <p><strong>Repo:</strong><br>\n    <input value="'+
 ((__t=(get('repo_url') ))==null?'':__t)+
 '" style="width:100%;"></p>\n    ';
  if(has('config')) { 
@@ -31189,6 +31191,7 @@ process.browser = true;
 process.env = {};
 process.argv = [];
 process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
 
 function noop() {}
 

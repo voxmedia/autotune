@@ -56,7 +56,7 @@ module Autotune
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
-    # different name
+    # different name.
     def self.inheritance_column
       'class'
     end

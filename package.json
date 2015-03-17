@@ -40,7 +40,8 @@
     "handlebars": "^1.3.0",
     "jquery": "~2.1.1",
     "node-underscorify": "~0.0.14",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "underscore.string": "~3.0.3"
   },
   "browser": {
     "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js"

@@ -25,6 +25,9 @@ module Autotune
         blueprint.tags << tag unless blueprint.tags.include?(tag)
       end
 
+      # Get the type from the config
+      blueprint.type = blueprint.config['type'].downcase
+
       # Track the current commit version
       blueprint.version = blueprint.repo.version
 
