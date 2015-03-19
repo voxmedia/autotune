@@ -1,8 +1,72 @@
-/*! autotune - v0.1.0 - 2015-03-17
+/*! autotune - v0.1.0 - 2015-03-19
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var trim = require('./trim');
+var decap = require('./decapitalize');
+
+module.exports = function camelize(str, decapitalize) {
+  str = trim(str).replace(/[-_\s]+(.)?/g, function(match, c) {
+    return c ? c.toUpperCase() : "";
+  });
+
+  if (decapitalize === true) {
+    return decap(str);
+  } else {
+    return str;
+  }
+};
+
+},{"./decapitalize":2,"./trim":6}],2:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+
+module.exports = function decapitalize(str) {
+  str = makeString(str);
+  return str.charAt(0).toLowerCase() + str.slice(1);
+};
+
+},{"./helper/makeString":5}],3:[function(require,module,exports){
+var escapeRegExp = require('./escapeRegExp');
+
+module.exports = function defaultToWhiteSpace(characters) {
+  if (characters == null)
+    return '\\s';
+  else if (characters.source)
+    return characters.source;
+  else
+    return '[' + escapeRegExp(characters) + ']';
+};
+
+},{"./escapeRegExp":4}],4:[function(require,module,exports){
+var makeString = require('./makeString');
+
+module.exports = function escapeRegExp(str) {
+  return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+};
+
+},{"./makeString":5}],5:[function(require,module,exports){
+/**
+ * Ensure some object is a coerced to a string
+ **/
+module.exports = function makeString(object) {
+  if (object == null) return '';
+  return '' + object;
+};
+
+},{}],6:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
+var nativeTrim = String.prototype.trim;
+
+module.exports = function trim(str, characters) {
+  str = makeString(str);
+  if (!characters && nativeTrim) return nativeTrim.call(str);
+  characters = defaultToWhiteSpace(characters);
+  return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
+};
+
+},{"./helper/defaultToWhiteSpace":3,"./helper/makeString":5}],7:[function(require,module,exports){
 /*
  * autotune
  * https://github.com/voxmedia/autotune
@@ -30,7 +94,7 @@ $(document).ready(function() {
   Backbone.history.start({pushState: true});
 });
 
-},{"./router":3,"./vendor/alpaca":12,"backbone":15,"bootstrap":16,"jquery":34}],2:[function(require,module,exports){
+},{"./router":9,"./vendor/alpaca":18,"backbone":21,"bootstrap":22,"jquery":40}],8:[function(require,module,exports){
 "use strict";
 
 var Backbone = require('backbone'),
@@ -79,6 +143,15 @@ exports.Blueprint = Backbone.Model.extend({
   thumbUrl: function() {
     return [this.url(), 'thumb'].join('/');
   },
+  placeholderThumbUrl: function() {
+    if(this.attributes.config.thumbnail){
+      console.log(this);
+      // Using github link for now until we grab and host the thumbnail images
+      return [(this.attributes.repo_url).replace('.git', '').replace('github', 'raw.githubusercontent'), 'master', this.attributes.config.thumbnail].join('/');
+    } else {
+      return '/assets/autotune/at_placeholder.png';
+    }
+  },
   urlRoot: '/blueprints'
 });
 
@@ -87,7 +160,7 @@ exports.BlueprintCollection = Backbone.Collection.extend({
   url: '/blueprints'
 });
 
-},{"backbone":15,"underscore":41}],3:[function(require,module,exports){
+},{"backbone":21,"underscore":41}],9:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -232,7 +305,7 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"./models":2,"./views":13,"backbone":15,"jquery":34}],4:[function(require,module,exports){
+},{"./models":8,"./views":19,"backbone":21,"jquery":40}],10:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -246,7 +319,7 @@ __p+='<div class="alert alert-'+
 return __p;
 };
 
-},{"underscore":41}],5:[function(require,module,exports){
+},{"underscore":41}],11:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -281,16 +354,20 @@ __p+='\n    <p>'+
 ((__t=(get('config').description ))==null?'':__t)+
 '</p>\n    ';
  } 
-__p+='\n  </div>\n  <div class="col-md-6">\n    <img src="'+
+__p+='\n  </div>\n  <div class="col-md-6">\n    <!-- <img src="'+
 ((__t=(thumbUrl() ))==null?'':__t)+
 '" alt="'+
 ((__t=(get('title') ))==null?'':__t)+
-'" height="200" width="355">\n  </div>\n</div>\n';
+'" height="200" width="355"> -->\n    <img src="'+
+((__t=(placeholderThumbUrl() ))==null?'':__t)+
+'" alt="'+
+((__t=(get('title') ))==null?'':__t)+
+'" width="100%">\n  </div>\n</div>\n';
 }
 return __p;
 };
 
-},{"underscore":41}],6:[function(require,module,exports){
+},{"underscore":41}],12:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -322,7 +399,7 @@ __p+='\n</div>\n';
 return __p;
 };
 
-},{"underscore":41}],7:[function(require,module,exports){
+},{"underscore":41}],13:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -380,7 +457,7 @@ __p+='\n  <button type="submit" class="btn btn-primary">Save changes</button>\n<
 return __p;
 };
 
-},{"underscore":41}],8:[function(require,module,exports){
+},{"underscore":41}],14:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -417,7 +494,7 @@ __p+='\n  </tbody>\n</table>\n\n<!-- Modal -->\n<div class="modal fade" id="newB
 return __p;
 };
 
-},{"underscore":41}],9:[function(require,module,exports){
+},{"underscore":41}],15:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -439,7 +516,7 @@ __p+='<h3>'+
 return __p;
 };
 
-},{"underscore":41}],10:[function(require,module,exports){
+},{"underscore":41}],16:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -455,7 +532,7 @@ __p+=' project</small></h3>\n<div id="projectForm"></div>\n';
 return __p;
 };
 
-},{"underscore":41}],11:[function(require,module,exports){
+},{"underscore":41}],17:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -492,7 +569,7 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"underscore":41}],12:[function(require,module,exports){
+},{"underscore":41}],18:[function(require,module,exports){
 (function (process){
 
 (function(root, factory)
@@ -27109,7 +27186,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }));
 
 }).call(this,require('_process'))
-},{"_process":18,"bootstrap":16,"handlebars":33,"jquery":34}],13:[function(require,module,exports){
+},{"_process":24,"bootstrap":22,"handlebars":39,"jquery":40}],19:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -27237,7 +27314,7 @@ module.exports = {
   })
 };
 
-},{"./models":2,"./templates/blueprint.ejs":5,"./templates/blueprint_chooser.ejs":6,"./templates/blueprint_form.ejs":7,"./templates/blueprint_list.ejs":8,"./templates/project.ejs":9,"./templates/project_form.ejs":10,"./templates/project_list.ejs":11,"./views/FormView":14,"backbone":15,"jquery":34,"underscore":41}],14:[function(require,module,exports){
+},{"./models":8,"./templates/blueprint.ejs":11,"./templates/blueprint_chooser.ejs":12,"./templates/blueprint_form.ejs":13,"./templates/blueprint_list.ejs":14,"./templates/project.ejs":15,"./templates/project_form.ejs":16,"./templates/project_list.ejs":17,"./views/FormView":20,"backbone":21,"jquery":40,"underscore":41}],20:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -27419,7 +27496,7 @@ module.exports = Backbone.View.extend({
 });
 
 
-},{"../models":2,"../templates/alert.ejs":4,"backbone":15,"jquery":34,"underscore":41,"underscore.string/camelize":35}],15:[function(require,module,exports){
+},{"../models":8,"../templates/alert.ejs":10,"backbone":21,"jquery":40,"underscore":41,"underscore.string/camelize":1}],21:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -29029,7 +29106,7 @@ module.exports = Backbone.View.extend({
 
 }));
 
-},{"underscore":41}],16:[function(require,module,exports){
+},{"underscore":41}],22:[function(require,module,exports){
 (function (global){
 
 ; jQuery = global.jQuery = require("jquery");
@@ -31152,9 +31229,9 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
 }).call(global, module, undefined, undefined);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":34}],17:[function(require,module,exports){
+},{"jquery":40}],23:[function(require,module,exports){
 
-},{}],18:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -31214,7 +31291,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],19:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var Handlebars = require("./handlebars.runtime")["default"];
@@ -31252,7 +31329,7 @@ Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars.runtime":20,"./handlebars/compiler/ast":22,"./handlebars/compiler/base":23,"./handlebars/compiler/compiler":24,"./handlebars/compiler/javascript-compiler":25}],20:[function(require,module,exports){
+},{"./handlebars.runtime":26,"./handlebars/compiler/ast":28,"./handlebars/compiler/base":29,"./handlebars/compiler/compiler":30,"./handlebars/compiler/javascript-compiler":31}],26:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -31285,7 +31362,7 @@ var Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars/base":21,"./handlebars/exception":29,"./handlebars/runtime":30,"./handlebars/safe-string":31,"./handlebars/utils":32}],21:[function(require,module,exports){
+},{"./handlebars/base":27,"./handlebars/exception":35,"./handlebars/runtime":36,"./handlebars/safe-string":37,"./handlebars/utils":38}],27:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -31466,7 +31543,7 @@ exports.log = log;var createFrame = function(object) {
   return obj;
 };
 exports.createFrame = createFrame;
-},{"./exception":29,"./utils":32}],22:[function(require,module,exports){
+},{"./exception":35,"./utils":38}],28:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -31694,7 +31771,7 @@ var AST = {
 // Must be exported as an object rather than the root of the module as the jison lexer
 // most modify the object to operate properly.
 exports["default"] = AST;
-},{"../exception":29}],23:[function(require,module,exports){
+},{"../exception":35}],29:[function(require,module,exports){
 "use strict";
 var parser = require("./parser")["default"];
 var AST = require("./ast")["default"];
@@ -31710,7 +31787,7 @@ function parse(input) {
 }
 
 exports.parse = parse;
-},{"./ast":22,"./parser":26}],24:[function(require,module,exports){
+},{"./ast":28,"./parser":32}],30:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -32180,7 +32257,7 @@ exports.precompile = precompile;function compile(input, options, env) {
 }
 
 exports.compile = compile;
-},{"../exception":29}],25:[function(require,module,exports){
+},{"../exception":35}],31:[function(require,module,exports){
 "use strict";
 var COMPILER_REVISION = require("../base").COMPILER_REVISION;
 var REVISION_CHANGES = require("../base").REVISION_CHANGES;
@@ -33123,7 +33200,7 @@ JavaScriptCompiler.isValidJavaScriptVariableName = function(name) {
 };
 
 exports["default"] = JavaScriptCompiler;
-},{"../base":21,"../exception":29}],26:[function(require,module,exports){
+},{"../base":27,"../exception":35}],32:[function(require,module,exports){
 "use strict";
 /* jshint ignore:start */
 /* Jison generated parser */
@@ -33614,7 +33691,7 @@ function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Pa
 return new Parser;
 })();exports["default"] = handlebars;
 /* jshint ignore:end */
-},{}],27:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 var Visitor = require("./visitor")["default"];
 
@@ -33753,7 +33830,7 @@ PrintVisitor.prototype.content = function(content) {
 PrintVisitor.prototype.comment = function(comment) {
   return this.pad("{{! '" + comment.comment + "' }}");
 };
-},{"./visitor":28}],28:[function(require,module,exports){
+},{"./visitor":34}],34:[function(require,module,exports){
 "use strict";
 function Visitor() {}
 
@@ -33766,7 +33843,7 @@ Visitor.prototype = {
 };
 
 exports["default"] = Visitor;
-},{}],29:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
@@ -33795,7 +33872,7 @@ function Exception(message, node) {
 Exception.prototype = new Error();
 
 exports["default"] = Exception;
-},{}],30:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -33933,7 +34010,7 @@ exports.program = program;function invokePartial(partial, name, context, helpers
 exports.invokePartial = invokePartial;function noop() { return ""; }
 
 exports.noop = noop;
-},{"./base":21,"./exception":29,"./utils":32}],31:[function(require,module,exports){
+},{"./base":27,"./exception":35,"./utils":38}],37:[function(require,module,exports){
 "use strict";
 // Build out our basic SafeString type
 function SafeString(string) {
@@ -33945,7 +34022,7 @@ SafeString.prototype.toString = function() {
 };
 
 exports["default"] = SafeString;
-},{}],32:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 /*jshint -W004 */
 var SafeString = require("./safe-string")["default"];
@@ -34022,7 +34099,7 @@ exports.escapeExpression = escapeExpression;function isEmpty(value) {
 }
 
 exports.isEmpty = isEmpty;
-},{"./safe-string":31}],33:[function(require,module,exports){
+},{"./safe-string":37}],39:[function(require,module,exports){
 // USAGE:
 // var handlebars = require('handlebars');
 
@@ -34049,7 +34126,7 @@ if (typeof require !== 'undefined' && require.extensions) {
   require.extensions[".hbs"] = extension;
 }
 
-},{"../dist/cjs/handlebars":19,"../dist/cjs/handlebars/compiler/printer":27,"../dist/cjs/handlebars/compiler/visitor":28,"fs":17}],34:[function(require,module,exports){
+},{"../dist/cjs/handlebars":25,"../dist/cjs/handlebars/compiler/printer":33,"../dist/cjs/handlebars/compiler/visitor":34,"fs":23}],40:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.3
  * http://jquery.com/
@@ -43256,71 +43333,7 @@ return jQuery;
 
 }));
 
-},{}],35:[function(require,module,exports){
-var trim = require('./trim');
-var decap = require('./decapitalize');
-
-module.exports = function camelize(str, decapitalize) {
-  str = trim(str).replace(/[-_\s]+(.)?/g, function(match, c) {
-    return c ? c.toUpperCase() : "";
-  });
-
-  if (decapitalize === true) {
-    return decap(str);
-  } else {
-    return str;
-  }
-};
-
-},{"./decapitalize":36,"./trim":40}],36:[function(require,module,exports){
-var makeString = require('./helper/makeString');
-
-module.exports = function decapitalize(str) {
-  str = makeString(str);
-  return str.charAt(0).toLowerCase() + str.slice(1);
-};
-
-},{"./helper/makeString":39}],37:[function(require,module,exports){
-var escapeRegExp = require('./escapeRegExp');
-
-module.exports = function defaultToWhiteSpace(characters) {
-  if (characters == null)
-    return '\\s';
-  else if (characters.source)
-    return characters.source;
-  else
-    return '[' + escapeRegExp(characters) + ']';
-};
-
-},{"./escapeRegExp":38}],38:[function(require,module,exports){
-var makeString = require('./makeString');
-
-module.exports = function escapeRegExp(str) {
-  return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
-};
-
-},{"./makeString":39}],39:[function(require,module,exports){
-/**
- * Ensure some object is a coerced to a string
- **/
-module.exports = function makeString(object) {
-  if (object == null) return '';
-  return '' + object;
-};
-
-},{}],40:[function(require,module,exports){
-var makeString = require('./helper/makeString');
-var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
-var nativeTrim = String.prototype.trim;
-
-module.exports = function trim(str, characters) {
-  str = makeString(str);
-  if (!characters && nativeTrim) return nativeTrim.call(str);
-  characters = defaultToWhiteSpace(characters);
-  return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
-};
-
-},{"./helper/defaultToWhiteSpace":37,"./helper/makeString":39}],41:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -44737,4 +44750,4 @@ module.exports = function trim(str, characters) {
   }
 }.call(this));
 
-},{}]},{},[1]);
+},{}]},{},[7]);

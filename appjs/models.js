@@ -46,6 +46,15 @@ exports.Blueprint = Backbone.Model.extend({
   thumbUrl: function() {
     return [this.url(), 'thumb'].join('/');
   },
+  placeholderThumbUrl: function() {
+    if(this.attributes.config.thumbnail){
+      console.log(this);
+      // Using github link for now until we grab and host the thumbnail images
+      return [(this.attributes.repo_url).replace('.git', '').replace('github', 'raw.githubusercontent'), 'master', this.attributes.config.thumbnail].join('/');
+    } else {
+      return '/assets/autotune/at_placeholder.png';
+    }
+  },
   urlRoot: '/blueprints'
 });
 
