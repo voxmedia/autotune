@@ -14,10 +14,16 @@ module Autotune
     def edit; end
 
     def index
-      if params.key? :status
-        @blueprints = Blueprint.where(:status => params[:status])
+      @blueprints = Blueprint
+      query = {}
+      query[:status] = params[:status] if params.key? :status
+      query[:tag] = params[:tag] if params.key? :theme
+      query[:type] = params[:type] if params.key? :type
+      @blueprints = @blueprints.search(params[:search]) if params.key? :search
+      if query.empty?
+        @blueprints = @blueprints.all
       else
-        @blueprints = Blueprint.all
+        @blueprints = @blueprints.where(query)
       end
     end
 

@@ -4,13 +4,16 @@ module Autotune
   # Blueprints get built
   class Project < ActiveRecord::Base
     include Slugged
+    include Searchable
     serialize :data, Hash
     belongs_to :blueprint
 
     validates :title, :blueprint, :presence => true
     validates :status,
-              :inclusion => { :in => %w(new updating updated building built broken) }
+              :inclusion => { :in => Autotune::PROJECT_STATUSES }
     before_validation :defaults
+
+    search_fields :title
 
     def working_dir
       File.join(Rails.configuration.projects_dir, slug)

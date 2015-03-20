@@ -5,16 +5,19 @@ module Autotune
   # Blueprint
   class Blueprint < ActiveRecord::Base
     include Slugged
+    include Searchable
     serialize :config, Hash
     has_many :blueprint_tags
     has_many :tags, :through => :blueprint_tags
 
     validates :title, :repo_url, :presence => true
-    validates :status, :inclusion => { :in => %w(new updating testing ready broken) }
+    validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
     validates :repo_url,
               :format => { :with => Autotune::REPO_URL_RE },
               :uniqueness => true
     after_initialize :defaults
+
+    search_fields :title
 
     def working_dir
       File.join(Rails.configuration.blueprints_dir, slug)
