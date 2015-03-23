@@ -6,12 +6,21 @@ module Autotune
     # Make sure we load jbuilder for views
     require 'jbuilder'
 
-    # Figure out where we project our blueprints
-    config.working_dir = File.expand_path(ENV['WORKING_DIR'] || './working', Rails.root)
-    config.blueprints_dir = File.join(config.working_dir, 'blueprints')
-    config.projects_dir = File.join(config.working_dir, 'projects')
-    [:working_dir, :blueprints_dir, :projects_dir].each do |s|
-      Dir.mkdir(config.try(s)) unless Dir.exist?(config.try(s))
+    initializer 'autotune.init', :before => :load_config_initializers do |app|
+      AutotuneConfig = Struct.new(:working_dir, :blueprints_dir, :projects_dir)
+
+      app.config.autotune = AutotuneConfig.new
+      # Figure out where we project our blueprints
+      app.config.autotune.working_dir = File.expand_path(
+        ENV['WORKING_DIR'] || './working', Rails.root)
+      app.config.autotune.blueprints_dir = File.join(
+        app.config.autotune.working_dir, 'blueprints')
+      app.config.autotune.projects_dir = File.join(
+        app.config.autotune.working_dir, 'projects')
     end
+
+    #[:working_dir, :blueprints_dir, :projects_dir].each do |s|
+      #Dir.mkdir(config.autotune.try(s)) unless Dir.exist?(config.autotune.try(s))
+    #end
   end
 end

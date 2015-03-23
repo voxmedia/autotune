@@ -1,13 +1,11 @@
 require 'test_helper'
-require 'repo'
 require 'work_dir'
-require 'snapshot'
 
 # Test the WorkDir classes; Repo and Snapshot
 class Autotune::WorkDirTest < ActionDispatch::IntegrationTest
   test 'setup repo' do
     in_tmpdir do |dir|
-      r = Repo.new dir
+      r = WorkDir.repo dir
 
       # working dir is empty, so
       assert !r.ruby?, "Shouldn't have ruby"
@@ -52,12 +50,12 @@ class Autotune::WorkDirTest < ActionDispatch::IntegrationTest
 
   test 'snapshot' do
     in_tmpdir do |rdir|
-      r = Repo.new rdir
+      r = WorkDir.repo rdir
       r.clone repo_url
       r.setup_environment
 
       in_tmpdir do |sdir|
-        s = Snapshot.new sdir
+        s = WorkDir.snapshot sdir
 
         # working dir is empty, so
         assert !s.ruby?, "Shouldn't have ruby"

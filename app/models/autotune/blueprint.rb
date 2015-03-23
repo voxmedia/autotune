@@ -1,5 +1,5 @@
 require 'uri'
-require 'repo'
+require 'work_dir'
 
 module Autotune
   # Blueprint
@@ -44,10 +44,14 @@ module Autotune
       SyncBlueprintJob.perform_later self
     end
 
+    def thumbnail_url
+
+    end
+
     # only call these from a job
 
     def repo
-      @_repo ||= Repo.new working_dir
+      @repo ||= WorkDir.repo working_dir
     end
 
     def create_repo

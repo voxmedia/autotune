@@ -1,4 +1,4 @@
-require 'snapshot'
+require 'work_dir'
 
 module Autotune
   # Blueprints get built
@@ -32,7 +32,7 @@ module Autotune
     # only call these from a job
 
     def snapshot
-      @snapshot ||= Snapshot.new working_dir
+      @snapshot ||= WorkDir.snapshot working_dir
     end
 
     def sync_snapshot
