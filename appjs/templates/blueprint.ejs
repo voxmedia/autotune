@@ -1,33 +1,33 @@
 <h3>
-  <%=get('title') %>
-  <% if(get('status') == 'built') { %>
-  <span class="label label-success"><%=get('status') %></span></h4>
+  <%=model.get('title') %>
+  <% if(model.get('status') == 'built') { %>
+  <span class="label label-success"><%=model.get('status') %></span></h4>
   <% } else { %>
-  <span class="label label-warning"><%=get('status') %></span></h4>
+  <span class="label label-warning"><%=model.get('status') %></span></h4>
   <% } %>
 </h3>
 <div class="row">
   <div class="col-md-6">
     <p><div class="btn-group" role="group" aria-label="blueprint actions">
-      <a class="btn btn-default" href="<%=url() %>/new_project">New project</a>
-      <a class="btn btn-default" href="<%=url() %>/edit">Edit</a>
+      <a class="btn btn-default" href="<%=model.url() %>/new_project">New project</a>
+      <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
       <button type="button" class="btn btn-default"
               data-action="update" data-model="Blueprint"
-              data-model-id="<%=get('slug') %>">Update</button>
+              data-model-id="<%=model.get('slug') %>">Update</button>
       <button type="button" class="btn btn-danger"
               data-action="delete" data-model="Blueprint"
               data-next="/blueprints"
-              data-model-id="<%=get('slug') %>">Delete</button>
+              data-model-id="<%=model.get('slug') %>">Delete</button>
     </div></p>
-    <p><strong>Type:</strong> <%=get('type') %></p>
+    <p><strong>Type:</strong> <%=model.get('type') %></p>
     <p><strong>Repo:</strong><br>
-    <input value="<%=get('repo_url') %>" style="width:100%;"></p>
-    <% if(has('config')) { %>
-    <p><%=get('config').description %></p>
+    <input value="<%=model.get('repo_url') %>" style="width:100%;"></p>
+    <% if(model.has('config')) { %>
+    <p><%=model.get('config').description %></p>
     <% } %>
   </div>
   <div class="col-md-6">
-    <!-- <img src="<%=thumbUrl() %>" alt="<%=get('title') %>" height="200" width="355"> -->
-    <img src="<%=placeholderThumbUrl() %>" alt="<%=get('title') %>" width="100%">
+    <!-- <img src="<%=model.thumbUrl() %>" alt="<%=model.get('title') %>" height="200" width="355"> -->
+    <img src="<%=model.placeholderThumbUrl() %>" alt="<%=model.get('title') %>" width="100%">
   </div>
 </div>

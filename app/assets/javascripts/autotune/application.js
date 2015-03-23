@@ -1,72 +1,8 @@
-/*! autotune - v0.1.0 - 2015-03-19
+/*! autotune - v0.1.0 - 2015-03-23
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var trim = require('./trim');
-var decap = require('./decapitalize');
-
-module.exports = function camelize(str, decapitalize) {
-  str = trim(str).replace(/[-_\s]+(.)?/g, function(match, c) {
-    return c ? c.toUpperCase() : "";
-  });
-
-  if (decapitalize === true) {
-    return decap(str);
-  } else {
-    return str;
-  }
-};
-
-},{"./decapitalize":2,"./trim":6}],2:[function(require,module,exports){
-var makeString = require('./helper/makeString');
-
-module.exports = function decapitalize(str) {
-  str = makeString(str);
-  return str.charAt(0).toLowerCase() + str.slice(1);
-};
-
-},{"./helper/makeString":5}],3:[function(require,module,exports){
-var escapeRegExp = require('./escapeRegExp');
-
-module.exports = function defaultToWhiteSpace(characters) {
-  if (characters == null)
-    return '\\s';
-  else if (characters.source)
-    return characters.source;
-  else
-    return '[' + escapeRegExp(characters) + ']';
-};
-
-},{"./escapeRegExp":4}],4:[function(require,module,exports){
-var makeString = require('./makeString');
-
-module.exports = function escapeRegExp(str) {
-  return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
-};
-
-},{"./makeString":5}],5:[function(require,module,exports){
-/**
- * Ensure some object is a coerced to a string
- **/
-module.exports = function makeString(object) {
-  if (object == null) return '';
-  return '' + object;
-};
-
-},{}],6:[function(require,module,exports){
-var makeString = require('./helper/makeString');
-var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
-var nativeTrim = String.prototype.trim;
-
-module.exports = function trim(str, characters) {
-  str = makeString(str);
-  if (!characters && nativeTrim) return nativeTrim.call(str);
-  characters = defaultToWhiteSpace(characters);
-  return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
-};
-
-},{"./helper/defaultToWhiteSpace":3,"./helper/makeString":5}],7:[function(require,module,exports){
 /*
  * autotune
  * https://github.com/voxmedia/autotune
@@ -94,7 +30,7 @@ $(document).ready(function() {
   Backbone.history.start({pushState: true});
 });
 
-},{"./router":9,"./vendor/alpaca":18,"backbone":21,"bootstrap":22,"jquery":40}],8:[function(require,module,exports){
+},{"./router":3,"./vendor/alpaca":12,"backbone":15,"bootstrap":16,"jquery":34}],2:[function(require,module,exports){
 "use strict";
 
 var Backbone = require('backbone'),
@@ -160,13 +96,14 @@ exports.BlueprintCollection = Backbone.Collection.extend({
   url: '/blueprints'
 });
 
-},{"backbone":21,"underscore":41}],9:[function(require,module,exports){
+},{"backbone":15,"underscore":42}],3:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('./models'),
-    views = require('./views');
+    views = require('./views'),
+    queryString = require('query-string');
 
 function display(view) {
   $('#main')
@@ -205,14 +142,16 @@ module.exports = Backbone.Router.extend({
     "projects/:slug/edit": "editProject"
   },
 
-  listBlueprints: function() {
-    console.log("listBlueprints");
-    setTab('blueprints');
-    var blueprints = this.blueprints = new models.BlueprintCollection();
+  listBlueprints: function(params) {
+    console.log("listBlueprints", params);
     spinStart();
-    blueprints.fetch().always(function() {
-      var view = new views.ListBlueprints({collection: blueprints});
-      display(view);
+    var blueprints = this.blueprints = new models.BlueprintCollection(),
+        query = {};
+    if(params) { query = queryString.parse(params); }
+    blueprints.fetch({data: query}).always(function() {
+      display( new views.ListBlueprints(
+        {collection: blueprints, query: query}) );
+      setTab('blueprints');
       spinStop();
     });
   },
@@ -226,86 +165,94 @@ module.exports = Backbone.Router.extend({
 
   showBlueprint: function(slug) {
     console.log("showBlueprint");
-    setTab('blueprints');
-    var blueprint = new models.Blueprint({id: slug});
     spinStart();
+    var blueprint = new models.Blueprint({id: slug});
     blueprint.fetch().always(function() {
       display( new views.ShowBlueprint({ model: blueprint }) );
+      setTab('blueprints');
       spinStop();
     });
   },
 
   editBlueprint: function(slug) {
     console.log("editBlueprint");
-    setTab('blueprints');
-    var blueprint = new models.Blueprint({id: slug});
     spinStart();
+    var blueprint = new models.Blueprint({id: slug});
     blueprint.fetch().always(function() {
       display( new views.EditBlueprint({ model: blueprint }) );
+      setTab('blueprints');
       spinStop();
     });
   },
 
-  chooseBlueprint: function() {
+  chooseBlueprint: function(params) {
     console.log("chooseBlueprint");
-    setTab('projects');
-    var blueprints = new models.BlueprintCollection();
     spinStart();
-    blueprints.fetch({data: {status: 'ready'}}).always(function() {
-      display( new views.ChooseBlueprint({ collection: blueprints }) );
+    var blueprints = new models.BlueprintCollection(),
+        query = {};
+    if(params) { query = queryString.parse(params); }
+    query['status'] = 'ready';
+    blueprints.fetch({data: query}).always(function() {
+      display( new views.ChooseBlueprint(
+        { collection: blueprints, query: query }) );
+      setTab('projects');
       spinStop();
     });
   },
 
-  listProjects: function() {
+  listProjects: function(params) {
     console.log("listProjects");
-    setTab('projects');
-    var projects = new models.ProjectCollection();
     spinStart();
-    projects.fetch().always(function() {
-      display( new views.ListProjects({ collection: projects }) );
+    var projects = new models.ProjectCollection(),
+        query = {};
+    if(params) { query = queryString.parse(params); }
+    projects.fetch({data: query}).always(function() {
+      display( new views.ListProjects(
+        { collection: projects, query: query }) );
+      setTab('projects');
       spinStop();
     });
   },
 
   newProject: function(slug) {
     console.log("newProject");
-    setTab('projects');
-    var blueprint = new models.Blueprint({id: slug});
     spinStart();
+    var blueprint = new models.Blueprint({id: slug});
     blueprint.fetch().always(function() {
-      display( new views.EditProject({ model: new models.Project({ blueprint: blueprint }) }) );
+      display( new views.EditProject(
+        { model: new models.Project({ blueprint: blueprint }) }) );
+      setTab('projects');
       spinStop();
     });
   },
 
   showProject: function(slug) {
     console.log("showProject");
-    setTab('projects');
-    var project = new models.Project({id: slug});
     spinStart();
+    var project = new models.Project({id: slug});
     project.fetch().always(function() {
       display( new views.ShowProject({ model: project }) );
+      setTab('projects');
       spinStop();
     });
   },
 
   editProject: function( slug) {
     console.log("editProject");
-    setTab('projects');
-    var project = new models.Project({id: slug});
     spinStart();
+    var project = new models.Project({id: slug});
     project.fetch().always(function() {
       project.blueprint = new models.Blueprint({id: project.get('blueprint_id')});
       project.blueprint.fetch().always(function() {
         display( new views.EditProject({ model: project }) );
+        setTab('projects');
         spinStop();
       });
     });
   }
 });
 
-},{"./models":8,"./views":19,"backbone":21,"jquery":40}],10:[function(require,module,exports){
+},{"./models":2,"./views":13,"backbone":15,"jquery":34,"query-string":35}],4:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -319,55 +266,55 @@ __p+='<div class="alert alert-'+
 return __p;
 };
 
-},{"underscore":41}],11:[function(require,module,exports){
+},{"underscore":42}],5:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3>\n  '+
-((__t=(get('title') ))==null?'':__t)+
+((__t=(model.get('title') ))==null?'':__t)+
 '\n  ';
- if(get('status') == 'built') { 
+ if(model.get('status') == 'built') { 
 __p+='\n  <span class="label label-success">'+
-((__t=(get('status') ))==null?'':__t)+
+((__t=(model.get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
  } else { 
 __p+='\n  <span class="label label-warning">'+
-((__t=(get('status') ))==null?'':__t)+
+((__t=(model.get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
  } 
 __p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="btn-group" role="group" aria-label="blueprint actions">\n      <a class="btn btn-default" href="'+
-((__t=(url() ))==null?'':__t)+
+((__t=(model.url() ))==null?'':__t)+
 '/new_project">New project</a>\n      <a class="btn btn-default" href="'+
-((__t=(url() ))==null?'':__t)+
+((__t=(model.url() ))==null?'':__t)+
 '/edit">Edit</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-model-id="'+
-((__t=(get('slug') ))==null?'':__t)+
+((__t=(model.get('slug') ))==null?'':__t)+
 '">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-model-id="'+
-((__t=(get('slug') ))==null?'':__t)+
+((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n    </div></p>\n    <p><strong>Type:</strong> '+
-((__t=(get('type') ))==null?'':__t)+
+((__t=(model.get('type') ))==null?'':__t)+
 '</p>\n    <p><strong>Repo:</strong><br>\n    <input value="'+
-((__t=(get('repo_url') ))==null?'':__t)+
+((__t=(model.get('repo_url') ))==null?'':__t)+
 '" style="width:100%;"></p>\n    ';
- if(has('config')) { 
+ if(model.has('config')) { 
 __p+='\n    <p>'+
-((__t=(get('config').description ))==null?'':__t)+
+((__t=(model.get('config').description ))==null?'':__t)+
 '</p>\n    ';
  } 
 __p+='\n  </div>\n  <div class="col-md-6">\n    <!-- <img src="'+
-((__t=(thumbUrl() ))==null?'':__t)+
+((__t=(model.thumbUrl() ))==null?'':__t)+
 '" alt="'+
-((__t=(get('title') ))==null?'':__t)+
+((__t=(model.get('title') ))==null?'':__t)+
 '" height="200" width="355"> -->\n    <img src="'+
-((__t=(placeholderThumbUrl() ))==null?'':__t)+
+((__t=(model.placeholderThumbUrl() ))==null?'':__t)+
 '" alt="'+
-((__t=(get('title') ))==null?'':__t)+
+((__t=(model.get('title') ))==null?'':__t)+
 '" width="100%">\n  </div>\n</div>\n';
 }
 return __p;
 };
 
-},{"underscore":41}],12:[function(require,module,exports){
+},{"underscore":42}],6:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -375,7 +322,7 @@ with(obj||{}){
 __p+='<h3>Choose a blueprint</h3>\n';
  var index = 0 
 __p+='\n';
- _.each(models, function(blueprint) { 
+ _.each(collection.models, function(blueprint) { 
 __p+='\n  ';
  if(index % 3 == 0) { 
 __p+='\n  ';
@@ -399,55 +346,55 @@ __p+='\n</div>\n';
 return __p;
 };
 
-},{"underscore":41}],13:[function(require,module,exports){
+},{"underscore":42}],7:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3>';
- if(isNew()) { 
+ if(model.isNew()) { 
 __p+='New';
  } else { 
 __p+='Edit';
  } 
 __p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n  ';
- if(isNew()) { 
+ if(model.isNew()) { 
 __p+='\n  data-model="Blueprint" data-action="new" data-next="/blueprints"\n  ';
  } else { 
 __p+='\n  data-model="Blueprint" data-action="edit"\n  data-model-id="'+
-((__t=(get('id') ))==null?'':__t)+
+((__t=(model.get('id') ))==null?'':__t)+
 '"\n  ';
  } 
 __p+='\n  >\n  <div class="form-group">\n    <label for="title">Title</label>\n    <input type="text" required class="form-control"\n           ';
- if(!isNew()) { 
+ if(!model.isNew()) { 
 __p+='value="'+
-((__t=(attributes.title ))==null?'':__t)+
+((__t=(model.get('title') ))==null?'':__t)+
 '"';
  } 
 __p+='\n           id="title" name="title" placeholder="Enter title">\n  </div>\n  <div class="form-group">\n    <label for="repo_url">Repo url</label>\n    <input type="url" required class="form-control"\n           ';
- if(!isNew()) { 
+ if(!model.isNew()) { 
 __p+='value="'+
-((__t=(attributes.repo_url ))==null?'':__t)+
+((__t=(model.get('repo_url') ))==null?'':__t)+
 '"';
  } 
 __p+='\n           id="repo_url" name="repo_url" placeholder="Enter repo url">\n  </div>\n  ';
- if(!isNew()) { 
+ if(!model.isNew()) { 
 __p+='\n  <div class="form-group">\n    <label for="status">Status</label>\n    <select id="status" name="status" class="form-control"\n      ';
- if(get('status') != 'testing'
-            && get('status') != 'broken'
-            && get('status') != 'ready') { 
+ if(model.get('status') != 'testing'
+            && model.get('status') != 'broken'
+            && model.get('status') != 'ready') { 
 __p+='disabled';
  } 
 __p+='>\n      <option value="testing"\n        ';
- if(get('status') == 'testing') { 
+ if(model.get('status') == 'testing') { 
 __p+='selected';
  } 
 __p+='\n        >Testing</option>\n      <option value="broken"\n        ';
- if(get('status') == 'broken') { 
+ if(model.get('status') == 'broken') { 
 __p+='selected';
  } 
 __p+='\n        >Broken</option>\n      <option value="ready"\n        ';
- if(get('status') == 'ready') { 
+ if(model.get('status') == 'ready') { 
 __p+='selected';
  } 
 __p+='\n        >Ready</option>\n    </select>\n  </div>\n  ';
@@ -457,16 +404,78 @@ __p+='\n  <button type="submit" class="btn btn-primary">Save changes</button>\n<
 return __p;
 };
 
-},{"underscore":41}],14:[function(require,module,exports){
+},{"underscore":42}],8:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h3>Manage blueprints\n  <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a></h3>\n<div class="row">\n  <div class="col-sm-5">\n    <form class="form-inline">\n      <div class="form-group">\n        <label class="sr-only" for="search">Search query</label>\n        <input type="search" class="form-control"\n               name="search" id="search" placeholder="Search">\n      </div>\n    </form>\n  </div>\n  <div class="col-sm-7 text-right">\n    <form class="form-inline">\n      Filter:\n      <select name="type" id="type" class="form-control">\n        <option>Type</option>\n      </select>\n      <select name="tag" id="tag" class="form-control">\n        <option>Tag</option>\n      </select>\n      <select name="status" id="status" class="form-control">\n        <option>Status</option>\n      </select>\n    </form>\n  </div>\n</div>\n<br>\n<table class="table">\n  <tbody>\n';
- if(models.length == 0) { 
-__p+='\n    <td class="text-center"><h4>No blueprints yet!</h4></td>\n';
+__p+='<h3>Manage blueprints\n  <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a></h3>\n<div class="row">\n  <div class="col-sm-5">\n    <form class="form-inline" method="get" action="/blueprints">\n      <div class="form-group">\n        <label class="sr-only" for="search">Search query</label>\n        <input type="search" class="form-control"\n               name="search" id="search" placeholder="Search"\n               ';
+ if(query.search) { 
+__p+='value="'+
+((__t=(query.search ))==null?'':__t)+
+'"';
+ } 
+__p+='>\n        ';
+ if(query.search) { 
+__p+='\n          <a href="/blueprints">clear</a>\n        ';
+ } 
+__p+='\n      </div>\n    </form>\n  </div>\n  <div class="col-sm-7 text-right">\n    <form class="form-inline" method="get" action="/blueprints">\n      Filters\n      ';
+ if(query.type || query.tag || query.status) { 
+__p+='\n        (<a href="/projects">clear</a>)\n      ';
+ } 
+__p+='\n      &nbsp;\n      <select name="type" id="type" class="form-control" data-auto-submit="true">\n        <option disabled ';
+ if(!query.type) { 
+__p+='selected';
+ } 
+__p+='>Type</option>\n      ';
+ _.each(AUTOTUNE_CONFIG.blueprint_types, function(type) { 
+__p+='\n        <option ';
+ if(type === query.type) { 
+__p+='selected';
+ } 
+__p+='\n                value="'+
+((__t=(type ))==null?'':__t)+
+'">'+
+((__t=(type ))==null?'':__t)+
+'</option>\n      ';
+ }) 
+__p+='\n      </select>\n      <select name="tag" id="tag" class="form-control" data-auto-submit="true">\n        <option disabled ';
+ if(!query.tag) { 
+__p+='selected';
+ } 
+__p+='>Tag</option>\n      ';
+ _.each(AUTOTUNE_CONFIG.blueprint_tags, function(tag) { 
+__p+='\n        <option ';
+ if(tag.slug === query.tag) { 
+__p+='selected';
+ } 
+__p+='\n                value="'+
+((__t=(tag.slug ))==null?'':__t)+
+'">'+
+((__t=(tag.title ))==null?'':__t)+
+'</option>\n      ';
+ }) 
+__p+='\n      </select>\n      <select name="status" id="status" class="form-control" data-auto-submit="true">\n        <option disabled ';
+ if(!query.status) { 
+__p+='selected';
+ } 
+__p+='>Status</option>\n      ';
+ _.each(AUTOTUNE_CONFIG.blueprint_statuses, function(status) { 
+__p+='\n        <option ';
+ if(status === query.status) { 
+__p+='selected';
+ } 
+__p+='\n                value="'+
+((__t=(status ))==null?'':__t)+
+'">'+
+((__t=(status ))==null?'':__t)+
+'</option>\n      ';
+ }) 
+__p+='\n      </select>\n    </form>\n  </div>\n</div>\n<br>\n<table class="table">\n  <tbody>\n';
+ if(collection.models.length == 0) { 
+__p+='\n    <td class="text-center"><h4>No blueprints found</h4></td>\n';
  }
-  _.each(models, function(item) { 
+  _.each(collection.models, function(item) { 
 __p+='\n  <tr>\n    <td><a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
@@ -489,40 +498,40 @@ __p+='\n      <div class="btn-group btn-group-sm" role="group" aria-label="bluep
 ((__t=( item.attributes.slug ))==null?'':__t)+
 '">Delete</button>\n      </div>\n    </td>\n  </tr>\n';
  }); 
-__p+='\n  </tbody>\n</table>\n\n<!-- Modal -->\n<div class="modal fade" id="newBlueprintModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n    <div class="modal-content">\n      <form id="new-blueprint" role="form" data-model="Blueprint" data-action="new">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>\n        <h4 class="modal-title" id="myModalLabel">New Blueprint</h4>\n      </div>\n      <div class="modal-body">\n        <div class="alert alert-danger" role="alert" style="display:none;"></div>\n        <div class="form-group">\n          <label for="title">Title</label>\n          <input type="text" required class="form-control"\n                 id="title" name="title" placeholder="Enter title">\n        </div>\n        <div class="form-group">\n          <label for="repo_url">Repo url</label>\n          <input type="text" required class="form-control"\n                 id="repo_url" name="repo_url" placeholder="Enter repo url">\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n        <button type="submit" class="btn btn-primary">Save changes</button>\n      </div>\n      </form>\n    </div>\n  </div>\n</div>\n';
+__p+='\n  </tbody>\n</table>\n';
 }
 return __p;
 };
 
-},{"underscore":41}],15:[function(require,module,exports){
+},{"underscore":42}],9:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3>'+
-((__t=( get('title') ))==null?'':__t)+
+((__t=(model.get('title') ))==null?'':__t)+
 '</h3>\n<p><div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" href="'+
-((__t=(url() ))==null?'':__t)+
+((__t=(model.url() ))==null?'':__t)+
 '/edit">Edit</a>\n  <button type="button" class="btn btn-default"\n          data-action="update" data-model="Project"\n          data-model-id="'+
-((__t=(get('slug') ))==null?'':__t)+
+((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
-((__t=(get('slug') ))==null?'':__t)+
+((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n</div></p>\n\n<h4>Blueprint data:</h4>\n<pre>\n'+
-((__t=(JSON.stringify(get('data'), null, 2) ))==null?'':__t)+
+((__t=(JSON.stringify(model.get('data'), null, 2) ))==null?'':__t)+
 '\n</pre>\n\n<h4>Output from last build:</h4>\n<pre>\n'+
-((__t=(get('output') ))==null?'':__t)+
+((__t=(model.get('output') ))==null?'':__t)+
 '\n</pre>\n';
 }
 return __p;
 };
 
-},{"underscore":41}],16:[function(require,module,exports){
+},{"underscore":42}],10:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3><small>';
- if(isNew()) { 
+ if(model.isNew()) { 
 __p+='New';
  } else { 
 __p+='Edit';
@@ -532,16 +541,78 @@ __p+=' project</small></h3>\n<div id="projectForm"></div>\n';
 return __p;
 };
 
-},{"underscore":41}],17:[function(require,module,exports){
+},{"underscore":42}],11:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h3>Projects\n    <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a></h3>\n<div class="row">\n  <div class="col-sm-5">\n    <form class="form-inline">\n      <div class="form-group">\n        <label class="sr-only" for="search">Search query</label>\n        <input type="text" class="form-control"\n               name="search" id="search" placeholder="Search">\n      </div>\n    </form>\n  </div>\n  <div class="col-sm-7 text-right">\n    <form class="form-inline">\n      Filter:\n      <select name="type" id="type" class="form-control">\n        <option>Blueprint</option>\n      </select>\n      <select name="status" id="status" class="form-control">\n        <option>Status</option>\n      </select>\n    </form>\n  </div>\n</div>\n<br>\n<table class="table">\n  <tbody>\n';
- if(models.length == 0) { 
-__p+='\n    <td class="text-center"><h4>No projects yet!</h4></td>\n';
+__p+='<h3>Projects\n    <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a></h3>\n<div class="row">\n  <div class="col-sm-5">\n    <form class="form-inline" method="get" action="/projects">\n      <div class="form-group">\n        <label class="sr-only" for="search">Search query</label>\n        <div class="btn-group">\n          <input type="text" class="form-control"\n                 name="search" id="search" placeholder="Search"\n                 ';
+ if(query.search) { 
+__p+='value="'+
+((__t=(query.search ))==null?'':__t)+
+'"';
+ } 
+__p+='>\n        ';
+ if(query.search) { 
+__p+='\n          <a href="/projects">clear</a>\n        ';
+ } 
+__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n  <div class="col-sm-7 text-right">\n    <form class="form-inline" method="get" action="/projects">\n      Filters\n      ';
+ if(query.theme || query.blueprint_type || query.status) { 
+__p+='\n        (<a href="/projects">clear</a>)\n      ';
+ } 
+__p+='\n      &nbsp;\n      <select name="theme" id="theme" class="form-control" data-auto-submit="true">\n        <option disabled ';
+ if(!query.theme) { 
+__p+='selected';
+ } 
+__p+='>Theme</option>\n      ';
+ _.each(AUTOTUNE_CONFIG.project_themes, function(theme) { 
+__p+='\n        <option ';
+ if(theme === query.theme) { 
+__p+='selected';
+ } 
+__p+='\n                value="'+
+((__t=(theme ))==null?'':__t)+
+'">'+
+((__t=(theme ))==null?'':__t)+
+'</option>\n      ';
+ }) 
+__p+='\n      </select>\n      <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n        <option disabled ';
+ if(!query.blueprint_type) { 
+__p+='selected';
+ } 
+__p+='>Type</option>\n      ';
+ _.each(AUTOTUNE_CONFIG.blueprint_types, function(type) { 
+__p+='\n        <option ';
+ if(type === query.blueprint_type) { 
+__p+='selected';
+ } 
+__p+='\n                value="'+
+((__t=(type ))==null?'':__t)+
+'">'+
+((__t=(type ))==null?'':__t)+
+'</option>\n      ';
+ }) 
+__p+='\n      </select>\n      <select name="status" id="status" class="form-control" data-auto-submit="true">\n        <option disabled ';
+ if(!query.status) { 
+__p+='selected';
+ } 
+__p+='>Status</option>\n      ';
+ _.each(AUTOTUNE_CONFIG.project_statuses, function(status) { 
+__p+='\n        <option ';
+ if(status === query.status) { 
+__p+='selected';
+ } 
+__p+='\n                value="'+
+((__t=(status ))==null?'':__t)+
+'">'+
+((__t=(status ))==null?'':__t)+
+'</option>\n      ';
+ }) 
+__p+='\n      </select>\n    </form>\n  </div>\n</div>\n<br>\n<table class="table">\n  <tbody>\n';
+ if(collection.models.length == 0) { 
+__p+='\n    <td class="text-center"><h4>No projects found</h4></td>\n';
  }
-   _.each(models, function(item) { 
+   _.each(collection.models, function(item) { 
 __p+='\n    <td><a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
@@ -569,7 +640,7 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"underscore":41}],18:[function(require,module,exports){
+},{"underscore":42}],12:[function(require,module,exports){
 (function (process){
 
 (function(root, factory)
@@ -27186,7 +27257,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }));
 
 }).call(this,require('_process'))
-},{"_process":24,"bootstrap":22,"handlebars":39,"jquery":40}],19:[function(require,module,exports){
+},{"_process":18,"bootstrap":16,"handlebars":33,"jquery":34}],13:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -27314,7 +27385,7 @@ module.exports = {
   })
 };
 
-},{"./models":8,"./templates/blueprint.ejs":11,"./templates/blueprint_chooser.ejs":12,"./templates/blueprint_form.ejs":13,"./templates/blueprint_list.ejs":14,"./templates/project.ejs":15,"./templates/project_form.ejs":16,"./templates/project_list.ejs":17,"./views/FormView":20,"backbone":21,"jquery":40,"underscore":41}],20:[function(require,module,exports){
+},{"./models":2,"./templates/blueprint.ejs":5,"./templates/blueprint_chooser.ejs":6,"./templates/blueprint_form.ejs":7,"./templates/blueprint_list.ejs":8,"./templates/project.ejs":9,"./templates/project_form.ejs":10,"./templates/project_list.ejs":11,"./views/FormView":14,"backbone":15,"jquery":34,"underscore":42}],14:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -27328,7 +27399,8 @@ module.exports = Backbone.View.extend({
   events: {
     'click a': 'handleLink',
     'submit form': 'handleForm',
-    'click button[data-action]': 'handleAction'
+    'click button[data-action]': 'handleAction',
+    'change select[data-auto-submit=true]': 'submitForm'
   },
 
   initialize: function() {
@@ -27347,6 +27419,8 @@ module.exports = Backbone.View.extend({
         .on("error", this.logError, this);
     }
 
+    if(_.isObject(args[0]['query'])) { this.query = args[0].query; }
+
     this.render();
 
     this.hook('afterInit', args);
@@ -27363,6 +27437,7 @@ module.exports = Backbone.View.extend({
   handleForm: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+
     var inst, Model,
         $form = $(eve.currentTarget),
         fields = this._formData(eve.currentTarget),
@@ -27378,6 +27453,14 @@ module.exports = Backbone.View.extend({
     } else if(_.isObject(this.model) && action === 'edit') {
       this.hook('beforeSubmit', $form, fields, action, this.model);
       inst = this.model;
+    } else if ($form.attr('method').toLowerCase() === 'get') {
+      // if the method attr is `get` then we can navigate to that new
+      // url and avoid any posting
+      var basepath = $form.attr('action') || window.location.pathname;
+      Backbone.history.navigate(
+        basepath + '?' + $form.serialize(),
+        {trigger: true});
+      return;
     } else { throw "Don't know how to handle this form"; }
 
     inst.set(fields);
@@ -27444,8 +27527,16 @@ module.exports = Backbone.View.extend({
     console.log(xhr, status, error);
   },
 
+  submitForm: function(eve) {
+    $(eve.currentTarget).parents('form').submit();
+  },
+
   render: function() {
-    var obj = this._modelOrCollection();
+    var obj = {};
+    if(_.isObject(this.collection)) { obj.collection = this.collection; }
+    else if(_.isObject(this.model)) { obj.model = this.model; }
+
+    if(_.isObject(this.query)) { obj.query = this.query; }
 
     this.hook('beforeRender', obj);
 
@@ -27496,7 +27587,7 @@ module.exports = Backbone.View.extend({
 });
 
 
-},{"../models":8,"../templates/alert.ejs":10,"backbone":21,"jquery":40,"underscore":41,"underscore.string/camelize":1}],21:[function(require,module,exports){
+},{"../models":2,"../templates/alert.ejs":4,"backbone":15,"jquery":34,"underscore":42,"underscore.string/camelize":36}],15:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -29106,7 +29197,7 @@ module.exports = Backbone.View.extend({
 
 }));
 
-},{"underscore":41}],22:[function(require,module,exports){
+},{"underscore":42}],16:[function(require,module,exports){
 (function (global){
 
 ; jQuery = global.jQuery = require("jquery");
@@ -31229,9 +31320,9 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
 }).call(global, module, undefined, undefined);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":40}],23:[function(require,module,exports){
+},{"jquery":34}],17:[function(require,module,exports){
 
-},{}],24:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -31291,7 +31382,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],25:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var Handlebars = require("./handlebars.runtime")["default"];
@@ -31329,7 +31420,7 @@ Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars.runtime":26,"./handlebars/compiler/ast":28,"./handlebars/compiler/base":29,"./handlebars/compiler/compiler":30,"./handlebars/compiler/javascript-compiler":31}],26:[function(require,module,exports){
+},{"./handlebars.runtime":20,"./handlebars/compiler/ast":22,"./handlebars/compiler/base":23,"./handlebars/compiler/compiler":24,"./handlebars/compiler/javascript-compiler":25}],20:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -31362,7 +31453,7 @@ var Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars/base":27,"./handlebars/exception":35,"./handlebars/runtime":36,"./handlebars/safe-string":37,"./handlebars/utils":38}],27:[function(require,module,exports){
+},{"./handlebars/base":21,"./handlebars/exception":29,"./handlebars/runtime":30,"./handlebars/safe-string":31,"./handlebars/utils":32}],21:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -31543,7 +31634,7 @@ exports.log = log;var createFrame = function(object) {
   return obj;
 };
 exports.createFrame = createFrame;
-},{"./exception":35,"./utils":38}],28:[function(require,module,exports){
+},{"./exception":29,"./utils":32}],22:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -31771,7 +31862,7 @@ var AST = {
 // Must be exported as an object rather than the root of the module as the jison lexer
 // most modify the object to operate properly.
 exports["default"] = AST;
-},{"../exception":35}],29:[function(require,module,exports){
+},{"../exception":29}],23:[function(require,module,exports){
 "use strict";
 var parser = require("./parser")["default"];
 var AST = require("./ast")["default"];
@@ -31787,7 +31878,7 @@ function parse(input) {
 }
 
 exports.parse = parse;
-},{"./ast":28,"./parser":32}],30:[function(require,module,exports){
+},{"./ast":22,"./parser":26}],24:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -32257,7 +32348,7 @@ exports.precompile = precompile;function compile(input, options, env) {
 }
 
 exports.compile = compile;
-},{"../exception":35}],31:[function(require,module,exports){
+},{"../exception":29}],25:[function(require,module,exports){
 "use strict";
 var COMPILER_REVISION = require("../base").COMPILER_REVISION;
 var REVISION_CHANGES = require("../base").REVISION_CHANGES;
@@ -33200,7 +33291,7 @@ JavaScriptCompiler.isValidJavaScriptVariableName = function(name) {
 };
 
 exports["default"] = JavaScriptCompiler;
-},{"../base":27,"../exception":35}],32:[function(require,module,exports){
+},{"../base":21,"../exception":29}],26:[function(require,module,exports){
 "use strict";
 /* jshint ignore:start */
 /* Jison generated parser */
@@ -33691,7 +33782,7 @@ function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Pa
 return new Parser;
 })();exports["default"] = handlebars;
 /* jshint ignore:end */
-},{}],33:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 var Visitor = require("./visitor")["default"];
 
@@ -33830,7 +33921,7 @@ PrintVisitor.prototype.content = function(content) {
 PrintVisitor.prototype.comment = function(comment) {
   return this.pad("{{! '" + comment.comment + "' }}");
 };
-},{"./visitor":34}],34:[function(require,module,exports){
+},{"./visitor":28}],28:[function(require,module,exports){
 "use strict";
 function Visitor() {}
 
@@ -33843,7 +33934,7 @@ Visitor.prototype = {
 };
 
 exports["default"] = Visitor;
-},{}],35:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
@@ -33872,7 +33963,7 @@ function Exception(message, node) {
 Exception.prototype = new Error();
 
 exports["default"] = Exception;
-},{}],36:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -34010,7 +34101,7 @@ exports.program = program;function invokePartial(partial, name, context, helpers
 exports.invokePartial = invokePartial;function noop() { return ""; }
 
 exports.noop = noop;
-},{"./base":27,"./exception":35,"./utils":38}],37:[function(require,module,exports){
+},{"./base":21,"./exception":29,"./utils":32}],31:[function(require,module,exports){
 "use strict";
 // Build out our basic SafeString type
 function SafeString(string) {
@@ -34022,7 +34113,7 @@ SafeString.prototype.toString = function() {
 };
 
 exports["default"] = SafeString;
-},{}],38:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 /*jshint -W004 */
 var SafeString = require("./safe-string")["default"];
@@ -34099,7 +34190,7 @@ exports.escapeExpression = escapeExpression;function isEmpty(value) {
 }
 
 exports.isEmpty = isEmpty;
-},{"./safe-string":37}],39:[function(require,module,exports){
+},{"./safe-string":31}],33:[function(require,module,exports){
 // USAGE:
 // var handlebars = require('handlebars');
 
@@ -34126,7 +34217,7 @@ if (typeof require !== 'undefined' && require.extensions) {
   require.extensions[".hbs"] = extension;
 }
 
-},{"../dist/cjs/handlebars":25,"../dist/cjs/handlebars/compiler/printer":33,"../dist/cjs/handlebars/compiler/visitor":34,"fs":23}],40:[function(require,module,exports){
+},{"../dist/cjs/handlebars":19,"../dist/cjs/handlebars/compiler/printer":27,"../dist/cjs/handlebars/compiler/visitor":28,"fs":17}],34:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.3
  * http://jquery.com/
@@ -43333,7 +43424,139 @@ return jQuery;
 
 }));
 
+},{}],35:[function(require,module,exports){
+/*!
+	query-string
+	Parse and stringify URL query strings
+	https://github.com/sindresorhus/query-string
+	by Sindre Sorhus
+	MIT License
+*/
+(function () {
+	'use strict';
+	var queryString = {};
+
+	queryString.parse = function (str) {
+		if (typeof str !== 'string') {
+			return {};
+		}
+
+		str = str.trim().replace(/^(\?|#)/, '');
+
+		if (!str) {
+			return {};
+		}
+
+		return str.trim().split('&').reduce(function (ret, param) {
+			var parts = param.replace(/\+/g, ' ').split('=');
+			var key = parts[0];
+			var val = parts[1];
+
+			key = decodeURIComponent(key);
+			// missing `=` should be `null`:
+			// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+			val = val === undefined ? null : decodeURIComponent(val);
+
+			if (!ret.hasOwnProperty(key)) {
+				ret[key] = val;
+			} else if (Array.isArray(ret[key])) {
+				ret[key].push(val);
+			} else {
+				ret[key] = [ret[key], val];
+			}
+
+			return ret;
+		}, {});
+	};
+
+	queryString.stringify = function (obj) {
+		return obj ? Object.keys(obj).map(function (key) {
+			var val = obj[key];
+
+			if (Array.isArray(val)) {
+				return val.map(function (val2) {
+					return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+				}).join('&');
+			}
+
+			return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+		}).join('&') : '';
+	};
+
+	if (typeof define === 'function' && define.amd) {
+		define(function() { return queryString; });
+	} else if (typeof module !== 'undefined' && module.exports) {
+		module.exports = queryString;
+	} else {
+		window.queryString = queryString;
+	}
+})();
+
+},{}],36:[function(require,module,exports){
+var trim = require('./trim');
+var decap = require('./decapitalize');
+
+module.exports = function camelize(str, decapitalize) {
+  str = trim(str).replace(/[-_\s]+(.)?/g, function(match, c) {
+    return c ? c.toUpperCase() : "";
+  });
+
+  if (decapitalize === true) {
+    return decap(str);
+  } else {
+    return str;
+  }
+};
+
+},{"./decapitalize":37,"./trim":41}],37:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+
+module.exports = function decapitalize(str) {
+  str = makeString(str);
+  return str.charAt(0).toLowerCase() + str.slice(1);
+};
+
+},{"./helper/makeString":40}],38:[function(require,module,exports){
+var escapeRegExp = require('./escapeRegExp');
+
+module.exports = function defaultToWhiteSpace(characters) {
+  if (characters == null)
+    return '\\s';
+  else if (characters.source)
+    return characters.source;
+  else
+    return '[' + escapeRegExp(characters) + ']';
+};
+
+},{"./escapeRegExp":39}],39:[function(require,module,exports){
+var makeString = require('./makeString');
+
+module.exports = function escapeRegExp(str) {
+  return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+};
+
+},{"./makeString":40}],40:[function(require,module,exports){
+/**
+ * Ensure some object is a coerced to a string
+ **/
+module.exports = function makeString(object) {
+  if (object == null) return '';
+  return '' + object;
+};
+
 },{}],41:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
+var nativeTrim = String.prototype.trim;
+
+module.exports = function trim(str, characters) {
+  str = makeString(str);
+  if (!characters && nativeTrim) return nativeTrim.call(str);
+  characters = defaultToWhiteSpace(characters);
+  return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
+};
+
+},{"./helper/defaultToWhiteSpace":38,"./helper/makeString":40}],42:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -44750,4 +44973,4 @@ return jQuery;
   }
 }.call(this));
 
-},{}]},{},[7]);
+},{}]},{},[1]);

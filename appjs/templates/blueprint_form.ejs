@@ -1,40 +1,40 @@
-<h3><% if(isNew()) { %>New<% } else { %>Edit<% } %> Blueprint</h3>
+<h3><% if(model.isNew()) { %>New<% } else { %>Edit<% } %> Blueprint</h3>
 <div class="alert alert-danger" role="alert" style="display:none;"></div>
 <form id="new-blueprint" role="form"
-  <% if(isNew()) { %>
+  <% if(model.isNew()) { %>
   data-model="Blueprint" data-action="new" data-next="/blueprints"
   <% } else { %>
   data-model="Blueprint" data-action="edit"
-  data-model-id="<%=get('id') %>"
+  data-model-id="<%=model.get('id') %>"
   <% } %>
   >
   <div class="form-group">
     <label for="title">Title</label>
     <input type="text" required class="form-control"
-           <% if(!isNew()) { %>value="<%=attributes.title %>"<% } %>
+           <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
            id="title" name="title" placeholder="Enter title">
   </div>
   <div class="form-group">
     <label for="repo_url">Repo url</label>
     <input type="url" required class="form-control"
-           <% if(!isNew()) { %>value="<%=attributes.repo_url %>"<% } %>
+           <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
            id="repo_url" name="repo_url" placeholder="Enter repo url">
   </div>
-  <% if(!isNew()) { %>
+  <% if(!model.isNew()) { %>
   <div class="form-group">
     <label for="status">Status</label>
     <select id="status" name="status" class="form-control"
-      <% if(get('status') != 'testing'
-            && get('status') != 'broken'
-            && get('status') != 'ready') { %>disabled<% } %>>
+      <% if(model.get('status') != 'testing'
+            && model.get('status') != 'broken'
+            && model.get('status') != 'ready') { %>disabled<% } %>>
       <option value="testing"
-        <% if(get('status') == 'testing') { %>selected<% } %>
+        <% if(model.get('status') == 'testing') { %>selected<% } %>
         >Testing</option>
       <option value="broken"
-        <% if(get('status') == 'broken') { %>selected<% } %>
+        <% if(model.get('status') == 'broken') { %>selected<% } %>
         >Broken</option>
       <option value="ready"
-        <% if(get('status') == 'ready') { %>selected<% } %>
+        <% if(model.get('status') == 'ready') { %>selected<% } %>
         >Ready</option>
     </select>
   </div>

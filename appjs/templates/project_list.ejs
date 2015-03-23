@@ -3,22 +3,47 @@
        href="/projects/new">New project</a></h3>
 <div class="row">
   <div class="col-sm-5">
-    <form class="form-inline">
+    <form class="form-inline" method="get" action="/projects">
       <div class="form-group">
         <label class="sr-only" for="search">Search query</label>
-        <input type="text" class="form-control"
-               name="search" id="search" placeholder="Search">
+        <div class="btn-group">
+          <input type="text" class="form-control"
+                 name="search" id="search" placeholder="Search"
+                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+        <% if(query.search) { %>
+          <a href="/projects">clear</a>
+        <% } %>
+        </div>
       </div>
     </form>
   </div>
   <div class="col-sm-7 text-right">
-    <form class="form-inline">
-      Filter:
-      <select name="type" id="type" class="form-control">
-        <option>Blueprint</option>
+    <form class="form-inline" method="get" action="/projects">
+      Filters
+      <% if(query.theme || query.blueprint_type || query.status) { %>
+        (<a href="/projects">clear</a>)
+      <% } %>
+      &nbsp;
+      <select name="theme" id="theme" class="form-control" data-auto-submit="true">
+        <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
+      <% _.each(AUTOTUNE_CONFIG.project_themes, function(theme) { %>
+        <option <% if(theme === query.theme) { %>selected<% } %>
+                value="<%=theme %>"><%=theme %></option>
+      <% }) %>
       </select>
-      <select name="status" id="status" class="form-control">
-        <option>Status</option>
+      <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">
+        <option disabled <% if(!query.blueprint_type) { %>selected<% } %>>Type</option>
+      <% _.each(AUTOTUNE_CONFIG.blueprint_types, function(type) { %>
+        <option <% if(type === query.blueprint_type) { %>selected<% } %>
+                value="<%=type %>"><%=type %></option>
+      <% }) %>
+      </select>
+      <select name="status" id="status" class="form-control" data-auto-submit="true">
+        <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
+      <% _.each(AUTOTUNE_CONFIG.project_statuses, function(status) { %>
+        <option <% if(status === query.status) { %>selected<% } %>
+                value="<%=status %>"><%=status %></option>
+      <% }) %>
       </select>
     </form>
   </div>
@@ -26,10 +51,10 @@
 <br>
 <table class="table">
   <tbody>
-<% if(models.length == 0) { %>
-    <td class="text-center"><h4>No projects yet!</h4></td>
+<% if(collection.models.length == 0) { %>
+    <td class="text-center"><h4>No projects found</h4></td>
 <% }
-   _.each(models, function(item) { %>
+   _.each(collection.models, function(item) { %>
     <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
     <td class="text-right">
     <% if(item.attributes.status == 'built') { %>

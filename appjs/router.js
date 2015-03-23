@@ -3,7 +3,8 @@
 var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('./models'),
-    views = require('./views');
+    views = require('./views'),
+    queryString = require('query-string');
 
 function display(view) {
   $('#main')
@@ -42,14 +43,16 @@ module.exports = Backbone.Router.extend({
     "projects/:slug/edit": "editProject"
   },
 
-  listBlueprints: function() {
-    console.log("listBlueprints");
-    setTab('blueprints');
-    var blueprints = this.blueprints = new models.BlueprintCollection();
+  listBlueprints: function(params) {
+    console.log("listBlueprints", params);
     spinStart();
-    blueprints.fetch().always(function() {
-      var view = new views.ListBlueprints({collection: blueprints});
-      display(view);
+    var blueprints = this.blueprints = new models.BlueprintCollection(),
+        query = {};
+    if(params) { query = queryString.parse(params); }
+    blueprints.fetch({data: query}).always(function() {
+      display( new views.ListBlueprints(
+        {collection: blueprints, query: query}) );
+      setTab('blueprints');
       spinStop();
     });
   },
@@ -63,79 +66,87 @@ module.exports = Backbone.Router.extend({
 
   showBlueprint: function(slug) {
     console.log("showBlueprint");
-    setTab('blueprints');
-    var blueprint = new models.Blueprint({id: slug});
     spinStart();
+    var blueprint = new models.Blueprint({id: slug});
     blueprint.fetch().always(function() {
       display( new views.ShowBlueprint({ model: blueprint }) );
+      setTab('blueprints');
       spinStop();
     });
   },
 
   editBlueprint: function(slug) {
     console.log("editBlueprint");
-    setTab('blueprints');
-    var blueprint = new models.Blueprint({id: slug});
     spinStart();
+    var blueprint = new models.Blueprint({id: slug});
     blueprint.fetch().always(function() {
       display( new views.EditBlueprint({ model: blueprint }) );
+      setTab('blueprints');
       spinStop();
     });
   },
 
-  chooseBlueprint: function() {
+  chooseBlueprint: function(params) {
     console.log("chooseBlueprint");
-    setTab('projects');
-    var blueprints = new models.BlueprintCollection();
     spinStart();
-    blueprints.fetch({data: {status: 'ready'}}).always(function() {
-      display( new views.ChooseBlueprint({ collection: blueprints }) );
+    var blueprints = new models.BlueprintCollection(),
+        query = {};
+    if(params) { query = queryString.parse(params); }
+    query['status'] = 'ready';
+    blueprints.fetch({data: query}).always(function() {
+      display( new views.ChooseBlueprint(
+        { collection: blueprints, query: query }) );
+      setTab('projects');
       spinStop();
     });
   },
 
-  listProjects: function() {
+  listProjects: function(params) {
     console.log("listProjects");
-    setTab('projects');
-    var projects = new models.ProjectCollection();
     spinStart();
-    projects.fetch().always(function() {
-      display( new views.ListProjects({ collection: projects }) );
+    var projects = new models.ProjectCollection(),
+        query = {};
+    if(params) { query = queryString.parse(params); }
+    projects.fetch({data: query}).always(function() {
+      display( new views.ListProjects(
+        { collection: projects, query: query }) );
+      setTab('projects');
       spinStop();
     });
   },
 
   newProject: function(slug) {
     console.log("newProject");
-    setTab('projects');
-    var blueprint = new models.Blueprint({id: slug});
     spinStart();
+    var blueprint = new models.Blueprint({id: slug});
     blueprint.fetch().always(function() {
-      display( new views.EditProject({ model: new models.Project({ blueprint: blueprint }) }) );
+      display( new views.EditProject(
+        { model: new models.Project({ blueprint: blueprint }) }) );
+      setTab('projects');
       spinStop();
     });
   },
 
   showProject: function(slug) {
     console.log("showProject");
-    setTab('projects');
-    var project = new models.Project({id: slug});
     spinStart();
+    var project = new models.Project({id: slug});
     project.fetch().always(function() {
       display( new views.ShowProject({ model: project }) );
+      setTab('projects');
       spinStop();
     });
   },
 
   editProject: function( slug) {
     console.log("editProject");
-    setTab('projects');
-    var project = new models.Project({id: slug});
     spinStart();
+    var project = new models.Project({id: slug});
     project.fetch().always(function() {
       project.blueprint = new models.Blueprint({id: project.get('blueprint_id')});
       project.blueprint.fetch().always(function() {
         display( new views.EditProject({ model: project }) );
+        setTab('projects');
         spinStop();
       });
     });

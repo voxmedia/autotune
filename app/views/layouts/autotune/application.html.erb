@@ -16,6 +16,10 @@
   <%= stylesheet_link_tag 'autotune/application', media: 'all' %>
   <%= javascript_include_tag 'autotune/application' %>
   <%= csrf_meta_tags %>
+
+  <script>
+    AUTOTUNE_CONFIG = <%=raw config.to_json %>;
+  </script>
 </head>
 <body>
 

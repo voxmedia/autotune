@@ -11,7 +11,8 @@ module.exports = Backbone.View.extend({
   events: {
     'click a': 'handleLink',
     'submit form': 'handleForm',
-    'click button[data-action]': 'handleAction'
+    'click button[data-action]': 'handleAction',
+    'change select[data-auto-submit=true]': 'submitForm'
   },
 
   initialize: function() {
@@ -30,6 +31,8 @@ module.exports = Backbone.View.extend({
         .on("error", this.logError, this);
     }
 
+    if(_.isObject(args[0]['query'])) { this.query = args[0].query; }
+
     this.render();
 
     this.hook('afterInit', args);
@@ -46,6 +49,7 @@ module.exports = Backbone.View.extend({
   handleForm: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+
     var inst, Model,
         $form = $(eve.currentTarget),
         fields = this._formData(eve.currentTarget),
@@ -61,6 +65,14 @@ module.exports = Backbone.View.extend({
     } else if(_.isObject(this.model) && action === 'edit') {
       this.hook('beforeSubmit', $form, fields, action, this.model);
       inst = this.model;
+    } else if ($form.attr('method').toLowerCase() === 'get') {
+      // if the method attr is `get` then we can navigate to that new
+      // url and avoid any posting
+      var basepath = $form.attr('action') || window.location.pathname;
+      Backbone.history.navigate(
+        basepath + '?' + $form.serialize(),
+        {trigger: true});
+      return;
     } else { throw "Don't know how to handle this form"; }
 
     inst.set(fields);
@@ -127,8 +139,16 @@ module.exports = Backbone.View.extend({
     console.log(xhr, status, error);
   },
 
+  submitForm: function(eve) {
+    $(eve.currentTarget).parents('form').submit();
+  },
+
   render: function() {
-    var obj = this._modelOrCollection();
+    var obj = {};
+    if(_.isObject(this.collection)) { obj.collection = this.collection; }
+    else if(_.isObject(this.model)) { obj.model = this.model; }
+
+    if(_.isObject(this.query)) { obj.query = this.query; }
 
     this.hook('beforeRender', obj);
 
