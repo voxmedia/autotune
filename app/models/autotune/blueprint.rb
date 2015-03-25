@@ -6,6 +6,7 @@ module Autotune
   class Blueprint < ActiveRecord::Base
     include Slugged
     include Searchable
+    include WorkingDir
     serialize :config, Hash
     has_many :blueprint_tags
     has_many :tags, :through => :blueprint_tags
@@ -18,10 +19,6 @@ module Autotune
     after_initialize :defaults
 
     search_fields :title
-
-    def working_dir
-      File.join(Rails.configuration.autotune.blueprints_dir, slug)
-    end
 
     def installed?
       %w(updating testing ready).include? status

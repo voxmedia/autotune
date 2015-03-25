@@ -94,6 +94,10 @@ module WorkDir
       FileUtils.rm_rf(expand path)
     end
 
+    def move_to(path)
+      FileUtils.mv(@working_dir, path.to_s)
+    end
+
     # Delete the working directory
     def destroy
       FileUtils.rm_rf(@working_dir)
@@ -141,6 +145,10 @@ module WorkDir
 
     def logger
       @logger ||= Logger.new(STDOUT)
+    end
+
+    def to_s
+      @working_dir
     end
   end
 end

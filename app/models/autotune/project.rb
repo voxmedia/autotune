@@ -1,10 +1,9 @@
-require 'work_dir'
-
 module Autotune
   # Blueprints get built
   class Project < ActiveRecord::Base
     include Slugged
     include Searchable
+    include WorkingDir
     serialize :data, Hash
     belongs_to :blueprint
 
@@ -14,10 +13,6 @@ module Autotune
     before_validation :defaults
 
     search_fields :title
-
-    def working_dir
-      File.join(Rails.configuration.autotune.projects_dir, slug)
-    end
 
     def update_snapshot
       update(:status => 'updating')
