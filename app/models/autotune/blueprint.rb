@@ -44,24 +44,6 @@ module Autotune
       SyncBlueprintJob.perform_later self
     end
 
-    def thumbnail_url
-
-    end
-
-    # only call these from a job
-
-    def repo
-      @repo ||= WorkDir.repo working_dir
-    end
-
-    def create_repo
-      repo.clone(repo_url)
-    end
-
-    def sync_repo
-      repo.update
-    end
-
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
     # different name.
     def self.inheritance_column

@@ -29,22 +29,12 @@ module Autotune
       BuildJob.perform_later(self)
     end
 
-    # only call these from a job
-
-    def snapshot
-      @snapshot ||= WorkDir.snapshot working_dir
-    end
-
-    def sync_snapshot
-      snapshot.sync(blueprint.repo)
-      update(:blueprint_version => blueprint.version)
-    end
-
     private
 
     def defaults
       self.status ||= 'new'
       self.theme ||= 'default'
+      self.blueprint_version ||= blueprint.version unless blueprint.nil?
     end
   end
 end

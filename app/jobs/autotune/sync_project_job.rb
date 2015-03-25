@@ -1,12 +1,26 @@
+require 'work_dir'
+
 module Autotune
   # Job that updates the snapshot
   class SyncProjectJob < ActiveJob::Base
     queue_as :default
 
     def perform(project)
-      project.snapshot.sync(project.blueprint.repo)
+      # Create a new snapshot object based on the projects working dir
+      snapshot = WorkDir.snapshot(project.working_dir)
+      # Create a new repo object based on the blueprints working dir
+      repo = WorkDir.repo(project.blueprint.working_dir)
+      # rsync the files from the cloned repo to our snapshot folder
+      snapshot.sync(repo)
+      # Save the results
       project.update(
-        :status => 'updated', :blueprint_version => project.blueprint.repo.version)
+        :status => 'updated',
+        :blueprint_version => project.blueprint.version)
+    rescue WorkDir::CommandError => exc
+      # If the command failed, raise a red flag
+      logger.error(exc)
+      project.update!(:status => 'broken')
+      raise
     end
   end
 end

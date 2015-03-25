@@ -20,7 +20,9 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
     assert_equal 'built', b.status
     assert_match(/Build data:/, b.output)
 
-    assert b.snapshot.exist?, 'Snapshot should exist'
-    assert !b.snapshot.git?, 'Snapshot should not be a git repo'
+    snapshot = WorkDir.snapshot(b.working_dir)
+
+    assert snapshot.exist?, 'Snapshot should exist'
+    assert !snapshot.git?, 'Snapshot should not be a git repo'
   end
 end
