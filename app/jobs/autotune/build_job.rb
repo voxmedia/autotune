@@ -7,7 +7,8 @@ module Autotune
 
     def perform(project)
       # Create a new snapshot object based on the projects working dir
-      snapshot = WorkDir.snapshot(project.working_dir)
+      snapshot = WorkDir.snapshot(project.working_dir,
+                                  Rails.configuration.autotune.environment)
       # Setup the snapshot if it's not already. We don't want to update
       # our snapshot, we just need it to exist
       SyncProjectJob.perform_now(project) unless snapshot.exist?

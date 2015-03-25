@@ -7,9 +7,7 @@ module Autotune
     require 'jbuilder'
 
     initializer 'autotune.init', :before => :load_config_initializers do |app|
-      AutotuneConfig = Struct.new(:working_dir, :blueprints_dir, :projects_dir)
-
-      app.config.autotune = AutotuneConfig.new
+      app.config.autotune = Config.new
       # Figure out where we project our blueprints
       app.config.autotune.working_dir = File.expand_path(
         ENV['WORKING_DIR'] || './working', Rails.root)
@@ -17,6 +15,7 @@ module Autotune
         app.config.autotune.working_dir, 'blueprints')
       app.config.autotune.projects_dir = File.join(
         app.config.autotune.working_dir, 'projects')
+      app.config.autotune.environment = {}
     end
   end
 end

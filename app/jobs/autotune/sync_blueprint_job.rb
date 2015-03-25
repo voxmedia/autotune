@@ -7,7 +7,9 @@ module Autotune
 
     # do the deed
     def perform(blueprint)
-      repo = WorkDir.repo(blueprint.working_dir)
+      # Create a new repo object based on the blueprints working dir
+      repo = WorkDir.repo(blueprint.working_dir,
+                          Rails.configuration.autotune.environment)
       if repo.exist?
         # Update the repo
         repo.update

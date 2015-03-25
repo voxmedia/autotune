@@ -10,4 +10,7 @@ module Autotune
   REPO_URL_RE = %r{(\w+://)?(.+@)?([\w\.]+)(:[\d]+)?/?(.*)}
   PROJECT_STATUSES = %w(new updating updated building built broken)
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
+
+  Config = Struct.new(
+    :working_dir, :blueprints_dir, :projects_dir, :environment)
 end
