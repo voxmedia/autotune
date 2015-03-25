@@ -26,7 +26,8 @@ module WorkDir
 
     # Clone a repo to disk from the url
     def clone(repo_url)
-      git 'clone', '--recursive', repo_url, @working_dir
+      FileUtils.mkdir_p(File.dirname(working_dir))
+      git 'clone', '--recursive', repo_url, working_dir
     end
 
     # Get the config data from this repo
