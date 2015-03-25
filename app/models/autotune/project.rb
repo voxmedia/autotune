@@ -16,7 +16,7 @@ module Autotune
     search_fields :title
 
     def working_dir
-      File.join(Rails.configuration.projects_dir, slug)
+      File.join(Rails.configuration.autotune.projects_dir, slug)
     end
 
     def update_snapshot

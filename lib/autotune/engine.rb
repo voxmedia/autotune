@@ -18,9 +18,5 @@ module Autotune
       app.config.autotune.projects_dir = File.join(
         app.config.autotune.working_dir, 'projects')
     end
-
-    #[:working_dir, :blueprints_dir, :projects_dir].each do |s|
-      #Dir.mkdir(config.autotune.try(s)) unless Dir.exist?(config.autotune.try(s))
-    #end
   end
 end

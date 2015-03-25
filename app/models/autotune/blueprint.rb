@@ -20,7 +20,7 @@ module Autotune
     search_fields :title
 
     def working_dir
-      File.join(Rails.configuration.blueprints_dir, slug)
+      File.join(Rails.configuration.autotune.blueprints_dir, slug)
     end
 
     def installed?
