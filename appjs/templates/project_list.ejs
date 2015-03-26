@@ -52,9 +52,10 @@
 <table class="table">
   <tbody>
 <% if(collection.models.length == 0) { %>
-    <td class="text-center"><h4>No projects found</h4></td>
+  <tr><td class="text-center"><h4>No projects found</h4></td></tr>
 <% }
    _.each(collection.models, function(item) { %>
+   <tr>
     <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
     <td class="text-right">
     <% if(item.attributes.status == 'built') { %>
@@ -65,13 +66,17 @@
       <div class="btn-group btn-group-sm" role="group" aria-label="project actions">
         <a class="btn btn-default" href="<%=item.url() %>">Edit</a>
         <button type="button" class="btn btn-default"
+                data-action="build" data-model="Project"
+                data-model-id="<%= item.attributes.slug %>">Rebuild</button>
+        <button type="button" class="btn btn-default"
                 data-action="update" data-model="Project"
-                data-model-id="<%= item.attributes.slug %>">Update</button>
+                data-model-id="<%= item.attributes.slug %>">Upgrade</button>
         <button type="button" class="btn btn-danger"
                 data-action="delete" data-model="Project"
                 data-model-id="<%= item.attributes.slug %>">Delete</button>
       </div>
     </td>
+  </tr>
 <% }); %>
   </tbody>
 </table>

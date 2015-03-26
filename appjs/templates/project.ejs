@@ -2,6 +2,9 @@
 <p><div class="btn-group" role="group" aria-label="project actions">
   <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
   <button type="button" class="btn btn-default"
+          data-action="build" data-model="Project"
+          data-model-id="<%=model.get('slug') %>">Rebuild</button>
+  <button type="button" class="btn btn-default"
           data-action="update" data-model="Project"
           data-model-id="<%=model.get('slug') %>">Upgrade</button>
   <button type="button" class="btn btn-danger"

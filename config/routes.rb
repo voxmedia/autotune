@@ -14,8 +14,8 @@ Autotune::Engine.routes.draw do
 
   resources :projects,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  get 'projects/:id/update_repo',
-      :to => 'projects#update_repo',
+  get 'projects/:id/update_snapshot',
+      :to => 'projects#update_snapshot',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   get 'projects/:id/build',
       :to => 'projects#build',

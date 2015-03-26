@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-03-23
+/*! autotune - v0.1.0 - 2015-03-26
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -512,7 +512,9 @@ __p+='<h3>'+
 ((__t=(model.get('title') ))==null?'':__t)+
 '</h3>\n<p><div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" href="'+
 ((__t=(model.url() ))==null?'':__t)+
-'/edit">Edit</a>\n  <button type="button" class="btn btn-default"\n          data-action="update" data-model="Project"\n          data-model-id="'+
+'/edit">Edit</a>\n  <button type="button" class="btn btn-default"\n          data-action="build" data-model="Project"\n          data-model-id="'+
+((__t=(model.get('slug') ))==null?'':__t)+
+'">Rebuild</button>\n  <button type="button" class="btn btn-default"\n          data-action="update" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
@@ -610,10 +612,10 @@ __p+='\n                value="'+
  }) 
 __p+='\n      </select>\n    </form>\n  </div>\n</div>\n<br>\n<table class="table">\n  <tbody>\n';
  if(collection.models.length == 0) { 
-__p+='\n    <td class="text-center"><h4>No projects found</h4></td>\n';
+__p+='\n  <tr><td class="text-center"><h4>No projects found</h4></td></tr>\n';
  }
    _.each(collection.models, function(item) { 
-__p+='\n    <td><a href="'+
+__p+='\n   <tr>\n    <td><a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
 ((__t=( item.attributes.title ))==null?'':__t)+
@@ -629,11 +631,13 @@ __p+='\n      <span class="label label-warning text-capitalize">'+
  } 
 __p+='\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
-'">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="update" data-model="Project"\n                data-model-id="'+
+'">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="build" data-model="Project"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
-'">Update</button>\n        <button type="button" class="btn btn-danger"\n                data-action="delete" data-model="Project"\n                data-model-id="'+
+'">Rebuild</button>\n        <button type="button" class="btn btn-default"\n                data-action="update" data-model="Project"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
-'">Delete</button>\n      </div>\n    </td>\n';
+'">Upgrade</button>\n        <button type="button" class="btn btn-danger"\n                data-action="delete" data-model="Project"\n                data-model-id="'+
+((__t=( item.attributes.slug ))==null?'':__t)+
+'">Delete</button>\n      </div>\n    </td>\n  </tr>\n';
  }); 
 __p+='\n  </tbody>\n</table>\n';
 }
@@ -27313,7 +27317,39 @@ module.exports = {
     template: require('./templates/blueprint_chooser.ejs')
   }),
   ListProjects: FormView.extend({
-    template: require('./templates/project_list.ejs')
+    template: require('./templates/project_list.ejs'),
+    handleUpdateAction: function(eve) {
+      var $btn = $(eve.currentTarget),
+          model_class = $btn.data('model'),
+          model_id = $btn.data('model-id'),
+          inst = new models[model_class]({id: model_id});
+
+      Backbone.ajax({
+        type: 'GET',
+        url: inst.url() + '/update_snapshot'
+      })
+        .done(_.bind(function() {
+          this.success('Upgrading the project to use the newest blueprint');
+          inst.fetch();
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
+    },
+    handleBuildAction: function(eve) {
+      var $btn = $(eve.currentTarget),
+          model_class = $btn.data('model'),
+          model_id = $btn.data('model-id'),
+          inst = new models[model_class]({id: model_id});
+
+      Backbone.ajax({
+        type: 'GET',
+        url: inst.url() + '/build'
+      })
+        .done(_.bind(function() {
+          this.success('Building project');
+          inst.fetch();
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
+    }
   }),
   EditProject: FormView.extend({
     template: require('./templates/project_form.ejs'),
@@ -27381,7 +27417,39 @@ module.exports = {
     }
   }),
   ShowProject: FormView.extend({
-    template: require('./templates/project.ejs')
+    template: require('./templates/project.ejs'),
+    handleUpdateAction: function(eve) {
+      var $btn = $(eve.currentTarget),
+          model_class = $btn.data('model'),
+          model_id = $btn.data('model-id'),
+          inst = new models[model_class]({id: model_id});
+
+      Backbone.ajax({
+        type: 'GET',
+        url: inst.url() + '/update_snapshot'
+      })
+        .done(_.bind(function() {
+          this.success('Upgrading the project to use the newest blueprint');
+          inst.fetch();
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
+    },
+    handleBuildAction: function(eve) {
+      var $btn = $(eve.currentTarget),
+          model_class = $btn.data('model'),
+          model_id = $btn.data('model-id'),
+          inst = new models[model_class]({id: model_id});
+
+      Backbone.ajax({
+        type: 'GET',
+        url: inst.url() + '/build'
+      })
+        .done(_.bind(function() {
+          this.success('Building project');
+          inst.fetch();
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
+    }
   })
 };
 
