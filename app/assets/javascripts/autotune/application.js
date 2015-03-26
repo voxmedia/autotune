@@ -371,7 +371,7 @@ __p+='value="'+
 ((__t=(model.get('title') ))==null?'':__t)+
 '"';
  } 
-__p+='\n           id="title" name="title" placeholder="Enter title">\n  </div>\n  <div class="form-group">\n    <label for="repo_url">Repo url</label>\n    <input type="url" required class="form-control"\n           ';
+__p+='\n           id="title" name="title" placeholder="Enter title">\n  </div>\n  <div class="form-group">\n    <label for="repo_url">Repo url</label>\n    <input type="text" required class="form-control"\n           ';
  if(!model.isNew()) { 
 __p+='value="'+
 ((__t=(model.get('repo_url') ))==null?'':__t)+

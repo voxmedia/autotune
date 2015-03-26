@@ -13,9 +13,9 @@ module Autotune
 
     validates :title, :repo_url, :presence => true
     validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
-    validates :repo_url,
-              :format => { :with => Autotune::REPO_URL_RE },
-              :uniqueness => true
+    # validates :repo_url,
+    #           :format => { :with => Autotune::REPO_URL_RE },
+    #           :uniqueness => true
     after_initialize :defaults
 
     search_fields :title

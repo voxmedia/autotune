@@ -16,7 +16,7 @@
   </div>
   <div class="form-group">
     <label for="repo_url">Repo url</label>
-    <input type="url" required class="form-control"
+    <input type="text" required class="form-control"
            <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
            id="repo_url" name="repo_url" placeholder="Enter repo url">
   </div>
