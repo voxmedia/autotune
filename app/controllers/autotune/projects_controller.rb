@@ -4,6 +4,7 @@ module Autotune
   # API for projects
   class ProjectsController < ApplicationController
     before_action :respond_to_html
+    model Project
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
@@ -26,11 +27,7 @@ module Autotune
     end
 
     def show
-      if params[:id] =~ /^\d+$/
-        @project = Project.find params[:id]
-      else
-        @project = Project.find_by_slug params[:id]
-      end
+      @project = instance
     end
 
     def create
@@ -52,11 +49,7 @@ module Autotune
     end
 
     def update
-      if params[:id] =~ /^\d+$/
-        @project = Project.find params[:id]
-      else
-        @project = Project.find_by_slug params[:id]
-      end
+      @project = instance
       data = request.POST.dup
       data.delete 'blueprint_id'
       if @project.update(
@@ -70,24 +63,19 @@ module Autotune
     end
 
     def update_snapshot
-      if params[:id] =~ /^\d+$/
-        @project = Blueprint.find params[:id]
-      else
-        @project = Blueprint.find_by_slug params[:id]
-      end
-      @project.update_snapshot
+      instance.update_snapshot
+      head :accepted
+    end
+
+    def build
+      instance.build
       head :accepted
     end
 
     def destroy
-      if params[:id] =~ /^\d+$/
-        @project = Project.find params[:id]
-      else
-        @project = Project.find_by_slug params[:id]
-      end
+      @project = instance
       if @project.destroy
         head :no_content
-        DeleteWorkDirJob.perform_later(@project.working_dir)
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end

@@ -9,6 +9,28 @@ module Autotune
 
     helper_method :current_user, :signed_in?, :omniauth_path, :login_path
 
+    def self.model(klass = nil)
+      return @model if klass.nil?
+      @model = klass
+    end
+
+    def model
+      self.class.model
+    end
+
+    def instance
+      return nil unless model
+      @instance ||= begin
+        if params[:id] =~ /^\d+$/
+          model.find params[:id]
+        elsif params.key?(:id) && !params[:id].empty?
+          model.find_by_slug params[:id]
+        else
+          model.new
+        end
+      end
+    end
+
     protected
 
     def omniauth_path(provider, origin = nil)

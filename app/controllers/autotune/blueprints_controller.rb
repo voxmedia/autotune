@@ -4,6 +4,7 @@ module Autotune
   # API for blueprints
   class BlueprintsController < ApplicationController
     before_action :respond_to_html, :except => [:thumb]
+    model Blueprint
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
@@ -28,11 +29,7 @@ module Autotune
     end
 
     def show
-      if params[:id] =~ /^\d+$/
-        @blueprint = Blueprint.find params[:id]
-      else
-        @blueprint = Blueprint.find_by_slug params[:id]
-      end
+      @blueprint = instance
     end
 
     def create
@@ -48,11 +45,7 @@ module Autotune
     end
 
     def update
-      if params[:id] =~ /^\d+$/
-        @blueprint = Blueprint.find params[:id]
-      else
-        @blueprint = Blueprint.find_by_slug params[:id]
-      end
+      @blueprint = instance
       @blueprint.attributes = request.POST
       if @blueprint.valid?
         @blueprint.save
@@ -63,24 +56,14 @@ module Autotune
     end
 
     def update_repo
-      if params[:id] =~ /^\d+$/
-        @blueprint = Blueprint.find params[:id]
-      else
-        @blueprint = Blueprint.find_by_slug params[:id]
-      end
-      @blueprint.update_repo
+      instance.update_repo
       head :accepted
     end
 
     def destroy
-      if params[:id] =~ /^\d+$/
-        @blueprint = Blueprint.find params[:id]
-      else
-        @blueprint = Blueprint.find_by_slug params[:id]
-      end
+      @blueprint = instance
       if @blueprint.destroy
         head :no_content
-        DeleteWorkDirJob.perform_later(@blueprint.working_dir)
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
       end
@@ -101,16 +84,6 @@ module Autotune
           :disposition => 'inline')
       else
         head :not_found
-      end
-    end
-
-    def instance
-      @blueprint ||= begin
-        if params[:id] =~ /^\d+$/
-          Blueprint.find params[:id]
-        else
-          Blueprint.find_by_slug params[:id]
-        end
       end
     end
   end

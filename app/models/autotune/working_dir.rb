@@ -5,6 +5,7 @@ module Autotune
 
     included do
       after_save :move_working_dir
+      after_destroy :delete_working_dir
     end
 
     def working_dir
@@ -21,6 +22,10 @@ module Autotune
     def move_working_dir
       return if !slug_changed? || slug_was.nil?
       MoveWorkDirJob.perform_later(working_dir_was, working_dir)
+    end
+
+    def delete_working_dir
+      DeleteWorkDirJob.perform_later(working_dir)
     end
   end
 end
