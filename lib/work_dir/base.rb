@@ -98,6 +98,10 @@ module WorkDir
       FileUtils.mv(@working_dir, path.to_s)
     end
 
+    def copy_to(path)
+      FileUtils.cp_r(@working_dir, path.to_s)
+    end
+
     # Delete the working directory
     def destroy
       FileUtils.rm_rf(@working_dir)

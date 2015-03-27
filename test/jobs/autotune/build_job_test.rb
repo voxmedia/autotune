@@ -8,6 +8,8 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
 
     assert_equal autotune_blueprints(:example), b.blueprint
 
+    assert_not_nil Rails.configuration.autotune.preview
+
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
@@ -17,8 +19,13 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
 
     assert_performed_jobs 2
 
+    b.reload
+
     assert_equal 'built', b.status
     assert_match(/Build data:/, b.output)
+
+    assert File.exist?(Rails.root.join('public', 'preview', b.slug, 'index.html')),
+           'Built file should be deployed to public/preview'
 
     snapshot = WorkDir.snapshot(b.working_dir)
 

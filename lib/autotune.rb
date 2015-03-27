@@ -11,6 +11,5 @@ module Autotune
   PROJECT_STATUSES = %w(new updating updated building built broken)
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
 
-  Config = Struct.new(
-    :working_dir, :blueprints_dir, :projects_dir, :environment)
+  Config = Struct.new(:working_dir, :environment, :preview, :publish)
 end

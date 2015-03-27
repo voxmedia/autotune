@@ -1,6 +1,7 @@
 require 'work_dir/base'
 require 'work_dir/snapshot'
 require 'work_dir/repo'
+require 'work_dir/website'
 
 # Top-level module for work dir
 module WorkDir
@@ -22,5 +23,9 @@ module WorkDir
 
   def self.repo(*args)
     Repo.new(*args)
+  end
+
+  def self.website(*args)
+    Website.new(*args)
   end
 end

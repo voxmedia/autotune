@@ -14,6 +14,12 @@ module Autotune
       SyncProjectJob.perform_now(project) unless snapshot.exist?
       # Run the build
       out = snapshot.build(project.data)
+      # Upload build
+      ws = WorkDir.website(
+        snapshot.expand('build'),
+        Rails.configuration.autotune.environment)
+      ws.deploy(File.join(
+        Rails.configuration.autotune.preview[:connect], project.slug))
       # Save the results
       project.update!(:output => out, :status => 'built')
     rescue WorkDir::CommandError => exc

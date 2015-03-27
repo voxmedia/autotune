@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'omniauth', '~> 1.2.2'
   s.add_dependency 'resque', '~> 1.25.2'
   s.add_dependency 'jbuilder', '~> 2.0'
+  s.add_dependency 's3deploy', '~> 0.2'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'pry-rails'

@@ -15,6 +15,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     assert_performed_jobs 1
 
+    bp.reload
+
     assert bp.installed?, 'Blueprint should be installed'
     assert_equal 'testing', bp.status
   end

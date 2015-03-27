@@ -18,12 +18,8 @@ OmniAuth.config.add_mock(:developer, OmniAuth::AuthHash.new(
 # Make some temporary working dirs
 require 'tmpdir'
 require 'fileutils'
-Rails.configuration.working_dir = File.expand_path(
+Rails.configuration.autotune.working_dir = File.expand_path(
   "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/")
-Rails.configuration.blueprints_dir = File.join(
-  Rails.configuration.working_dir, 'blueprints')
-Rails.configuration.projects_dir = File.join(
-  Rails.configuration.working_dir, 'projects')
 
 # Filter out Minitest backtrace while allowing backtrace from other libraries
 # to be shown.
@@ -40,16 +36,15 @@ end
 # Add more helper methods to be used by all tests here...
 class ActiveSupport::TestCase
   def setup
-    [:working_dir, :blueprints_dir, :projects_dir].each do |s|
-      Dir.mkdir(Rails.configuration.try(s)) \
-        unless Dir.exist?(Rails.configuration.try(s))
-    end
+    FileUtils.mkdir_p(Rails.configuration.autotune.working_dir)
   end
 
-  #def teardown
-    #FileUtils.rm_rf(Rails.configuration.working_dir) \
-      #if File.exist?(Rails.configuration.working_dir)
-  #end
+  def teardown
+    FileUtils.rm_rf(Rails.configuration.autotune.working_dir) \
+      if File.exist?(Rails.configuration.autotune.working_dir)
+    FileUtils.rm_rf(Rails.root.join 'public', 'preview') \
+      if File.exist?(Rails.root.join 'public', 'preview')
+  end
 
   def mock_auth
     OmniAuth.config.mock_auth

@@ -17,6 +17,8 @@ class Autotune::SyncProjectJobTest < ActiveJob::TestCase
 
     assert_performed_jobs 2
 
+    b.reload
+
     assert_equal 'updated', b.status
   end
 end
