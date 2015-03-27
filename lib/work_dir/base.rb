@@ -7,7 +7,7 @@ module WorkDir
   class Base
     # Create a new shell object with a working directory and environment vars
     def initialize(working_dir, env = {})
-      @working_dir = working_dir
+      @working_dir = working_dir.to_s
       @env = ENV.select { |k, _| WorkDir::ALLOWED_ENV.include? k }
       @env.update env
     end
