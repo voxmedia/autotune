@@ -6,8 +6,8 @@ module WorkDir
   # Thin API for doing shell stuff
   class Base
     # Create a new shell object with a working directory and environment vars
-    def initialize(working_dir, env = {})
-      @working_dir = working_dir.to_s
+    def initialize(path, env = {})
+      @working_dir = path.to_s
       @env = ENV.select { |k, _| WorkDir::ALLOWED_ENV.include? k }
       @env.update env
     end
@@ -79,6 +79,7 @@ module WorkDir
     # Wrapper around Open3.capture2e
     def cmd(*args, **opts, &block)
       opts[:unsetenv_others] = true unless opts.keys.include? :unsetenv_others
+      WorkDir.logger.debug((@env.map { |k, v| "#{k}=#{v}" } + args).join(' '))
       out, status = Open3.capture2e(@env, *args, **opts, &block)
       return out if status.success?
       raise CommandError, out
@@ -86,7 +87,7 @@ module WorkDir
 
     # expand a local path for this working directory
     def expand(path)
-      File.expand_path(path, working_dir)
+      File.expand_path(path, working_dir).to_s
     end
 
     # Delete a path in the working directory
@@ -95,11 +96,13 @@ module WorkDir
     end
 
     def move_to(path)
-      FileUtils.mv(@working_dir, path.to_s)
+      FileUtils.mkdir_p(File.dirname(expand path))
+      FileUtils.mv(@working_dir, expand(path))
     end
 
     def copy_to(path)
-      FileUtils.cp_r(@working_dir, path.to_s)
+      FileUtils.mkdir_p(File.dirname(expand path))
+      FileUtils.cp_r(@working_dir, expand(path))
     end
 
     # Delete the working directory
@@ -145,10 +148,6 @@ module WorkDir
       else
         nil
       end
-    end
-
-    def logger
-      @logger ||= Logger.new(STDOUT)
     end
 
     def to_s

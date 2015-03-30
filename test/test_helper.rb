@@ -20,6 +20,36 @@ require 'tmpdir'
 require 'fileutils'
 Rails.configuration.autotune.working_dir = File.expand_path(
   "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/")
+# puts 'Working dir: ' + Rails.configuration.autotune.working_dir
+
+# Configure the environment for autotune
+Rails.configuration.autotune.environment = {
+  # 'GITHUB_KEY' => ENV['GITHUB_KEY'],
+  # 'GITHUB_SECRET' => ENV['GITHUB_SECRET'],
+
+  # 'GIT_HTTP_USERNAME' => ENV['GIT_HTTP_USERNAME'],
+  # 'GIT_HTTP_PASSWORD' => ENV['GIT_HTTP_PASSWORD'],
+  # 'GIT_ASKPASS' => Rails.configuration.autotune.git_ssh,
+
+  # 'GIT_PRIVATE_KEY' => ENV['GIT_PRIVATE_KEY'],
+  # 'GIT_SSH' => Rails.configuration.autotune.git_ssh,
+
+  # 'GOOGLE_CLIENT_ID' => ENV['GOOGLE_CLIENT_ID'],
+  # 'GOOGLE_CLIENT_SECRET' => ENV['GOOGLE_CLIENT_SECRET'],
+
+  # 'AWS_ACCESS_KEY_ID' => ENV['AWS_ACCESS_KEY_ID'],
+  # 'AWS_SECRET_ACCESS_KEY' => ENV['AWS_SECRET_ACCESS_KEY'],
+
+  # 'GOOGLE_OAUTH_PERSON' => ENV['GOOGLE_OAUTH_PERSON'],
+  # 'GOOGLE_OAUTH_ISSUER' => ENV['GOOGLE_OAUTH_ISSUER'],
+  # 'GOOGLE_OAUTH_KEYFILE' => ENV['GOOGLE_OAUTH_KEYFILE'],
+
+  'ENV' => Rails.env
+}
+
+# Display work_dir commands
+# require 'work_dir'
+# WorkDir.logger.level = Logger::DEBUG
 
 # Filter out Minitest backtrace while allowing backtrace from other libraries
 # to be shown.

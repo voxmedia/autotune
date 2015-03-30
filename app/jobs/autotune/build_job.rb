@@ -22,7 +22,7 @@ module Autotune
         Rails.configuration.autotune.preview[:connect], project.slug))
       # Save the results
       project.update!(:output => out, :status => 'built')
-    rescue WorkDir::CommandError => exc
+    rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
       project.update!(:status => 'broken')

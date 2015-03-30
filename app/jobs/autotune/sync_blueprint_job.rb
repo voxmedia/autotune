@@ -39,7 +39,7 @@ module Autotune
       # Blueprint is now ready for testing
       blueprint.status = 'testing'
       blueprint.save!
-    rescue WorkDir::CommandError => exc
+    rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
       blueprint.update!(:status => 'broken')

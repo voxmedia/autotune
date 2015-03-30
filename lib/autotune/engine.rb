@@ -17,6 +17,8 @@ module Autotune
         :base_url => '/preview'
       }
       app.config.autotune.publish = {}
+      app.config.autotune.git_ssh = File.expand_path('../../../bin/git_ssh.sh', __FILE__)
+      app.config.autotune.git_askpass = File.expand_path('../../../bin/git_ask_pass.sh', __FILE__)
     end
   end
 end

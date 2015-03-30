@@ -18,7 +18,7 @@ module Autotune
       project.update(
         :status => 'updated',
         :blueprint_version => project.blueprint.version)
-    rescue WorkDir::CommandError => exc
+    rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
       project.update!(:status => 'broken')
