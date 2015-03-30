@@ -8,6 +8,6 @@ class CreateBlueprintTags < ActiveRecord::Migration
       t.timestamps null: false
     end
     add_foreign_key :autotune_blueprint_tags, :autotune_blueprints, column: :blueprint_id
-    add_foreign_key :autotune_blueprint_tags, :autotune_tags, column: :blueprint_id
+    add_foreign_key :autotune_blueprint_tags, :autotune_tags, column: :tag_id
   end
 end
