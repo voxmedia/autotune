@@ -60,7 +60,7 @@ module WorkDir
     def setup_ruby_environment
       return false unless ruby?
       working_dir do
-        cmd 'bundle', 'install', '--path', "#{working_dir}/.bundle", '--deployment'
+        cmd 'bundle', 'install', '--path', '.bundle', '--deployment'
       end
     end
 
