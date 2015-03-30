@@ -24,6 +24,14 @@ module Autotune
       BuildJob.perform_later(self)
     end
 
+    def preview_url
+      File.join(Rails.configuration.autotune.preview[:base_url], slug).to_s
+    end
+
+    def publish_url
+      File.join(Rails.configuration.autotune.publish[:base_url], slug).to_s
+    end
+
     private
 
     def defaults

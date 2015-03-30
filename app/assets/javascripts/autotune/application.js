@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-03-26
+/*! autotune - v0.1.0 - 2015-03-30
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -274,12 +274,16 @@ with(obj||{}){
 __p+='<h3>\n  '+
 ((__t=(model.get('title') ))==null?'':__t)+
 '\n  ';
- if(model.get('status') == 'built') { 
-__p+='\n  <span class="label label-success">'+
+ if(model.get('status') == 'ready') { 
+__p+='\n  <span class="label label-success text-capitalize">'+
+((__t=(model.get('status') ))==null?'':__t)+
+'</span></h4>\n  ';
+ } else if(model.get('status') == 'broken') { 
+__p+='\n  <span class="label label-danger text-capitalize">'+
 ((__t=(model.get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
  } else { 
-__p+='\n  <span class="label label-warning">'+
+__p+='\n  <span class="label label-warning text-capitalize">'+
 ((__t=(model.get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
  } 
@@ -320,9 +324,11 @@ module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3>Choose a blueprint</h3>\n';
- var index = 0 
-__p+='\n';
- _.each(collection.models, function(blueprint) { 
+ if(collection.models.length == 0) { 
+__p+='\n  <div class="well text-center">\n    <h4>There are no blueprints ready for use.</h4>\n    <p>You must change the status of a blueprint to\n      <span class="label label-success text-capitalize">ready</span> for it to appear here.</p>\n  </div>\n';
+ }
+   var index = 0;
+   _.each(collection.models, function(blueprint) { 
 __p+='\n  ';
  if(index % 3 == 0) { 
 __p+='\n  ';
@@ -481,13 +487,17 @@ __p+='\n  <tr>\n    <td><a href="'+
 '">'+
 ((__t=( item.attributes.title ))==null?'':__t)+
 '</a></td>\n    <td class="text-right">\n    ';
- if(item.attributes.status == 'ready') { 
+ if(item.get('status') == 'ready') { 
 __p+='\n      <span class="label label-success text-capitalize">'+
-((__t=( item.attributes.status ))==null?'':__t)+
+((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n    ';
+ } else if(item.get('status') == 'broken') { 
+__p+='\n      <span class="label label-danger text-capitalize">'+
+((__t=(item.get('status') ))==null?'':__t)+
+'</span></h4>\n    ';
  } else { 
 __p+='\n      <span class="label label-warning text-capitalize">'+
-((__t=( item.attributes.status ))==null?'':__t)+
+((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n    ';
  } 
 __p+='\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
@@ -508,11 +518,31 @@ var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h3>'+
+__p+='<h3>\n  '+
 ((__t=(model.get('title') ))==null?'':__t)+
-'</h3>\n<p><div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" href="'+
+'\n  ';
+ if(model.get('status') == 'built') { 
+__p+='\n  <span class="label label-success text-capitalize">'+
+((__t=(model.get('status') ))==null?'':__t)+
+'</span></h4>\n  ';
+ } else if(model.get('status') == 'broken') { 
+__p+='\n  <span class="label label-danger text-capitalize">'+
+((__t=(model.get('status') ))==null?'':__t)+
+'</span></h4>\n  ';
+ } else { 
+__p+='\n  <span class="label label-warning text-capitalize">'+
+((__t=(model.get('status') ))==null?'':__t)+
+'</span></h4>\n  ';
+ } 
+__p+='\n</h3>\n<p><div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" href="'+
 ((__t=(model.url() ))==null?'':__t)+
-'/edit">Edit</a>\n  <button type="button" class="btn btn-default"\n          data-action="build" data-model="Project"\n          data-model-id="'+
+'/edit">Edit</a>\n  <a class="btn btn-default" target="_blank"\n     ';
+ if(model.get('status') != 'built') { 
+__p+='disabled="true"';
+ } 
+__p+='\n     href="'+
+((__t=(model.get('preview_url') ))==null?'':__t)+
+'">Preview</a>\n  <button type="button" class="btn btn-default"\n          data-action="build" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Rebuild</button>\n  <button type="button" class="btn btn-default"\n          data-action="update" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
@@ -618,25 +648,29 @@ __p+='\n  <tr><td class="text-center"><h4>No projects found</h4></td></tr>\n';
 __p+='\n   <tr>\n    <td><a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
-((__t=( item.attributes.title ))==null?'':__t)+
+((__t=( item.get('title') ))==null?'':__t)+
 '</a></td>\n    <td class="text-right">\n    ';
- if(item.attributes.status == 'built') { 
+ if(item.get('status') == 'built') { 
 __p+='\n      <span class="label label-success text-capitalize">'+
-((__t=( item.attributes.status ))==null?'':__t)+
+((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n    ';
+ } else if(item.get('status') == 'broken') { 
+__p+='\n      <span class="label label-danger text-capitalize">'+
+((__t=(item.get('status') ))==null?'':__t)+
+'</span></h4>\n    ';
  } else { 
 __p+='\n      <span class="label label-warning text-capitalize">'+
-((__t=( item.attributes.status ))==null?'':__t)+
+((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n    ';
  } 
 __p+='\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="build" data-model="Project"\n                data-model-id="'+
-((__t=( item.attributes.slug ))==null?'':__t)+
+((__t=( item.get('slug') ))==null?'':__t)+
 '">Rebuild</button>\n        <button type="button" class="btn btn-default"\n                data-action="update" data-model="Project"\n                data-model-id="'+
-((__t=( item.attributes.slug ))==null?'':__t)+
+((__t=( item.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n        <button type="button" class="btn btn-danger"\n                data-action="delete" data-model="Project"\n                data-model-id="'+
-((__t=( item.attributes.slug ))==null?'':__t)+
+((__t=( item.get('slug') ))==null?'':__t)+
 '">Delete</button>\n      </div>\n    </td>\n  </tr>\n';
  }); 
 __p+='\n  </tbody>\n</table>\n';
@@ -27495,11 +27529,14 @@ module.exports = Backbone.View.extend({
   },
 
   handleLink: function(eve) {
-    eve.preventDefault();
-    eve.stopPropagation();
-    Backbone.history.navigate(
-      $(eve.currentTarget).attr('href'),
-      {trigger: true});
+    var href = $(eve.currentTarget).attr('href');
+    if (!/https?:\/\//.test(href)) {
+      eve.preventDefault();
+      eve.stopPropagation();
+      Backbone.history.navigate(
+        $(eve.currentTarget).attr('href'),
+        {trigger: true});
+    }
   },
 
   handleForm: function(eve) {

@@ -1,9 +1,11 @@
 <h3>
   <%=model.get('title') %>
-  <% if(model.get('status') == 'built') { %>
-  <span class="label label-success"><%=model.get('status') %></span></h4>
+  <% if(model.get('status') == 'ready') { %>
+  <span class="label label-success text-capitalize"><%=model.get('status') %></span></h4>
+  <% } else if(model.get('status') == 'broken') { %>
+  <span class="label label-danger text-capitalize"><%=model.get('status') %></span></h4>
   <% } else { %>
-  <span class="label label-warning"><%=model.get('status') %></span></h4>
+  <span class="label label-warning text-capitalize"><%=model.get('status') %></span></h4>
   <% } %>
 </h3>
 <div class="row">

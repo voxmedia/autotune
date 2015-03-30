@@ -1,6 +1,13 @@
 <h3>Choose a blueprint</h3>
-<% var index = 0 %>
-<% _.each(collection.models, function(blueprint) { %>
+<% if(collection.models.length == 0) { %>
+  <div class="well text-center">
+    <h4>There are no blueprints ready for use.</h4>
+    <p>You must change the status of a blueprint to
+      <span class="label label-success text-capitalize">ready</span> for it to appear here.</p>
+  </div>
+<% }
+   var index = 0;
+   _.each(collection.models, function(blueprint) { %>
   <% if(index % 3 == 0) { %>
   <% if(index != 0) { %></div><% } %>
 <div class="row">

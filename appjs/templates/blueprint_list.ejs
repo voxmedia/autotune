@@ -55,10 +55,12 @@
   <tr>
     <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
     <td class="text-right">
-    <% if(item.attributes.status == 'ready') { %>
-      <span class="label label-success text-capitalize"><%= item.attributes.status %></span>
+    <% if(item.get('status') == 'ready') { %>
+      <span class="label label-success text-capitalize"><%=item.get('status') %></span>
+    <% } else if(item.get('status') == 'broken') { %>
+      <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
     <% } else { %>
-      <span class="label label-warning text-capitalize"><%= item.attributes.status %></span>
+      <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
     <% } %>
       <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">
         <a class="btn btn-default" href="<%=item.url() %>/edit">Edit</a>

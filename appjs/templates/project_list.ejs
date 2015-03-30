@@ -56,24 +56,26 @@
 <% }
    _.each(collection.models, function(item) { %>
    <tr>
-    <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
+    <td><a href="<%=item.url() %>"><%= item.get('title') %></a></td>
     <td class="text-right">
-    <% if(item.attributes.status == 'built') { %>
-      <span class="label label-success text-capitalize"><%= item.attributes.status %></span>
+    <% if(item.get('status') == 'built') { %>
+      <span class="label label-success text-capitalize"><%=item.get('status') %></span>
+    <% } else if(item.get('status') == 'broken') { %>
+      <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
     <% } else { %>
-      <span class="label label-warning text-capitalize"><%= item.attributes.status %></span>
+      <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
     <% } %>
       <div class="btn-group btn-group-sm" role="group" aria-label="project actions">
         <a class="btn btn-default" href="<%=item.url() %>">Edit</a>
         <button type="button" class="btn btn-default"
                 data-action="build" data-model="Project"
-                data-model-id="<%= item.attributes.slug %>">Rebuild</button>
+                data-model-id="<%= item.get('slug') %>">Rebuild</button>
         <button type="button" class="btn btn-default"
                 data-action="update" data-model="Project"
-                data-model-id="<%= item.attributes.slug %>">Upgrade</button>
+                data-model-id="<%= item.get('slug') %>">Upgrade</button>
         <button type="button" class="btn btn-danger"
                 data-action="delete" data-model="Project"
-                data-model-id="<%= item.attributes.slug %>">Delete</button>
+                data-model-id="<%= item.get('slug') %>">Delete</button>
       </div>
     </td>
   </tr>
