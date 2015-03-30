@@ -6,6 +6,7 @@ module Autotune
     queue_as :default
 
     def perform(project)
+      out = nil
       # Create a new snapshot object based on the projects working dir
       snapshot = WorkDir.snapshot(project.working_dir,
                                   Rails.configuration.autotune.environment)
@@ -25,7 +26,7 @@ module Autotune
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
-      project.update!(:status => 'broken')
+      project.update!(:output => out || exc.backtrace, :status => 'broken')
       raise
     end
   end
