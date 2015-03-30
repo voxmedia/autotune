@@ -26,7 +26,8 @@ module Autotune
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
-      project.update!(:output => out || exc.backtrace, :status => 'broken')
+      out ||= "#{exc.message}\n#{exc.backtrace.join("\n")}"
+      project.update!(:output => out, :status => 'broken')
       raise
     end
   end
