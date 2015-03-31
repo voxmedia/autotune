@@ -5,7 +5,7 @@ module Autotune
   class BuildJob < ActiveJob::Base
     queue_as :default
 
-    def perform(project)
+    def perform(project, mode = 'preview')
       out = nil
       # Create a new snapshot object based on the projects working dir
       snapshot = WorkDir.snapshot(project.working_dir,
@@ -15,15 +15,24 @@ module Autotune
       SyncProjectJob.perform_now(project) unless snapshot.exist?
       # Add a few extras to the build data
       build_data = project.data.dup
-      build_data['base_url'] = project.preview_url
+      if mode == :publish
+        build_data['base_url'] = project.publish_url
+      else
+        build_data['base_url'] = project.preview_url
+      end
       # Run the build
       out = snapshot.build(project.data)
       # Upload build
       ws = WorkDir.website(
         snapshot.expand('build'),
         Rails.configuration.autotune.environment)
-      ws.deploy(File.join(
-        Rails.configuration.autotune.preview[:connect], project.slug))
+      if mode == 'publish'
+        ws.deploy(File.join(
+          Rails.configuration.autotune.publish[:connect], project.slug))
+      else
+        ws.deploy(File.join(
+          Rails.configuration.autotune.preview[:connect], project.slug))
+      end
       # Save the results
       project.update!(:output => out, :status => 'built')
     rescue => exc

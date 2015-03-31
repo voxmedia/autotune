@@ -185,6 +185,22 @@ module.exports = {
           inst.fetch();
         }, this))
         .fail(_.bind(this.handleRequestError, this));
+    },
+    handleBuildAndPublishAction: function(eve) {
+      var $btn = $(eve.currentTarget),
+          model_class = $btn.data('model'),
+          model_id = $btn.data('model-id'),
+          inst = new models[model_class]({id: model_id});
+
+      Backbone.ajax({
+        type: 'GET',
+        url: inst.url() + '/build_and_publish'
+      })
+        .done(_.bind(function() {
+          this.success('Publishing project');
+          inst.fetch();
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
     }
   })
 };

@@ -72,6 +72,11 @@ module Autotune
       head :accepted
     end
 
+    def build_and_publish
+      instance.build_and_publish
+      head :accepted
+    end
+
     def destroy
       @project = instance
       if @project.destroy

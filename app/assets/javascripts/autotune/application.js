@@ -544,7 +544,19 @@ __p+='\n     href="'+
 ((__t=(model.get('preview_url') ))==null?'':__t)+
 '">Preview</a>\n  <button type="button" class="btn btn-default"\n          data-action="build" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Rebuild</button>\n  <button type="button" class="btn btn-default"\n          data-action="update" data-model="Project"\n          data-model-id="'+
+'">Rebuild preview</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" target="_blank"\n     ';
+ if(model.get('status') != 'built') { 
+__p+='disabled="true"';
+ } 
+__p+='\n     href="'+
+((__t=(model.get('publish_url') ))==null?'':__t)+
+'">View</a>\n  <button type="button" class="btn btn-default"\n          ';
+ if(model.get('status') != 'built') { 
+__p+='disabled="true"';
+ } 
+__p+='\n          data-action="build-and-publish" data-model="Project"\n          data-model-id="'+
+((__t=(model.get('slug') ))==null?'':__t)+
+'">Build and publish</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  <button type="button" class="btn btn-warning"\n          data-action="update" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
@@ -27483,6 +27495,22 @@ module.exports = {
           inst.fetch();
         }, this))
         .fail(_.bind(this.handleRequestError, this));
+    },
+    handleBuildAndPublishAction: function(eve) {
+      var $btn = $(eve.currentTarget),
+          model_class = $btn.data('model'),
+          model_id = $btn.data('model-id'),
+          inst = new models[model_class]({id: model_id});
+
+      Backbone.ajax({
+        type: 'GET',
+        url: inst.url() + '/build_and_publish'
+      })
+        .done(_.bind(function() {
+          this.success('Publishing project');
+          inst.fetch();
+        }, this))
+        .fail(_.bind(this.handleRequestError, this));
     }
   })
 };
@@ -27672,6 +27700,7 @@ module.exports = Backbone.View.extend({
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
+    console.log('hook ' + name);
     if(_.isFunction(this[name])) { return this[name].apply(this, args); }
     this.trigger(name, args);
   },

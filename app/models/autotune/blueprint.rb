@@ -39,6 +39,9 @@ module Autotune
     def update_repo
       update(:status => 'updating')
       SyncBlueprintJob.perform_later self
+    rescue
+      update!(:status => 'broken')
+      raise
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a

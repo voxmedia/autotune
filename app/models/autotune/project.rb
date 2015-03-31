@@ -17,11 +17,25 @@ module Autotune
     def update_snapshot
       update(:status => 'updating')
       SyncProjectJob.perform_later(self)
+    rescue
+      update!(:status => 'broken')
+      raise
     end
 
     def build
       update(:status => 'building')
       BuildJob.perform_later(self)
+    rescue
+      update!(:status => 'broken')
+      raise
+    end
+
+    def build_and_publish
+      update(:status => 'building')
+      BuildJob.perform_later(self, 'publish')
+    rescue
+      update!(:status => 'broken')
+      raise
     end
 
     def preview_url
