@@ -25,10 +25,12 @@ module Autotune
     end
 
     def preview_url
+      return nil if Rails.configuration.autotune.preview.empty?
       File.join(Rails.configuration.autotune.preview[:base_url], slug).to_s
     end
 
     def publish_url
+      return nil if Rails.configuration.autotune.publish.empty?
       File.join(Rails.configuration.autotune.publish[:base_url], slug).to_s
     end
 
