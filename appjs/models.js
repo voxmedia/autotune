@@ -1,7 +1,8 @@
 "use strict";
 
 var Backbone = require('backbone'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    markdown = require('markdown').markdown;
 
 exports.Project = Backbone.Model.extend({
   initialize: function(args) {
@@ -21,6 +22,14 @@ exports.Project = Backbone.Model.extend({
       return [this.urlRoot, this.get('slug')].join('/');
     } else {
       return [this.urlRoot, this.id].join('/');
+    }
+  },
+  hasInstructions: function() {
+    return this.blueprint && this.blueprint.get('config')['instructions'];
+  },
+  instructions: function() {
+    if(this.hasInstructions()) {
+      return markdown.toHTML(this.blueprint.get('config')['instructions']);
     }
   },
   urlRoot: '/projects'

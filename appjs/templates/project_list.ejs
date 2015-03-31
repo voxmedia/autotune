@@ -66,7 +66,7 @@
       <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
     <% } %>
       <div class="btn-group btn-group-sm" role="group" aria-label="project actions">
-        <a class="btn btn-default" href="<%=item.url() %>">Edit</a>
+        <a class="btn btn-default" href="<%=item.url() %>/edit">Edit</a>
         <button type="button" class="btn btn-default"
                 data-action="build" data-model="Project"
                 data-model-id="<%= item.get('slug') %>">Rebuild</button>
