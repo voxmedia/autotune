@@ -41,7 +41,7 @@ This is an active project and we encourage contributions. [Please review our gui
 
 ## License
 
-Copyright (c) 2014, Vox Media, Inc.
+Copyright (c) 2015, Vox Media, Inc.
 All rights reserved.
 
 BSD license
