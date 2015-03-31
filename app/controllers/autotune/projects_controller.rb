@@ -55,7 +55,7 @@ module Autotune
       if @project.update(
         :title => data['title'],
         :slug => data['slug'],
-        :data => data)
+        :data => data['data'])
         render :show, :status => :created
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
