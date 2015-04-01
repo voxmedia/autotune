@@ -149,6 +149,7 @@ module.exports = {
       }
     },
     beforeSubmit: function($form, fields, action, Model) {
+      fields = $form.alpaca('get');
       fields.blueprint_id = this.model.blueprint.get('id');
     }
   }),

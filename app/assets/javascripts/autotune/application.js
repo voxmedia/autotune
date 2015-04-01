@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-03-31
+/*! autotune - v0.1.0 - 2015-04-01
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -27484,6 +27484,7 @@ module.exports = {
       }
     },
     beforeSubmit: function($form, fields, action, Model) {
+      fields = $form.alpaca('get');
       fields.blueprint_id = this.model.blueprint.get('id');
     }
   }),
