@@ -29,6 +29,28 @@
     
         this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
 this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
+this["HandlebarsPrecompiled"]["web-display"]["container-array-item"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </div>\n\n</script>\n";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
 this["HandlebarsPrecompiled"]["web-display"]["container-array"] = function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -60,6 +82,28 @@ function program2(depth0,data) {
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
 this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
+this["HandlebarsPrecompiled"]["web-display"]["container-object-item"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </div>\n\n</script>\n";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
 this["HandlebarsPrecompiled"]["web-display"]["container-object"] = function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -84,6 +128,125 @@ function program2(depth0,data) {
   }
 
   buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n    </div>\n\n</script>";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
+this["HandlebarsPrecompiled"]["web-display"]["container-table-item"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <tr>\n        ";
+  stack1 = (helper = helpers.itemField || (depth0 && depth0.itemField),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "td", options) : helperMissing.call(depth0, "itemField", "td", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </tr>\n\n\n</script>\n";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
+this["HandlebarsPrecompiled"]["web-display"]["container-table"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n                    <th>"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.value)),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</th>\n                    ";
+  return buffer;
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n\n                ";
+  stack1 = (helper = helpers.item || (depth0 && depth0.item),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "tr", options) : helperMissing.call(depth0, "item", "tr", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n            ";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.arrayToolbar) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.arrayToolbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.arrayToolbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n                    ";
+  stack1 = (helper = helpers.eachProperty || (depth0 && depth0.eachProperty),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options) : helperMissing.call(depth0, "eachProperty", ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n            ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n            </tbody>\n\n        </table>\n\n    </div>\n\n</script>";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
+this["HandlebarsPrecompiled"]["web-display"]["container-tablerow-item"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <td>\n        ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </td>\n\n</script>\n";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
+this["HandlebarsPrecompiled"]["web-display"]["container-tablerow"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n            ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n        ";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-merge-up\">\n\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n    </div>\n\n</script>";
@@ -556,7 +719,15 @@ function program4(depth0,data) {
   else { return ''; }
   }
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-array-actionbar btn-group\" data-alpaca-array-actionbar-field-id=\"";
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-array-actionbar alpaca-array-actionbar-";
+  if (helper = helpers.actionbarStyle) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.actionbarStyle); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " btn-group\" data-alpaca-array-actionbar-parent-field-id=\"";
+  if (helper = helpers.parentFieldId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.parentFieldId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" data-alpaca-array-actionbar-field-id=\"";
   if (helper = helpers.fieldId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.fieldId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -568,6 +739,102 @@ function program4(depth0,data) {
   stack1 = helpers.each.call(depth0, (depth0 && depth0.actions), {hash:{},inverse:self.noop,fn:self.programWithDepth(1, program1, data, depth0),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n    </div>\n\n</script>";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
+this["HandlebarsPrecompiled"]["web-edit"]["container-array-item"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing, helperMissing=helpers.helperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n        <div class=\"pull-left\">\n            ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n        </div>\n        <div class=\"pull-right\">\n            ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n        </div>\n        <div class=\"clear\"></div>\n    ";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "";
+  return buffer;
+  }
+
+function program4(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n        ";
+  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "right", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "right", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    ";
+  return buffer;
+  }
+function program5(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n            <div class=\"pull-left\">\n                ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n            </div>\n            <div class=\"pull-right\">\n                ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n            </div>\n            <div class=\"alpaca-clear\"></div>\n        ";
+  return buffer;
+  }
+
+function program7(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n            <div>\n\n                ";
+  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "top", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "top", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n                ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n                ";
+  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "bottom", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "bottom", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n            </div>\n        ";
+  return buffer;
+  }
+function program8(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n                ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n                ";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n    ";
+  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.program(4, program4, data),fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "left", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "left", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </div>\n\n</script>\n";
   return buffer;
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
@@ -587,66 +854,65 @@ function program3(depth0,data,depth1) {
   
   var buffer = "", stack1, helper, options;
   buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data},helper ? helper.call(depth0, (depth1 && depth1.toolbarStyle), "link", options) : helperMissing.call(depth0, "compare", (depth1 && depth1.toolbarStyle), "link", options));
+  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(4, program4, data, depth0),data:data},helper ? helper.call(depth0, (depth1 && depth1.toolbarStyle), "link", options) : helperMissing.call(depth0, "compare", (depth1 && depth1.toolbarStyle), "link", options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(6, program6, data, depth1),data:data},helper ? helper.call(depth0, (depth1 && depth1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", (depth1 && depth1.toolbarStyle), "button", options));
+  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(6, program6, data, depth0, depth1),data:data},helper ? helper.call(depth0, (depth1 && depth1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", (depth1 && depth1.toolbarStyle), "button", options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n        ";
   return buffer;
   }
-function program4(depth0,data) {
+function program4(depth0,data,depth1) {
   
   var buffer = "", stack1;
   buffer += "\n                <a href=\"#\" class=\"alpaca-array-toolbar-action\" data-alpaca-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + escapeExpression(((stack1 = (depth1 && depth1.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\">";
-  stack1 = ((stack1 = (depth0 && depth0.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
+  stack1 = ((stack1 = (depth1 && depth1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</a>\n            ";
   return buffer;
   }
 
-function program6(depth0,data,depth2) {
+function program6(depth0,data,depth1,depth2) {
   
   var buffer = "", stack1;
   buffer += "\n                <button class=\"alpaca-array-toolbar-action "
     + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.smallButton)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\" data-alpaca-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + escapeExpression(((stack1 = (depth1 && depth1.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\">\n                    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth1 && depth1.iconClass), {hash:{},inverse:self.noop,fn:self.programWithDepth(7, program7, data, depth0),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth1 && depth1.label), {hash:{},inverse:self.noop,fn:self.programWithDepth(9, program9, data, depth0),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                </button>\n            ";
   return buffer;
   }
-function program7(depth0,data) {
+function program7(depth0,data,depth1) {
   
   var buffer = "", stack1;
   buffer += "\n                    <i class=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + escapeExpression(((stack1 = (depth1 && depth1.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\"></i>\n                    ";
   return buffer;
   }
 
-function program9(depth0,data) {
+function program9(depth0,data,depth1) {
   
-  var stack1, helper;
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  var stack1;
+  stack1 = ((stack1 = (depth1 && depth1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
   if(stack1 || stack1 === 0) { return stack1; }
   else { return ''; }
   }
 
   buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-array-toolbar\" data-alpaca-array-toolbar-field-id=\"";
-  if (helper = helpers.fieldId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.fieldId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options));
+  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.toolbarStyle), "button", options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\n\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.actions), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
@@ -659,30 +925,59 @@ this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-e
 this["HandlebarsPrecompiled"]["web-edit"]["container-array"] = function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
 
 function program1(depth0,data) {
   
+  var buffer = "";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
   var buffer = "", stack1, helper, options;
   buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
   if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
   else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
+  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n        ";
   return buffer;
   }
-function program2(depth0,data) {
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.arrayToolbar) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.arrayToolbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.arrayToolbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n    </div>\n\n</script>\n";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
+this["HandlebarsPrecompiled"]["web-edit"]["container-object-item"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
   
   var buffer = "";
   return buffer;
   }
 
   buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
+  buffer += "\n\n    </div>\n\n</script>\n";
   return buffer;
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
@@ -718,148 +1013,146 @@ function program2(depth0,data) {
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
 this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-table"] = function (Handlebars,depth0,helpers,partials,data) {
+this["HandlebarsPrecompiled"]["web-edit"]["container-table-item"] = function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+  var buffer = "", stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
 
 function program1(depth0,data) {
   
-  
-  return " btn-group";
-  }
-
-function program3(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data},helper ? helper.call(depth0, ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "link", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "link", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(6, program6, data, depth1),data:data},helper ? helper.call(depth0, ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program4(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n            <a href=\"#\" class=\"alpaca-array-toolbar-action\" data-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">";
-  stack1 = ((stack1 = (depth0 && depth0.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</a>\n            ";
+  var buffer = "";
   return buffer;
   }
 
-function program6(depth0,data,depth2) {
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <tr>\n        ";
+  stack1 = (helper = helpers.itemField || (depth0 && depth0.itemField),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "td", options) : helperMissing.call(depth0, "itemField", "td", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </tr>\n\n\n</script>\n";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
+this["HandlebarsPrecompiled"]["web-edit"]["container-table"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
   
-  var buffer = "", stack1;
-  buffer += "\n            <button class=\"alpaca-array-toolbar-action "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </button>\n            ";
+  var buffer = "";
   return buffer;
   }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n                    <th>"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.value)),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</th>\n                    ";
+  return buffer;
+  }
+
+function program5(depth0,data) {
+  
+  
+  return "\n                        <th>Actions</th>\n                    ";
+  }
+
 function program7(depth0,data) {
   
-  var buffer = "", stack1;
-  buffer += "\n                <i class=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"></i>\n                ";
+  var buffer = "", stack1, helper, options;
+  buffer += "\n\n                ";
+  stack1 = (helper = helpers.item || (depth0 && depth0.item),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "tr", options) : helperMissing.call(depth0, "item", "tr", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n            ";
   return buffer;
   }
 
-function program9(depth0,data) {
-  
-  var stack1, helper;
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
-  }
-
-function program11(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                    <th>";
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.arrayToolbar) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.arrayToolbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.arrayToolbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</th>\n                    ";
+  buffer += "\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n                    ";
+  stack1 = (helper = helpers.eachProperty || (depth0 && depth0.eachProperty),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options) : helperMissing.call(depth0, "eachProperty", ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n                    ";
+  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.showActionsColumn), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n            ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n            </tbody>\n\n        </table>\n\n    </div>\n\n</script>";
   return buffer;
-  }
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
+this["HandlebarsPrecompiled"]["web-edit"]["container-tablerow-item"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
 
-function program13(depth0,data,depth1) {
+function program1(depth0,data) {
   
-  var buffer = "", stack1;
-  buffer += "\n                <tr>\n                    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                    <!-- actions cell -->\n                    <td>\n                        <div class=\"alpaca-array-item-actions btn-group\">\n                            ";
-  stack1 = helpers.each.call(depth0, (depth1 && depth1.arrayItemActions), {hash:{},inverse:self.noop,fn:self.programWithDepth(16, program16, data, depth1),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                        </div>\n                    </td>\n                </tr>\n            ";
-  return buffer;
-  }
-function program14(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                    <td>";
-  stack1 = (typeof depth0 === functionType ? depth0.apply(depth0) : depth0);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</td>\n                    ";
+  var buffer = "";
   return buffer;
   }
 
-function program16(depth0,data,depth2) {
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <td>\n        ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </td>\n\n</script>\n";
+  return buffer;
+  };
+this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
+this["HandlebarsPrecompiled"]["web-edit"]["container-tablerow"] = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
   
-  var buffer = "", stack1, helper;
-  buffer += "\n                            <button class=\"alpaca-array-item-action "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-array-item-action=\"";
-  if (helper = helpers.action) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.action); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">\n                                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(17, program17, data),data:data});
+  var buffer = "", stack1, helper, options;
+  buffer += "\n            ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                            </button>\n                            ";
+  buffer += "\n        ";
   return buffer;
   }
-function program17(depth0,data) {
+function program2(depth0,data) {
   
-  var buffer = "", stack1;
-  buffer += "\n                                <i class=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"></i>\n                                ";
+  var buffer = "";
   return buffer;
   }
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        <div class=\"alpaca-array-toolbar\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options));
+function program4(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
+  buffer += "\n            <div class=\"alpaca-merge-up\">\n                ";
+  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
+  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.arrayToolbarActions), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
+  buffer += "\n            </div>\n        ";
+  return buffer;
+  }
+
+  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-merge-up\">\n\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        </div>\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n                    ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.fields), {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data});
+  buffer += "\n\n        <!-- actions cell -->\n        ";
+  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.showActionsColumn), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                    <th>Actions</th>\n                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n            ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.programWithDepth(13, program13, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </tbody>\n\n        </table>\n    </div>\n\n</script>";
+  buffer += "\n\n    </div>\n\n</script>";
   return buffer;
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
@@ -2125,68 +2418,6 @@ function program13(depth0,data,depth1) {
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
 this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"]["container-array"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"]["container-object"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
 this["HandlebarsPrecompiled"]["bootstrap-display"]["container"] = function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -2198,23 +2429,43 @@ function program1(depth0,data) {
   buffer += "\n        <legend class=\"";
   stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " alpaca-container-label\">";
+  buffer += "alpaca-container-label\">\n\n            ";
+  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.collapsible), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n            ";
   stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</legend>\n        ";
+  buffer += "\n\n            ";
+  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.collapsible), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n        </legend>\n        ";
   return buffer;
   }
 function program2(depth0,data) {
   
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
+  var buffer = "", stack1;
+  buffer += escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + " ";
+  return buffer;
   }
 
 function program4(depth0,data) {
   
+  
+  return "\n            <span data-toggle=\"collapse\">\n            ";
+  }
+
+function program6(depth0,data) {
+  
+  
+  return "\n            </span>\n            ";
+  }
+
+function program8(depth0,data) {
+  
   var buffer = "", stack1;
   buffer += "\n        <p class=\"alpaca-helper help-block ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\">\n            <i class=\"alpaca-icon-16 glyphicon glyphicon-info-sign\"></i>\n            ";
   stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
@@ -2222,13 +2473,13 @@ function program4(depth0,data) {
   buffer += "\n        </p>\n        ";
   return buffer;
   }
-function program5(depth0,data) {
+function program9(depth0,data) {
   
   var stack1;
   return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
   }
 
-function program7(depth0,data) {
+function program11(depth0,data) {
   
   var buffer = "";
   return buffer;
@@ -2238,15 +2489,15 @@ function program7(depth0,data) {
   stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data}
+  options={hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data}
   if (helper = helpers.container) { stack1 = helper.call(depth0, options); }
   else { helper = (depth0 && depth0.container); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.container) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data}); }
+  if (!helpers.container) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data}); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
+  buffer += "\n\n    </div>\n\n</script>\n";
   return buffer;
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
@@ -2400,37 +2651,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
 this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["container-array"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
 this["HandlebarsPrecompiled"]["bootstrap-edit"]["container-grid"] = function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -2510,183 +2730,6 @@ function program9(depth0,data) {
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
 this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["container-object"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["container-table"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-  
-  
-  return " btn-group";
-  }
-
-function program3(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data},helper ? helper.call(depth0, ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "link", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "link", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(6, program6, data, depth1),data:data},helper ? helper.call(depth0, ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program4(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n            <a href=\"#\" class=\"alpaca-array-toolbar-action\" data-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">";
-  stack1 = ((stack1 = (depth0 && depth0.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</a>\n            ";
-  return buffer;
-  }
-
-function program6(depth0,data,depth2) {
-  
-  var buffer = "", stack1;
-  buffer += "\n            <button class=\"alpaca-array-toolbar-action "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </button>\n            ";
-  return buffer;
-  }
-function program7(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                <i class=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"></i>\n                ";
-  return buffer;
-  }
-
-function program9(depth0,data) {
-  
-  var stack1, helper;
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
-  }
-
-function program11(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                    <th>";
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</th>\n                    ";
-  return buffer;
-  }
-
-function program13(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                <tr>\n                    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                    <!-- actions cell -->\n                    <td>\n                        <div class=\"alpaca-array-item-actions btn-group\">\n                            ";
-  stack1 = helpers.each.call(depth0, (depth1 && depth1.arrayItemActions), {hash:{},inverse:self.noop,fn:self.programWithDepth(16, program16, data, depth1),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                        </div>\n                    </td>\n                </tr>\n            ";
-  return buffer;
-  }
-function program14(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                    <td>";
-  stack1 = (typeof depth0 === functionType ? depth0.apply(depth0) : depth0);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</td>\n                    ";
-  return buffer;
-  }
-
-function program16(depth0,data,depth2) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                            <button class=\"alpaca-array-item-action "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-array-item-action=\"";
-  if (helper = helpers.action) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.action); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">\n                                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(17, program17, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                                ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                            </button>\n                            ";
-  return buffer;
-  }
-function program17(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                                <i class=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"></i>\n                                ";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        <div class=\"alpaca-array-toolbar\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.arrayToolbarActions), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        </div>\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n                    ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.fields), {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                    <th>Actions</th>\n                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n            ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.programWithDepth(13, program13, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </tbody>\n\n        </table>\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
 this["HandlebarsPrecompiled"]["bootstrap-edit"]["container"] = function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -2698,7 +2741,7 @@ function program1(depth0,data) {
   buffer += "\n        <legend class=\"";
   stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " alpaca-container-label\">\n\n            ";
+  buffer += "alpaca-container-label\">\n\n            ";
   stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.collapsible), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n            ";
@@ -2712,8 +2755,10 @@ function program1(depth0,data) {
   }
 function program2(depth0,data) {
   
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
+  var buffer = "", stack1;
+  buffer += escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + " ";
+  return buffer;
   }
 
 function program4(depth0,data) {
@@ -2764,7 +2809,7 @@ function program11(depth0,data) {
   else { helper = (depth0 && depth0.container); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
   if (!helpers.container) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data}); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
+  buffer += "\n\n    </div>\n\n</script>\n";
   return buffer;
   };
 this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
@@ -3152,153 +3197,378 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   buffer += "\n    </div>\n\n</script>";
   return buffer;
   };
-/*
- Based on Base.js 1.1a (c) 2006-2010, Dean Edwards
- Updated to pass JSHint and converted into a module by Kenneth Powers
- License: http://www.opensource.org/licenses/mit-license.php
-
- GitHub: https://github.com/KenPowers/Base.js-Module
+/**
+ * Using fork:
+ * https://github.com/kcmoot/Base.js-Fork/blob/master/build/base.js
  */
-/*global define:true module:true*/
-/*jshint eqeqeq:true*/
-(function (name, global, definition) {
-//    if (typeof module !== 'undefined') {
-//        module.exports = definition();
-//    } else if (typeof define !== 'undefined' && typeof define.amd === 'object') {
-//        define(definition);
-//    } else {
-    global[name] = definition();
-//    }
-})('Base', this, function () {
-    // Base Object
-    var Base = function () {};
+(function (root, factory) {
+    /*
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], function () {
+            return (root.returnExportsGlobal = factory());
+        });
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like enviroments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+    */
+        root['Base'] = factory();
+    /*
+    }
+    */
+}(this, function () {
 
-    // Implementation
-    Base.extend = function (_instance, _static) { // subclass
+    /**
+     *   Base.js, version 1.1a
+     *   Copyright 2006-2010, Dean Edwards
+     *   License: http://www.opensource.org/licenses/mit-license.php
+     *
+     *   Modified by the Nerdery for improved performance and various bugfixes
+     */
+
+    /**
+     * Function type
+     *
+     * @type String
+     * @ignore
+     * @final
+     */
+    var TYPE_FUNCTION = 'function';
+
+    /**
+     * Object type
+     *
+     * @type String
+     * @ignore
+     * @final
+     */
+    var TYPE_OBJECT = 'object';
+
+    /**
+     * String type
+     *
+     * @type String
+     * @ignore
+     * @final
+     */
+    var TYPE_STRING = 'string';
+
+    /**
+     * Flag to determine if we are currently creating a clean prototype of a class
+     *
+     * @type Boolean
+     * @private
+     * @ignore
+     */
+    var _prototyping = false;
+
+    /**
+     * Method to extend manually - do not do automatically
+     *
+     * @type Array
+     * @private
+     * @ignore
+     */
+    var _hiddenMethods = ['constructor', 'toString', 'valueOf'];
+
+    /**
+     * Lenth of hidden methods array
+     *
+     * @type Number
+     * @private
+     * @ignore
+     */
+    var _hiddenMethodsLength = _hiddenMethods.length;
+
+    /**
+     * Regex to find any calls to a parent method
+     *
+     * @type RegExp
+     * @private
+     * @ignore
+     */
+    var _superMethodRegex = /\bbase\b/;
+
+    /**
+     * Blank function
+     *
+     * @type Function
+     * @private
+     * @ignore
+     */
+    var _blankFunction = function() {};
+
+    /**
+     * Prototype default values. When extending methods, if both sources have these values, do not copy them.
+     *
+     * @type Object
+     * @private
+     * @ignore
+     */
+    var _prototypeDefaults = { toSource: null, base: _blankFunction };
+
+    /**
+     * BaseLib class
+     *
+     * A library to create a more traditional OOP interface for developers to work with
+     *
+     * @class Lib.Base.Base
+     *
+     * @constructor
+     */
+    var Base = function() {};
+
+    /**
+     * Subclass a class
+     *
+     * @method extend
+     * @param {Object} [instanceMethods] Instance members/methods
+     * @param {Object} [staticMethods] Static members/methods
+     * @return {Function}
+     * @static
+     */
+    Base.extend = function(instanceMethods, staticMethods) { // subclass
         var extend = Base.prototype.extend;
+
         // build the prototype
-        Base._prototyping = true;
+        _prototyping = true;
+
         var proto = new this();
-        extend.call(proto, _instance);
-        proto.base = function () {
-            // call this method from any other method to invoke that method's ancestor
-        };
-        delete Base._prototyping;
+        extend.call(proto, instanceMethods);
+
+        // call this method from any other method to invoke that method's ancestor
+        proto.base = _prototypeDefaults.base;
+
+        _prototyping = false;
+
         // create the wrapper for the constructor function
-        //var constructor = proto.constructor.valueOf(); //-dean
         var constructor = proto.constructor;
-        var klass = proto.constructor = function () {
-            if (!Base._prototyping) {
-                if (this._constructing || this.constructor === klass) { // instantiation
+        var klass = proto.constructor = function() {
+            if (!_prototyping) {
+                // instantiation
+                if (this && (this._constructing || this.constructor === klass)) {
                     this._constructing = true;
                     constructor.apply(this, arguments);
-                    delete this._constructing;
-                } else if (arguments[0] !== null) { // casting
-                    return (arguments[0].extend || extend).call(arguments[0], proto);
+                    this._constructing = false;
+
+                    // casting
+                } else if (arguments.length) {
+                    Base.cast.apply(klass, arguments);
                 }
             }
         };
         // build the class interface
+        extend.call(klass, this);
         klass.ancestor = this;
-        klass.extend = this.extend;
-        klass.forEach = this.forEach;
-        klass.implement = this.implement;
         klass.prototype = proto;
-        klass.toString = this.toString;
-        klass.valueOf = function (type) {
-            return (type === 'object') ? klass : constructor.valueOf();
+
+        /**
+         * Return original method
+         *
+         * @method valueOf
+         * @param {String} [type]
+         * @return Function
+         * @static
+         */
+        klass.valueOf = function(type) {
+            return (type === TYPE_OBJECT) ? klass : constructor.valueOf();
         };
-        extend.call(klass, _static);
-        // class initialization
-        if (typeof klass.init === 'function') klass.init();
+        extend.call(klass, staticMethods);
+
+        // if static init method exists, call it
+        if (typeof klass.init === TYPE_FUNCTION) {
+            klass.init();
+        }
+
         return klass;
     };
 
-    Base.prototype = {
-        extend: function (source, value) {
-            if (arguments.length > 1) { // extending with a name/value pair
-                var ancestor = this[source];
-                if (ancestor && (typeof value === 'function') && // overriding a method?
+    /**
+     * @method extend
+     * @param {String|Object} source
+     * @param {Function} [value]
+     * @chainable
+     */
+    Base.prototype.extend = function(source, value) {
+        // extending with a name/value pair
+        if (typeof source === TYPE_STRING && arguments.length > 1) {
+            var ancestor = this[source];
+            if (
+                ancestor &&
+                    // overriding a method?
+                (typeof value === TYPE_FUNCTION) &&
                     // the valueOf() comparison is to avoid circular references
-                    (!ancestor.valueOf || ancestor.valueOf() !== value.valueOf()) && /\bbase\b/.test(value)) {
-                    // get the underlying method
-                    var method = value.valueOf();
-                    // override
-                    value = function () {
-                        var previous = this.base || Base.prototype.base;
-                        this.base = ancestor;
-                        var returnValue = method.apply(this, arguments);
-                        this.base = previous;
-                        return returnValue;
-                    };
-                    // point to the underlying method
-                    value.valueOf = function (type) {
-                        return (type === 'object') ? value : method;
-                    };
-                    value.toString = Base.toString;
-                }
-                this[source] = value;
-            } else if (source) { // extending with an object literal
-                var extend = Base.prototype.extend;
-                // if this object has a customized extend method then use it
-                if (!Base._prototyping && typeof this !== 'function') {
-                    extend = this.extend || extend;
-                }
-                var proto = {
-                    toSource: null
+                (!ancestor.valueOf || ancestor.valueOf() !== value.valueOf()) &&
+                _superMethodRegex.test(value)
+            ) {
+                // get the underlying method
+                var method = value.valueOf();
+
+                // override
+                value = function() {
+                    var returnValue;
+                    var previous = this.base || _prototypeDefaults.base;
+                    this.base = ancestor;
+                    if (arguments.length === 0) {
+                        returnValue = method.call(this);
+                    } else {
+                        returnValue = method.apply(this, arguments);
+                    }
+                    this.base = previous;
+                    return returnValue;
                 };
-                // do the "toString" and other methods manually
-                var hidden = ['constructor', 'toString', 'valueOf'];
-                // if we are prototyping then include the constructor
-                for (var i = Base._prototyping ? 0 : 1; i < hidden.length; i++) {
-                    var h = hidden[i];
-                    if (source[h] !== proto[h])
-                        extend.call(this, h, source[h]);
-                }
-                // copy each of the source object's properties to this object
-                for (var key in source) {
-                    if (!proto[key]) extend.call(this, key, source[key]);
+
+                // point to the underlying method
+                value.valueOf = function(type) {
+                    return (type === TYPE_OBJECT) ? value : method;
+                };
+                value.toString = Base.toString;
+            }
+            this[source] = value;
+
+            // extending with an object literal
+        } else if (source) {
+            var extend = Base.prototype.extend;
+
+            // if this object has a customised extend method then use it
+            if (!_prototyping && typeof this !== TYPE_FUNCTION) {
+                extend = this.extend || extend;
+            }
+
+            // do hidden methods separately
+            // if we are prototyping then include the constructor
+            var i = _prototyping ? 0 : 1;
+            var key;
+            for (; i < _hiddenMethodsLength; i++) {
+                key = _hiddenMethods[i];
+                if (source[key] !== _prototypeDefaults[key]) {
+                    extend.call(this, key, source[key]);
                 }
             }
-            return this;
+
+            // copy each of the source object's properties to this object
+            for (key in source) {
+                if (!_prototypeDefaults[key]) {
+                    extend.call(this, key, source[key]);
+                }
+            }
         }
+
+        return this;
     };
 
-    // initialize
+    // initialise
     Base = Base.extend({
-        constructor: function () {
-            this.extend(arguments[0]);
-        }
+
+        /**
+         * Default static base method
+         *
+         * @method base
+         * @ignore
+         */
+        base: _prototypeDefaults.base
+
     }, {
+
+        /**
+         * Parent object/class
+         *
+         * @property ancestor
+         * @type Object
+         * @static
+         * @ignore
+         */
         ancestor: Object,
+
+        /**
+         * Base.js version
+         *
+         * @property version
+         * @type String
+         * @static
+         * @ignore
+         */
         version: '1.1',
-        forEach: function (object, block, context) {
-            for (var key in object) {
-                if (this.prototype[key] === undefined) {
-                    block.call(context, object[key], key, object);
-                }
-            }
-        },
-        implement: function () {
-            for (var i = 0; i < arguments.length; i++) {
-                if (typeof arguments[i] === 'function') {
-                    // if it's a function, call it
-                    arguments[i](this.prototype);
+
+        /**
+         * Extend current class into another object or class.
+         *
+         * If an object with no prototype is passed, only prototype methods
+         * will be cast EXCEPT for the constructor.
+         *
+         * If an a class (with constructor) is passed, both static and
+         * prototype methods will be cast EXCEPT for the constructor.
+         *
+         * @method cast
+         * @param {Object|Function} class* Classes or objects to cast
+         * @chainable
+         * @static
+         */
+        cast: function() {
+            var i = 0;
+            var length = arguments.length;
+            var extend;
+            var caster;
+
+            for (; i < length; i++) {
+                caster = arguments[i];
+                extend = caster.extend || Base.prototype.extend;
+
+                // cast prototype and static methods
+                if (typeof caster === TYPE_FUNCTION) {
+                    extend = caster.prototype.extend || Base.prototype.extend;
+                    extend.call(caster.prototype, this.prototype);
+                    extend.call(caster, this);
+                    caster.ancestor = this;
+
+                    // cast only prototype methods
                 } else {
-                    // add the interface using the extend method
-                    this.prototype.extend(arguments[i]);
+                    extend.call(caster, this.prototype);
                 }
             }
+
             return this;
         },
-        toString: function () {
-            return String(this.valueOf());
+
+        /**
+         * Implement a class into the current class.
+         *
+         * All prototype and static properties will be extended into
+         * `this` EXCEPT for the constructor.
+         *
+         * @method implement
+         * @param {Object|Function} class* Classes or objects to cast
+         * @chainable
+         * @static
+         */
+        implement: function() {
+            for (var i = 0; i < arguments.length; i++) {
+                this.cast.call(arguments[i], this);
+            }
+
+            return this;
+        },
+
+        /**
+         * Get string value of class
+         *
+         * @method toString
+         * @return String
+         * @static
+         */
+        toString: function() {
+            return this.valueOf() + '';
         }
+
     });
 
-    // Return Base implementation
     return Base;
-});
+
+
+}));
 /*jshint -W004 */ // duplicate variables
 /*jshint -W083 */ // inline functions are used safely
 /**
@@ -3341,11 +3611,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         var args = Alpaca.makeArray(arguments);
         if (args.length === 0) {
             // illegal
-            return Alpaca.throwDefaultError("You must supply at least one argument which is the element against which to apply the Alpaca generated form");
+            return Alpaca.throwDefaultError("You must supply at least one argument.  This argument can either be a DOM element against which Alpaca will generate a form or it can be a function name.  See http://www.alpacajs.org for more details.");
         }
 
-        // element is the first argument
+        // element is the first argument (either a string or a DOM element)
         var el = args[0];
+        if (el && Alpaca.isString(el)) {
+            el = $("#" + el);
+        }
 
         // other arguments we may want to figure out
         var data = null;
@@ -3365,66 +3638,137 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         var optionsSource = null;
         var viewSource = null;
 
-        if (args.length === 1) {
-            // hands back the field instance that is bound directly under the specified element
-            // var field = Alpaca(el);
-            var domElements = $(el).find(":first");
+        // hands back the field instance that is bound directly under the element el
+        var findExistingAlpacaBinding = function()
+        {
+            var existing = null;
 
-            var field = null;
-            for (var i = 0; i < domElements.length; i++) {
-                var domElement = domElements[i];
-                var fieldId = $(domElement).attr("alpaca-field-id");
-                if (fieldId) {
-                    var _field = Alpaca.fieldInstances[fieldId];
-                    if (_field) {
-                        field = _field;
+            var topElements = $(el).find(":first");
+            if (topElements.length > 0)
+            {
+                // does a field binding exist?
+                var fieldId = $(topElements[0]).attr("data-alpaca-field-id");
+                if (fieldId)
+                {
+                    var _existing = Alpaca.fieldInstances[fieldId];
+                    if (_existing) {
+                        existing = _existing;
+                    }
+                }
+                else
+                {
+                    // does a form binding exist?
+                    var formId = $(topElements[0]).attr("data-alpaca-form-id");
+                    if (formId)
+                    {
+                        var subElements = $(topElements[0]).find(":first");
+                        if (subElements.length > 0)
+                        {
+                            var subFieldId = $(subElements[0]).attr("data-alpaca-field-id");
+                            if (subFieldId)
+                            {
+                                var _existing = Alpaca.fieldInstances[subFieldId];
+                                if (_existing) {
+                                    existing = _existing;
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            if (field !== null) {
-                return field;
-            } else {
-                // otherwise, grab the data inside the element and use that for the control
-                var domData = $(el).html();
-                $(el).html("");
-                data = domData;
+            return existing;
+        };
+
+        var specialFunctionNames = ["get", "exists", "destroy"];
+        var isSpecialFunction = (args.length > 1 && Alpaca.isString(args[1]) && (specialFunctionNames.indexOf(args[1]) > -1));
+
+        var existing = findExistingAlpacaBinding();
+        if (existing || isSpecialFunction)
+        {
+            if (isSpecialFunction)
+            {
+                // second argument must be a special function name
+                var specialFunctionName = args[1];
+                if ("get" === specialFunctionName) {
+                    return existing;
+                }
+                else if ("exists" === specialFunctionName) {
+                    return (existing ? true : false);
+                }
+                else if ("destroy" === specialFunctionName) {
+                    existing.destroy();
+                    return;
+                }
+
+                return Alpaca.throwDefaultError("Unknown special function: " + specialFunctionName);
             }
+
+            return existing;
         }
+        else
+        {
+            var config = null;
 
-        if (args.length >= 2) {
-            if (Alpaca.isObject(args[1])) {
-                data = args[1].data;
-                schema = args[1].schema;
-                options = args[1].options;
-                view = args[1].view;
-                callback = args[1].render;
-                renderedCallback = args[1].postRender;
-                errorCallback = args[1].error;
-                connector = args[1].connector;
+            // just a dom element, no other args?
+            if (args.length === 1)
+            {
+                // grab the data inside of the element and use that for config
+                var jsonString = $(el).text();
 
-                // sources
-                dataSource = args[1].dataSource;
-                schemaSource = args[1].schemaSource;
-                optionsSource = args[1].optionsSource;
-                viewSource = args[1].viewSource;
+                config = JSON.parse(jsonString);
+                $(el).html("");
+            }
+            else
+            {
+                if (Alpaca.isObject(args[1]))
+                {
+                    config = args[1];
+                }
+                else if (Alpaca.isFunction(args[1]))
+                {
+                    config = args[1]();
+                }
+                else
+                {
+                    config = {
+                        "data": args[1]
+                    };
+                }
+            }
 
-                // other
-                if (args[1].ui) {
-                    initialSettings["ui"] = args[1].ui;
-                }
-                if (args[1].type) {
-                    initialSettings["type"] = args[1].type;
-                }
-                if (!Alpaca.isEmpty(args[1].notTopLevel)) {
-                    notTopLevel = args[1].notTopLevel;
-                }
-            } else {
-                // "data" is the second argument
-                data = args[1];
-                if (Alpaca.isFunction(data)) {
-                    data = data();
-                }
+            if (!config)
+            {
+                return Alpaca.throwDefaultError("Unable to determine Alpaca configuration");
+            }
+
+            data = config.data;
+            schema = config.schema;
+            options = config.options;
+            view = config.view;
+            callback = config.render;
+            if (config.callback) {
+                callback = config.callback;
+            }
+            renderedCallback = config.postRender;
+            errorCallback = config.error;
+            connector = config.connector;
+
+            // sources
+            dataSource = config.dataSource;
+            schemaSource = config.schemaSource;
+            optionsSource = config.optionsSource;
+            viewSource = config.viewSource;
+
+            // other
+            if (config.ui) {
+                initialSettings["ui"] = config.ui;
+            }
+            if (config.type) {
+                initialSettings["type"] = config.type;
+            }
+            if (!Alpaca.isEmpty(config.notTopLevel)) {
+                notTopLevel = config.notTopLevel;
             }
         }
 
@@ -3433,17 +3777,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             errorCallback = Alpaca.defaultErrorCallback;
         }
 
-        if (Alpaca.isEmpty(connector)) {
-            var ConnectorClass = Alpaca.getConnectorClass("default");
-            connector = new ConnectorClass("default");
+        var connectorId = "default";
+        var connectorConfig = {};
+        if (Alpaca.isString(connector)) {
+            connectorId = connector;
         }
-
-        // container can either be a dom id or a dom element
-        if (el) {
-            if (Alpaca.isString(el)) {
-                el = $("#" + el);
+        else if (Alpaca.isObject(connector) && connector.id) {
+            connectorId = connector.id;
+            if (connector.config) {
+                connectorConfig = connector.config;
             }
         }
+
+        // instantiate the connector
+        var ConnectorClass = Alpaca.getConnectorClass(connectorId);
+        connector = new ConnectorClass(connectorId, connectorConfig);
 
         // For second or deeper level of fields, default loader should be the one to do loadAll
         // since schema, data, options and view should have already been loaded.
@@ -4045,23 +4393,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (Alpaca.isEmpty(data)) {
                 schemaType = "string";
             }
-            if (Alpaca.isObject(data)) {
-                schemaType = "object";
-            }
-            if (Alpaca.isString(data)) {
-                schemaType = "string";
-            }
-            if (Alpaca.isNumber(data)) {
-                schemaType = "number";
-            }
-            if (Alpaca.isArray(data)) {
+            else if (Alpaca.isArray(data)) {
                 schemaType = "array";
             }
-            if (Alpaca.isBoolean(data)) {
+            else if (Alpaca.isObject(data)) {
+                schemaType = "object";
+            }
+            else if (Alpaca.isString(data)) {
+                schemaType = "string";
+            }
+            else if (Alpaca.isNumber(data)) {
+                schemaType = "number";
+            }
+            else if (Alpaca.isBoolean(data)) {
                 schemaType = "boolean";
             }
             // Last check for data that carries functions -- GitanaConnector case.
-            if (typeof data === 'object') {
+            if (!schemaType && (typeof data === 'object')) {
                 schemaType = "object";
             }
 
@@ -5095,7 +5443,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     schema.type = Alpaca.getSchemaType(data);
                 }
                 if (!schema.type) {
-                    schema.type = "object"; // fallback
+                    if (data && Alpaca.isArray(data)) {
+                        schema.type = "array";
+                    }
+                    else {
+                        schema.type = "object"; // fallback
+                    }
                 }
                 if (schema && schema["enum"]) {
                     if (schema["enum"].length > 3) {
@@ -5964,7 +6317,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
      */
     Alpaca.resolveReference = function(schema, options, referenceId)
     {
-        if (schema.id == referenceId) // jshint ignore:line
+        if ((schema.id === referenceId) || (("#" + schema.id) === referenceId)) // jshint ignore:line
         {
             var result = {};
             if (schema) {
@@ -6014,10 +6367,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         var newArgs = [].concat(this, args);
 
         // invoke Alpaca against current element
-        Alpaca.apply(this, newArgs);
+        var ret = Alpaca.apply(this, newArgs);
+        if (typeof(ret) === "undefined") {
+            // as per jQuery's pattern, assume we hand back $el
+            ret = $(this);
+        }
 
-        // as per jQuery's pattern, hand back $el
-        return this;
+        return ret;
     };
 
     /**
@@ -6481,29 +6837,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     };
 
     /**
-     * Runs the given function over the field's children recursively.
-     *
-     * @param field
-     * @param fn
-     */
-    Alpaca.fieldApplyChildren = function(field, fn)
-    {
-        var f = function(field, fn)
-        {
-            // if the field has children, go depth first
-            if (field.children && field.children.length > 0)
-            {
-                for (var i = 0; i < field.children.length; i++)
-                {
-                    fn(field.children[i]);
-                }
-            }
-        };
-
-        f(field, fn);
-    };
-
-    /**
      * Runs the given function over the field and all of its children recursively.
      *
      * @param field
@@ -6513,7 +6846,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     {
         fn(field);
 
-        Alpaca.fieldApplyChildren(field, fn);
+        // if the field has children, go depth first
+        if (field.children && field.children.length > 0)
+        {
+            for (var i = 0; i < field.children.length; i++)
+            {
+                Alpaca.fieldApplyFieldAndChildren(field.children[i], fn);
+            }
+        }
     };
 
     /**
@@ -7754,6 +8094,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     Alpaca.CLASS_CONTROL = "alpaca-control";
     Alpaca.MARKER_CLASS_INSERT = "alpaca-marker-insert";
     Alpaca.MARKER_DATA_INSERT_KEY = "data-alpaca-marker-insert-key";
+    Alpaca.MARKER_CLASS_ARRAY_TOOLBAR = "alpaca-marker-array-field-toolbar";
+    Alpaca.MARKER_DATA_ARRAY_TOOLBAR_FIELD_ID = "data-alpaca-array-field-toolbar-field-id";
+    Alpaca.MARKER_CLASS_ARRAY_ITEM_ACTIONBAR = "alpaca-marker-array-field-item-actionbar";
+    Alpaca.MARKER_DATA_ARRAY_ITEM_KEY = "data-alpaca-marker-array-field-item-key";
+    Alpaca.MARKER_DATA_ARRAY_ITEM_PARENT_FIELD_ID = "data-alpaca-marker-array-field-item-parent-field-id";
+    Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM_FIELD = "alpaca-marker-container-field-item-field";
 
     Alpaca.makeCacheKey = function(viewId, scopeType, scopeId, templateId)
     {
@@ -8703,6 +9049,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return options.inverse(this);
         }
     };
+    helpers["ifnot"] = function(value, options)
+    {
+        if (!value)
+        {
+            return options.fn(this);
+        }
+        else
+        {
+            return options.inverse(this);
+        }
+    };
     helpers["times"] = function(n, block) {
         var accum = '';
         for(var i = 0; i < n; ++i)
@@ -8719,9 +9076,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     {
         return "<div class='" + Alpaca.MARKER_CLASS_CONTAINER_FIELD + "'></div>";
     };
-    helpers["item"] = function(options)
+    helpers["item"] = function(tag, options)
     {
-        return "<div class='" + Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM + "' " + Alpaca.MARKER_DATA_CONTAINER_FIELD_ITEM_KEY + "='" + this.name + "'></div>";
+        if (Alpaca.isObject(tag))
+        {
+            options = tag;
+            tag = "div";
+        }
+
+        return "<" + tag + " class='" + Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM + "' " + Alpaca.MARKER_DATA_CONTAINER_FIELD_ITEM_KEY + "='" + this.name + "'></" + tag + ">";
+    };
+    helpers["itemField"] = function(tag, options)
+    {
+        if (Alpaca.isObject(tag))
+        {
+            options = tag;
+            tag = "div";
+        }
+
+        return "<" + tag + " class='" + Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM_FIELD + "'></" + tag + ">";
     };
     helpers["formItems"] = function(options)
     {
@@ -8772,9 +9145,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         return data;
     };
-    Handlebars.registerHelper('setIndex', function(value){
+    helpers["arrayToolbar"] = function(options)
+    {
+        return "<div class='" + Alpaca.MARKER_CLASS_ARRAY_TOOLBAR + "' " + Alpaca.MARKER_DATA_ARRAY_TOOLBAR_FIELD_ID + "='" + this.id + "'></div>";
+    };
+    helpers["arrayActionbar"] = function(options)
+    {
+        return "<div class='" + Alpaca.MARKER_CLASS_ARRAY_ITEM_ACTIONBAR + "' " + Alpaca.MARKER_DATA_ARRAY_ITEM_KEY + "='" + this.name + "' " + Alpaca.MARKER_DATA_ARRAY_ITEM_PARENT_FIELD_ID + "='" + this.parentFieldId + "'></div>";
+    };
+    Handlebars.registerHelper("arrayToolbar", helpers["arrayToolbar"]);
+    Handlebars.registerHelper("arrayActionbar", helpers["arrayActionbar"]);
+
+    Handlebars.registerHelper("setIndex", function(value){
         this.index = Number(value);
     });
+
+    Handlebars.registerHelper("eachProperty", function(context, options) {
+        var ret = "";
+        for(var prop in context)
+        {
+            ret = ret + options.fn({key:prop,value:context[prop]});
+        }
+        return ret;
+    });
+
 
     Handlebars.registerHelper("uploadErrorMessage", function(error) {
 
@@ -8843,6 +9237,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     Handlebars.registerHelper("control", helpers["control"]);
     Handlebars.registerHelper("container", helpers["container"]);
     Handlebars.registerHelper("item", helpers["item"]);
+    Handlebars.registerHelper("itemField", helpers["itemField"]);
     Handlebars.registerHelper("formItems", helpers["formItems"]);
     Handlebars.registerHelper("times", helpers["times"]);
     Handlebars.registerHelper("str", helpers["str"]);
@@ -8851,6 +9246,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     Handlebars.registerHelper('with', function(context, options) {
         return options.fn(context);
     });
+
+    // ifnot
+    Handlebars.registerHelper("ifnot", helpers["ifnot"]);
 
     var partials = {};
 
@@ -9084,6 +9482,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // whether the view is readonly
                 setScalar(this, element, "displayReadonly");
 
+                // locale
+                setScalar(this, element, "locale");
+
                 // functions
                 setFunction(this, element, "render");
                 setFunction(this, element, "postRender");
@@ -9109,7 +9510,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // horizontal
                 setScalar(this, element, "horizontal");
 
-                // TODO: remove some of these
+                // TODO: remove some of these?
                 setScalar(this, element, "collapsible");
                 setScalar(this, element, "legendStyle");
                 setScalar(this, element, "toolbarStyle");
@@ -9117,7 +9518,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 setScalar(this, element, "toolbarSticky");
                 setScalar(this, element, "globalTemplate");
 
-                // TODO: remove wizard
+                // TODO: remove wizard?
                 mergeMap(this, element, "wizard");
             }
 
@@ -9236,15 +9637,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * Gets message for the given id.
+         * Gets message for the given id
          *
-         * @param {String} messageId Message id.
+         * @param {String} messageId Message id
+         * @param {String} locale locale
          *
          * @returns {String} Message mapped to the given id.
          */
-        getMessage : function (messageId) {
-            var messageForLocale = this.getViewParam(["messages",Alpaca.defaultLocale,messageId]);
-            return Alpaca.isEmpty(messageForLocale) ? this.getViewParam(["messages",messageId]): messageForLocale;
+        getMessage : function (messageId, locale)
+        {
+            if (!locale) {
+                locale = Alpaca.defaultLocale;
+            }
+
+            var messageForLocale = this.getViewParam(["messages", locale, messageId]);
+            if (Alpaca.isEmpty(messageForLocale)) {
+                messageForLocale = this.getViewParam(["messages", messageId]);
+            }
+
+            return messageForLocale;
         },
 
         /**
@@ -9897,6 +10308,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             });
         },
 
+        renderFieldDomElement: function(data)
+        {
+            var templateDescriptor = this.getTemplateDescriptor();
+
+            // render the field
+            return Alpaca.tmpl(templateDescriptor, {
+                "id": this.getId(),
+                "options": this.options,
+                "schema": this.schema,
+                "data": data,
+                "view": this.view,
+                "path": this.path,
+                "name": this.name
+            });
+        },
+
         /**
          * Renders the "field" outer element.  This is usually the control or container.
          *
@@ -9907,8 +10334,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             var self = this;
 
-            var templateDescriptor = this.getTemplateDescriptor();
-
             // the data we'll render
             var theData = this.data;
 
@@ -9918,16 +10343,35 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 theData = JSON.stringify(theData);
             }
 
-            // render the field
-            var renderedDomElement = Alpaca.tmpl(templateDescriptor, {
-                "id": this.getId(),
-                "options": this.options,
-                "schema": this.schema,
-                "data": theData,
-                "view": this.view,
-                "path": this.path,
-                "name": this.name
-            });
+            var renderedDomElement = self.renderFieldDomElement(theData);
+
+            // if we got back multiple elements, try to pick at the first DIV
+            if ($(renderedDomElement).length > 0)
+            {
+                var single = null;
+                for (var i = 0; i < $(renderedDomElement).length; i++)
+                {
+                    var name = $(renderedDomElement)[i].nodeName;
+                    if (name)
+                    {
+                        name = name.toLowerCase();
+
+                        if ("div" === name || "span" === name)
+                        {
+                            single = $($(renderedDomElement)[i]);
+                            break;
+                        }
+                    }
+                }
+                if (!single)
+                {
+                    single = $($(renderedDomElement).last());
+                }
+                if (single)
+                {
+                    renderedDomElement = single;
+                }
+            }
 
             // remove the previous "field" element if it exists
             self._oldFieldEl = self.field;
@@ -10518,6 +10962,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * View and locale friendly retrieval of messages.
+         *
+         * @param key
+         */
+        getMessage: function(key)
+        {
+            return this.view.getMessage(key, this.view.locale);
+        },
+
+        /**
          * Validates this field and returns whether it is in a valid state.
          *
          * @param [Boolean] validateChildren whether to child controls.
@@ -10578,13 +11032,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateOptional();
             valInfo["notOptional"] = {
-                "message": status ? "" : this.view.getMessage("notOptional"),
+                "message": status ? "" : this.getMessage("notOptional"),
                 "status": status
             };
 
             status = this._validateDisallow();
             valInfo["disallowValue"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("disallowValue"), [this.schema["disallow"].join(', ')]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("disallowValue"), [this.schema["disallow"].join(', ')]),
                 "status": status
             };
 
@@ -11143,7 +11597,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     {
                         for (var i = 0; i < requiredArray.length; i++)
                         {
-                            if (requiredArray[i] === this.name)
+                            if (requiredArray[i] === this.propertyId)
                             {
                                 required = true;
                                 break;
@@ -11771,6 +12225,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             model.schema = this.schema;
             model.data = this.data;
             model.required = this.isRequired();
+            model.view = this.view;
 
             callback(model);
         },
@@ -11906,7 +12361,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateEnum();
             valInfo["invalidValueOfEnum"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("invalidValueOfEnum"), [this.schema["enum"].join(', '), this.data]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("invalidValueOfEnum"), [this.schema["enum"].join(', '), this.data]),
                 "status": status
             };
 
@@ -12213,6 +12668,40 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return selectedType;
         },
 
+        resolveContainerItemTemplateType: function()
+        {
+            // we assume the field type and then check the view to see if there is a template for this view
+            // if not, we walk the parent chain until we find a template type
+
+            var finished = false;
+            var selectedType = null;
+
+            var b = this;
+            do
+            {
+                if (!b.getFieldType)
+                {
+                    finished = true;
+                }
+                else
+                {
+                    var d = this.view.getTemplateDescriptor("container-" + b.getFieldType() + "-item", this);
+                    if (d)
+                    {
+                        selectedType = b.getFieldType();
+                        finished = true;
+                    }
+                    else
+                    {
+                        b = b.constructor.ancestor.prototype;
+                    }
+                }
+            }
+            while (!finished);
+
+            return selectedType;
+        },
+
         /**
          * @see Alpaca.Field#setup
          */
@@ -12267,15 +12756,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.children = [];
             this.childrenById = {};
             this.childrenByPropertyId = {};
-            // style icons
-            this.commonIcon = this.view.getStyle("commonIcon");
-            this.addIcon = this.view.getStyle("addIcon");
-            this.removeIcon = this.view.getStyle("removeIcon");
-            this.upIcon = this.view.getStyle("upIcon");
-            this.downIcon = this.view.getStyle("downIcon");
-            this.expandedIcon = this.view.getStyle("expandedIcon");
-            this.collapsedIcon = this.view.getStyle("collapsedIcon");
-            this.buttonClass = this.view.getStyle("button");
         },
 
         /**
@@ -12361,7 +12841,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var model = {
                 "id": this.getId(),
                 "name": this.name,
-                "options": this.options
+                "schema": this.schema,
+                "options": this.options,
+                "view": this.view
             };
 
             // load items into array and store on model for future use
@@ -12370,6 +12852,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (!items)
                 {
                     items = [];
+                }
+
+                // legacy support: assume containerItemEl = fieldEl
+                for (var i = 0; i < items.length; i++)
+                {
+                    if (!items[i].containerItemEl) {
+                        items[i].containerItemEl = items[i].getFieldEl();
+                    }
                 }
 
                 model.items = items;
@@ -12426,12 +12916,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             var self = this;
 
-            self.applyCreatedItems(model, function() {
-
-                self.afterApplyCreatedItems(model, function() {
-
-                    callback();
-
+            self.beforeApplyCreatedItems(model, function() {
+                self.applyCreatedItems(model, function () {
+                    self.afterApplyCreatedItems(model, function () {
+                        callback();
+                    });
                 });
             });
         },
@@ -12480,6 +12969,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             callback();
         },
 
+        beforeApplyCreatedItems: function(model, callback)
+        {
+            callback();
+        },
+
         applyCreatedItems: function(model, callback)
         {
             var self = this;
@@ -12520,12 +13014,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var item = model.items[i];
 
                 // find the insertion point
-                var insertionPoint = $(self.container).find("[" + Alpaca.MARKER_DATA_CONTAINER_FIELD_ITEM_KEY + "='" + item.name + "']");
+                var insertionPoint = $(self.container).find("." + Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM + "[" + Alpaca.MARKER_DATA_CONTAINER_FIELD_ITEM_KEY + "='" + item.name + "']");
                 if (!layoutBindings)
                 {
                     var holder = $(insertionPoint).parent();
 
-                    $(insertionPoint).replaceWith(item.field);
+                    $(insertionPoint).replaceWith(item.containerItemEl);
 
                     // reset domEl to allow for refresh
                     item.domEl = holder;
@@ -12546,7 +13040,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                         if (holder.length > 0)
                         {
-                            $(item.field).appendTo(holder);
+                            $(item.containerItemEl).appendTo(holder);
 
                             // reset domEl to allow for refresh
                             item.domEl = holder;
@@ -12557,20 +13051,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     $(insertionPoint).remove();
                 }
 
-                $(item.field).addClass("alpaca-container-item");
+                $(item.containerItemEl).addClass("alpaca-container-item");
 
                 if (i === 0)
                 {
-                    $(item.field).addClass("alpaca-container-item-first");
+                    $(item.containerItemEl).addClass("alpaca-container-item-first");
                 }
 
                 if (i + 1 === model.items.length)
                 {
-                    $(item.field).addClass("alpaca-container-item-last");
+                    $(item.containerItemEl).addClass("alpaca-container-item-last");
                 }
 
-                $(item.field).attr("data-alpaca-container-item-index", i);
-                $(item.field).attr("data-alpaca-container-item-name", item.name);
+                $(item.containerItemEl).attr("data-alpaca-container-item-index", i);
+                $(item.containerItemEl).attr("data-alpaca-container-item-name", item.name);
+                $(item.containerItemEl).attr("data-alpaca-container-item-parent-field-id", self.getId());
 
                 // register the child
                 self.registerChild(item, i);
@@ -12674,73 +13169,32 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 {
                     var child = self.children[i];
 
-                    var field = child.getFieldEl();
-
                     // reset path and name
                     child.path = self.path + "[" + i + "]";
                     child.calculateName();
 
-                    //$(field).removeClass("alpaca-container-item");
-                    $(field).removeClass("alpaca-container-item-first");
-                    $(field).removeClass("alpaca-container-item-last");
-                    $(field).removeClass("alpaca-container-item-index");
-                    $(field).removeClass("alpaca-container-item-key");
+                    $(child.containerItemEl).removeClass("alpaca-container-item-first");
+                    $(child.containerItemEl).removeClass("alpaca-container-item-last");
+                    $(child.containerItemEl).removeClass("alpaca-container-item-index");
+                    $(child.containerItemEl).removeClass("alpaca-container-item-key");
 
-                    $(field).addClass("alpaca-container-item");
+                    $(child.containerItemEl).addClass("alpaca-container-item");
 
                     if (i === 0)
                     {
-                        $(field).addClass("alpaca-container-item-first");
+                        $(child.containerItemEl).addClass("alpaca-container-item-first");
                     }
                     if (i + 1 === self.children.length)
                     {
-                        $(field).addClass("alpaca-container-item-last");
+                        $(child.containerItemEl).addClass("alpaca-container-item-last");
                     }
 
-                    $(field).attr("data-alpaca-container-item-index", i);
-                    $(field).attr("data-alpaca-container-item-name", child.name);
+                    $(child.containerItemEl).attr("data-alpaca-container-item-index", i);
+                    $(child.containerItemEl).attr("data-alpaca-container-item-name", child.name);
+                    $(child.containerItemEl).attr("data-alpaca-container-item-parent-field-id", self.getId());
                 }
             }
         },
-
-        /**
-         * @see Alpaca.Field#setDefault
-         */
-            /*
-        setDefault: function()
-        {
-            if (Alpaca.isEmpty(this.schema['default']))
-            {
-                Alpaca.each(this.children, function() {
-                    this.setDefault();
-                });
-            }
-            else
-            {
-                this.setValue(this.schema['default']);
-            }
-        },
-        */
-
-        /**
-         * Clears the field and resets the field to its original value.
-         *
-         * @param stopUpdateTrigger If false, triggers the update event of this event.
-         */
-            /*
-        clear: function(stopUpdateTrigger)
-        {
-            // clear all the kiddies
-            Alpaca.each(this.children, function() {
-                this.clear(false);
-            });
-
-            // trigger update all at once
-            if (!stopUpdateTrigger) {
-                this.triggerUpdate();
-            }
-        },
-        */
 
         /**
          * Propagates signal down to all children.
@@ -12907,6 +13361,555 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var Alpaca = $.alpaca;
 
+    Alpaca.Form = Base.extend(
+    /**
+     * @lends Alpaca.Form.prototype
+     */
+    {
+        /**
+         * @constructs
+         *
+         * @class This class is for managing HTML form control.
+         *
+         * @param {Object} container Field container.
+         * @param {Object} options Field options.
+         * @param {Object|String} view Field view.
+         * @param {Alpaca.Connector} connector Field connector.
+         * @param {Function} errorCallback Error callback.
+         */
+        constructor: function(domEl, options, viewId, connector, errorCallback) {
+
+            // container
+            this.domEl = domEl;
+
+            // parent
+            this.parent = null;
+
+            this.connector = connector;
+            this.errorCallback = errorCallback;
+
+            // options
+            this.options = options;
+
+            if (this.options.attributes)
+            {
+                this.attributes = this.options.attributes;
+            }
+            else
+            {
+                this.attributes = {};
+            }
+
+            if (this.options.buttons)
+            {
+                if (this.options.buttons.submit)
+                {
+                    if (!this.options.buttons.submit.type)
+                    {
+                        this.options.buttons.submit.type = 'submit';
+                    }
+
+                    if (!this.options.buttons.submit.name)
+                    {
+                        this.options.buttons.submit.name = 'submit';
+                    }
+
+                    if (!this.options.buttons.submit.value)
+                    {
+                        this.options.buttons.submit.value = 'Submit';
+                    }
+                }
+
+                if (this.options.buttons.reset)
+                {
+                    if (!this.options.buttons.reset.type)
+                    {
+                        this.options.buttons.reset.type = 'reset';
+                    }
+                    if (!this.options.buttons.reset.name)
+                    {
+                        this.options.buttons.reset.name = 'reset';
+                    }
+                    if (!this.options.buttons.reset.value)
+                    {
+                        this.options.buttons.reset.value = 'Reset';
+                    }
+                }
+
+                // some general correction
+                for (var k in this.options.buttons)
+                {
+                    if (this.options.buttons[k].label)
+                    {
+                        this.options.buttons[k].value = this.options.buttons[k].label;
+                    }
+                    if (this.options.buttons[k].title)
+                    {
+                        this.options.buttons[k].value = this.options.buttons[k].title;
+                    }
+                    if (!this.options.buttons[k].type)
+                    {
+                        this.options.buttons[k].type = "button";
+                    }
+                }
+            }
+
+            if (this.attributes.id)
+            {
+                this.id = this.attributes.id;
+            }
+            else
+            {
+                this.id = Alpaca.generateId();
+                this.attributes.id = this.id;
+            }
+
+            // if we have a submit button specified, and toggleSubmitValidState isn't defined, set to true by default
+            // don't allow the form to submit unless valid
+            if (this.options.buttons && this.options.buttons.submit && Alpaca.isUndefined(this.options.toggleSubmitValidState))
+            {
+                this.options.toggleSubmitValidState = true;
+            }
+
+            this.viewType = options.viewType;
+
+            // set a runtime view
+            this.view = new Alpaca.RuntimeView(viewId, this);
+        },
+
+        /**
+         * Renders this form into the container.
+         *
+         * @param {Function} callback
+         */
+        render: function(callback)
+        {
+            var self = this;
+
+            // remove the previous form element if it exists
+            if (this.form)
+            {
+                this.form.remove();
+            }
+
+            // load the appropriate template and render it
+            this.processRender(this.domEl, function() {
+
+                // bind our field dom element into the container
+                self.form.appendTo(self.container);
+
+                // add default class
+                self.form.addClass("alpaca-form");
+
+                // CALLBACK: "form"
+                self.fireCallback("form");
+
+                // execute callback
+                callback(self);
+            });
+        },
+
+        /**
+         * Determines whether the top control is entirely valid.
+         *
+         * @return {*}
+         */
+        isFormValid: function()
+        {
+            // re-compute validation for the full control set
+            this.topControl.validate(true);
+
+            var valid = this.topControl.isValid(true);
+            //this.refreshValidationState(true);
+
+            return valid;
+        },
+
+        isValid: function()
+        {
+            return this.isFormValid();
+        },
+
+        validate: function(children)
+        {
+            return this.topControl.validate(children);
+        },
+
+        enableSubmitButton: function()
+        {
+            $(".alpaca-form-button-submit").attrProp("disabled", false);
+
+            if ($.mobile)
+            {
+                try { $(".alpaca-form-button-submit").button('refresh'); } catch (e) { }
+            }
+        },
+
+        disableSubmitButton: function()
+        {
+            $(".alpaca-form-button-submit").attrProp("disabled", true);
+
+            if ($.mobile)
+            {
+                try { $(".alpaca-form-button-submit").button('refresh'); } catch (e) { }
+            }
+        },
+
+        adjustSubmitButtonState: function()
+        {
+            this.disableSubmitButton();
+
+            if (this.isFormValid())
+            {
+                this.enableSubmitButton();
+            }
+        },
+
+        /**
+         * Responsible for fetching any templates needed so as to render the
+         * current mode for this field.
+         *
+         * Once completed, the onSuccess method is called.
+         *
+         * @param {Object} parentEl Field container.
+         * @param {Function} callback
+         */
+        processRender: function(parentEl, callback)
+        {
+            var self = this;
+
+            // lookup the template we should use to render
+            this.formDescriptor = this.view.getTemplateDescriptor("form");
+            if (!this.formDescriptor)
+            {
+                return Alpaca.throwErrorWithCallback("Could not find template descriptor: form");
+            }
+
+            var renderedDomElement = Alpaca.tmpl(this.formDescriptor, {
+                id: this.getId(),
+                options: this.options,
+                view: this.view
+            });
+            renderedDomElement.appendTo(parentEl);
+
+            this.form = renderedDomElement;
+
+            // find our insertion point
+            // this is marked by the handlebars helper
+            this.formFieldsContainer = $(this.form).find("." + Alpaca.MARKER_CLASS_FORM_ITEMS_FIELD);
+            this.formFieldsContainer.removeClass(Alpaca.MARKER_CLASS_FORM_ITEMS_FIELD);
+
+            if (Alpaca.isEmpty(this.form.attr("id")))
+            {
+                this.form.attr("id", this.getId() + "-form-outer");
+            }
+            if (Alpaca.isEmpty(this.form.attr("data-alpaca-form-id")))
+            {
+                this.form.attr("data-alpaca-form-id", this.getId());
+            }
+
+            // the form field
+            parentEl.find("form").attr(this.attributes);
+
+            // populate the buttons as well
+            this.buttons = {};
+            $(parentEl).find(".alpaca-form-button").each(function() {
+
+                $(this).click(function(e) {
+                    $(this).attr("button-pushed", true);
+                });
+
+                // custom click handler?
+                var key = $(this).attr("data-key");
+                if (key)
+                {
+                    var buttonConfig = self.options.buttons[key];
+                    if (buttonConfig)
+                    {
+                        if (buttonConfig.click)
+                        {
+                            $(this).click(function(form, handler) {
+                                return function(e) {
+                                    e.preventDefault();
+                                    handler.call(form, e);
+                                }
+                            }(self, buttonConfig.click));
+                        }
+                    }
+                }
+            });
+
+            callback();
+        },
+
+        /**
+         * Returns the id of the form.
+         *
+         * @returns {String} Form id
+         */
+        getId: function()
+        {
+            return this.id;
+        },
+
+        /**
+         * Returns form type.
+         *
+         * @returns {String} Form type.
+         */
+        getType: function()
+        {
+            return this.type;
+        },
+
+        /**
+         * Returns this form's parent.
+         *
+         * @returns {Object} Form parent.
+         */
+        getParent: function()
+        {
+            return this.parent;
+        },
+
+        /**
+         * Returns the value of the JSON rendered by this form.
+         *
+         * @returns {Any} Value of the JSON rendered by this form.
+         */
+        getValue: function()
+        {
+            return this.topControl.getValue();
+        },
+
+        /**
+         * Sets the value of the JSON to be rendered by this form.
+         *
+         * @param {Any} value Value to be set.
+         */
+        setValue: function(value)
+        {
+            this.topControl.setValue(value);
+        },
+
+        /**
+         * Initializes events handling (Form Submission) for this form.
+         */
+        initEvents: function()
+        {
+            var _this = this;
+
+            var formTag = $(this.domEl).find("form");
+
+            var v = this.getValue();
+            $(formTag).submit(v, function(e) {
+                return _this.onSubmit(e, _this);
+            });
+
+            // listen for fieldupdates and determine whether the form is valid.
+            // if so, enable the submit button...
+            // otherwise, disable it
+            if (this.options.toggleSubmitValidState)
+            {
+                $(_this.topControl.getFieldEl()).bind("fieldupdate", function() {
+                    _this.adjustSubmitButtonState();
+                });
+
+                this.adjustSubmitButtonState();
+            }
+        },
+
+        getButtonEl: function(buttonId)
+        {
+            return $(this.domEl).find(".alpaca-form-button-" + buttonId);
+        },
+
+        /**
+         * Handles form submit events.
+         *
+         * @param {Object} e Submit event.
+         * @param {Object} form the form
+         */
+        onSubmit: function(e, form)
+        {
+            if (this.submitHandler)
+            {
+                e.stopPropagation();
+
+                var v = this.submitHandler(e, form);
+                if (Alpaca.isUndefined(v)) {
+                    v = false;
+                }
+
+                return v;
+            }
+        },
+
+        /**
+         * Registers a custom submit handler.
+         *
+         * @param {Object} func Submit handler to be registered.
+         */
+        registerSubmitHandler: function (func)
+        {
+            if (Alpaca.isFunction(func))
+            {
+                this.submitHandler = func;
+            }
+        },
+
+        /**
+         * Displays validation information of all fields of this form.
+         *
+         * @param {Boolean} children whether to render validation state for child fields
+         *
+         * @returns {Object} Form validation state.
+         */
+        refreshValidationState: function(children, callback)
+        {
+            this.topControl.refreshValidationState(children, callback);
+        },
+
+        /**
+         * Disables this form.
+         */
+        disable: function()
+        {
+            this.topControl.disable();
+        },
+
+        /**
+         * Enables this form.
+         */
+        enable: function()
+        {
+            this.topControl.enable();
+        },
+
+        /**
+         * Focuses on this form.
+         */
+        focus: function()
+        {
+            this.topControl.focus();
+        },
+
+        /**
+         * Purge any event listeners and remove the form from the DOM.
+         *
+         * @param [Boolean] skipParent when true, the form cleans up without traversing through parent child controls
+         */
+        destroy: function(skipParent)
+        {
+            this.getFormEl().remove();
+
+            // we allow form.destroy() which tells parent control to destroy
+            // if skipParent == true, then we do not call up (invoked from container)
+            if (!skipParent && this.parent)
+            {
+                this.parent.destroy();
+            }
+        },
+
+        /**
+         * Shows the form.
+         */
+        show: function()
+        {
+            this.getFormEl().css({
+                "display": ""
+            });
+        },
+
+        /**
+         * Hides the form.
+         */
+        hide: function()
+        {
+            this.getFormEl().css({
+                "display": "none"
+            });
+        },
+
+        /**
+         * Clears the form and resets values of its fields.
+         *
+         * @param stopUpdateTrigger If false, triggers the update event of this event.
+         */
+        clear: function(stopUpdateTrigger)
+        {
+            this.topControl.clear(stopUpdateTrigger);
+        },
+
+        /**
+         * Checks if form is empty.
+         *
+         * @returns {Boolean} True if the form is empty, false otherwise.
+         */
+        isEmpty: function()
+        {
+            return this.topControl.isEmpty();
+        },
+
+        /**
+         * Fires a view callback for the current form.
+         *
+         * @param id
+         * @param arg1
+         * @param arg2
+         * @param arg3
+         * @param arg4
+         * @param arg5
+         */
+        fireCallback: function(id, arg1, arg2, arg3, arg4, arg5)
+        {
+            this.view.fireCallback(this, id, arg1, arg2, arg3, arg4, arg5);
+        },
+
+        /**
+         * Retrieves the form element.
+         *
+         * @returns {Object} The rendered DOM element.
+         */
+        getFormEl: function() {
+            return this.form;
+        },
+
+        /**
+         * Performs a regular old submit.
+         */
+        submit: function()
+        {
+            this.form.submit();
+        },
+
+        /**
+         * Fires the submit in the background and hands back the jQuery promise.
+         *
+         * @returns {*}
+         */
+        ajaxSubmit: function()
+        {
+            var self = this;
+
+            return $.ajax({
+                data: this.getValue(),
+                url: self.options.attributes.action,
+                type: self.options.attributes.method,
+                dataType: "json"
+            });
+        }
+
+    });
+
+})(jQuery);
+
+(function($) {
+
+    var Alpaca = $.alpaca;
+
+    var ONE_HOUR = 3600000;
+
     Alpaca.Connector = Base.extend(
     /**
      * @lends Alpaca.Connector.prototype
@@ -12916,11 +13919,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          * @constructs
          * @class Connects Alpaca to remote data stores.
 
-         * @param {String} id Connector ID.
+         * @param {String} id Connector ID
+         * @param {Object} config Connector Config
          */
-        constructor: function(id)
+        constructor: function(id, config)
         {
             this.id = id;
+            this.config = config;
 
             // helper function to determine if a resource is a uri
             this.isUri = function(resource)
@@ -12928,7 +13933,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return !Alpaca.isEmpty(resource) && Alpaca.isUri(resource);
             };
 
-            var ONE_HOUR = 3600000;
             this.cache = new AjaxCache('URL', true, ONE_HOUR);
         },
 
@@ -12940,10 +13944,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         connect: function (onSuccess, onError)
         {
-            if (onSuccess && Alpaca.isFunction(onSuccess))
-            {
-                onSuccess();
-            }
+            onSuccess();
         },
 
         /**
@@ -13048,110 +14049,149 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         loadAll: function (resources, onSuccess, onError)
         {
-            var dataSource = resources.dataSource;
-            var schemaSource = resources.schemaSource;
-            var optionsSource = resources.optionsSource;
-            var viewSource = resources.viewSource;
+            var self = this;
 
-            // we allow "schema" to contain a URI as well (backwards-compatibility)
-            if (!schemaSource)
-            {
-                schemaSource = resources.schema;
-            }
+            var onConnectSuccess = function() {
 
-            // we allow "options" to contain a URI as well (backwards-compatibility)
-            if (!optionsSource)
-            {
-                optionsSource = resources.options;
-            }
+                var dataSource = resources.dataSource;
+                var schemaSource = resources.schemaSource;
+                var optionsSource = resources.optionsSource;
+                var viewSource = resources.viewSource;
 
-            // we allow "view" to contain a URI as well (backwards-compatibility)
-            if (!viewSource)
-            {
-                viewSource = resources.view;
-            }
-
-            var loaded = {};
-
-            var loadCounter = 0;
-            var invocationCount = 0;
-
-            var successCallback = function()
-            {
-                if (loadCounter === invocationCount)
+                // we allow "schema" to contain a URI as well (backwards-compatibility)
+                if (!schemaSource && typeof(resources.schema) === "string")
                 {
-                    if (onSuccess && Alpaca.isFunction(onSuccess))
+                    schemaSource = resources.schema;
+                }
+
+                // we allow "options" to contain a URI as well (backwards-compatibility)
+                if (!optionsSource && typeof(resources.options) === "string")
+                {
+                    optionsSource = resources.options;
+                }
+
+                // we allow "view" to contain a URI as well (backwards-compatibility)
+                if (!viewSource && typeof(resources.view) === "string")
+                {
+                    viewSource = resources.view;
+                }
+
+                var loaded = {};
+
+                var loadCounter = 0;
+                var invocationCount = 0;
+
+                var successCallback = function()
+                {
+                    if (loadCounter === invocationCount)
                     {
-                        onSuccess(loaded.data, loaded.options, loaded.schema, loaded.view);
+                        if (onSuccess && Alpaca.isFunction(onSuccess))
+                        {
+                            onSuccess(loaded.data, loaded.options, loaded.schema, loaded.view);
+                        }
                     }
-                }
-            };
+                };
 
-            var errorCallback = function (loadError)
-            {
-                if (onError && Alpaca.isFunction(onError))
+                var errorCallback = function (loadError)
                 {
-                    onError(loadError);
+                    if (onError && Alpaca.isFunction(onError))
+                    {
+                        onError(loadError);
+                    }
+                };
+
+                // count out the total # of invokes we're going to fire off
+                if (dataSource)
+                {
+                    invocationCount++;
+                }
+                if (schemaSource)
+                {
+                    invocationCount++;
+                }
+                if (optionsSource)
+                {
+                    invocationCount++;
+                }
+                if (viewSource)
+                {
+                    invocationCount++;
+                }
+                if (invocationCount === 0)
+                {
+                    // nothing to invoke, so just hand back
+                    successCallback();
+                    return;
+                }
+
+                var doMerge = function(p, v1, v2)
+                {
+                    loaded[p] = v1;
+
+                    if (v2)
+                    {
+                        if ((typeof(loaded[p]) === "object") && (typeof(v2) === "object"))
+                        {
+                            Alpaca.mergeObject(loaded[p], v2);
+                        }
+                        else
+                        {
+                            loaded[p] = v2;
+                        }
+                    }
+                };
+
+                // fire off all of the invokes
+                if (dataSource)
+                {
+                    self.loadData(dataSource, function(data) {
+
+                        doMerge("data", resources.data, data);
+
+                        loadCounter++;
+                        successCallback();
+                    }, errorCallback);
+                }
+                if (schemaSource)
+                {
+                    self.loadSchema(schemaSource, function(schema) {
+
+                        doMerge("schema", resources.schema, schema);
+
+                        loadCounter++;
+                        successCallback();
+                    }, errorCallback);
+                }
+                if (optionsSource)
+                {
+                    self.loadOptions(optionsSource, function(options) {
+
+                        doMerge("options", resources.options, options);
+
+                        loadCounter++;
+                        successCallback();
+                    }, errorCallback);
+                }
+                if (viewSource)
+                {
+                    self.loadView(viewSource, function(view) {
+
+                        doMerge("view", resources.view, view);
+
+                        loadCounter++;
+                        successCallback();
+                    }, errorCallback);
+                }
+
+            };
+
+            var onConnectError  = function(err) {
+                if (onError && Alpaca.isFunction(onError)) {
+                    onError(err);
                 }
             };
 
-            // count out the total # of invokes we're going to fire off
-            if (dataSource)
-            {
-                invocationCount++;
-            }
-            if (schemaSource)
-            {
-                invocationCount++;
-            }
-            if (optionsSource)
-            {
-                invocationCount++;
-            }
-            if (viewSource)
-            {
-                invocationCount++;
-            }
-            if (invocationCount === 0)
-            {
-                // nothing to invoke, so just hand back
-                successCallback();
-                return;
-            }
-
-            // fire off all of the invokes
-            if (dataSource)
-            {
-                this.loadData(dataSource, function(data) {
-                    loaded.data = data;
-                    loadCounter++;
-                    successCallback();
-                }, errorCallback);
-            }
-            if (schemaSource)
-            {
-                this.loadSchema(schemaSource, function(schema) {
-                    loaded.schema = schema;
-                    loadCounter++;
-                    successCallback();
-                }, errorCallback);
-            }
-            if (optionsSource)
-            {
-                this.loadOptions(optionsSource, function(options) {
-                    loaded.options = options;
-                    loadCounter++;
-                    successCallback();
-                }, errorCallback);
-            }
-            if (viewSource)
-            {
-                this.loadView(viewSource, function(view) {
-                    loaded.view = view;
-                    loadCounter++;
-                    successCallback();
-                }, errorCallback);
-            }
+            self.connect(onConnectSuccess, onConnectError);
         },
 
         /**
@@ -13164,6 +14204,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         loadJson : function(uri, onSuccess, onError) {
             this.loadUri(uri, true, onSuccess, onError);
         } ,
+
+        /**
+         * Extension point.  Set up default ajax configuration for URL retrieval.
+         *
+         * @param uri
+         * @param isJson
+         * @returns {{url: *, type: string}}
+         */
+        buildAjaxConfig: function(uri, isJson)
+        {
+            var ajaxConfig = {
+                "url": uri,
+                "type": "get"
+            };
+
+            if (isJson) {
+                ajaxConfig.dataType = "json";
+            } else {
+                ajaxConfig.dataType = "text";
+            }
+
+            return ajaxConfig;
+        },
 
         /**
          * Loads a general document through Ajax call.
@@ -13180,44 +14243,36 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var self = this;
 
-            var ajaxConfigs = {
-                "url": uri,
-                "type": "get",
-                "success": function(jsonDocument) {
+            var ajaxConfig = self.buildAjaxConfig(uri, isJson);
 
-                    self.cache.put(uri, jsonDocument);
+            ajaxConfig["success"] = function(jsonDocument) {
 
-                    if (onSuccess && Alpaca.isFunction(onSuccess)) {
-                        onSuccess(jsonDocument);
-                    }
-                },
-                "error": function(jqXHR, textStatus, errorThrown) {
-                    if (onError && Alpaca.isFunction(onError)) {
-                        onError({
-                            "message":"Unable to load data from uri : " + uri,
-                            "stage": "DATA_LOADING_ERROR",
-                            "details": {
-                                "jqXHR" : jqXHR,
-                                "textStatus" : textStatus,
-                                "errorThrown" : errorThrown
-                            }
-                        });
-                    }
+                self.cache.put(uri, jsonDocument);
+
+                if (onSuccess && Alpaca.isFunction(onSuccess)) {
+                    onSuccess(jsonDocument);
                 }
             };
-
-            if (isJson) {
-                ajaxConfigs.dataType = "json";
-            } else {
-                ajaxConfigs.dataType = "text";
-            }
+            ajaxConfig["error"] = function(jqXHR, textStatus, errorThrown) {
+                if (onError && Alpaca.isFunction(onError)) {
+                    onError({
+                        "message":"Unable to load data from uri : " + uri,
+                        "stage": "DATA_LOADING_ERROR",
+                        "details": {
+                            "jqXHR" : jqXHR,
+                            "textStatus" : textStatus,
+                            "errorThrown" : errorThrown
+                        }
+                    });
+                }
+            };
 
             var cachedDocument = self.cache.get(uri);
 
             if (cachedDocument !== false && onSuccess && Alpaca.isFunction(onSuccess)) {
                 onSuccess(cachedDocument);
             } else {
-                $.ajax(ajaxConfigs);
+                $.ajax(ajaxConfig);
             }
         },
 
@@ -13632,546 +14687,134 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var Alpaca = $.alpaca;
 
-    Alpaca.Form = Base.extend(
+    Alpaca.CloudCmsConnector = Alpaca.Connector.extend(
     /**
-     * @lends Alpaca.Form.prototype
+     * @lends Alpaca.CloudCmsConnector.prototype
      */
     {
         /**
-         * @constructs
+         * Makes initial connections to data source.
          *
-         * @class This class is for managing HTML form control.
-         *
-         * @param {Object} container Field container.
-         * @param {Object} options Field options.
-         * @param {Object|String} view Field view.
-         * @param {Alpaca.Connector} connector Field connector.
-         * @param {Function} errorCallback Error callback.
+         * @param {Function} onSuccess onSuccess callback.
+         * @param {Function} onError onError callback.
          */
-        constructor: function(domEl, options, viewId, connector, errorCallback) {
-
-            // container
-            this.domEl = domEl;
-
-            // parent
-            this.parent = null;
-
-            this.connector = connector;
-            this.errorCallback = errorCallback;
-
-            // options
-            this.options = options;
-
-            if (this.options.attributes)
-            {
-                this.attributes = this.options.attributes;
-            }
-            else
-            {
-                this.attributes = {};
-            }
-
-            if (this.options.buttons)
-            {
-                if (this.options.buttons.submit)
-                {
-                    if (!this.options.buttons.submit.type)
-                    {
-                        this.options.buttons.submit.type = 'submit';
-                    }
-
-                    if (!this.options.buttons.submit.name)
-                    {
-                        this.options.buttons.submit.name = 'submit';
-                    }
-
-                    if (!this.options.buttons.submit.value)
-                    {
-                        this.options.buttons.submit.value = 'Submit';
-                    }
-                }
-
-                if (this.options.buttons.reset)
-                {
-                    if (!this.options.buttons.reset.type)
-                    {
-                        this.options.buttons.reset.type = 'reset';
-                    }
-                    if (!this.options.buttons.reset.name)
-                    {
-                        this.options.buttons.reset.name = 'reset';
-                    }
-                    if (!this.options.buttons.reset.value)
-                    {
-                        this.options.buttons.reset.value = 'Reset';
-                    }
-                }
-
-                // some general correction
-                for (var k in this.options.buttons)
-                {
-                    if (this.options.buttons[k].label)
-                    {
-                        this.options.buttons[k].value = this.options.buttons[k].label;
-                    }
-                    if (this.options.buttons[k].title)
-                    {
-                        this.options.buttons[k].value = this.options.buttons[k].title;
-                    }
-                    if (!this.options.buttons[k].type)
-                    {
-                        this.options.buttons[k].type = "button";
-                    }
-                }
-            }
-
-            if (this.attributes.id)
-            {
-                this.id = this.attributes.id;
-            }
-            else
-            {
-                this.id = Alpaca.generateId();
-                this.attributes.id = this.id;
-            }
-
-            // if we have a submit button specified, and toggleSubmitValidState isn't defined, set to true by default
-            // don't allow the form to submit unless valid
-            if (this.options.buttons && this.options.buttons.submit && Alpaca.isUndefined(this.options.toggleSubmitValidState))
-            {
-                this.options.toggleSubmitValidState = true;
-            }
-
-            this.viewType = options.viewType;
-
-            // set a runtime view
-            this.view = new Alpaca.RuntimeView(viewId, this);
-        },
-
-        /**
-         * Renders this form into the container.
-         *
-         * @param {Function} callback
-         */
-        render: function(callback)
+        connect: function (onSuccess, onError)
         {
             var self = this;
 
-            // remove the previous form element if it exists
-            if (this.form)
-            {
-                this.form.remove();
-            }
+            Gitana.connect(this.config, function(err) {
 
-            // load the appropriate template and render it
-            this.processRender(this.domEl, function() {
+                if (err) {
+                    onError(err);
+                    return;
+                }
 
-                // bind our field dom element into the container
-                self.form.appendTo(self.container);
+                self.gitana = this;
 
-                // add default class
-                self.form.addClass("alpaca-form");
+                self.gitana.datastore("content").readBranch("master").then(function() {
 
-                // CALLBACK: "form"
-                self.fireCallback("form");
+                    self.branch = this;
 
-                // execute callback
-                callback(self);
-            });
-        },
-
-        /**
-         * Determines whether the top control is entirely valid.
-         *
-         * @return {*}
-         */
-        isFormValid: function()
-        {
-            // re-compute validation for the full control set
-            this.topControl.validate(true);
-
-            var valid = this.topControl.isValid(true);
-            //this.refreshValidationState(true);
-
-            return valid;
-        },
-
-        isValid: function()
-        {
-            return this.isFormValid();
-        },
-
-        validate: function(children)
-        {
-            return this.topControl.validate(children);
-        },
-
-        enableSubmitButton: function()
-        {
-            $(".alpaca-form-button-submit").attrProp("disabled", false);
-
-            if ($.mobile)
-            {
-                try { $(".alpaca-form-button-submit").button('refresh'); } catch (e) { }
-            }
-        },
-
-        disableSubmitButton: function()
-        {
-            $(".alpaca-form-button-submit").attrProp("disabled", true);
-
-            if ($.mobile)
-            {
-                try { $(".alpaca-form-button-submit").button('refresh'); } catch (e) { }
-            }
-        },
-
-        adjustSubmitButtonState: function()
-        {
-            this.disableSubmitButton();
-
-            if (this.isFormValid())
-            {
-                this.enableSubmitButton();
-            }
-        },
-
-        /**
-         * Responsible for fetching any templates needed so as to render the
-         * current mode for this field.
-         *
-         * Once completed, the onSuccess method is called.
-         *
-         * @param {Object} parentEl Field container.
-         * @param {Function} callback
-         */
-        processRender: function(parentEl, callback)
-        {
-            var self = this;
-
-            // lookup the template we should use to render
-            this.formDescriptor = this.view.getTemplateDescriptor("form");
-            if (!this.formDescriptor)
-            {
-                return Alpaca.throwErrorWithCallback("Could not find template descriptor: form");
-            }
-
-            var renderedDomElement = Alpaca.tmpl(this.formDescriptor, {
-                id: this.getId(),
-                options: this.options,
-                view: this.view
-            });
-            renderedDomElement.appendTo(parentEl);
-
-            this.form = renderedDomElement;
-
-            // find our insertion point
-            // this is marked by the handlebars helper
-            this.formFieldsContainer = $(this.form).find("." + Alpaca.MARKER_CLASS_FORM_ITEMS_FIELD);
-            this.formFieldsContainer.removeClass(Alpaca.MARKER_CLASS_FORM_ITEMS_FIELD);
-
-            if (Alpaca.isEmpty(this.form.attr("id")))
-            {
-                this.form.attr("id", this.getId() + "-form-outer");
-            }
-            if (Alpaca.isEmpty(this.form.attr("alpaca-field-id")))
-            {
-                this.form.attr("alpaca-field-id", this.getId());
-            }
-
-            // the form field
-            parentEl.find("form").attr(this.attributes);
-
-            // populate the buttons as well
-            this.buttons = {};
-            $(parentEl).find(".alpaca-form-button").each(function() {
-
-                $(this).click(function(e) {
-                    $(this).attr("button-pushed", true);
+                    onSuccess();
                 });
-
-                // custom click handler?
-                var key = $(this).attr("data-key");
-                if (key)
-                {
-                    var buttonConfig = self.options.buttons[key];
-                    if (buttonConfig)
-                    {
-                        if (buttonConfig.click)
-                        {
-                            $(this).click(function(form, handler) {
-                                return function(e) {
-                                    e.preventDefault();
-                                    handler.call(form, e);
-                                }
-                            }(self, buttonConfig.click));
-                        }
-                    }
-                }
-            });
-
-            callback();
-        },
-
-        /**
-         * Returns the id of the form.
-         *
-         * @returns {String} Form id
-         */
-        getId: function()
-        {
-            return this.id;
-        },
-
-        /**
-         * Returns form type.
-         *
-         * @returns {String} Form type.
-         */
-        getType: function()
-        {
-            return this.type;
-        },
-
-        /**
-         * Returns this form's parent.
-         *
-         * @returns {Object} Form parent.
-         */
-        getParent: function()
-        {
-            return this.parent;
-        },
-
-        /**
-         * Returns the value of the JSON rendered by this form.
-         *
-         * @returns {Any} Value of the JSON rendered by this form.
-         */
-        getValue: function()
-        {
-            return this.topControl.getValue();
-        },
-
-        /**
-         * Sets the value of the JSON to be rendered by this form.
-         *
-         * @param {Any} value Value to be set.
-         */
-        setValue: function(value)
-        {
-            this.topControl.setValue(value);
-        },
-
-        /**
-         * Initializes events handling (Form Submission) for this form.
-         */
-        initEvents: function()
-        {
-            var _this = this;
-
-            var formTag = $(this.domEl).find("form");
-
-            var v = this.getValue();
-            $(formTag).submit(v, function(e) {
-                return _this.onSubmit(e, _this);
-            });
-
-            // listen for fieldupdates and determine whether the form is valid.
-            // if so, enable the submit button...
-            // otherwise, disable it
-            if (this.options.toggleSubmitValidState)
-            {
-                $(_this.topControl.getFieldEl()).bind("fieldupdate", function() {
-                    _this.adjustSubmitButtonState();
-                });
-
-                this.adjustSubmitButtonState();
-            }
-        },
-
-        getButtonEl: function(buttonId)
-        {
-            return $(this.domEl).find(".alpaca-form-button-" + buttonId);
-        },
-
-        /**
-         * Handles form submit events.
-         *
-         * @param {Object} e Submit event.
-         * @param {Object} form the form
-         */
-        onSubmit: function(e, form)
-        {
-            if (this.submitHandler)
-            {
-                e.stopPropagation();
-
-                var v = this.submitHandler(e, form);
-                if (Alpaca.isUndefined(v)) {
-                    v = false;
-                }
-
-                return v;
-            }
-        },
-
-        /**
-         * Registers a custom submit handler.
-         *
-         * @param {Object} func Submit handler to be registered.
-         */
-        registerSubmitHandler: function (func)
-        {
-            if (Alpaca.isFunction(func))
-            {
-                this.submitHandler = func;
-            }
-        },
-
-        /**
-         * Displays validation information of all fields of this form.
-         *
-         * @param {Boolean} children whether to render validation state for child fields
-         *
-         * @returns {Object} Form validation state.
-         */
-        refreshValidationState: function(children, callback)
-        {
-            this.topControl.refreshValidationState(children, callback);
-        },
-
-        /**
-         * Disables this form.
-         */
-        disable: function()
-        {
-            this.topControl.disable();
-        },
-
-        /**
-         * Enables this form.
-         */
-        enable: function()
-        {
-            this.topControl.enable();
-        },
-
-        /**
-         * Focuses on this form.
-         */
-        focus: function()
-        {
-            this.topControl.focus();
-        },
-
-        /**
-         * Purge any event listeners and remove the form from the DOM.
-         *
-         * @param [Boolean] skipParent when true, the form cleans up without traversing through parent child controls
-         */
-        destroy: function(skipParent)
-        {
-            this.getFieldEl().remove();
-
-            // we allow form.destroy() which tells parent control to destroy
-            // if skipParent == true, then we do not call up (invoked from container)
-            if (!skipParent && this.parent)
-            {
-                this.parent.destroy();
-            }
-        },
-
-        /**
-         * Shows the form.
-         */
-        show: function()
-        {
-            this.getFieldEl().css({
-                "display": ""
             });
         },
 
         /**
-         * Hides the form.
+         * Loads data from Cloud CMS.
+         *
+         * @param {String} nodeId the node id to load
+         * @param {Function} onSuccess onSuccess callback
+         * @param {Function} onError onError callback
          */
-        hide: function()
+        loadData: function (nodeId, successCallback, errorCallback)
         {
-            this.getFieldEl().css({
-                "display": "none"
+            Chain(this.branch).trap(function(err) {
+                errorCallback(err);
+                return false;
+            }).readNode(nodeId).then(function() {
+
+                var obj = JSON.parse(JSON.stringify(this));
+
+                successCallback(obj);
             });
         },
 
         /**
-         * Clears the form and resets values of its fields.
+         * Loads json schema from Cloud CMS.
          *
-         * @param stopUpdateTrigger If false, triggers the update event of this event.
+         * @param {Object|String} qname the definition qname to load
+         * @param {Function} onSuccess onSuccess callback.
+         * @param {Function} onError onError callback.
          */
-        clear: function(stopUpdateTrigger)
+        loadSchema: function (qname, successCallback, errorCallback)
         {
-            this.topControl.clear(stopUpdateTrigger);
-        },
+            Chain(this.branch).trap(function(err) {
+                errorCallback(err);
+                return false;
+            }).readDefinition(qname).then(function() {
 
-        /**
-         * Checks if form is empty.
-         *
-         * @returns {Boolean} True if the form is empty, false otherwise.
-         */
-        isEmpty: function()
-        {
-            return this.topControl.isEmpty();
-        },
+                var obj = JSON.parse(JSON.stringify(this));
 
-        /**
-         * Fires a view callback for the current form.
-         *
-         * @param id
-         * @param arg1
-         * @param arg2
-         * @param arg3
-         * @param arg4
-         * @param arg5
-         */
-        fireCallback: function(id, arg1, arg2, arg3, arg4, arg5)
-        {
-            this.view.fireCallback(this, id, arg1, arg2, arg3, arg4, arg5);
-        },
-
-        /**
-         * Retrieves the form element.
-         *
-         * @returns {Object} The rendered DOM element.
-         */
-        getFormEl: function() {
-            return this.form;
-        },
-
-        /**
-         * Performs a regular old submit.
-         */
-        submit: function()
-        {
-            this.form.submit();
-        },
-
-        /**
-         * Fires the submit in the background and hands back the jQuery promise.
-         *
-         * @returns {*}
-         */
-        ajaxSubmit: function()
-        {
-            var self = this;
-
-            return $.ajax({
-                data: this.getValue(),
-                url: self.options.attributes.action,
-                type: self.options.attributes.method,
-                dataType: "json"
+                successCallback(obj);
             });
+        },
+
+        /**
+         * Loads json options from Cloud CMS.
+         *
+         * @param {Object|String} formNodeId the form to load
+         * @param {Function} onSuccess onSuccess callback.
+         * @param {Function} onError onError callback.
+         */
+        loadOptions: function (formNodeId, successCallback, errorCallback)
+        {
+            Chain(this.branch).trap(function(err) {
+                errorCallback(err);
+                return false;
+            }).readNode(formNodeId).then(function() {
+
+                var obj = JSON.parse(JSON.stringify(this));
+
+                successCallback(obj);
+            });
+        },
+
+        /**
+         * Loads a referenced JSON schema by it's qname from Cloud CMS.
+         *
+         * @param {Object|String} qname schema to load
+         * @param {Function} onSuccess onSuccess callback.
+         * @param {Function} onError onError callback.
+         */
+        loadReferenceSchema: function (qname, successCallback, errorCallback)
+        {
+            Chain(this.branch).trap(function(err) {
+                errorCallback(err);
+                return false;
+            }).readDefinition(qname).then(function() {
+
+                var obj = JSON.parse(JSON.stringify(this));
+
+                successCallback(obj);
+            });
+        },
+
+        /**
+         * Loads referenced JSON options by it's form key from Cloud CMS.
+         *
+         * @param {Object|String} formKey form to load.
+         * @param {Function} onSuccess onSuccess callback.
+         * @param {Function} onError onError callback.
+         */
+        loadReferenceOptions: function (formKey, successCallback, errorCallback)
+        {
+            successCallback({});
         }
 
     });
+
+    Alpaca.registerConnectorClass("cloudcms", Alpaca.CloudCmsConnector);
 
 })(jQuery);
 
@@ -14199,9 +14842,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             this.base();
 
+            /*
             if (!this.options.size) {
                 this.options.size = 40;
             }
+            */
 
             // assume html5 input type = "text"
             if (!this.inputType)
@@ -14226,9 +14871,35 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.options.attributes = {};
             }
 
-            if (typeof(this.options.allowOptionalEmpty) == "undefined")
+            if (typeof(this.options.allowOptionalEmpty) === "undefined")
             {
                 this.options.allowOptionalEmpty = true;
+            }
+
+            // DOM "autocomplete"
+            if (this.options.autocomplete && typeof(this.options.autocomplete) === "string")
+            {
+                if (this.options.autocomplete.toLowerCase() === "on")
+                {
+                    this.options.autocomplete = true;
+                }
+                else if (this.options.autocomplete.toLowerCase() === "true")
+                {
+                    this.options.autocomplete = true;
+                }
+                else if (this.options.autocomplete.toLowerCase() === "yes")
+                {
+                    this.options.autocomplete = true;
+                }
+                else
+                {
+                    this.options.autocomplete = false;
+                }
+            }
+
+            if (typeof(this.options.autocomplete) === "undefined")
+            {
+                this.options.autocomplete = false;
             }
         },
 
@@ -14257,6 +14928,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 if (self.control)
                 {
+                    // autocomplete
+                    self.applyAutocomplete();
+
                     // mask
                     self.applyMask();
 
@@ -14269,6 +14943,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 callback();
             });
+        },
+
+        applyAutocomplete: function()
+        {
+            var self = this;
+
+            // autocomplete
+            if (self.options.autocomplete)
+            {
+                $(self.field).addClass("alpaca-autocomplete");
+                $(self.control).attr("autocomplete", (self.options.autocomplete ? "on" : "off"));
+
+                // CALLBACK: "autocomplete"
+                self.fireCallback("autocomplete");
+            }
         },
 
         applyMask: function()
@@ -14465,13 +15154,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             var self = this;
 
-            var indicator = $(self.field).find(".alpaca-field-text-max-length-indicator");
-            if (indicator.length === 0)
-            {
-                indicator = $("<p class='alpaca-field-text-max-length-indicator'></p>");
-                $(self.control).after(indicator);
-            }
-
             var errState = false;
 
             var message = "";
@@ -14488,6 +15170,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 {
                     message = "Your message is too long by " + (diff*-1) + " characters";
                     errState = true;
+                }
+
+                var indicator = $(self.field).find(".alpaca-field-text-max-length-indicator");
+                if (indicator.length === 0)
+                {
+                    indicator = $("<p class='alpaca-field-text-max-length-indicator'></p>");
+                    $(self.control).after(indicator);
                 }
 
                 $(indicator).html(message);
@@ -14567,19 +15256,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status =  this._validatePattern();
             valInfo["invalidPattern"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("invalidPattern"), [this.schema.pattern]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("invalidPattern"), [this.schema.pattern]),
                 "status": status
             };
 
             status = this._validateMaxLength();
             valInfo["stringTooLong"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("stringTooLong"), [this.schema.maxLength]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("stringTooLong"), [this.schema.maxLength]),
                 "status": status
             };
 
             status = this._validateMinLength();
             valInfo["stringTooShort"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("stringTooShort"), [this.schema.minLength]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("stringTooShort"), [this.schema.minLength]),
                 "status": status
             };
 
@@ -14848,6 +15537,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "title": "Data attributes for the underlying DOM input control",
                         "description": "Allows you to specify a key/value map of data attributes that will be added as DOM attribuets for the underlying input control.  The data attributes will be added as data-{name}='{value}'.",
                         "type": "object"
+                    },
+                    "autocomplete": {
+                        "title": "HTML autocomplete attribute for the underlying DOM input control",
+                        "description": "Allows you to specify the autocomplete attribute for the underlying input control whether or not field should have autocomplete enabled.",
+                        "type": "string"
                     }
                 }
             });
@@ -14941,7 +15635,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status =  this._validateWordCount();
             valInfo["wordLimitExceeded"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("wordLimitExceeded"), [this.options.wordlimit]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("wordLimitExceeded"), [this.options.wordlimit]),
                 "status": status
             };
 
@@ -15201,7 +15895,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                         for (var k in dataArray)
                         {
-                            $(self.getFieldEl()).find("input:checkbox[data-checkbox-value='" + dataArray[k] + "']").prop("checked", true);
+                            $(self.getFieldEl()).find("input:checkbox[data-checkbox-value=\"" + dataArray[k] + "\"]").prop("checked", true);
                         }
                     }
                 }
@@ -15302,7 +15996,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // walk through values and assign into appropriate inputs
                 for (var j = 0; j < values.length; j++)
                 {
-                    var input = $(self.getFieldEl()).find("input[data-checkbox-value='" + values[j] + "']");
+                    var input = $(self.getFieldEl()).find("input[data-checkbox-value=\"" + values[j] + "\"]");
                     if (input.length > 0)
                     {
                         Alpaca.checked($(input[0]), value);
@@ -15677,14 +16371,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.base(function(model) {
 
-                model.noneLabel = "None";
-                if (typeof(self.options.noneLabel) != "undefined")
+                model.noneLabel = self.getMessage("noneLabel");
+                if (typeof(self.options.noneLabel) !== "undefined")
                 {
                     model.noneLabel = self.options.noneLabel;
                 }
 
                 model.hideNone = self.isRequired();
-                if (typeof(self.options.removeDefaultNone) != "undefined")
+                if (typeof(self.options.removeDefaultNone) !== "undefined")
                 {
                     model.hideNone = self.options.removeDefaultNone;
                 }
@@ -15994,6 +16688,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         /* end_builder_helpers */
     });
+
+    // Registers additional messages
+    Alpaca.registerMessages({
+        "noneLabel": "None"
+    });
+
 })(jQuery);
 
 (function($){
@@ -16075,7 +16775,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // mark selected value
             if (typeof(val) != "undefined")
             {
-                Alpaca.checked($(self.control).find("input[value='" + val + "']"), "checked");
+                Alpaca.checked($(self.control).find("input[value=\"" + val + "\"]"), "checked");
             }
 
             // if none selected and "emptySelectFirst", then select
@@ -16142,7 +16842,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     if ($("input:radio:checked", self.control).length === 0)
                     {
-                        Alpaca.checked($(self.control).find("input:radio[value='" + self.data + "']"), "checked");
+                        Alpaca.checked($(self.control).find("input:radio[value=\"" + self.data + "\"]"), "checked");
                     }
                 }
 
@@ -16562,13 +17262,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateMaxItems();
             valInfo["tooManyItems"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("tooManyItems"), [this.schema.items.maxItems]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("tooManyItems"), [this.schema.items.maxItems]),
                 "status": status
             };
 
             status = this._validateMinItems();
             valInfo["notEnoughItems"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("notEnoughItems"), [this.schema.items.minItems]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("notEnoughItems"), [this.schema.items.minItems]),
                 "status": status
             };
 
@@ -16715,13 +17415,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateNumber();
             valInfo["stringNotANumber"] = {
-                "message": status ? "" : this.view.getMessage("stringNotANumber"),
+                "message": status ? "" : this.getMessage("stringNotANumber"),
                 "status": status
             };
 
             status = this._validateDivisibleBy();
             valInfo["stringDivisibleBy"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("stringDivisibleBy"), [this.schema.divisibleBy]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("stringDivisibleBy"), [this.schema.divisibleBy]),
                 "status": status
             };
 
@@ -16732,9 +17432,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             };
             if (!status) {
                 if (this.schema.exclusiveMaximum) {
-                    valInfo["stringValueTooLarge"]["message"] = Alpaca.substituteTokens(this.view.getMessage("stringValueTooLargeExclusive"), [this.schema.maximum]);
+                    valInfo["stringValueTooLarge"]["message"] = Alpaca.substituteTokens(this.getMessage("stringValueTooLargeExclusive"), [this.schema.maximum]);
                 } else {
-                    valInfo["stringValueTooLarge"]["message"] = Alpaca.substituteTokens(this.view.getMessage("stringValueTooLarge"), [this.schema.maximum]);
+                    valInfo["stringValueTooLarge"]["message"] = Alpaca.substituteTokens(this.getMessage("stringValueTooLarge"), [this.schema.maximum]);
                 }
             }
 
@@ -16745,9 +17445,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             };
             if (!status) {
                 if (this.schema.exclusiveMinimum) {
-                    valInfo["stringValueTooSmall"]["message"] = Alpaca.substituteTokens(this.view.getMessage("stringValueTooSmallExclusive"), [this.schema.minimum]);
+                    valInfo["stringValueTooSmall"]["message"] = Alpaca.substituteTokens(this.getMessage("stringValueTooSmallExclusive"), [this.schema.minimum]);
                 } else {
-                    valInfo["stringValueTooSmall"]["message"] = Alpaca.substituteTokens(this.view.getMessage("stringValueTooSmall"), [this.schema.minimum]);
+                    valInfo["stringValueTooSmall"]["message"] = Alpaca.substituteTokens(this.getMessage("stringValueTooSmall"), [this.schema.minimum]);
                 }
             }
 
@@ -16758,7 +17458,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             };
             if (!status)
             {
-                valInfo["stringValueNotMultipleOf"]["message"] = Alpaca.substituteTokens(this.view.getMessage("stringValueNotMultipleOf"), [this.schema.multipleOf]);
+                valInfo["stringValueNotMultipleOf"]["message"] = Alpaca.substituteTokens(this.getMessage("stringValueNotMultipleOf"), [this.schema.multipleOf]);
             }
 
             // hand back a true/false
@@ -17018,8 +17718,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.base();
 
-            this.options.toolbarStyle = Alpaca.isEmpty(this.view.toolbarStyle) ? "button" : this.view.toolbarStyle;
-            this.options.actionbarStyle = Alpaca.isEmpty(this.view.actionbarStyle) ? "top" : this.view.actionbarStyle;
+            var containerItemTemplateType = self.resolveContainerItemTemplateType();
+            if (!containerItemTemplateType)
+            {
+                return Alpaca.throwErrorWithCallback("Unable to find template descriptor for container item: " + self.getFieldType());
+            }
+
+            this.containerItemTemplateDescriptor = self.view.getTemplateDescriptor("container-" + containerItemTemplateType + "-item", self);
+
+            if (!this.options.toolbarStyle) {
+                this.options.toolbarStyle = Alpaca.isEmpty(this.view.toolbarStyle) ? "button" : this.view.toolbarStyle;
+            }
+            if (!this.options.toolbarStyle) {
+                this.options.toolbarStyle = "button";
+            }
+
+            if (!this.options.actionbarStyle) {
+                this.options.actionbarStyle = Alpaca.isEmpty(this.view.actionbarStyle) ? "top" : this.view.actionbarStyle;
+            }
+            if (!this.options.actionbarStyle) {
+                this.options.actionbarStyle = "top";
+            }
 
             // determine whether we are using "ruby on rails" compatibility mode
             this.options.rubyrails = false;
@@ -17046,16 +17765,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (!Alpaca.isEmpty(this.options.toolbarSticky))
             {
                 toolbarSticky = this.options.toolbarSticky;
-            }
-
-            if (Alpaca.isEmpty(this.options.items.showMoveUpItemButton))
-            {
-                this.options.items.showMoveUpItemButton = true;
-            }
-
-            if (Alpaca.isEmpty(this.options.items.showMoveDownItemButton))
-            {
-                this.options.items.showMoveDownItemButton = true;
             }
 
             this.options.toolbarSticky = toolbarSticky;
@@ -17111,7 +17820,58 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return;
             }
 
-            // determine which actions to add into the top array toolbar
+            //
+            // ACTIONS
+            //
+            var applyAction = function(actions, key, actionConfig) {
+                var action = self.findAction(actions, key);
+                if (!action) {
+                    action = {
+                        "core": true
+                    };
+                    actions.push(action);
+                }
+                for (var k in actionConfig) {
+                    if (!action[k]) {
+                        action[k] = actionConfig[k];
+                    }
+                }
+            };
+            var cleanupActions = function(actions, showLabels) {
+                var i = 0;
+                do {
+
+                    // assume enabled by default
+                    if (typeof(actions[i].enabled) === "undefined") {
+                        actions[i].enabled = true;
+                    }
+
+                    // hide label if global disable
+                    if (!showLabels) {
+                        delete actions[i].label;
+                    }
+
+                    if (!actions[i].enabled) {
+                        actions.splice(i, 1);
+                    } else {
+                        i++;
+                    }
+
+                } while (i < actions.length);
+
+                // sort so that core actions appear first
+                actions.sort(function(a, b) {
+                    if (a.core && !b.core) {
+                        return -1;
+                    }
+                    if (!a.core && b.core) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            };
+
+            // set up default actions for the top array toolbar
             self.toolbar = {};
             if (self.options.toolbar)
             {
@@ -17119,26 +17879,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     self.toolbar[k] = self.options.toolbar[k];
                 }
             }
-            if (!self.toolbar.actions)
-            {
-                self.toolbar.actions = [];
-                self.toolbar.actions.push({
-                    "label": (self.options.items && self.options.items.addItemLabel) ? self.options.items.addItemLabel : "Add Item",
-                    "action": "add",
-                    "iconClass": self.addIcon,
-                    "click": function(key, action)
-                    {
-                        self.resolveItemSchemaOptions(function(itemSchema, itemOptions) {
-                            var itemData = Alpaca.createEmptyDataInstance(itemSchema);
-                            self.addItem(0, itemSchema, itemOptions, itemData, function() {
-                                // all done
-                            });
-                        });
-
-                    }
-                });
+            if (typeof(self.toolbar.showLabels) === "undefined") {
+                self.toolbar.showLabels = true;
             }
+            if (!self.toolbar.actions) {
+                self.toolbar.actions = [];
+            }
+            applyAction(self.toolbar.actions, "add", {
+                "label": self.getMessage("addItemButtonLabel"),
+                "action": "add",
+                "iconClass": self.view.getStyle("addIcon"),
+                "click": function(key, action)
+                {
+                    self.resolveItemSchemaOptions(function(itemSchema, itemOptions) {
+                        var itemData = Alpaca.createEmptyDataInstance(itemSchema);
+                        self.addItem(0, itemSchema, itemOptions, itemData, function() {
+                            // all done
+                        });
+                    });
+                }
+            });
+            cleanupActions(self.toolbar.actions, self.toolbar.showLabels);
 
+            // determine which actions to add into the per-item actionbar
             self.actionbar = {};
             if (self.options.actionbar)
             {
@@ -17146,66 +17909,70 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     self.actionbar[k2] = self.options.actionbar[k2];
                 }
             }
-            if (!self.actionbar.actions)
-            {
-                self.actionbar.actions = [];
-                self.actionbar.actions.push({
-                    //"label": "Add",
-                    "action": "add",
-                    "iconClass": self.addIcon,
-                    "click": function(key, action, itemIndex) {
-
-                        self.resolveItemSchemaOptions(function(itemSchema, itemOptions) {
-                            var itemData = Alpaca.createEmptyDataInstance(itemSchema);
-                            self.addItem(itemIndex + 1, itemSchema, itemOptions, itemData, function() {
-                                // all done
-                            });
-                        });
-
-                    }
-                });
-                self.actionbar.actions.push({
-                    //"label": "Remove",
-                    "action": "remove",
-                    "iconClass": self.removeIcon,
-                    "click": function(key, action, itemIndex) {
-
-                        self.removeItem(itemIndex, function() {
-                            // all done
-                        });
-
-                    }
-                });
-                self.actionbar.actions.push({
-                    //"label": "Up",
-                    "action": "up",
-                    "iconClass": self.upIcon,
-                    "click": function(key, action, itemIndex) {
-
-                        self.moveItem(itemIndex, itemIndex - 1, self.options.animate, function() {
-                            // all done
-                        });
-
-                    }
-                });
-                self.actionbar.actions.push({
-                    //"label": "Down",
-                    "action": "down",
-                    "iconClass": self.downIcon,
-                    "click": function(key, action, itemIndex) {
-
-                        self.moveItem(itemIndex, itemIndex + 1, self.options.animate, function() {
-                            // all done
-                        });
-
-                    }
-                });
+            if (typeof(self.actionbar.showLabels) === "undefined") {
+                self.actionbar.showLabels = false;
             }
+            if (!self.actionbar.actions) {
+                self.actionbar.actions = [];
+            }
+            applyAction(self.actionbar.actions, "add", {
+                "label": self.getMessage("addButtonLabel"),
+                "action": "add",
+                "iconClass": self.view.getStyle("addIcon"),
+                "click": function(key, action, itemIndex) {
 
-            var len     = this.data.length;
-            var data    = $.extend(true, {}, this.data);
+                    self.resolveItemSchemaOptions(function(itemSchema, itemOptions) {
+                        var itemData = Alpaca.createEmptyDataInstance(itemSchema);
+                        self.addItem(itemIndex + 1, itemSchema, itemOptions, itemData, function() {
+                            // all done
+                        });
+                    });
+
+                }
+            });
+            applyAction(self.actionbar.actions, "remove", {
+                "label": self.getMessage("removeButtonLabel"),
+                "action": "remove",
+                "iconClass": self.view.getStyle("removeIcon"),
+                "click": function(key, action, itemIndex) {
+
+                    self.removeItem(itemIndex, function() {
+                        // all done
+                    });
+
+                }
+            });
+            applyAction(self.actionbar.actions, "up", {
+                "label": self.getMessage("upButtonLabel"),
+                "action": "up",
+                "iconClass": self.view.getStyle("upIcon"),
+                "click": function(key, action, itemIndex) {
+
+                    self.moveItem(itemIndex, itemIndex - 1, self.options.animate, function() {
+                        // all done
+                    });
+
+                }
+            });
+            applyAction(self.actionbar.actions, "down", {
+                "label": self.getMessage("downButtonLabel"),
+                "action": "down",
+                "iconClass": self.view.getStyle("downIcon"),
+                "click": function(key, action, itemIndex) {
+
+                    self.moveItem(itemIndex, itemIndex + 1, self.options.animate, function() {
+                        // all done
+                    });
+
+                }
+            });
+            cleanupActions(self.actionbar.actions, self.actionbar.showLabels);
+
+            var len = this.data.length;
+            var data = $.extend(true, {}, this.data);
             data.length = len;
-            this.data   = Array.prototype.slice.call(data);
+
+            this.data = Array.prototype.slice.call(data);
         },
 
         /**
@@ -17342,9 +18109,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         {
                             return function(callback)
                             {
-                                self.createItem(index, schema, options, value, function(addedItemControl) {
+                                self.createItem(index, schema, options, value, function(item) {
 
-                                    items.push(addedItemControl);
+                                    items.push(item);
 
                                     // by the time we get here, we may have constructed a very large child chain of
                                     // sub-dependencies and so we use nextTick() instead of a straight callback so as to
@@ -17362,7 +18129,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
 
                     Alpaca.series(funcs, function(err) {
-
                         callback(items);
                     });
 
@@ -17380,7 +18146,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          * @param index
          * @param itemSchema
          * @param itemOptions
-         * @param insertAfterId
+         * @param itemData
          * @param postRenderCallback
          * @return {*}
          * @private
@@ -17391,13 +18157,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (self._validateEqualMaxItems())
             {
-                if (itemOptions === null && self.options && self.options.fields && self.options.fields["item"])
-                {
-                    itemOptions = self.options.fields["item"];
-                }
-
-                var containerElem = $("<div></div>");
-                containerElem.alpaca({
+                var formEl = $("<div></div>");
+                formEl.alpaca({
                     "data" : itemData,
                     "options": itemOptions,
                     "schema" : itemSchema,
@@ -17407,7 +18168,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     {
                         self.destroy();
 
-                        self.errorCallback.call(_this, err);
+                        self.errorCallback.call(self, err);
                     },
                     "notTopLevel":true,
                     "render": function(fieldControl, cb) {
@@ -17433,10 +18194,50 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     },
                     "postRender": function(control)
                     {
+                        // alpaca finished
+
+                        // render the outer container
+                        var containerItemEl = Alpaca.tmpl(self.containerItemTemplateDescriptor, {
+                            "id": self.getId(),
+                            "name": control.name,
+                            "parentFieldId": self.getId(),
+                            "actionbarStyle": self.options.actionbarStyle,
+                            "view": self.view,
+                            "data": itemData
+                        });
+
+                        // find the insertion point
+                        var insertionPointEl = $(containerItemEl).find("." + Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM_FIELD);
+                        if (insertionPointEl.length === 0)
+                        {
+                            if ($(containerItemEl).hasClass(Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM_FIELD)) {
+                                insertionPointEl = $(containerItemEl);
+                            }
+                        }
+                        if (insertionPointEl.length === 0)
+                        {
+                            self.errorCallback.call(self, {
+                                "message": "Cannot find insertion point for field: " + self.getId()
+                            });
+                            return;
+                        }
+
+                        // copy into place
+                        $(insertionPointEl).before(control.getFieldEl());
+                        $(insertionPointEl).remove();
+
+                        control.containerItemEl = containerItemEl;
+
+                        // TODO: verify, as per: https://github.com/emircal/alpaca/commit/4061c33787bd7a2b86fb613317374d365d9acc92
+                        // Reset hideInitValidationError after render
+                        Alpaca.fieldApplyFieldAndChildren(control, function(_control) {
+                            _control.hideInitValidationError = false;
+                        });
+
                         // PR: https://github.com/gitana/alpaca/pull/124
                         if (Alpaca.isFunction(self.options.items.postRender))
                         {
-                            self.options.items.postRender(containerElem);
+                            self.options.items.postRender.call(control, insertionPointEl);
                         }
 
                         if (postRenderCallback)
@@ -17445,8 +18246,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                     }
                 });
-
-                return containerElem;
             }
         },
 
@@ -17459,9 +18258,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             var _this = this;
 
+            var completionFunction = function(resolvedItemSchema, resolvedItemOptions, circular)
+            {
+                // special caveat:  if we're in read-only mode, the child must also be in read-only mode
+                if (_this.options.readonly) {
+                    resolvedItemOptions.readonly = true;
+                }
+
+                callback(resolvedItemSchema, resolvedItemOptions, circular);
+            };
+
             var itemOptions;
-            if (_this.options && _this.options.fields && _this.options.fields["item"]) {
-                itemOptions = _this.options.fields["item"];
+            // legacy support for options.fields.item
+            if (!itemOptions && _this.options && _this.options.fields && _this.options.fields.item) {
+                itemOptions = _this.options.fields.item;
+            }
+            if (!itemOptions && _this.options && _this.options.items) {
+                itemOptions = _this.options.items;
             }
             var itemSchema;
             if (_this.schema && _this.schema.items) {
@@ -17490,9 +18303,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var refCount = 0;
                     for (var i = 0; i < fieldChain.length; i++)
                     {
-                        if (fieldChain[i].schema && fieldChain[i].schema.id === referenceId)
+                        if (fieldChain[i].schema)
                         {
-                            refCount++;
+                            if ( (fieldChain[i].schema.id === referenceId) || (fieldChain[i].schema.id === "#" + referenceId))
+                            {
+                                refCount++;
+                            }
+                            else if ( (fieldChain[i].schema["$ref"] === referenceId))
+                            {
+                                refCount++;
+                            }
                         }
                     }
 
@@ -17517,12 +18337,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         Alpaca.mergeObject(resolvedItemOptions, itemOptions);
                     }
 
-                    callback(resolvedItemSchema, resolvedItemOptions, circular);
+                    Alpaca.nextTick(function() {
+                        completionFunction(resolvedItemSchema, resolvedItemOptions, circular);
+                    });
                 });
             }
             else
             {
-                callback(itemSchema, itemOptions);
+                Alpaca.nextTick(function() {
+                    completionFunction(itemSchema, itemOptions);
+                });
             }
         },
 
@@ -17537,19 +18361,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateUniqueItems();
             valInfo["valueNotUnique"] = {
-                "message": status ? "" : this.view.getMessage("valueNotUnique"),
+                "message": status ? "" : this.getMessage("valueNotUnique"),
                 "status": status
             };
 
             status = this._validateMaxItems();
             valInfo["tooManyItems"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("tooManyItems"), [this.schema.items.maxItems]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("tooManyItems"), [this.schema.items.maxItems]),
                 "status": status
             };
 
             status = this._validateMinItems();
             valInfo["notEnoughItems"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("notEnoughItems"), [this.schema.items.minItems]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("notEnoughItems"), [this.schema.items.minItems]),
                 "status": status
             };
 
@@ -17824,19 +18648,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // TOOLBAR
             //
 
-            var toolbar = $(this.getFieldEl()).find(".alpaca-array-toolbar[data-alpaca-array-toolbar-field-id='" + self.getId() + "']");
+            var toolbarEl = $(this.getFieldEl()).find(".alpaca-array-toolbar[data-alpaca-array-toolbar-field-id='" + self.getId() + "']");
             if (this.children.length > 0)
             {
                 // hide toolbar
-                $(toolbar).hide();
+                $(toolbarEl).hide();
             }
             else
             {
                 // show toolbar
-                $(toolbar).show();
+                $(toolbarEl).show();
 
                 // CLICK: array toolbar buttons
-                $(toolbar).find("[data-alpaca-array-toolbar-action]").each(function() {
+                $(toolbarEl).find("[data-alpaca-array-toolbar-action]").each(function() {
 
                     var actionKey = $(this).attr("data-alpaca-array-toolbar-action");
                     var action = self.findAction(self.toolbar.actions, actionKey);
@@ -17863,16 +18687,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 $(items).each(function(itemIndex) {
 
                     // find the actionbar for this item
-                    var actionbar = $(self.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-field-id='" + self.getId() +  "'][data-alpaca-array-actionbar-item-index='" + itemIndex + "']");
-                    if (actionbar && actionbar.length > 0)
+                    // find from containerItemEl
+                    var actionbarEl = $(self.containerItemEl).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-field-id='" + self.getId() +  "'][data-alpaca-array-actionbar-item-index='" + itemIndex + "']");
+                    if (actionbarEl && actionbarEl.length > 0)
                     {
                         $(this).hover(function() {
-                            $(actionbar).show();
+                            $(actionbarEl).show();
                         }, function() {
-                            $(actionbar).hide();
+                            $(actionbarEl).hide();
                         });
 
-                        $(actionbar).hide();
+                        $(actionbarEl).hide();
                     }
                 });
             }
@@ -17883,8 +18708,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // CLICK: actionbar buttons
-            var actionbars = $(this.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-field-id='" + self.getId() + "']");
-            $(actionbars).each(function() {
+            var actionbarEls = $(this.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-parent-field-id='" + self.getId() + "']");
+            $(actionbarEls).each(function() {
 
                 var targetIndex = $(this).attr("data-alpaca-array-actionbar-item-index");
                 if (typeof(targetIndex) === "string")
@@ -17939,12 +18764,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             });
             // first actionbar has its "move up" button disabled
-            $(actionbars).first().find("[data-alpaca-array-actionbar-action='up']").each(function() {
+            $(actionbarEls).first().find("[data-alpaca-array-actionbar-action='up']").each(function() {
                 $(this).addClass('alpaca-button-disabled');
                 self.fireCallback("disableButton", this);
             });
             // last actionbar has its "move down" button disabled
-            $(actionbars).last().find("[data-alpaca-array-actionbar-action='down']").each(function() {
+            $(actionbarEls).last().find("[data-alpaca-array-actionbar-action='down']").each(function() {
                 $(this).addClass('alpaca-button-disabled');
                 self.fireCallback("disableButton", this);
             });
@@ -17957,6 +18782,44 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         // DYNAMIC METHODS
         //
         ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+        doResolveItemContainer: function()
+        {
+            var self = this;
+
+            return $(self.container);
+        },
+
+        doAddItem: function(index, item)
+        {
+            var self = this;
+
+            var addItemContainer = self.doResolveItemContainer();
+
+            // insert into dom
+            if (index === 0)
+            {
+                // insert first into container
+                $(addItemContainer).append(item.containerItemEl);
+            }
+            else
+            {
+                // insert at a specific index
+                var existingElement = addItemContainer.children("[data-alpaca-container-item-index='" + (index-1) + "']");
+                if (existingElement && existingElement.length > 0)
+                {
+                    // insert after
+                    existingElement.after(item.containerItemEl);
+                }
+            }
+
+            self.doAfterAddItem(item);
+        },
+
+        doAfterAddItem: function(item)
+        {
+
+        },
 
         /**
          * Adds an item to the array.
@@ -17976,27 +18839,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (self._validateEqualMaxItems())
             {
-                self.createItem(index, schema, options, data, function(child) {
+                self.createItem(index, schema, options, data, function(item) {
 
                     // register the child
-                    self.registerChild(child, index);
+                    self.registerChild(item, index);
 
                     // insert into dom
-                    if (index === 0)
-                    {
-                        // insert first into container
-                        $(self.container).append(child.getFieldEl());
-                    }
-                    else
-                    {
-                        // insert at a specific index
-                        var existingElement = self.getContainerEl().children("[data-alpaca-container-item-index='" + (index-1) + "']");
-                        if (existingElement && existingElement.length > 0)
-                        {
-                            // insert after
-                            existingElement.after(child.getFieldEl());
-                        }
-                    }
+                    self.doAddItem(index, item);
 
                     // updates child dom marker elements
                     self.updateChildDOMElements();
@@ -18018,6 +18867,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
+        doRemoveItem: function(childIndex)
+        {
+            var self = this;
+
+            var removeItemContainer = self.doResolveItemContainer();
+
+            removeItemContainer.children(".alpaca-container-item[data-alpaca-container-item-index='" + childIndex + "']").remove();
+        },
+
         /**
          * Removes an item from the array.
          *
@@ -18036,8 +18894,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // unregister the child
                 self.unregisterChild(childIndex);
 
-                // remove from DOM
-                self.getContainerEl().children("[data-alpaca-container-item-index='" + childIndex + "']").remove();
+                // remove itemContainerEl from DOM
+                self.doRemoveItem(childIndex);
 
                 // updates child dom marker elements
                 self.updateChildDOMElements();
@@ -18121,9 +18979,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return;
             }
 
+            var parentFieldId = self.getId();
+
             // the source and target DOM elements
-            var sourceContainer = self.getContainerEl().children("[data-alpaca-container-item-index='" + sourceIndex + "']");
-            var targetContainer = self.getContainerEl().children("[data-alpaca-container-item-index='" + targetIndex + "']");
+            var sourceContainer = self.getContainerEl().find(".alpaca-container-item[data-alpaca-container-item-index='" + sourceIndex + "'][data-alpaca-container-item-parent-field-id='" + parentFieldId + "']");
+            var targetContainer = self.getContainerEl().find(".alpaca-container-item[data-alpaca-container-item-index='" + targetIndex + "'][data-alpaca-container-item-parent-field-id='" + parentFieldId + "']");
 
             // create two temp elements as markers for switch
             var tempSourceMarker = $("<div class='tempMarker1'></div>");
@@ -18160,8 +19020,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 self.updateChildDOMElements();
 
                 // update the action bar bindings
-                $(sourceContainer).find("[data-alpaca-array-actionbar-item-index='" + sourceIndex + "']").attr("data-alpaca-array-actionbar-item-index", targetIndex);
-                $(targetContainer).find("[data-alpaca-array-actionbar-item-index='" + targetIndex + "']").attr("data-alpaca-array-actionbar-item-index", sourceIndex);
+                $(sourceContainer).find(".alpaca-container-item[data-alpaca-array-actionbar-item-index='" + sourceIndex + "']").attr("data-alpaca-array-actionbar-item-index", targetIndex);
+                $(targetContainer).find(".alpaca-container-item[data-alpaca-array-actionbar-item-index='" + targetIndex + "']").attr("data-alpaca-array-actionbar-item-index", sourceIndex);
 
                 // update the array item toolbar state
                 self.updateToolbars();
@@ -18178,17 +19038,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             };
 
+            var duration = 0;
             if (animate)
             {
-                // swap divs visually
-                Alpaca.animatedSwap(sourceContainer, targetContainer, 500, function() {
-                    onComplete();
-                });
+                duration = 500;
             }
-            else
-            {
+
+            // swap divs visually
+            Alpaca.animatedSwap(sourceContainer, targetContainer, duration, function() {
                 onComplete();
-            }
+            });
         },
 
         /**
@@ -18293,52 +19152,90 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "type": "boolean",
                         "default": false
                     },
-                    "items": {
-                        "title": "Array Items",
-                        "description": "Options for array items.",
+                    "toolbarStyle": {
+                        "title": "Toolbar Style",
+                        "description": "The kind of top-level toolbar to render for the array field.  Either 'button' or 'link'.",
+                        "type": "string",
+                        "default": "button"
+                    },
+                    "actionbarStyle": {
+                        "title": "Actionbar Style",
+                        "description": "The kind of actionbar to render for each item in the array.  Either 'top', 'bottom', 'left', or 'right'.",
+                        "type": "string",
+                        "default": "top"
+                    },
+                    "toolbar": {
+                        "type": "object",
+                        "title": "Toolbar Configuration",
+                        "properties": {
+                            "showLabels": {
+                                "type": "boolean",
+                                "default": true,
+                                "title": "Whether to show labels next to actions"
+                            },
+                            "actions": {
+                                "type": "array",
+                                "title": "Toolbar Actions Configuration",
+                                "items": {
+                                    "action": {
+                                        "type": "string",
+                                        "title": "Action Key"
+                                    },
+                                    "label": {
+                                        "type": "string",
+                                        "title": "Action Label"
+                                    },
+                                    "iconClass": {
+                                        "type": "string",
+                                        "title": "Action CSS Classes for Icon"
+                                    },
+                                    "click": {
+                                        "type": "function",
+                                        "title": "Action Click Handler"
+                                    },
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "title": "Whether to enable the action",
+                                        "default": true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "actionbar": {
                         "type": "object",
                         "properties": {
-                            "extraToolbarButtons": {
-                                "title": "Extra Toolbar buttons",
-                                "description": "Buttons to be added next to add/remove/up/down, see examples",
+                            "showLabels": {
+                                "type": "boolean",
+                                "default": false,
+                                "title": "Whether to show labels next to actions"
+                            },
+                            "actions": {
                                 "type": "array",
-                                "default": undefined
-                            },
-                            "moveUpItemLabel": {
-                                "title": "Move Up Item Label",
-                                "description": "The label to use for the toolbar's 'move up' button.",
-                                "type": "string",
-                                "default": "Move Up"
-                            },
-                            "moveDownItemLabel": {
-                                "title": "Move Down Item Label",
-                                "description": "The label to use for the toolbar's 'move down' button.",
-                                "type": "string",
-                                "default": "Move Down"
-                            },
-                            "removeItemLabel": {
-                                "title": "Remove Item Label",
-                                "description": "The label to use for the toolbar's 'remove item' button.",
-                                "type": "string",
-                                "default": "Remove Item"
-                            },
-                            "addItemLabel": {
-                                "title": "Add Item Label",
-                                "description": "The label to use for the toolbar's 'add item' button.",
-                                "type": "string",
-                                "default": "Add Item"
-                            },
-                            "showMoveDownItemButton": {
-                                "title": "Show Move Down Item Button",
-                                "description": "Whether to show to the 'Move Down' button on the toolbar.",
-                                "type": "boolean",
-                                "default": true
-                            },
-                            "showMoveUpItemButton": {
-                                "title": "Show Move Up Item Button",
-                                "description": "Whether to show the 'Move Up' button on the toolbar.",
-                                "type": "boolean",
-                                "default": true
+                                "title": "Actions Bar Actions Configuration",
+                                "items": {
+                                    "action": {
+                                        "type": "string",
+                                        "title": "Action Key"
+                                    },
+                                    "label": {
+                                        "type": "string",
+                                        "title": "Action Label"
+                                    },
+                                    "iconClass": {
+                                        "type": "string",
+                                        "title": "Action CSS Classes for Icon"
+                                    },
+                                    "click": {
+                                        "type": "function",
+                                        "title": "Action Click Handler"
+                                    },
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "title": "Whether to enable the action",
+                                        "default": true
+                                    }
+                                }
                             }
                         }
                     }
@@ -18383,6 +19280,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     Alpaca.registerFieldClass("array", Alpaca.Fields.ArrayField);
     Alpaca.registerDefaultSchemaFieldMapping("array", "array");
 
+    Alpaca.registerMessages({
+        "addItemButtonLabel": "Add New Item",
+        "addButtonLabel": "Add",
+        "removeButtonLabel": "Remove",
+        "upButtonLabel": "Up",
+        "downButtonLabel": "Down"
+    });
+
 })(jQuery);
 
 /*jshint -W004 */ // duplicate variables
@@ -18408,7 +19313,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         setup: function()
         {
+            var self = this;
+
             this.base();
+
+            var containerItemTemplateType = self.resolveContainerItemTemplateType();
+            if (!containerItemTemplateType)
+            {
+                var x = self.resolveContainerItemTemplateType();
+                return Alpaca.throwErrorWithCallback("Unable to find template descriptor for container item: " + self.getFieldType());
+            }
+
+            this.containerItemTemplateDescriptor = self.view.getTemplateDescriptor("container-" + containerItemTemplateType + "-item", self);
 
             if (Alpaca.isEmpty(this.data))
             {
@@ -18683,7 +19599,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             // or the schema is optional
                             if (circular)
                             {
-                                return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + schema, _this.errorCallback);
+                                return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + JSON.stringify(schema), _this.errorCallback);
                             }
 
                             if (!schema)
@@ -18732,10 +19648,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         createItem: function(propertyId, itemSchema, itemOptions, itemData, insertAfterId, postRenderCallback)
         {
-            var _this = this;
+            var self = this;
 
-            var containerElem = $("<div></div>");
-            containerElem.alpaca({
+            var formEl = $("<div></div>");
+            formEl.alpaca({
                 "data" : itemData,
                 "options": itemOptions,
                 "schema" : itemSchema,
@@ -18743,27 +19659,67 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "connector": this.connector,
                 "error": function(err)
                 {
-                    _this.destroy();
+                    self.destroy();
 
-                    _this.errorCallback.call(_this, err);
+                    self.errorCallback.call(self, err);
                 },
                 "notTopLevel":true,
                 "render" : function(fieldControl, cb) {
                     // render
-                    fieldControl.parent = _this;
+                    fieldControl.parent = self;
                     // add the property Id
                     fieldControl.propertyId = propertyId;
                     // setup item path
-                    if (_this.path !== "/") {
-                        fieldControl.path = _this.path + "/" + propertyId;
+                    if (self.path !== "/") {
+                        fieldControl.path = self.path + "/" + propertyId;
                     } else {
-                        fieldControl.path = _this.path + propertyId;
+                        fieldControl.path = self.path + propertyId;
                     }
                     fieldControl.render(null, function() {
                         cb();
                     });
                 },
                 "postRender": function(control) {
+
+                    // alpaca finished
+
+                    // render the outer container
+                    var containerItemEl = Alpaca.tmpl(self.containerItemTemplateDescriptor, {
+                        "id": self.getId(),
+                        "name": control.name,
+                        "parentFieldId": self.getId(),
+                        "actionbarStyle": self.options.actionbarStyle,
+                        "view": self.view,
+                        "data": itemData
+                    });
+
+                    // find the insertion point
+                    var insertionPointEl = $(containerItemEl).find("." + Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM_FIELD);
+                    if (insertionPointEl.length === 0)
+                    {
+                        if ($(containerItemEl).hasClass(Alpaca.MARKER_CLASS_CONTAINER_FIELD_ITEM_FIELD)) {
+                            insertionPointEl = $(containerItemEl);
+                        }
+                    }
+                    if (insertionPointEl.length === 0)
+                    {
+                        self.errorCallback.call(self, {
+                            "message": "Cannot find insertion point for field: " + self.getId()
+                        });
+                        return;
+                    }
+
+                    // copy into place
+                    $(insertionPointEl).before(control.getFieldEl());
+                    $(insertionPointEl).remove();
+
+                    control.containerItemEl = containerItemEl;
+
+                    // TODO: verify, as per: https://github.com/emircal/alpaca/commit/4061c33787bd7a2b86fb613317374d365d9acc92
+                    // Reset hideInitValidationError after render
+                    Alpaca.fieldApplyFieldAndChildren(control, function(_control) {
+                        _control.hideInitValidationError = false;
+                    });
 
                     if (postRenderCallback)
                     {
@@ -18782,6 +19738,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         resolvePropertySchemaOptions: function(propertyId, callback)
         {
             var _this = this;
+
+            var completionFunction = function(resolvedPropertySchema, resolvedPropertyOptions, circular)
+            {
+                // special caveat:  if we're in read-only mode, the child must also be in read-only mode
+                if (_this.options.readonly) {
+                    resolvedPropertyOptions.readonly = true;
+                }
+
+                callback(resolvedPropertySchema, resolvedPropertyOptions, circular);
+            };
 
             var propertySchema = null;
             if (_this.schema && _this.schema.properties && _this.schema.properties[propertyId]) {
@@ -18814,9 +19780,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var refCount = 0;
                     for (var i = 0; i < fieldChain.length; i++)
                     {
-                        if (fieldChain[i].schema && fieldChain[i].schema.id === referenceId)
+                        if (fieldChain[i].schema)
                         {
-                            refCount++;
+                            if ( (fieldChain[i].schema.id === referenceId) || (fieldChain[i].schema.id === "#" + referenceId))
+                            {
+                                refCount++;
+                            }
+                            else if ( (fieldChain[i].schema["$ref"] === referenceId))
+                            {
+                                refCount++;
+                            }
                         }
                     }
 
@@ -18846,14 +19819,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
 
                     Alpaca.nextTick(function() {
-                        callback(resolvedPropertySchema, resolvedPropertyOptions, circular);
+                        completionFunction(resolvedPropertySchema, resolvedPropertyOptions, circular);
                     });
                 });
             }
             else
             {
                 Alpaca.nextTick(function() {
-                    callback(propertySchema, propertyOptions);
+                    completionFunction(propertySchema, propertyOptions);
                 });
             }
         },
@@ -18905,13 +19878,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateMaxProperties();
             valInfo["tooManyProperties"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("tooManyProperties"), [this.schema.maxProperties]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("tooManyProperties"), [this.schema.maxProperties]),
                 "status": status
             };
 
             status = this._validateMinProperties();
             valInfo["tooFewProperties"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("tooManyItems"), [this.schema.items.minProperties]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("tooManyItems"), [this.schema.items.minProperties]),
                 "status": status
             };
 
@@ -19224,8 +20197,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (Alpaca.isArray(conditionalData)) {
 
                         // check array value
-                        //if (conditionalDependencies[dependentOnPropertyId] && $.inArray(dependentOnData, conditionalDependencies[dependentOnPropertyId]) == -1)
-                        if (Alpaca.anyEquality(dependentOnData, conditionalData))
+                        if (!Alpaca.anyEquality(dependentOnData, conditionalData))
                         {
                             valid = false;
                         }
@@ -20795,10 +21767,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.base(model, function() {
 
                 // see if we can render CK Editor
-                if (!self.isDisplayOnly() && self.control && $.fn.ckeditor)
+                if (!self.isDisplayOnly() && self.control && typeof(CKEDITOR) !== "undefined")
                 {
-                    self.plugin = $( self.control ).ckeditor(self.options.ckeditor); // Use CKEDITOR.replace() if element is <textarea>.
+                    // use a timeout because CKEditor has some odd timing dependencies
+                    setTimeout(function() {
+
+                        self.editor = CKEDITOR.replace($(self.control)[0], self.options.ckeditor);
+
+                    }, 250);
                 }
+
+                // if the ckeditor's dom element gets destroyed, make sure we clean up the editor instance
+                $(self.control).bind('destroyed', function() {
+
+                    if (self.editor)
+                    {
+                        self.editor.removeAllListeners();
+                        self.editor.destroy(false);
+                        self.editor = null;
+                    }
+
+                });
 
                 callback();
             });
@@ -20810,10 +21799,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         destroy: function()
         {
             // destroy the plugin instance
-            if (this.plugin)
+            if (this.editor)
             {
-                this.plugin.destroy();
-                this.plugin = null;
+                this.editor.destroy();
+                this.editor = null;
             }
 
             // call up to base method
@@ -20962,7 +21951,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.schema["enum"] = [];
             this.options.optionLabels = [];
 
-            var countriesMap = this.view.getMessage("countries");
+            var countriesMap = this.getMessage("countries");
             if (countriesMap)
             {
                 for (var countryKey in countriesMap)
@@ -21341,6 +22330,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return "date";
         },
 
+        getDefaultFormat: function() {
+            return "MM/DD/YYYY";
+        },
+
+        getDefaultExtraFormats: function() {
+            return [];
+        },
+
         /**
          * @see Alpaca.Fields.TextField#setup
          */
@@ -21358,9 +22355,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 self.options.picker = {};
             }
 
-            self.options.picker.pickDate = true;
-            self.options.picker.pickTime = false;
-            self.options.picker.useCurrent = false;
+            if (typeof(self.options.picker.useCurrent) === "undefined") {
+                self.options.picker.useCurrent = false;
+            }
+
+            // date format
+
+            if (self.options.picker.format) {
+                self.options.dateFormat = self.options.picker.format;
+            }
+            if (!self.options.dateFormat) {
+                self.options.dateFormat = self.getDefaultFormat();
+            }
+            if (!self.options.picker.format) {
+                self.options.picker.format = self.options.dateFormat;
+            }
+
+            // extra formats
+            if (!self.options.picker.extraFormats) {
+                var extraFormats = self.getDefaultExtraFormats();
+                if (extraFormats) {
+                    self.options.picker.extraFormats = extraFormats;
+                }
+            }
         },
 
         /**
@@ -21381,11 +22398,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         self.picker = self.getControlEl().data("DateTimePicker");
                         if (self.picker && self.options.dateFormat)
                         {
-                            self.picker.format =  self.options.dateFormat;
+                            self.picker.format(self.options.dateFormat);
                         }
                         if (self.picker)
                         {
-                            self.options.dateFormat = self.picker.format;
+                            self.options.dateFormat = self.picker.format();
                         }
                     }
                 }
@@ -21396,17 +22413,42 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * Returns field value as a date.
+         * Returns field value as a JavaScript Date.
          *
          * @returns {Date} Field value.
          */
         getDate: function()
         {
-            try {
-                return this.getControlEl().datetimepicker('getDate');
-            } catch (e) {
-                return this.getValue();
+            var self = this;
+
+            var date = null;
+            try
+            {
+                if (self.picker)
+                {
+                    date = (self.picker.date() ? self.picker.date()._d: null);
+                }
+                else
+                {
+                    date = new Date(this.getValue());
+                }
             }
+            catch (e)
+            {
+                console.error(e);
+            }
+
+            return date;
+        },
+
+        /**
+         * Returns field value as a JavaScript Date.
+         *
+         * @returns {Date} Field value.
+         */
+        date: function()
+        {
+            return this.getDate();
         },
 
         /**
@@ -21435,7 +22477,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateDateFormat();
             valInfo["invalidDate"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.view.getMessage("invalidDate"), [this.options.dateFormat]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("invalidDate"), [this.options.dateFormat]),
                 "status": status
             };
 
@@ -21451,32 +22493,49 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             var self = this;
 
+            var isValid = true;
+
             if (self.options.dateFormat)
             {
-                var value = this.getControlEl().val();
+                var value = self.getValue();
                 if (value || self.isRequired())
                 {
-                    return moment(value, self.options.dateFormat, true).isValid();
-                }
+                    // collect all formats
+                    var dateFormats = [];
+                    dateFormats.push(self.options.dateFormat);
+                    if (self.options.picker && self.options.picker.extraFormats)
+                    {
+                        for (var i = 0; i < self.options.picker.extraFormats.length; i++)
+                        {
+                            dateFormats.push(self.options.picker.extraFormats[i]);
+                        }
+                    }
 
-                return true;
+                    for (var i = 0; i < dateFormats.length; i++)
+                    {
+                        isValid = isValid || moment(value, self.options.dateFormat, true).isValid();
+                    }
+                }
             }
-            else
-            {
-                return true;
-            }
+
+            return isValid;
         },
 
         /**
          * @see Alpaca.Fields.TextField#setValue
          */
-        setValue: function(val)
+        setValue: function(value)
         {
-            this.base(val);
+            var self = this;
+
+            this.base(value);
 
             if (this.picker)
             {
-                this.picker.setValue(val);
+                if (moment(value, self.options.dateFormat, true).isValid())
+                {
+                    this.picker.date(value);
+                }
             }
         },
 
@@ -21485,14 +22544,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         getValue: function()
         {
-            var val = this.base();
-
-            if (this.picker && this.picker.getDate())
-            {
-                val = this.picker.getDate()._i;
-            }
-
-            return val;
+            return this.base();
         },
 
         destroy: function()
@@ -21562,7 +22614,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "properties": {
                     "dateFormat": {
                         "title": "Date Format",
-                        "description": "Date format",
+                        "description": "Date format (using moment.js format)",
                         "type": "string"
                     },
                     "picker": {
@@ -21618,6 +22670,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return "datetime";
             },
 
+            getDefaultFormat: function() {
+                return "MM/DD/YYYY HH:mm:ss";
+            },
+
+            getDefaultExtraFormats: function() {
+                return [
+                    "MM/DD/YYYY hh:mm:ss a",
+                    "MM/DD/YYYY HH:mm",
+                    "MM/DD/YYYY"
+                ];
+            },
+
             /**
              * @see Alpaca.Fields.TextField#setup
              */
@@ -21629,41 +22693,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 //this.inputType = "datetime";
 
                 this.base();
-
-                self.options.picker.pickDate = true;
-                self.options.picker.pickTime = true;
-                if (typeof(self.options.picker.sideBySide) == "undefined")
-                {
-                    self.options.picker.sideBySide = true;
-                }
-            },
-
-            /**
-             *@see Alpaca.Fields.TextField#setValue
-             */
-            setValue: function(value)
-            {
-                if (value) {
-                    if (Alpaca.isNumber()) {
-                        value = new Date(value);
-                    }
-                    if (Object.prototype.toString.call(value) === "[object Date]") {
-                        this.base((value.getMonth() + 1) + "/" + value.getDate() + "/" + value.getFullYear() + " " + value.getHours() + ":" + value.getMinutes());
-                    } else {
-                        this.base(value);
-                    }
-                } else {
-                    this.base(value);
-                }
-            },
-
-            /**
-             * Returns field value in datetime.
-             *
-             * @returns {Date} Field value.
-             */
-            getDatetime: function() {
-                return this.getDate();
             }
 
             /* builder_helpers */
@@ -21680,37 +22709,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
              * @see Alpaca.Fields.TextField#getDescription
              */
             getDescription: function() {
-                return "Datetime Field based on Trent Richardson's <a href='http://trentrichardson.com/examples/timepicker/'>jQuery timepicker addon</a>.";
-            },
-
-            /**
-             * @private
-             * @see Alpaca.ControlField#getSchemaOfOptions
-             */
-            getSchemaOfOptions: function() {
-                return Alpaca.merge(this.base(), {
-                    "properties": {
-                        "picker": {
-                            "title": "DatetimePicker options",
-                            "description": "Options that are supported by the <a href='http://eonasdan.github.io/bootstrap-datetimepicker/'>Bootstrap DateTime Picker</a>.",
-                            "type": "any"
-                        }
-                    }
-                });
-            },
-
-            /**
-             * @private
-             * @see Alpaca.ControlField#getOptionsForOptions
-             */
-            getOptionsForOptions: function() {
-                return Alpaca.merge(this.base(), {
-                    "fields": {
-                        "picker": {
-                            "type": "any"
-                        }
-                    }
-                });
+                return "Datetime Field based on <a href='http://eonasdan.github.io/bootstrap-datetimepicker/'>Bootstrap DateTime Picker</a>.";
             }
 
             /* end_builder_helpers */
@@ -21977,13 +22976,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var wordCountStatus =  this._validateWordCount();
             valInfo["wordLimitExceeded"] = {
-                "message": wordCountStatus ? "" : Alpaca.substituteTokens(this.view.getMessage("wordLimitExceeded"), [this.options.wordlimit]),
+                "message": wordCountStatus ? "" : Alpaca.substituteTokens(this.getMessage("wordLimitExceeded"), [this.options.wordlimit]),
                 "status": wordCountStatus
             };
 
             var editorAnnotationsStatus = this._validateEditorAnnotations();
             valInfo["editorAnnotationsExist"] = {
-                "message": editorAnnotationsStatus ? "" : this.view.getMessage("editorAnnotationsExist"),
+                "message": editorAnnotationsStatus ? "" : this.getMessage("editorAnnotationsExist"),
                 "status": editorAnnotationsStatus
             };
 
@@ -22231,7 +23230,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var valInfo = this.validation;
 
             if (!valInfo["invalidPattern"]["status"]) {
-                valInfo["invalidPattern"]["message"] = this.view.getMessage("invalidEmail");
+                valInfo["invalidPattern"]["message"] = this.getMessage("invalidEmail");
             }
 
             return baseStatus;
@@ -22550,7 +23549,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateInteger();
             valInfo["stringNotANumber"] = {
-                "message": status ? "" : this.view.getMessage("stringNotAnInteger"),
+                "message": status ? "" : this.getMessage("stringNotAnInteger"),
                 "status": status
             };
 
@@ -22750,7 +23749,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (!valInfo["invalidPattern"]["status"])
             {
-                valInfo["invalidPattern"]["message"] = this.view.getMessage("invalidIPv4");
+                valInfo["invalidPattern"]["message"] = this.getMessage("invalidIPv4");
             }
 
             return baseStatus;
@@ -22880,7 +23879,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var status = this._validateJSON();
             valInfo["stringNotAJSON"] = {
-                "message": status.status ? "" : this.view.getMessage("stringNotAJSON") +" "+ status.message,
+                "message": status.status ? "" : this.getMessage("stringNotAJSON") +" "+ status.message,
                 "status": status.status
             };
 
@@ -23281,13 +24280,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var isValidMapKeysNotEmpty = this._validateMapKeysNotEmpty();
             valInfo["keyMissing"] = {
-                "message": isValidMapKeysNotEmpty ? "" : this.view.getMessage("keyMissing"),
+                "message": isValidMapKeysNotEmpty ? "" : this.getMessage("keyMissing"),
                 "status": isValidMapKeysNotEmpty
             };
 
             var isValidMapKeysUnique = this._validateMapKeysUnique();
             valInfo["keyNotUnique"] = {
-                "message": isValidMapKeysUnique ? "" : this.view.getMessage("keyNotUnique"),
+                "message": isValidMapKeysUnique ? "" : this.getMessage("keyNotUnique"),
                 "status": isValidMapKeysUnique
             };
 
@@ -23413,7 +24412,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var valInfo = this.validation;
 
             if (!valInfo["invalidPattern"]["status"]) {
-                valInfo["invalidPattern"]["message"] = this.view.getMessage("invalidPassword");
+                valInfo["invalidPattern"]["message"] = this.getMessage("invalidPassword");
             }
 
             return baseStatus;
@@ -23625,7 +24624,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var valInfo = this.validation;
 
             if (!valInfo["invalidPattern"]["status"]) {
-                valInfo["invalidPattern"]["message"] = this.view.getMessage("invalidPhone");
+                valInfo["invalidPattern"]["message"] = this.getMessage("invalidPhone");
             }
 
             return baseStatus;
@@ -24046,11 +25045,71 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var Alpaca = $.alpaca;
 
+    /**
+     * The table field is used for data representations that consist of an array with objects inside of it.  The objects
+     * must have a uniform structure.  The table field renders a standard HTML table using the table.  The individual
+     * columns are either editable (in edit mode) or simply displayed in read-only mode.
+     */
     Alpaca.Fields.TableField = Alpaca.Fields.ArrayField.extend(
     /**
      * @lends Alpaca.Fields.TableField.prototype
      */
     {
+        setup: function()
+        {
+            var self = this;
+
+            if (!self.options)
+            {
+                self.options = {};
+            }
+
+            if (typeof(self.options.animate) === "undefined")
+            {
+                self.options.animate = false;
+            }
+
+            this.base();
+
+            if (!this.options.items.type)
+            {
+                this.options.items.type = "tablerow";
+            }
+
+            // support for either "datatable" or "datatables"
+            if (this.options.datatable) {
+                this.options.datatables = this.options.datatable;
+            }
+
+            // assume empty options for datatables
+            if (typeof(this.options.datatables) === "undefined")
+            {
+                this.options.datatables = {
+                    "paging": false,
+                    "lengthChange": false,
+                    "info": false,
+                    "searching": false,
+                    "ordering": true
+                };
+            }
+
+            // assume actions column to be shown
+            if (typeof(this.options.showActionsColumn) === "undefined")
+            {
+                this.options.showActionsColumn = true;
+
+                if (this.options.readonly)
+                {
+                    this.options.showActionsColumn = false;
+                }
+
+                if (this.isDisplayOnly())
+                {
+                    this.options.showActionsColumn = false;
+                }
+            }
+        },
+
         /**
          * @see Alpaca.ControlField#getFieldType
          */
@@ -24058,18 +25117,131 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return "table";
         },
 
+        /**
+         * The table field uses the "array" container convention to render the DOM.  As such, nested objects are wrapped
+         * in "field" elements that result in slightly incorrect table structures.  Part of the reason for this is that
+         * browsers are very fussy when it comes to injection of nested TR or TD partials.  Here, we generate most
+         * things as DIVs and then do some cleanup in this method to make sure that the table is put togehter in the
+         * right way.
+         *
+         * @param model
+         * @param callback
+         */
         afterRenderContainer: function(model, callback)
         {
             var self = this;
 
             this.base(model, function() {
 
-                $(self.container).find("table").dataTable({
+                self.cleanupDomInjections();
 
-                });
+                // apply styles of underlying "table"
+                var table = $(this.container).find("table");
+                self.applyStyle("table", table);
+
+                // if the DataTables plugin is available, use it
+                if (self.options.datatables)
+                {
+                    if ($.fn.DataTable)
+                    {
+                        $(this.container).find("table").DataTable(self.options.datatables);
+                    }
+                }
 
                 callback();
+
+            }.bind(self));
+        },
+
+        cleanupDomInjections: function()
+        {
+            /**
+             * Takes a DOM element and merges it "up" to the parent element.  Data attributes and some classes are
+             * copied from DOM element into the parent element.  The children of the DOM element are added to the
+             * parent and the DOM element is removed.
+             *
+             * @param mergeElement
+             */
+            var mergeElementUp = function(mergeElement)
+            {
+                var mergeElementParent = $(mergeElement).parent();
+                var mergeElementChildren = $(mergeElement).children();
+
+                // copy merge element classes to parent
+                var classNames =$(mergeElement).attr('class').split(/\s+/);
+                $.each( classNames, function(index, className){
+                    if (className === "alpaca-merge-up") {
+                        // skip
+                    } else {
+                        $(mergeElementParent).addClass(className);
+                    }
+                });
+
+                // copy attributes to TR
+                $.each($(mergeElement)[0].attributes, function() {
+                    if (this.name && this.name.indexOf("data-") === 0)
+                    {
+                        $(mergeElementParent).attr(this.name, this.value);
+                    }
+                });
+
+                // replace field with children
+                if (mergeElementChildren.length > 0)
+                {
+                    $(mergeElement).replaceWith(mergeElementChildren);
+                }
+                else
+                {
+                    $(mergeElement).remove();
+                }
+            };
+
+            // find each TR's .alpaca-field and merge up
+            this.getFieldEl().find("tr > .alpaca-field").each(function() {
+                mergeElementUp(this);
             });
+
+            // find each TR's .alpaca-container and merge up
+            this.getFieldEl().find("tr > .alpaca-container").each(function() {
+                mergeElementUp(this);
+            });
+
+            // find the action bar and slip a TD around it
+            var alpacaArrayActionbar = this.getFieldEl().find("." + Alpaca.MARKER_CLASS_ARRAY_ITEM_ACTIONBAR);
+            if (alpacaArrayActionbar.length > 0)
+            {
+                alpacaArrayActionbar.each(function() {
+                    var td = $("<td class='actionbar' nowrap='nowrap'></td>");
+                    $(this).before(td);
+                    $(td).append(this);
+                });
+            }
+
+            // find anything else with .alpaca-merge-up and merge up
+            this.getFieldEl().find(".alpaca-merge-up").each(function() {
+                mergeElementUp(this);
+            });
+        },
+
+        doResolveItemContainer: function()
+        {
+            var self = this;
+
+            return $(self.container).find("table tbody");
+        },
+
+        doAfterAddItem: function(item)
+        {
+            var self = this;
+
+            self.cleanupDomInjections();
+        },
+
+        doAfterRemoveItem: function(item)
+        {
+            var self = this;
+
+            self.cleanupDomInjections();
         },
 
         /**
@@ -24095,12 +25267,130 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         getDescription: function() {
             return "Renders array items into a table";
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.TextField#getSchemaOfOptions
+         */
+        getSchemaOfOptions: function() {
+            return Alpaca.merge(this.base(), {
+                "properties": {
+                    "datatables": {
+                        "title": "DataTables Configuration",
+                        "description": "Optional configuration to be passed to the underlying DataTables Plugin.",
+                        "type": "object"
+                    },
+                    "showActionsColumn": {
+                        "title": "Show Actions Column",
+                        "default": true,
+                        "description": "Whether to show or hide the actions column.",
+                        "type": "boolean"
+                    }
+                }
+            });
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.TextField#getOptionsForOptions
+         */
+        getOptionsForOptions: function() {
+            return Alpaca.merge(this.base(), {
+                "fields": {
+                    "datatables": {
+                        "type": "object"
+                    },
+                    "showActionsColumn": {
+                        "type": "checkbox"
+                    }
+                }
+            });
         }
 
         /* end_builder_helpers */
     });
 
     Alpaca.registerFieldClass("table", Alpaca.Fields.TableField);
+
+})(jQuery);
+
+(function($) {
+
+    var Alpaca = $.alpaca;
+
+    Alpaca.Fields.TableRowField = Alpaca.Fields.ObjectField.extend(
+    /**
+     * @lends Alpaca.Fields.TableRowField.prototype
+     */
+    {
+        prepareContainerModel: function(callback)
+        {
+            var self = this;
+
+            this.base(function(model) {
+
+                model.options.showActionsColumn = self.parent.options.showActionsColumn;
+
+                callback(model);
+            });
+        },
+
+        /*
+        afterRenderContainer: function(model, callback)
+        {
+            var self = this;
+
+            this.base(model, function() {
+
+                // apply "data-search" to the TD elements
+                var tds = $(this.container).find("td");
+                for (var i = 0; i < self.children.length; i++)
+                {
+                    $(tds[i]).attr("data-filter", "abc");//self.children[i].getValue());
+                }
+
+                callback();
+
+            }.bind(self));
+        },
+        */
+
+        /**
+         * @see Alpaca.ControlField#getFieldType
+         */
+        getFieldType: function() {
+            return "tablerow";
+        },
+
+        /**
+         * @see Alpaca.ControlField#getType
+         */
+        getType: function() {
+            return "object";
+        }
+
+        /* builder_helpers */
+        ,
+
+        /**
+         * @see Alpaca.ControlField#getTitle
+         */
+        getTitle: function() {
+            return "Table Row Field";
+        },
+
+        /**
+         * @see Alpaca.ControlField#getDescription
+         */
+        getDescription: function() {
+            return "Renders object items into a table row";
+        }
+
+        /* end_builder_helpers */
+    });
+
+    Alpaca.registerFieldClass("tablerow", Alpaca.Fields.TableRowField);
 
 })(jQuery);
 
@@ -24249,10 +25539,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var Alpaca = $.alpaca;
 
-    // time-related regular expressions
-    Alpaca.REGEX_TIME = /^((0?[1-9]|1[012])(:[0-5]\d){0,2}(\ [AP]M))$|^([01]\d|2[0-3])(:[0-5]\d){0,2}$/;
-
-    Alpaca.Fields.TimeField = Alpaca.Fields.TextField.extend(
+    Alpaca.Fields.TimeField = Alpaca.Fields.DateField.extend(
     /**
      * @lends Alpaca.Fields.TimeField.prototype
      */
@@ -24262,6 +25549,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         getFieldType: function() {
             return "time";
+        },
+
+        getDefaultFormat: function() {
+            return "h:mm:ss a";
         },
 
         /**
@@ -24275,94 +25566,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             //this.inputType = "time";
 
             this.base();
-
-            if (!self.options.picker)
-            {
-                self.options.picker = {};
-            }
-        },
-
-        /**
-         * @see Alpaca.Fields.TextField#afterRenderControl
-         */
-        afterRenderControl: function(model, callback) {
-
-            var self = this;
-
-            this.base(model, function() {
-
-                if ($.fn.timepicker)
-                {
-                    self.getControlEl().timepicker(self.options.picker);
-                }
-
-                callback();
-
-            });
-        },
-
-        /**
-         * @see Alpaca.Field#onChange
-         */
-        onChange: function(e)
-        {
-            this.base();
-
-            this.refreshValidationState();
-        },
-
-        isAutoFocusable: function()
-        {
-            return false;
-        },
-
-        /**
-         * @see Alpaca.Fields.TextField#handleValidate
-         */
-        handleValidate: function()
-        {
-            var baseStatus = this.base();
-
-            var valInfo = this.validation;
-
-            var status = this._validateTime();
-            valInfo["invalidTime"] = {
-                "message": status ? "" : this.view.getMessage("invalidTime"),
-                "status": status
-            };
-
-            return baseStatus && valInfo["invalidTime"]["status"];
-        },
-
-        /**
-         * Validates that the given value is a valid time.
-         *
-         * @returns {Boolean} True if it is a valid time, false otherwise.
-         */
-        _validateTime: function()
-        {
-            var value = this.getControlEl().val();
-            if (value || this.isRequired())
-            {
-                return Alpaca.REGEX_TIME.test(value);
-            }
-
-            return true;
-        },
-
-        /**
-         * @see Alpaca.Fields.TextField#setValue
-         */
-        setValue: function(val)
-        {
-            var self = this;
-
-            this.base(val);
-
-            if ($.fn.timepicker)
-            {
-                self.getControlEl().timepicker("setTime", val);
-            }
         }
 
         /* builder_helpers */
@@ -24380,69 +25583,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         getDescription: function() {
             return "Time Field";
-        },
-
-        /**
-         * @private
-         * @see Alpaca.Fields.TextField#getSchemaOfSchema
-         */
-        getSchemaOfSchema: function() {
-            return Alpaca.merge(this.base(), {
-                "properties": {
-                    "format": {
-                        "title": "Format",
-                        "description": "Property data format",
-                        "type": "string",
-                        "default":"time",
-                        "enum" : ["time"],
-                        "readonly":true
-                    }
-                }
-            });
-        },
-
-        /**
-         * @private
-         * @see Alpaca.Fields.TextField#getOptionsForSchema
-         */
-        getOptionsForSchema: function() {
-            return Alpaca.merge(this.base(), {
-                "fields": {
-                    "format": {
-                        "type": "text"
-                    }
-                }
-            });
-        },
-
-        /**
-         * @private
-         * @see Alpaca.Fields.TextField#getSchemaOfOptions
-         */
-        getSchemaOfOptions: function() {
-            return Alpaca.merge(this.base(), {
-                "properties": {
-                    "picker": {
-                        "title": "DatetimePicker options",
-                        "description": "Options that are supported by the <a href='https://github.com/m3wolf/bootstrap3-timepicker'>Bootstrap Time Picker</a>.",
-                        "type": "any"
-                    }
-                }
-            });
-        },
-
-        /**
-         * @private
-         * @see Alpaca.Fields.TextField#getOptionsForOptions
-         */
-        getOptionsForOptions: function() {
-            return Alpaca.merge(this.base(), {
-                "fields": {
-                    "picker": {
-                        "type": "any"
-                    }
-                }
-            });
         }
 
         /* end_builder_helpers */
@@ -24456,6 +25596,134 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 })(jQuery);
 
+(function($) {
+
+    var Alpaca = $.alpaca;
+
+    Alpaca.Fields.TinyMCEField = Alpaca.Fields.TextAreaField.extend(
+        /**
+         * @lends Alpaca.Fields.tinyMCEField.prototype
+         */
+        {
+            /**
+             * @see Alpaca.Fields.TextAreaField#getFieldType
+             */
+            getFieldType: function() {
+                return "tinymce";
+            },
+
+            /**
+             * @see Alpaca.Fields.TextAreaField#setup
+             */
+            setup: function()
+            {
+                var self=this;
+
+                if (!this.data)  {
+                    this.data = "";
+                }
+
+                var standardToolbar="insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image";
+                if (!self.options.toolbar) {
+                    self.options.toolbar = standardToolbar;
+                }
+
+                this.base();
+            },
+
+            getValue:function()
+            {
+                var self = this;
+
+                var rteFieldID = self.control[0].id;
+                var rteRef = tinymce.get(rteFieldID);
+                var returnVal = "";
+
+                //when page intially loads and tinyMCE not yet initialized, this check prevents an error
+                if (!rteRef)
+                {
+                    returnVal = rteRef.getContent()
+                }
+
+                return returnVal;
+            },
+
+            afterRenderControl: function(model, callback)
+            {
+                //"insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+                var self = this;
+                this.base(model, function() {
+
+                    if (!this.data) {
+                        if (!self.isDisplayOnly() && self.control) {
+                            var rteFieldID = self.control[0].id;
+
+                            setTimeout(function () {
+                                tinyMCE.init({
+                                    selector: "#" + rteFieldID,
+                                    toolbar: self.options.toolbar
+                                });
+                            }, 250); //There may be a better/more proper way to wait to be able to call tinymce, but calling it in a setTimeout seems to be reliable
+                        }
+                    }
+
+                    callback();
+                });
+            },
+
+
+            /* builder_helpers */
+
+            /**
+             * @see Alpaca.Fields.TextAreaField#getTitle
+             */
+            getTitle: function() {
+                return "TinyMCE Editor";
+            },
+
+            /**
+             * @see Alpaca.Fields.TextAreaField#getDescription
+             */
+            getDescription: function() {
+                return "Provides an instance of a TinyMCE control for use in editing HTML.";
+            },
+
+            /**
+             * @private
+             * @see Alpaca.ControlField#getSchemaOfOptions
+             */
+            getSchemaOfOptions: function() {
+                return Alpaca.merge(this.base(), {
+                    "properties": {
+                        "toolbar": {
+                            "title": "TinyMCE toolbar options",
+                            "description": "Toolbar options for TinyMCE plugin.",
+                            "type": "string"
+                        }
+                    }
+                });
+            },
+
+            /**
+             * @private
+             * @see Alpaca.ControlField#getOptionsForOptions
+             */
+            getOptionsForOptions: function() {
+                return Alpaca.merge(this.base(), {
+                    "fields": {
+                        "toolbar": {
+                            "type": "text"
+                        }
+                    }
+                });
+            }
+
+            /* end_builder_helpers */
+        });
+
+    Alpaca.registerFieldClass("tinymce", Alpaca.Fields.TinyMCEField);
+
+})(jQuery);
 (function($) {
 
     var Alpaca = $.alpaca;
@@ -25358,7 +26626,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (!valInfo["invalidPattern"]["status"]) {
 
-                valInfo["invalidPattern"]["message"] = this.view.getMessage("invalidURLFormat");
+                valInfo["invalidPattern"]["message"] = this.getMessage("invalidURLFormat");
             }
 
             return baseStatus;
@@ -25458,11 +26726,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 if (this.options.format === "nine")
                 {
-                    valInfo["invalidPattern"]["message"] = this.view.getMessage("invalidZipcodeFormatNine");
+                    valInfo["invalidPattern"]["message"] = this.getMessage("invalidZipcodeFormatNine");
                 }
                 else if (this.options.format === "five")
                 {
-                    valInfo["invalidPattern"]["message"] = this.view.getMessage("invalidZipcodeFormatFive");
+                    valInfo["invalidPattern"]["message"] = this.getMessage("invalidZipcodeFormatFive");
                 }
             }
 
@@ -25807,6 +27075,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 })(jQuery);
 (function($) {
 
+	// german - austria
+
 	var Alpaca = $.alpaca;
 
 	Alpaca.registerView ({
@@ -25846,7 +27116,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 				"invalidPattern": "&#27492;&#22495;&#39035;&#26377;&#26684;&#24335; {0}",
 				"stringTooShort": "&#27492;&#22495;&#33267;&#23569;&#38271;&#24230; {0}",
 				"stringTooLong": "&#27492;&#22495;&#26368;&#22810;&#38271;&#24230; {0}"
-			
 			}
         }
     });
@@ -25854,6 +27123,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 })(jQuery);
 
 (function($) {
+
+	// spanish - spain
 
 	var Alpaca = $.alpaca;
 
@@ -25884,7 +27155,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 				"stringNotAnInteger": "Este valor no es un número entero.",
 				"invalidIPv4": "Dirección inválida IPv4, ex: 192.168.0.1",
 				"stringValueTooSmall": "El valor mínimo para este campo es {0}",
-				"stringValueTooLarge": "El valor míximo para este campo es {0}",
+				"stringValueTooLarge": "El valor máximo para este campo es {0}",
 				"stringValueTooSmallExclusive": "El valor de este campo debe ser mayor que {0}",
 				"stringValueTooLargeExclusive": "El valor de este campo debe ser menos que {0}",
 				"stringDivisibleBy": "El valor debe ser divisible cerca {0}",
@@ -25893,7 +27164,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 				"invalidPhone": "Número de teléfono inválido, ex: (123) 456-9999",
 				"invalidPattern": "Este campo debe tener patrón {0}",
 				"stringTooShort": "Este campo debe contener por lo menos {0} números o caracteres",
-				"stringTooLong": "Este campo debe contener a lo más {0} números o caracteres"
+				"stringTooLong": "Este campo debe contener a lo más {0} números o caracteres",
+				"noneLabel": "Ninguno",
+				"addItemButtonLabel": "Añadir",
+				"addButtonLabel": "Añadir",
+				"removeButtonLabel": "Quitar",
+				"upButtonLabel": "Arriba",
+				"downButtonLabel": "Abajo"
 			}
         }
 	});
@@ -25901,6 +27178,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 })(jQuery);
 
 (function($) {
+
+	// french - france
 
 	var Alpaca = $.alpaca;
 
@@ -25948,6 +27227,112 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 })(jQuery);
 
 (function($) {
+
+	// croatian - croatia
+
+	var Alpaca = $.alpaca;
+
+	Alpaca.registerView ({
+		"id": "base",
+		"messages": {
+			"hr_HR": {
+				required: "Polje je obavezno",
+				invalid: "Pogrešna vrijednost",
+				months: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"],
+				timeUnits: {
+					SECOND: "sekunda",
+					MINUTE: "minuta",
+					HOUR: "sati",
+					DAY: "dan",
+					MONTH: "mjesec",
+					YEAR: "godina"
+				},
+				"notOptional": "Polje nije opciono.",
+				"disallowValue": "{0} vrijednost nije dozvoljena.",
+				"invalidValueOfEnum": "Moguće vrijednosti : {0}. [{1}]",
+				"notEnoughItems": "Odaberite najmanje {0}",
+				"tooManyItems": "Odaberite najviše {0}",
+				"valueNotUnique": "Vrijednost nije jedinstvena",
+				"notAnArray": "Vrijednost nije popis",
+				"invalidDate": "Datum nije u formatu {0}",
+				"invalidEmail": "E-mail adresa nije u ispravnom formatu, npr: ime.prezime@internet.com",
+				"stringNotAnInteger": "Vrijednost nije cijeli broj.",
+				"invalidIPv4": "IPv4 adresa nije ispravna, npr: 192.168.0.1",
+				"stringValueTooSmall": "Vrijednost je ispod dopuštenog {0}",
+				"stringValueTooLarge": "Vrijednost je iznad dopuštenog {0}",
+				"stringValueTooSmallExclusive": "Vrijednost mora biti veća od {0}",
+				"stringValueTooLargeExclusive": "Vrijednost mora biti manja od {0}",
+				"stringDivisibleBy": "Vrijednost mora biti djeljiva sa {0}",
+				"stringNotANumber": "Vrijednost nije broj.",
+				"invalidPassword": "Neispravna lozinka",
+				"invalidPhone": "Telefon nije ispravan, npr: (123) 456-9999",
+				"invalidPattern": "Pogrešan uzorak {0}",
+                "stringTooShort": "Polje mora imati namjanje {0} znakova",
+                "stringTooLong": "Polje mora imati najviše {0} znakova"
+            }
+        }
+    });
+
+})(jQuery);
+
+(function($) {
+
+	// italian - italy
+
+	var Alpaca = $.alpaca;
+
+	Alpaca.registerView ({
+		"id": "base",
+		"messages": {
+			"it_IT": {
+				required: "Questo campo è obbligatorio",
+				invalid: "Questo campo è invalido",
+				months: ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
+				timeUnits: {
+					SECOND: "secondi",
+					MINUTE: "minuti",
+					HOUR: "ore",
+					DAY: "giorni",
+					MONTH: "mesi",
+					YEAR: "anni"
+				},
+				"notOptional": "Questo campo non è opzionale",
+				"disallowValue": "{0} sono valori invalidi",
+				"invalidValueOfEnum": "Questo campo deve avere uno dei seguenti valori {0} (valore attuale: {1})",
+				"notEnoughItems": "Il numero minimo di elementi richiesti è {0}",
+				"tooManyItems": "Il numero massimo di elementi ammessi è {0}",
+				"valueNotUnique": "I valori non sono univoci",
+				"notAnArray": "Questo valore non è di tipo array",
+				"invalidDate": "Data invalida per il formato {0}",
+				"invalidEmail": "Indirizzo email invalido, si attendono valori del tipo: info@cloudcms.com",
+				"stringNotAnInteger": "Questo valore non è un numero intero",
+				"invalidIPv4": "Indirizzo IPv4 invalido, si attendono valori del tipo: 192.168.0.1",
+				"stringValueTooSmall": "Il valore minimo per questo campo è {0}",
+				"stringValueTooLarge": "Il valore massimo per questo campo è {0}",
+				"stringValueTooSmallExclusive": "Il valore di questo campo deve essere maggiore di {0}",
+				"stringValueTooLargeExclusive": "Il valore di questo campo deve essere minore di {0}",
+				"stringDivisibleBy": "Il valore di questo campo deve essere divisibile per {0}",
+				"stringNotANumber": "Questo valore non è un numero",
+				"invalidPassword": "Password invalida",
+				"invalidPhone": "Numero di telefono invalido, si attendono valori del tipo: (123) 456-9999",
+				"invalidPattern": "Questo campo deve avere la seguente struttura: {0}",
+				"stringTooShort": "Questo campo non deve contenere meno di {0} caratteri",
+				"stringTooLong": "Questo campo non deve contenere più di {0} caratteri",
+				"noneLabel": "Nessuno",
+				"addItemButtonLabel": "Aggiungi",
+				"addButtonLabel": "Aggiungi",
+				"removeButtonLabel": "Rimuovi",
+				"upButtonLabel": "Su",
+				"downButtonLabel": "Giù"
+			}
+		}
+	});
+
+})(jQuery);
+
+(function($) {
+
+    // japanese - japan
 
     var Alpaca = $.alpaca;
 
@@ -26008,6 +27393,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 (function($) {
 
+    // polish - poland
+
     var Alpaca = $.alpaca;
 
     Alpaca.registerView ({
@@ -26053,6 +27440,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 })(jQuery);
 (function($) {
+
+    // portuguese - portugal
 
     var Alpaca = $.alpaca;
 
@@ -26100,6 +27489,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 })(jQuery);
 
 (function($) {
+
+    // chinese - china
 
 	var Alpaca = $.alpaca;
 
@@ -26244,70 +27635,105 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     // fired to add or remove the array toolbar for a field
     callbacks["arrayToolbar"] = function(remove)
     {
-        var self = this;
+        // NOTE: this = array field
 
-        var fieldId = this.getId();
+        var self = this;
 
         if (remove)
         {
-            $(this.getFieldEl()).find(".alpaca-array-toolbar[data-alpaca-array-toolbar-field-id='" + fieldId + "']").remove();
+            // swap existing toolbar with an insertion point marker
+            var existingToolbar = $(self.getFieldEl()).find(".alpaca-array-toolbar[data-alpaca-array-toolbar-field-id='" + self.getId() + "']");
+            if (existingToolbar.length > 0)
+            {
+                var insertionPointEl = $("<div class='" + Alpaca.MARKER_CLASS_ARRAY_TOOLBAR + "' " + Alpaca.MARKER_DATA_ARRAY_TOOLBAR_FIELD_ID + "='" + self.getId() + "'></div>");
+
+                existingToolbar.before(insertionPointEl);
+                existingToolbar.remove();
+            }
         }
         else
         {
-            // render toolbar
-            var templateDescriptor = this.view.getTemplateDescriptor("container-array-toolbar", self);
-            var toolbar = Alpaca.tmpl(templateDescriptor, {
-                "actions": self.toolbar.actions,
-                "fieldId": self.getId(),
-                "toolbarStyle": self.options.toolbarStyle,
-                "view": self.view
-            });
+            // find the the insertion point marker
+            var insertionPointEl = $(self.getContainerEl()).find("." + Alpaca.MARKER_CLASS_ARRAY_TOOLBAR + "[" + Alpaca.MARKER_DATA_ARRAY_TOOLBAR_FIELD_ID + "='" + self.getId() + "']");
+            if (insertionPointEl.length > 0)
+            {
+                // render toolbar
+                var templateDescriptor = self.view.getTemplateDescriptor("container-array-toolbar", self);
+                if (templateDescriptor)
+                {
+                    var toolbar = Alpaca.tmpl(templateDescriptor, {
+                        "actions": self.toolbar.actions,
+                        "id": self.getId(),
+                        "toolbarStyle": self.options.toolbarStyle,
+                        "view": self.view
+                    });
 
-            $(this.getContainerEl()).before(toolbar);
+                    // replace the insertion point
+                    $(insertionPointEl).before(toolbar);
+                    $(insertionPointEl).remove();
+                }
+            }
         }
     };
-    // fired to add or remove the array actionbars for a field
+    // fired to add or remove the array actionbars all children of an array field
     callbacks["arrayActionbars"] = function(remove)
     {
+        // NOTE: this = array field
+
         var self = this;
 
-        var fieldId = this.getId();
-
-        if (remove)
+        // walk over all children
+        for (var childIndex = 0; childIndex < self.children.length; childIndex++)
         {
-            $(this.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-field-id='" + fieldId + "']").remove();
-        }
-        else
-        {
-            var templateDescriptor = this.view.getTemplateDescriptor("container-array-actionbar", self);
+            var childField = self.children[childIndex];
+            var childFieldId = childField.getId();
 
-            // for each item render the item toolbar
-            var items = this.getContainerEl().children(".alpaca-container-item");
-            $(items).each(function(itemIndex) {
-
-                var actionbar = Alpaca.tmpl(templateDescriptor, {
-                    "actions": self.actionbar.actions,
-                    "fieldId": self.getId(),
-                    "itemIndex": itemIndex,
-                    "actionbarStyle": self.options.actionbarStyle,
-                    "view": self.view
-                });
-
-                // insert above or below
-                if (self.options.actionbarStyle == "top")
+            if (remove)
+            {
+                // find the existing action bar for this child
+                // if we have one, remove it and replace it with an insertion point marker
+                var existingActionbar = $(self.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-field-id='" + childFieldId + "']");
+                if (existingActionbar.length > 0)
                 {
-                    $(this).children().first().before(actionbar);
+                    var insertionPointEl = $("<div class='" + Alpaca.MARKER_CLASS_ARRAY_ITEM_ACTIONBAR + "' " + Alpaca.MARKER_DATA_ARRAY_ITEM_KEY + "='" + childField.name + "'></div>");
+
+                    existingActionbar.before(insertionPointEl);
+                    existingActionbar.remove();
                 }
-                else if (self.options.actionbarStyle == "bottom")
+            }
+            else
+            {
+                // find the insertion point marker
+                // if we find one, bind in the action toolbar
+                var insertionPointEl = $(self.getFieldEl()).find("." + Alpaca.MARKER_CLASS_ARRAY_ITEM_ACTIONBAR + "[" + Alpaca.MARKER_DATA_ARRAY_ITEM_KEY + "='" + childField.name + "']");
+                if (insertionPointEl.length > 0)
                 {
-                    $(this).children().last().after(actionbar);
+                    var templateDescriptor = self.view.getTemplateDescriptor("container-array-actionbar", self);
+                    if (templateDescriptor)
+                    {
+                        var actionbar = Alpaca.tmpl(templateDescriptor, {
+                            "actions": self.actionbar.actions,
+                            "name": childField.name,
+                            "parentFieldId": self.getId(),
+                            "fieldId": childField.getId(),
+                            "itemIndex": childIndex,
+                            "actionbarStyle": self.options.actionbarStyle,
+                            "view": self.view
+                        });
+
+                        // replace the insertion point
+                        $(insertionPointEl).before(actionbar);
+                        $(insertionPointEl).remove();
+                    }
                 }
-
-            });
-
-
+            }
         }
     };
+    // fired after a text field is deemed to be autocomplete-able
+    callbacks["autocomplete"] = function()
+    {
+    };
+
 
     var styles = {};
     styles["button"] = "";
@@ -26318,6 +27744,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     styles["downIcon"] = "";
     styles["expandedIcon"] = "";
     styles["collapsedIcon"] = "";
+    styles["table"] = "";
 
     Alpaca.registerView({
         "id": "web-display",
@@ -26408,6 +27835,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     styles["downIcon"] = "glyphicon glyphicon-chevron-down";
     styles["expandedIcon"] = "glyphicon glyphicon-circle-arrow-down";
     styles["collapsedIcon"] = "glyphicon glyphicon-circle-arrow-right";
+    styles["table"] = "table table-striped table-bordered table-hover";
 
     // custom callbacks
     var callbacks = {};
@@ -26543,7 +27971,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             $(containerEl).addClass("collapse in");
 
             // set up legend anchor
-            $(anchorEl).attr("data-target", "#" + id);
+            if (!$(anchorEl).attr("data-target")) {
+                $(anchorEl).attr("data-target", "#" + id);
+            }
 
             $(anchorEl).mouseover(function(e) {
                 $(this).css("cursor", "pointer");
