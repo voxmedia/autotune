@@ -148,9 +148,10 @@ module.exports = {
         $form.alpaca(opts);
       }
     },
-    beforeSubmit: function($form, fields, action, Model) {
-      fields = $form.alpaca('get').getValue();
-      fields.blueprint_id = this.model.blueprint.get('id');
+    formValues: function($form) {
+      var values = $form.alpaca('get').getValue();
+      values.blueprint_id = this.model.blueprint.get('id');
+      return values;
     }
   }),
   ShowProject: FormView.extend({

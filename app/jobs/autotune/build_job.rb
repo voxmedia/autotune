@@ -21,7 +21,7 @@ module Autotune
         build_data['base_url'] = project.preview_url
       end
       # Run the build
-      out = snapshot.build(project.data)
+      out = snapshot.build(build_data)
       # Upload build
       ws = WorkDir.website(
         snapshot.expand('build'),

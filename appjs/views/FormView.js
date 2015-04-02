@@ -55,7 +55,7 @@ module.exports = Backbone.View.extend({
 
     var inst, Model,
         $form = $(eve.currentTarget),
-        fields = this._formData(eve.currentTarget),
+        values = this.formValues($form),
         model_class = $form.data('model'),
         model_id = $form.data('model-id'),
         action = $form.data('action'),
@@ -63,10 +63,10 @@ module.exports = Backbone.View.extend({
 
     if(model_class && action === 'new') {
       Model = models[model_class];
-      this.hook('beforeSubmit', $form, fields, action, Model);
+      this.hook('beforeSubmit', $form, values, action, Model);
       inst = new Model();
     } else if(_.isObject(this.model) && action === 'edit') {
-      this.hook('beforeSubmit', $form, fields, action, this.model);
+      this.hook('beforeSubmit', $form, values, action, this.model);
       inst = this.model;
     } else if ($form.attr('method').toLowerCase() === 'get') {
       // if the method attr is `get` then we can navigate to that new
@@ -78,7 +78,7 @@ module.exports = Backbone.View.extend({
       return;
     } else { throw "Don't know how to handle this form"; }
 
-    inst.set(fields);
+    inst.set(values);
     if(!inst.isValid()) { return this.render(); }
 
     inst.save()
@@ -99,6 +99,14 @@ module.exports = Backbone.View.extend({
         }
       }, this))
       .fail(_.bind(this.handleRequestError, this));
+  },
+
+  formValues: function($form) {
+    return _.reduce(
+      $form.find(":input").serializeArray(),
+      function(memo, i) { memo[i.name] = i.value; },
+      {}
+    );
   },
 
   handleAction: function(eve) {
@@ -190,15 +198,6 @@ module.exports = Backbone.View.extend({
   _modelOrCollection: function() {
     if(_.isObject(this.collection)) { return this.collection; }
     else if(_.isObject(this.model)) { return this.model; }
-  },
-
-  _formData: function(ele) {
-    var fields = {};
-    _.each(
-      $(ele).find(":input").serializeArray(),
-      function(i) { fields[i.name] = i.value; }
-    );
-    return fields;
   }
 });
 
