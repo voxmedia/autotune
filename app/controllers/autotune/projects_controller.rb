@@ -36,8 +36,9 @@ module Autotune
       @project = Project.new(
         :title => data['title'],
         :slug => data['slug'],
+        :theme => data['theme'],
         :blueprint => blueprint,
-        :data => data
+        :data => data['data']
       )
       if @project.valid?
         @project.save
@@ -51,10 +52,10 @@ module Autotune
     def update
       @project = instance
       data = request.POST.dup
-      data.delete 'blueprint_id'
       if @project.update(
         :title => data['title'],
         :slug => data['slug'],
+        :theme => data['theme'],
         :data => data['data'])
         render :show, :status => :created
       else
