@@ -104,7 +104,7 @@ module.exports = Backbone.View.extend({
   formValues: function($form) {
     return _.reduce(
       $form.find(":input").serializeArray(),
-      function(memo, i) { memo[i.name] = i.value; },
+      function(memo, i) { memo[i.name] = i.value; return memo; },
       {}
     );
   },

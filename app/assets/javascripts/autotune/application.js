@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-04-02
+/*! autotune - v0.1.0 - 2015-04-06
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -29079,7 +29079,7 @@ module.exports = Backbone.View.extend({
   formValues: function($form) {
     return _.reduce(
       $form.find(":input").serializeArray(),
-      function(memo, i) { memo[i.name] = i.value; },
+      function(memo, i) { memo[i.name] = i.value; return memo; },
       {}
     );
   },
