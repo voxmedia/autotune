@@ -81,7 +81,7 @@ class ActiveSupport::TestCase
   end
 
   def repo_url
-    'https://github.com/ryanmark/autotune-example-blueprint.git'
+    'https://github.com/voxmedia/autotune-example-blueprint.git'
   end
 end
 
@@ -115,7 +115,7 @@ class ActionController::TestCase
     assert_instance_of Hash, data
     keys = args.first.is_a?(Array) ? args.first : args
     keys.each do |k|
-      assert decoded_response.key?(k), "Should have #{k}"
+      assert decoded_response.key?(k.to_sym) || decoded_response.key?(k.to_s), "Should have #{k}"
     end
   end
 end

@@ -38,14 +38,13 @@ module Autotune
       accept_json!
       valid_auth_header!
 
-      title = 'New project'
+      post :create, project_data
 
-      post :create, :title => title, :blueprint_id => autotune_blueprints(:example).id
       assert_response :created, decoded_response['error']
       assert_project_data!
 
       new_bp = Project.find decoded_response['id']
-      assert_equal title, new_bp.title
+      assert_equal project_data[:title], new_bp.title
     end
 
     test 'update project' do
@@ -85,7 +84,23 @@ module Autotune
     private
 
     def assert_project_data!
-      assert_data %w(title slug id created_at updated_at)
+      assert_data project_data.keys
+    end
+
+    def project_data
+      @project_data ||= {
+        :title => 'New project',
+        :slug => 'New project'.parameterize,
+        :blueprint_id => autotune_blueprints(:example).id,
+        :theme => 'default',
+        :preview_url => '',
+        :data => {
+          :title => 'New project',
+          :slug => 'New project'.parameterize,
+          :theme => 'default',
+          :google_doc_id => '1234'
+        }
+      }
     end
   end
 end

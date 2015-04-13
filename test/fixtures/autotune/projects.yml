@@ -3,9 +3,15 @@
 example_one:
   title: Example build one
   slug: example-build-one
+  theme: default
+  status: new
+  data: {"title": "Example build one"}
   blueprint: example
 
 example_two:
   title: Example build two
   slug: example-build-two
+  theme: default
+  status: new
+  data: {"title": "Example build two"}
   blueprint: example
