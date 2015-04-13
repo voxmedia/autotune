@@ -29,3 +29,6 @@ Style/ClassLength:
 
 Style/MethodLength:
   Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false

@@ -36,12 +36,38 @@
           data-model-id="<%=model.get('slug') %>">Delete</button>
 </div></p>
 
-<h4>Blueprint data:</h4>
-<pre>
-<%=JSON.stringify(model.get('data'), null, 2) %>
-</pre>
+<div role="tabpanel">
 
-<h4>Output from last build:</h4>
-<pre>
-<%=model.get('output') %>
-</pre>
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a
+      href="#preview" aria-controls="preview"
+      role="tab" data-toggle="tab">Preview</a></li>
+    <li role="presentation"><a
+      href="#embed" aria-controls="embed"
+      role="tab" data-toggle="tab">Embed</a></li>
+    <li role="presentation"><a
+      href="#data" aria-controls="data"
+      role="tab" data-toggle="tab">Data</a></li>
+    <li role="presentation"><a
+      href="#output" aria-controls="output"
+      role="tab" data-toggle="tab">Output</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="preview"></div>
+    <div role="tabpanel" class="tab-pane active" id="embed">
+      <iframe src="<%=model.get('preview_url') + 'embed.txt' %>" frameborder="0" width="100%"></iframe>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="data">
+      <h4>Blueprint data:</h4>
+      <pre><%=JSON.stringify(model.get('data'), null, 2) %></pre>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="output">
+      <h4>Output from last build:</h4>
+      <pre><%=model.get('output') %></pre>
+    </div>
+  </div>
+
+</div>

@@ -4,7 +4,8 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('./models'),
-    FormView = require('./views/FormView');
+    FormView = require('./views/FormView'),
+    pym = require('pym.js');
 
 module.exports = {
   ListBlueprints: FormView.extend({
@@ -144,7 +145,6 @@ module.exports = {
           };
           _.extend(opts.data, this.model.get('data'));
         }
-        console.log(opts);
         $form.alpaca(opts);
       }
     },
@@ -161,6 +161,11 @@ module.exports = {
   }),
   ShowProject: FormView.extend({
     template: require('./templates/project.ejs'),
+    afterRender: function() {
+      _.defer(_.bind(function() {
+        this.pymParent = new pym.Parent('preview', this.model.get('preview_url'), {});
+      }, this));
+    },
     handleUpdateAction: function(eve) {
       var $btn = $(eve.currentTarget),
           model_class = $btn.data('model'),
