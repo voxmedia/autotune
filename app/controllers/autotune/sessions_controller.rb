@@ -7,8 +7,13 @@ module Autotune
 
     def create
       self.current_user = User.find_or_create_by_auth_hash(omniauth)
-      flash[:notice] = "Welcome #{current_user.name}!"
-      redirect_to(request.env['omniauth.origin'] || root_path)
+      if current_user
+        redirect_to(
+          request.env['omniauth.origin'] || root_path,
+          :notice => "Welcome #{current_user.name}!")
+      else
+        redirect_to(login_path, :alert => 'There was a problem logging you in')
+      end
     end
 
     def failure
