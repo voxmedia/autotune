@@ -5,7 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('./models'),
     FormView = require('./views/FormView'),
-    pym = require('pym.js');
+    pym = require('./vendor/pym.js');
 
 module.exports = {
   ListBlueprints: FormView.extend({
