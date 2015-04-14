@@ -29537,7 +29537,7 @@ module.exports = Backbone.View.extend({
 
   handleLink: function(eve) {
     var href = $(eve.currentTarget).attr('href');
-    if (!/^(https?:\/\/|#)/.test(href)) {
+    if (!/^(https?:\/\/|#)/.test(href) && !eve.metaKey && !eve.ctrlKey) {
       eve.preventDefault();
       eve.stopPropagation();
       Backbone.history.navigate(
