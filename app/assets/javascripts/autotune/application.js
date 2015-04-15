@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-04-14
+/*! autotune - v0.1.0 - 2015-04-15
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -30,7 +30,7 @@ $(document).ready(function() {
   Backbone.history.start({pushState: true});
 });
 
-},{"./router":3,"./vendor/alpaca":12,"backbone":16,"bootstrap":17,"jquery":38}],2:[function(require,module,exports){
+},{"./router":3,"./vendor/alpaca":12,"backbone":15,"bootstrap":16,"jquery":37}],2:[function(require,module,exports){
 "use strict";
 
 var Backbone = require('backbone'),
@@ -105,7 +105,7 @@ exports.BlueprintCollection = Backbone.Collection.extend({
   url: '/blueprints'
 });
 
-},{"backbone":16,"markdown":39,"underscore":108}],3:[function(require,module,exports){
+},{"backbone":15,"markdown":38,"underscore":108}],3:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -261,7 +261,7 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"./models":2,"./views":14,"backbone":16,"jquery":38,"query-string":41}],4:[function(require,module,exports){
+},{"./models":2,"./views":13,"backbone":15,"jquery":37,"query-string":41}],4:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -28764,517 +28764,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }));
 
 }).call(this,require('_process'))
-},{"_process":20,"bootstrap":17,"handlebars":37,"jquery":38}],13:[function(require,module,exports){
-/*! pym.js - v0.4.1 - 2014-12-12 */
-/*
-* Pym.js is library that resizes an iframe based on the width of the parent and the resulting height of the child.
-* Check out the docs at http://blog.apps.npr.org/pym.js/ or the readme at README.md for usage.
-*/
-
-/* global module */
-
-(function(factory) {
-    if (typeof define === 'function' && define.amd) {
-        define(factory);
-    } else if (typeof module !== 'undefined' && module.exports) {
-        module.exports = factory();
-    } else {
-        window.pym = factory.call(this);
-    }
-})(function() {
-    var MESSAGE_DELIMITER = 'xPYMx';
-
-    var lib = {};
-
-    /**
-    * Generic function for parsing URL params.
-    * Via http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-    *
-    * @method _getParameterByName
-    * @param {String} name The name of the paramter to get from the URL.
-    */
-    var _getParameterByName = function(name) {
-        var regex = new RegExp("[\\?&]" + name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]') + '=([^&#]*)');
-        var results = regex.exec(location.search);
-
-        if (results === null) {
-            return '';
-        }
-
-        return decodeURIComponent(results[1].replace(/\+/g, " "));
-    };
-
-    /**
-     * Check the message to make sure it comes from an acceptable xdomain.
-     * Defaults to '*' but can be overriden in config.
-     *
-     * @method _isSafeMessage
-     * @param {Event} e The message event.
-     * @param {Object} settings Configuration.
-     */
-    var _isSafeMessage = function(e, settings) {
-        if (settings.xdomain !== '*') {
-            // If origin doesn't match our xdomain, return.
-            if (!e.origin.match(new RegExp(settings.xdomain + '$'))) { return; }
-        }
-
-        return true;
-    };
-
-    /**
-     * Construct a message to send between frames.
-     *
-     * NB: We use string-building here because JSON message passing is
-     * not supported in all browsers.
-     *
-     * @method _makeMessage
-     * @param {String} id The unique id of the message recipient.
-     * @param {String} messageType The type of message to send.
-     * @param {String} message The message to send.
-     */
-    var _makeMessage = function(id, messageType, message) {
-        var bits = ['pym', id, messageType, message];
-
-        return bits.join(MESSAGE_DELIMITER);
-    };
-
-    /**
-     * Construct a regex to validate and parse messages.
-     *
-     * @method _makeMessageRegex
-     * @param {String} id The unique id of the message recipient.
-     */
-    var _makeMessageRegex = function(id) {
-        var bits = ['pym', id, '(\\S+)', '(.+)'];
-
-        return new RegExp('^' + bits.join(MESSAGE_DELIMITER) + '$');
-    };
-
-    /**
-     * Initialize Pym for elements on page that have data-pym attributes.
-     *
-     * @method _autoInit
-     */
-    var _autoInit = function() {
-        var elements = document.querySelectorAll(
-            '[data-pym-src]:not([data-pym-auto-initialized])'
-        );
-
-        var length = elements.length;
-
-        for (var idx = 0; idx < length; ++idx) {
-            var element = elements[idx];
-
-            /*
-            * Mark automatically-initialized elements so they are not
-            * re-initialized if the user includes pym.js more than once in the
-            * same document.
-            */
-            element.setAttribute('data-pym-auto-initialized', '');
-
-            // Ensure elements have an id
-            if (element.id === '') {
-                element.id = 'pym-' + idx;
-            }
-
-            var src = element.getAttribute('data-pym-src');
-            var xdomain = element.getAttribute('data-pym-xdomain');
-            var config = {};
-
-            if (xdomain) {
-               config.xdomain = xdomain;
-            }
-
-            new lib.Parent(element.id, src, config);
-        }
-    };
-
-    /**
-     * The Parent half of a response iframe.
-     *
-     * @class Parent
-     * @param {String} id The id of the div into which the iframe will be rendered.
-     * @param {String} url The url of the iframe source.
-     * @param {Object} config Configuration to override the default settings.
-     */
-    lib.Parent = function(id, url, config) {
-        this.id = id;
-        this.url = url;
-        this.el = document.getElementById(id);
-        this.iframe = null;
-
-        this.settings = {
-            xdomain: '*'
-        };
-
-        this.messageRegex = _makeMessageRegex(this.id); 
-        this.messageHandlers = {};
-
-        /**
-         * Construct the iframe.
-         *
-         * @memberof Parent.prototype
-         * @method _constructIframe
-         */
-        this._constructIframe = function() {
-            // Calculate the width of this element.
-            var width = this.el.offsetWidth.toString();
-
-            // Create an iframe element attached to the document.
-            this.iframe = document.createElement("iframe");
-
-            // Save fragment id
-            var hash = '';
-            var hashIndex = this.url.indexOf('#');
-
-            if (hashIndex > -1) {
-                hash = this.url.substring(hashIndex, this.url.length);
-                this.url = this.url.substring(0, hashIndex);
-            }
-
-            // If the URL contains querystring bits, use them.
-            // Otherwise, just create a set of valid params.
-            if (this.url.indexOf('?') < 0) {
-                this.url += '?';
-            } else {
-                this.url += '&';
-            }
-            
-            // Append the initial width as a querystring parameter, and the fragment id
-            this.iframe.src = this.url + 'initialWidth=' + width + '&childId=' + this.id + hash;
-
-            // Set some attributes to this proto-iframe.
-            this.iframe.setAttribute('width', '100%');
-            this.iframe.setAttribute('scrolling', 'no');
-            this.iframe.setAttribute('marginheight', '0');
-            this.iframe.setAttribute('frameborder', '0');
-
-            // Append the iframe to our element.
-            this.el.appendChild(this.iframe);
-
-            // Add an event listener that will handle redrawing the child on resize.
-            var that = this;
-            window.addEventListener('resize', function() {
-                that.sendWidth();
-            });
-        };
-
-        /**
-         * Fire all event handlers for a given message type.
-         *
-         * @memberof Parent.prototype
-         * @method _fire
-         * @param {String} messageType The type of message.
-         * @param {String} message The message data.
-         */
-        this._fire = function(messageType, message) {
-            if (messageType in this.messageHandlers) {
-                for (var i = 0; i < this.messageHandlers[messageType].length; i++) {
-                   this.messageHandlers[messageType][i].call(this, message);
-                }
-            }
-        };
-
-        /**
-         * @callback Parent~onMessageCallback
-         * @param {String} message The message data.
-         */
-
-        /**
-         * Process a new message from the child.
-         *
-         * @memberof Parent.prototype
-         * @method _processMessage
-         * @param {Event} e A message event.
-         */
-        this._processMessage = function(e) {
-            if (!_isSafeMessage(e, this.settings)) { return; }
-
-            // Grab the message from the child and parse it.
-            var match = e.data.match(this.messageRegex);
-
-            // If there's no match or too many matches in the message, punt.
-            if (!match || match.length !== 3) {
-                return false;
-            }
-
-            var messageType = match[1];
-            var message = match[2];
-
-            this._fire(messageType, message);
-        };
-
-        /**
-         * Resize iframe in response to new height message from child.
-         *
-         * @memberof Parent.prototype
-         * @method _onHeightMessage
-         * @param {String} message The new height.
-         */
-        this._onHeightMessage = function(message) {
-            /*
-             * Handle parent message from child.
-             */
-            var height = parseInt(message);
-            
-            this.iframe.setAttribute('height', height + 'px');
-        };
-
-
-        /**
-         * Bind a callback to a given messageType from the child.
-         *
-         * @memberof Parent.prototype
-         * @method onMessage
-         * @param {String} messageType The type of message being listened for.
-         * @param {Parent~onMessageCallback} callback The callback to invoke when a message of the given type is received.
-         */
-        this.onMessage = function(messageType, callback) {
-            if (!(messageType in this.messageHandlers)) {
-                this.messageHandlers[messageType] = [];
-            }
-
-            this.messageHandlers[messageType].push(callback);
-        };
-
-        /**
-         * Send a message to the the child.
-         *
-         * @memberof Parent.prototype
-         * @method sendMessage
-         * @param {String} messageType The type of message to send.
-         * @param {String} message The message data to send.
-         */
-        this.sendMessage = function(messageType, message) {
-            this.el.getElementsByTagName('iframe')[0].contentWindow.postMessage(_makeMessage(this.id, messageType, message), '*');
-        };
-
-        /**
-         * Transmit the current iframe width to the child.
-         *
-         * You shouldn't need to call this directly.
-         *
-         * @memberof Parent.prototype
-         * @method sendWidth
-         */
-        this.sendWidth = function() {
-            var width = this.el.offsetWidth.toString();
-
-            this.sendMessage('width', width);
-        };
-
-        // Add any overrides to settings coming from config.
-        for (var key in config) {
-            this.settings[key] = config[key];
-        }
-
-        // Add height event callback 
-        this.onMessage('height', this._onHeightMessage);
-
-        // Add a listener for processing messages from the child.
-        var that = this;
-        window.addEventListener('message', function(e) {
-            return that._processMessage(e);
-        }, false);
-
-        // Construct the iframe in the container element.
-        this._constructIframe();
-
-        return this;
-    };
-
-    /**
-     * The Child half of a responsive iframe.
-     *
-     * @class Child
-     * @param {Object} config Configuration to override the default settings.
-     */
-    lib.Child = function(config) {
-        this.parentWidth = null;
-        this.id = null;
-
-        this.settings = {
-            renderCallback: null,
-            xdomain: '*',
-            polling: 0
-        };
-
-        this.messageRegex = null;
-        this.messageHandlers = {};
-
-        /**
-         * Bind a callback to a given messageType from the child.
-         *
-         * @memberof Child.prototype
-         * @method onMessage
-         * @param {String} messageType The type of message being listened for.
-         * @param {Child~onMessageCallback} callback The callback to invoke when a message of the given type is received.
-         */
-        this.onMessage = function(messageType, callback) {
-            if (!(messageType in this.messageHandlers)) {
-                this.messageHandlers[messageType] = [];
-            }
-
-            this.messageHandlers[messageType].push(callback);
-        };
-
-        /**
-         * @callback Child~onMessageCallback
-         * @param {String} message The message data.
-         */
-
-        /**
-         * Fire all event handlers for a given message type.
-         *
-         * @memberof Parent.prototype
-         * @method _fire
-         * @param {String} messageType The type of message.
-         * @param {String} message The message data.
-         */
-        this._fire = function(messageType, message) {
-            /*
-             * Fire all event handlers for a given message type.
-             */
-            if (messageType in this.messageHandlers) {
-                for (var i = 0; i < this.messageHandlers[messageType].length; i++) {
-                   this.messageHandlers[messageType][i].call(this, message);
-                }
-            }
-        };
-
-        /**
-         * Process a new message from the parent.
-         *
-         * @memberof Child.prototype
-         * @method _processMessage
-         * @param {Event} e A message event.
-         */
-        this._processMessage = function(e) {
-            /*
-            * Process a new message from parent frame.
-            */
-            // First, punt if this isn't from an acceptable xdomain.
-            if (!_isSafeMessage(e, this.settings)) { return; }
-
-            // Get the message from the parent.
-            var match = e.data.match(this.messageRegex);
-
-            // If there's no match or it's a bad format, punt.
-            if (!match || match.length !== 3) { return; }
-
-            var messageType = match[1];
-            var message = match[2];
-
-            this._fire(messageType, message);
-        };
-
-        /**
-         * Send a message to the the Parent.
-         *
-         * @memberof Child.prototype
-         * @method sendMessage
-         * @param {String} messageType The type of message to send.
-         * @param {String} message The message data to send.
-         */
-        this.sendMessage = function(messageType, message) {
-            /*
-             * Send a message to the parent.
-             */
-            window.parent.postMessage(_makeMessage(this.id, messageType, message), '*');
-        };
-
-        /**
-         * Transmit the current iframe height to the parent.
-         *
-         * Call this directly in cases where you manually alter the height of the iframe contents.
-         *
-         * @memberof Child.prototype
-         * @method sendHeight
-         */
-        this.sendHeight = function() {
-            /*
-            * Transmit the current iframe height to the parent.
-            * Make this callable from external scripts in case they update the body out of sequence.
-            */
-
-            // Get the child's height.
-            var height = document.getElementsByTagName('body')[0].offsetHeight.toString();
-
-            // Send the height to the parent.
-            that.sendMessage('height', height);
-        };
-
-        /**
-         * Resize iframe in response to new width message from parent.
-         *
-         * @memberof Child.prototype
-         * @method _onWidthMessage
-         * @param {String} message The new width.
-         */
-        this._onWidthMessage = function(message) {
-            /*
-             * Handle width message from the child.
-             */
-            var width = parseInt(message);
-
-            // Change the width if it's different.
-            if (width !== this.parentWidth) {
-                this.parentWidth = width;
-
-                // Call the callback function if it exists.
-                if (this.settings.renderCallback) {
-                    this.settings.renderCallback(width);
-                }
-
-                // Send the height back to the parent.
-                this.sendHeight();
-            }
-        };
-
-        // Identify what ID the parent knows this child as.
-        this.id = _getParameterByName('childId') || config.id;
-        this.messageRegex = new RegExp('^pym' + MESSAGE_DELIMITER + this.id + MESSAGE_DELIMITER + '(\\S+)' + MESSAGE_DELIMITER + '(.+)$');
-
-        // Get the initial width from a URL parameter.
-        var width = parseInt(_getParameterByName('initialWidth'));
-
-        // Bind the width message handler
-        this.onMessage('width', this._onWidthMessage);
-
-        // Initialize settings with overrides.
-        for (var key in config) {
-            this.settings[key] = config[key];
-        }
-
-        // Set up a listener to handle any incoming messages.
-        var that = this;
-        window.addEventListener('message', function(e) {
-            that._processMessage(e);
-        }, false);
-
-        // If there's a callback function, call it.
-        if (this.settings.renderCallback) {
-            this.settings.renderCallback(width);
-        }
-
-        // Send the initial height to the parent.
-        this.sendHeight();
-
-        // If we're configured to poll, create a setInterval to handle that.
-        if (this.settings.polling) {
-            window.setInterval(this.sendHeight, this.settings.polling);
-        }
-
-        return this;
-    };
-
-    // Initialize elements with pym data attributes
-    _autoInit();
-
-    return lib;
-});
-
-},{}],14:[function(require,module,exports){
+},{"_process":19,"bootstrap":16,"handlebars":36,"jquery":37}],13:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29282,7 +28772,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('./models'),
     FormView = require('./views/FormView'),
-    pym = require('./vendor/pym.js');
+    pym = require('pym.js');
 
 module.exports = {
   ListBlueprints: FormView.extend({
@@ -29494,7 +28984,7 @@ module.exports = {
   })
 };
 
-},{"./models":2,"./templates/blueprint.ejs":5,"./templates/blueprint_chooser.ejs":6,"./templates/blueprint_form.ejs":7,"./templates/blueprint_list.ejs":8,"./templates/project.ejs":9,"./templates/project_form.ejs":10,"./templates/project_list.ejs":11,"./vendor/pym.js":13,"./views/FormView":15,"backbone":16,"jquery":38,"underscore":108}],15:[function(require,module,exports){
+},{"./models":2,"./templates/blueprint.ejs":5,"./templates/blueprint_chooser.ejs":6,"./templates/blueprint_form.ejs":7,"./templates/blueprint_list.ejs":8,"./templates/project.ejs":9,"./templates/project_form.ejs":10,"./templates/project_list.ejs":11,"./views/FormView":14,"backbone":15,"jquery":37,"pym.js":40,"underscore":108}],14:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29699,7 +29189,7 @@ module.exports = Backbone.View.extend({
 });
 
 
-},{"../models":2,"../templates/alert.ejs":4,"backbone":16,"jquery":38,"underscore":108,"underscore.string/camelize":42}],16:[function(require,module,exports){
+},{"../models":2,"../templates/alert.ejs":4,"backbone":15,"jquery":37,"underscore":108,"underscore.string/camelize":42}],15:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -31309,7 +30799,7 @@ module.exports = Backbone.View.extend({
 
 }));
 
-},{"underscore":108}],17:[function(require,module,exports){
+},{"underscore":108}],16:[function(require,module,exports){
 (function (global){
 
 ; jQuery = global.jQuery = require("jquery");
@@ -33432,9 +32922,9 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
 }).call(global, module, undefined, undefined);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":38}],18:[function(require,module,exports){
+},{"jquery":37}],17:[function(require,module,exports){
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -33459,7 +32949,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -33519,14 +33009,14 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -34116,7 +33606,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":21,"_process":20,"inherits":19}],23:[function(require,module,exports){
+},{"./support/isBuffer":20,"_process":19,"inherits":18}],22:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var Handlebars = require("./handlebars.runtime")["default"];
@@ -34154,7 +33644,7 @@ Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars.runtime":24,"./handlebars/compiler/ast":26,"./handlebars/compiler/base":27,"./handlebars/compiler/compiler":28,"./handlebars/compiler/javascript-compiler":29}],24:[function(require,module,exports){
+},{"./handlebars.runtime":23,"./handlebars/compiler/ast":25,"./handlebars/compiler/base":26,"./handlebars/compiler/compiler":27,"./handlebars/compiler/javascript-compiler":28}],23:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -34187,7 +33677,7 @@ var Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars/base":25,"./handlebars/exception":33,"./handlebars/runtime":34,"./handlebars/safe-string":35,"./handlebars/utils":36}],25:[function(require,module,exports){
+},{"./handlebars/base":24,"./handlebars/exception":32,"./handlebars/runtime":33,"./handlebars/safe-string":34,"./handlebars/utils":35}],24:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -34368,7 +33858,7 @@ exports.log = log;var createFrame = function(object) {
   return obj;
 };
 exports.createFrame = createFrame;
-},{"./exception":33,"./utils":36}],26:[function(require,module,exports){
+},{"./exception":32,"./utils":35}],25:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -34596,7 +34086,7 @@ var AST = {
 // Must be exported as an object rather than the root of the module as the jison lexer
 // most modify the object to operate properly.
 exports["default"] = AST;
-},{"../exception":33}],27:[function(require,module,exports){
+},{"../exception":32}],26:[function(require,module,exports){
 "use strict";
 var parser = require("./parser")["default"];
 var AST = require("./ast")["default"];
@@ -34612,7 +34102,7 @@ function parse(input) {
 }
 
 exports.parse = parse;
-},{"./ast":26,"./parser":30}],28:[function(require,module,exports){
+},{"./ast":25,"./parser":29}],27:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -35082,7 +34572,7 @@ exports.precompile = precompile;function compile(input, options, env) {
 }
 
 exports.compile = compile;
-},{"../exception":33}],29:[function(require,module,exports){
+},{"../exception":32}],28:[function(require,module,exports){
 "use strict";
 var COMPILER_REVISION = require("../base").COMPILER_REVISION;
 var REVISION_CHANGES = require("../base").REVISION_CHANGES;
@@ -36025,7 +35515,7 @@ JavaScriptCompiler.isValidJavaScriptVariableName = function(name) {
 };
 
 exports["default"] = JavaScriptCompiler;
-},{"../base":25,"../exception":33}],30:[function(require,module,exports){
+},{"../base":24,"../exception":32}],29:[function(require,module,exports){
 "use strict";
 /* jshint ignore:start */
 /* Jison generated parser */
@@ -36516,7 +36006,7 @@ function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Pa
 return new Parser;
 })();exports["default"] = handlebars;
 /* jshint ignore:end */
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 var Visitor = require("./visitor")["default"];
 
@@ -36655,7 +36145,7 @@ PrintVisitor.prototype.content = function(content) {
 PrintVisitor.prototype.comment = function(comment) {
   return this.pad("{{! '" + comment.comment + "' }}");
 };
-},{"./visitor":32}],32:[function(require,module,exports){
+},{"./visitor":31}],31:[function(require,module,exports){
 "use strict";
 function Visitor() {}
 
@@ -36668,7 +36158,7 @@ Visitor.prototype = {
 };
 
 exports["default"] = Visitor;
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
@@ -36697,7 +36187,7 @@ function Exception(message, node) {
 Exception.prototype = new Error();
 
 exports["default"] = Exception;
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -36835,7 +36325,7 @@ exports.program = program;function invokePartial(partial, name, context, helpers
 exports.invokePartial = invokePartial;function noop() { return ""; }
 
 exports.noop = noop;
-},{"./base":25,"./exception":33,"./utils":36}],35:[function(require,module,exports){
+},{"./base":24,"./exception":32,"./utils":35}],34:[function(require,module,exports){
 "use strict";
 // Build out our basic SafeString type
 function SafeString(string) {
@@ -36847,7 +36337,7 @@ SafeString.prototype.toString = function() {
 };
 
 exports["default"] = SafeString;
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 /*jshint -W004 */
 var SafeString = require("./safe-string")["default"];
@@ -36924,7 +36414,7 @@ exports.escapeExpression = escapeExpression;function isEmpty(value) {
 }
 
 exports.isEmpty = isEmpty;
-},{"./safe-string":35}],37:[function(require,module,exports){
+},{"./safe-string":34}],36:[function(require,module,exports){
 // USAGE:
 // var handlebars = require('handlebars');
 
@@ -36951,7 +36441,7 @@ if (typeof require !== 'undefined' && require.extensions) {
   require.extensions[".hbs"] = extension;
 }
 
-},{"../dist/cjs/handlebars":23,"../dist/cjs/handlebars/compiler/printer":31,"../dist/cjs/handlebars/compiler/visitor":32,"fs":18}],38:[function(require,module,exports){
+},{"../dist/cjs/handlebars":22,"../dist/cjs/handlebars/compiler/printer":30,"../dist/cjs/handlebars/compiler/visitor":31,"fs":17}],37:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.3
  * http://jquery.com/
@@ -46158,12 +45648,12 @@ return jQuery;
 
 }));
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 // super simple module for the most common nodejs use case.
 exports.markdown = require("./markdown");
 exports.parse = exports.markdown.toHTML;
 
-},{"./markdown":40}],40:[function(require,module,exports){
+},{"./markdown":39}],39:[function(require,module,exports){
 // Released under MIT license
 // Copyright (c) 2009-2010 Dominic Baggott
 // Copyright (c) 2009-2010 Ash Berlin
@@ -47890,7 +47380,516 @@ function merge_text_nodes( jsonml ) {
   }
 } )() );
 
-},{"util":22}],41:[function(require,module,exports){
+},{"util":21}],40:[function(require,module,exports){
+/*
+* Pym.js is library that resizes an iframe based on the width of the parent and the resulting height of the child.
+* Check out the docs at http://blog.apps.npr.org/pym.js/ or the readme at README.md for usage.
+*/
+
+/* global module */
+
+(function(factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(factory);
+    } else if (typeof module !== 'undefined' && module.exports) {
+        module.exports = factory();
+    } else {
+        window.pym = factory.call(this);
+    }
+})(function() {
+    var MESSAGE_DELIMITER = 'xPYMx';
+
+    var lib = {};
+
+    /**
+    * Generic function for parsing URL params.
+    * Via http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+    *
+    * @method _getParameterByName
+    * @param {String} name The name of the paramter to get from the URL.
+    */
+    var _getParameterByName = function(name) {
+        var regex = new RegExp("[\\?&]" + name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]') + '=([^&#]*)');
+        var results = regex.exec(location.search);
+
+        if (results === null) {
+            return '';
+        }
+
+        return decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
+
+    /**
+     * Check the message to make sure it comes from an acceptable xdomain.
+     * Defaults to '*' but can be overriden in config.
+     *
+     * @method _isSafeMessage
+     * @param {Event} e The message event.
+     * @param {Object} settings Configuration.
+     */
+    var _isSafeMessage = function(e, settings) {
+        if (settings.xdomain !== '*') {
+            // If origin doesn't match our xdomain, return.
+            if (!e.origin.match(new RegExp(settings.xdomain + '$'))) { return; }
+        }
+
+        return true;
+    };
+
+    /**
+     * Construct a message to send between frames.
+     *
+     * NB: We use string-building here because JSON message passing is
+     * not supported in all browsers.
+     *
+     * @method _makeMessage
+     * @param {String} id The unique id of the message recipient.
+     * @param {String} messageType The type of message to send.
+     * @param {String} message The message to send.
+     */
+    var _makeMessage = function(id, messageType, message) {
+        var bits = ['pym', id, messageType, message];
+
+        return bits.join(MESSAGE_DELIMITER);
+    };
+
+    /**
+     * Construct a regex to validate and parse messages.
+     *
+     * @method _makeMessageRegex
+     * @param {String} id The unique id of the message recipient.
+     */
+    var _makeMessageRegex = function(id) {
+        var bits = ['pym', id, '(\\S+)', '(.+)'];
+
+        return new RegExp('^' + bits.join(MESSAGE_DELIMITER) + '$');
+    };
+
+    /**
+     * Initialize Pym for elements on page that have data-pym attributes.
+     *
+     * @method _autoInit
+     */
+    var _autoInit = function() {
+        var elements = document.querySelectorAll(
+            '[data-pym-src]:not([data-pym-auto-initialized])'
+        );
+
+        var length = elements.length;
+
+        for (var idx = 0; idx < length; ++idx) {
+            var element = elements[idx];
+
+            /*
+            * Mark automatically-initialized elements so they are not
+            * re-initialized if the user includes pym.js more than once in the
+            * same document.
+            */
+            element.setAttribute('data-pym-auto-initialized', '');
+
+            // Ensure elements have an id
+            if (element.id === '') {
+                element.id = 'pym-' + idx;
+            }
+
+            var src = element.getAttribute('data-pym-src');
+            var xdomain = element.getAttribute('data-pym-xdomain');
+            var config = {};
+
+            if (xdomain) {
+               config.xdomain = xdomain;
+            }
+
+            new lib.Parent(element.id, src, config);
+        }
+    };
+
+    /**
+     * The Parent half of a response iframe.
+     *
+     * @class Parent
+     * @param {String} id The id of the div into which the iframe will be rendered.
+     * @param {String} url The url of the iframe source.
+     * @param {Object} config Configuration to override the default settings.
+     */
+    lib.Parent = function(id, url, config) {
+        this.id = id;
+        this.url = url;
+        this.el = document.getElementById(id);
+        this.iframe = null;
+
+        this.settings = {
+            xdomain: '*'
+        };
+
+        this.messageRegex = _makeMessageRegex(this.id); 
+        this.messageHandlers = {};
+
+        /**
+         * Construct the iframe.
+         *
+         * @memberof Parent.prototype
+         * @method _constructIframe
+         */
+        this._constructIframe = function() {
+            // Calculate the width of this element.
+            var width = this.el.offsetWidth.toString();
+
+            // Create an iframe element attached to the document.
+            this.iframe = document.createElement("iframe");
+
+            // Save fragment id
+            var hash = '';
+            var hashIndex = this.url.indexOf('#');
+
+            if (hashIndex > -1) {
+                hash = this.url.substring(hashIndex, this.url.length);
+                this.url = this.url.substring(0, hashIndex);
+            }
+
+            // If the URL contains querystring bits, use them.
+            // Otherwise, just create a set of valid params.
+            if (this.url.indexOf('?') < 0) {
+                this.url += '?';
+            } else {
+                this.url += '&';
+            }
+            
+            // Append the initial width as a querystring parameter, and the fragment id
+            this.iframe.src = this.url + 'initialWidth=' + width + '&childId=' + this.id + hash;
+
+            // Set some attributes to this proto-iframe.
+            this.iframe.setAttribute('width', '100%');
+            this.iframe.setAttribute('scrolling', 'no');
+            this.iframe.setAttribute('marginheight', '0');
+            this.iframe.setAttribute('frameborder', '0');
+
+            // Append the iframe to our element.
+            this.el.appendChild(this.iframe);
+
+            // Add an event listener that will handle redrawing the child on resize.
+            var that = this;
+            window.addEventListener('resize', function() {
+                that.sendWidth();
+            });
+        };
+
+        /**
+         * Fire all event handlers for a given message type.
+         *
+         * @memberof Parent.prototype
+         * @method _fire
+         * @param {String} messageType The type of message.
+         * @param {String} message The message data.
+         */
+        this._fire = function(messageType, message) {
+            if (messageType in this.messageHandlers) {
+                for (var i = 0; i < this.messageHandlers[messageType].length; i++) {
+                   this.messageHandlers[messageType][i].call(this, message);
+                }
+            }
+        };
+
+        /**
+         * @callback Parent~onMessageCallback
+         * @param {String} message The message data.
+         */
+
+        /**
+         * Process a new message from the child.
+         *
+         * @memberof Parent.prototype
+         * @method _processMessage
+         * @param {Event} e A message event.
+         */
+        this._processMessage = function(e) {
+            if (!_isSafeMessage(e, this.settings)) { return; }
+
+            // Grab the message from the child and parse it.
+            var match = e.data.match(this.messageRegex);
+
+            // If there's no match or too many matches in the message, punt.
+            if (!match || match.length !== 3) {
+                return false;
+            }
+
+            var messageType = match[1];
+            var message = match[2];
+
+            this._fire(messageType, message);
+        };
+
+        /**
+         * Resize iframe in response to new height message from child.
+         *
+         * @memberof Parent.prototype
+         * @method _onHeightMessage
+         * @param {String} message The new height.
+         */
+        this._onHeightMessage = function(message) {
+            /*
+             * Handle parent message from child.
+             */
+            var height = parseInt(message);
+            
+            this.iframe.setAttribute('height', height + 'px');
+        };
+
+
+        /**
+         * Bind a callback to a given messageType from the child.
+         *
+         * @memberof Parent.prototype
+         * @method onMessage
+         * @param {String} messageType The type of message being listened for.
+         * @param {Parent~onMessageCallback} callback The callback to invoke when a message of the given type is received.
+         */
+        this.onMessage = function(messageType, callback) {
+            if (!(messageType in this.messageHandlers)) {
+                this.messageHandlers[messageType] = [];
+            }
+
+            this.messageHandlers[messageType].push(callback);
+        };
+
+        /**
+         * Send a message to the the child.
+         *
+         * @memberof Parent.prototype
+         * @method sendMessage
+         * @param {String} messageType The type of message to send.
+         * @param {String} message The message data to send.
+         */
+        this.sendMessage = function(messageType, message) {
+            this.el.getElementsByTagName('iframe')[0].contentWindow.postMessage(_makeMessage(this.id, messageType, message), '*');
+        };
+
+        /**
+         * Transmit the current iframe width to the child.
+         *
+         * You shouldn't need to call this directly.
+         *
+         * @memberof Parent.prototype
+         * @method sendWidth
+         */
+        this.sendWidth = function() {
+            var width = this.el.offsetWidth.toString();
+
+            this.sendMessage('width', width);
+        };
+
+        // Add any overrides to settings coming from config.
+        for (var key in config) {
+            this.settings[key] = config[key];
+        }
+
+        // Add height event callback 
+        this.onMessage('height', this._onHeightMessage);
+
+        // Add a listener for processing messages from the child.
+        var that = this;
+        window.addEventListener('message', function(e) {
+            return that._processMessage(e);
+        }, false);
+
+        // Construct the iframe in the container element.
+        this._constructIframe();
+
+        return this;
+    };
+
+    /**
+     * The Child half of a responsive iframe.
+     *
+     * @class Child
+     * @param {Object} config Configuration to override the default settings.
+     */
+    lib.Child = function(config) {
+        this.parentWidth = null;
+        this.id = null;
+
+        this.settings = {
+            renderCallback: null,
+            xdomain: '*',
+            polling: 0
+        };
+
+        this.messageRegex = null;
+        this.messageHandlers = {};
+
+        /**
+         * Bind a callback to a given messageType from the child.
+         *
+         * @memberof Child.prototype
+         * @method onMessage
+         * @param {String} messageType The type of message being listened for.
+         * @param {Child~onMessageCallback} callback The callback to invoke when a message of the given type is received.
+         */
+        this.onMessage = function(messageType, callback) {
+            if (!(messageType in this.messageHandlers)) {
+                this.messageHandlers[messageType] = [];
+            }
+
+            this.messageHandlers[messageType].push(callback);
+        };
+
+        /**
+         * @callback Child~onMessageCallback
+         * @param {String} message The message data.
+         */
+
+        /**
+         * Fire all event handlers for a given message type.
+         *
+         * @memberof Parent.prototype
+         * @method _fire
+         * @param {String} messageType The type of message.
+         * @param {String} message The message data.
+         */
+        this._fire = function(messageType, message) {
+            /*
+             * Fire all event handlers for a given message type.
+             */
+            if (messageType in this.messageHandlers) {
+                for (var i = 0; i < this.messageHandlers[messageType].length; i++) {
+                   this.messageHandlers[messageType][i].call(this, message);
+                }
+            }
+        };
+
+        /**
+         * Process a new message from the parent.
+         *
+         * @memberof Child.prototype
+         * @method _processMessage
+         * @param {Event} e A message event.
+         */
+        this._processMessage = function(e) {
+            /*
+            * Process a new message from parent frame.
+            */
+            // First, punt if this isn't from an acceptable xdomain.
+            if (!_isSafeMessage(e, this.settings)) { return; }
+
+            // Get the message from the parent.
+            var match = e.data.match(this.messageRegex);
+
+            // If there's no match or it's a bad format, punt.
+            if (!match || match.length !== 3) { return; }
+
+            var messageType = match[1];
+            var message = match[2];
+
+            this._fire(messageType, message);
+        };
+
+        /**
+         * Send a message to the the Parent.
+         *
+         * @memberof Child.prototype
+         * @method sendMessage
+         * @param {String} messageType The type of message to send.
+         * @param {String} message The message data to send.
+         */
+        this.sendMessage = function(messageType, message) {
+            /*
+             * Send a message to the parent.
+             */
+            window.parent.postMessage(_makeMessage(this.id, messageType, message), '*');
+        };
+
+        /**
+         * Transmit the current iframe height to the parent.
+         *
+         * Call this directly in cases where you manually alter the height of the iframe contents.
+         *
+         * @memberof Child.prototype
+         * @method sendHeight
+         */
+        this.sendHeight = function() {
+            /*
+            * Transmit the current iframe height to the parent.
+            * Make this callable from external scripts in case they update the body out of sequence.
+            */
+
+            // Get the child's height.
+            var height = document.getElementsByTagName('body')[0].offsetHeight.toString();
+
+            // Send the height to the parent.
+            that.sendMessage('height', height);
+        };
+
+        /**
+         * Resize iframe in response to new width message from parent.
+         *
+         * @memberof Child.prototype
+         * @method _onWidthMessage
+         * @param {String} message The new width.
+         */
+        this._onWidthMessage = function(message) {
+            /*
+             * Handle width message from the child.
+             */
+            var width = parseInt(message);
+
+            // Change the width if it's different.
+            if (width !== this.parentWidth) {
+                this.parentWidth = width;
+
+                // Call the callback function if it exists.
+                if (this.settings.renderCallback) {
+                    this.settings.renderCallback(width);
+                }
+
+                // Send the height back to the parent.
+                this.sendHeight();
+            }
+        };
+
+        // Identify what ID the parent knows this child as.
+        this.id = _getParameterByName('childId') || config.id;
+        this.messageRegex = new RegExp('^pym' + MESSAGE_DELIMITER + this.id + MESSAGE_DELIMITER + '(\\S+)' + MESSAGE_DELIMITER + '(.+)$');
+
+        // Get the initial width from a URL parameter.
+        var width = parseInt(_getParameterByName('initialWidth'));
+
+        // Bind the width message handler
+        this.onMessage('width', this._onWidthMessage);
+
+        // Initialize settings with overrides.
+        for (var key in config) {
+            this.settings[key] = config[key];
+        }
+
+        // Set up a listener to handle any incoming messages.
+        var that = this;
+        window.addEventListener('message', function(e) {
+            that._processMessage(e);
+        }, false);
+
+        // If there's a callback function, call it.
+        if (this.settings.renderCallback) {
+            this.settings.renderCallback(width);
+        }
+
+        // Send the initial height to the parent.
+        this.sendHeight();
+
+        // If we're configured to poll, create a setInterval to handle that.
+        if (this.settings.polling) {
+            window.setInterval(this.sendHeight, this.settings.polling);
+        }
+
+        return this;
+    };
+
+    // Initialize elements with pym data attributes
+    _autoInit();
+
+    return lib;
+});
+
+},{}],41:[function(require,module,exports){
 /*!
 	query-string
 	Parse and stringify URL query strings
