@@ -1,0 +1,14 @@
+project_slug: ba87f42e18acb3417258cf6d3a5f4e30
+project_name: "autotune"
+ignored_paths:
+  - .bundle/
+  - app/
+  - config/
+  - db/
+  - lib/
+  - log/
+  - public/
+  - script/
+  - test/
+  - tmp/
+  - vendor/
