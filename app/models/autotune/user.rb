@@ -8,7 +8,7 @@ module Autotune
     validates :email, :api_key, :uniqueness => true
     validates :email,
               :uniqueness => { :case_sensitive => false },
-              :format => { :with => /@/ }
+              :format => { :with => /\A@\z/ }
     after_initialize :defaults
 
     def self.generate_api_key
