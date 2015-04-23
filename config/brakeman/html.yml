@@ -1,0 +1,6 @@
+---
+:app_path: "."
+:ignore_file: config/brakeman/ignore.json
+:quiet: true
+:output_files:
+- tmp/brakeman.html
