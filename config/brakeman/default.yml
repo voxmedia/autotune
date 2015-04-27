@@ -1,4 +1,0 @@
----
-:app_path: "."
-:ignore_file: config/brakeman/ignore.json
-:print_report: true
