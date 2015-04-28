@@ -50,7 +50,7 @@ module Autotune
     def self.verify_auth_hash(auth_hash)
       if Rails.configuration.autotune.verify_omniauth &&
          Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
-        Rails.configuration.autotune.verify_omniauth.send(auth_hash)
+        Rails.configuration.autotune.verify_omniauth.call(auth_hash)
       else
         true
       end
