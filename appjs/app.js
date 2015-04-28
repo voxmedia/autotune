@@ -18,9 +18,9 @@ var bootstrap = require('bootstrap'),
 // Load our components and run the app
 var Router = require('./router');
 
-var router = new Router();
-window.router = router;
+window.App = function(config) {
+  this.config = config;
+  this.router = new Router({app: this});
 
-$(document).ready(function() {
   Backbone.history.start({pushState: true});
-});
+};

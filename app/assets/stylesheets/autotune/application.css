@@ -29,3 +29,19 @@
 
 .alpaca-field-array.alpaca-top,
 .alpaca-field-object.alpaca-top { padding:10px 0; }
+
+.tab-content {
+  margin-top:20px;
+}
+
+#preview {
+  border-top:35px solid #dfdfdf;
+  border-left:1px solid #dfdfdf;
+  border-bottom:1px solid #dfdfdf;
+  border-right:1px solid #dfdfdf;
+  border-radius:8px 8px 2px 2px;
+}
+
+footer {
+  margin-top:20px;
+}

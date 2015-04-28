@@ -16,6 +16,13 @@ module.exports = Backbone.View.extend({
     var args = Array.prototype.slice.call(arguments);
     this.hook('beforeInit', args);
 
+    if (args[0]) {
+      if (args[0].app) { this.app = args[0].app; }
+      if (args[0].query) { this.app = args[0].query; }
+    }
+
+    console.log(this);
+
     if(_.isObject(this.collection)) {
       this.collection
         .on("sync sort", this.render, this)
@@ -27,8 +34,6 @@ module.exports = Backbone.View.extend({
         .on("sync change", this.render, this)
         .on("error", this.logError, this);
     }
-
-    if(_.isObject(args[0]['query'])) { this.query = args[0].query; }
 
     this.render();
 
@@ -47,17 +52,11 @@ module.exports = Backbone.View.extend({
   },
 
   render: function() {
-    var obj = {};
-    if(_.isObject(this.collection)) { obj.collection = this.collection; }
-    else if(_.isObject(this.model)) { obj.model = this.model; }
+    this.hook('beforeRender', this);
 
-    if(_.isObject(this.query)) { obj.query = this.query; }
+    this.$el.html(this.template(this));
 
-    this.hook('beforeRender', obj);
-
-    this.$el.html(this.template(obj));
-
-    this.hook('afterRender', obj);
+    this.hook('afterRender', this);
 
     return this;
   },

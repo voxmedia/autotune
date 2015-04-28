@@ -5,9 +5,10 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     camelize = require('underscore.string/camelize'),
-    alert_template = require('../templates/alert.ejs');
+    alert_template = require('../templates/alert.ejs'),
+    BaseView = require('./BaseView');
 
-module.exports = Backbone.View.extend({
+module.exports = BaseView.extend({
   events: {
     'click a': 'handleLink',
     'submit form': 'handleForm',
@@ -36,17 +37,6 @@ module.exports = Backbone.View.extend({
     this.render();
 
     this.hook('afterInit', args);
-  },
-
-  handleLink: function(eve) {
-    var href = $(eve.currentTarget).attr('href');
-    if (!/^(https?:\/\/|#)/.test(href) && !eve.metaKey && !eve.ctrlKey) {
-      eve.preventDefault();
-      eve.stopPropagation();
-      Backbone.history.navigate(
-        $(eve.currentTarget).attr('href'),
-        {trigger: true});
-    }
   },
 
   handleForm: function(eve) {
@@ -152,47 +142,6 @@ module.exports = Backbone.View.extend({
 
   submitForm: function(eve) {
     $(eve.currentTarget).parents('form').submit();
-  },
-
-  render: function() {
-    var obj = {};
-    if(_.isObject(this.collection)) { obj.collection = this.collection; }
-    else if(_.isObject(this.model)) { obj.model = this.model; }
-
-    if(_.isObject(this.query)) { obj.query = this.query; }
-
-    this.hook('beforeRender', obj);
-
-    this.$el.html(this.template(obj));
-
-    this.hook('afterRender', obj);
-
-    return this;
-  },
-
-  logError: function(model_or_collection, resp, options) {
-    console.log(arguments);
-  },
-
-  error: function(message) {
-    this.alert(message, 'danger');
-  },
-
-  success: function(message) {
-    this.alert(message, 'success');
-  },
-
-  alert: function(message) {
-    var level = arguments[1] || 'info';
-    $('#flash').html(alert_template({ level: level, message: message }));
-  },
-
-  hook: function() {
-    var args = Array.prototype.slice.call(arguments),
-        name = args.shift();
-    console.log('hook ' + name);
-    if(_.isFunction(this[name])) { return this[name].apply(this, args); }
-    this.trigger(name, args);
   },
 
   _modelOrCollection: function() {

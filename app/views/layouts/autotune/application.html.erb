@@ -17,12 +17,15 @@
   <%= javascript_include_tag 'autotune/application' %>
   <%= csrf_meta_tags %>
 
-  <script>
-    AUTOTUNE_CONFIG = <%=raw config.to_json %>;
-  </script>
 </head>
 <body>
-
 <%= yield %>
+<script>
+$(document).ready(function() {
+    var config = <%=raw config.to_json %>;
+    config.spinner = '<%=image_url 'autotune/spinner.gif' %>';
+    app = new App(config);
+});
+</script>
 </body>
 </html>

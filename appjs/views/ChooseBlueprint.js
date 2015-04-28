@@ -7,5 +7,5 @@ var $ = require('jquery'),
     FormView = require('./FormView');
 
 module.exports = FormView.extend({
-  template: require('./templates/blueprint_chooser.ejs')
+  template: require('../templates/blueprint_chooser.ejs')
 });

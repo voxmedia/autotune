@@ -26,21 +26,21 @@
       &nbsp;
       <select name="theme" id="theme" class="form-control" data-auto-submit="true">
         <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
-      <% _.each(AUTOTUNE_CONFIG.project_themes, function(theme) { %>
+      <% _.each(app.config.project_themes, function(theme) { %>
         <option <% if(theme === query.theme) { %>selected<% } %>
                 value="<%=theme %>"><%=theme %></option>
       <% }) %>
       </select>
       <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">
         <option disabled <% if(!query.blueprint_type) { %>selected<% } %>>Type</option>
-      <% _.each(AUTOTUNE_CONFIG.blueprint_types, function(type) { %>
+      <% _.each(app.config.blueprint_types, function(type) { %>
         <option <% if(type === query.blueprint_type) { %>selected<% } %>
                 value="<%=type %>"><%=type %></option>
       <% }) %>
       </select>
       <select name="status" id="status" class="form-control" data-auto-submit="true">
         <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
-      <% _.each(AUTOTUNE_CONFIG.project_statuses, function(status) { %>
+      <% _.each(app.config.project_statuses, function(status) { %>
         <option <% if(status === query.status) { %>selected<% } %>
                 value="<%=status %>"><%=status %></option>
       <% }) %>
