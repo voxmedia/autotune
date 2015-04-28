@@ -48,12 +48,20 @@ module.exports = function(grunt) {
         tasks: ['jshint:lib', 'browserify']
       }
     },
+    notify_hooks: {
+      options: {
+        success: true
+      }
+    }
   });
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-notify');
+
+  grunt.task.run('notify_hooks');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'browserify']);
