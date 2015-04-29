@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-04-28
+/*! autotune - v0.1.0 - 2015-04-29
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -28812,8 +28812,6 @@ module.exports = Backbone.View.extend({
       if (args[0].app) { this.app = args[0].app; }
       if (args[0].query) { this.app = args[0].query; }
     }
-
-    console.log(this);
 
     if(_.isObject(this.collection)) {
       this.collection

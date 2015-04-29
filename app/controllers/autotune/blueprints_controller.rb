@@ -86,5 +86,7 @@ module Autotune
         head :not_found
       end
     end
+
+    def builder; end
   end
 end

@@ -25,6 +25,7 @@ module.exports = Backbone.Router.extend({
     "blueprints/new": "newBlueprint",
     "blueprints/:slug": "showBlueprint",
     "blueprints/:slug/new_project": "newProject",
+    "blueprints/:slug/builder": "builderBlueprint",
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
