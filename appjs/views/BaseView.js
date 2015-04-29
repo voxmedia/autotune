@@ -21,8 +21,6 @@ module.exports = Backbone.View.extend({
       if (args[0].query) { this.app = args[0].query; }
     }
 
-    console.log(this);
-
     if(_.isObject(this.collection)) {
       this.collection
         .on("sync sort", this.render, this)

@@ -9,7 +9,7 @@ module Autotune
       out = nil
       # Create a new snapshot object based on the projects working dir
       snapshot = WorkDir.snapshot(project.working_dir,
-                                  Rails.configuration.autotune.environment)
+                                  Rails.configuration.autotune.build_environment)
       # Setup the snapshot if it's not already. We don't want to update
       # our snapshot, we just need it to exist
       SyncProjectJob.perform_now(project) unless snapshot.exist?
@@ -23,9 +23,7 @@ module Autotune
       # Run the build
       out = snapshot.build(build_data)
       # Upload build
-      ws = WorkDir.website(
-        snapshot.expand('build'),
-        Rails.configuration.autotune.environment)
+      ws = WorkDir.website(snapshot.expand('build'))
       if mode == 'publish'
         ws.deploy(File.join(
           Rails.configuration.autotune.publish[:connect], project.slug))

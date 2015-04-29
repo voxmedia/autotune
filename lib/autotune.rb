@@ -11,6 +11,6 @@ module Autotune
   PROJECT_STATUSES = %w(new updating updated building built broken)
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
 
-  Config = Struct.new(:working_dir, :environment, :preview, :publish, :verify_omniauth,
-                      :git_ssh, :git_askpass)
+  Config = Struct.new(:working_dir, :build_environment, :setup_environment,
+                      :preview, :publish, :verify_omniauth, :git_ssh, :git_askpass)
 end

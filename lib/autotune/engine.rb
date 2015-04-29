@@ -11,7 +11,8 @@ module Autotune
       # Figure out where we project our blueprints
       app.config.autotune.working_dir = File.expand_path(
         ENV['WORKING_DIR'] || './working', Rails.root)
-      app.config.autotune.environment = {}
+      app.config.autotune.build_environment = { 'ENV' => Rails.env }
+      app.config.autotune.setup_environment = { 'ENV' => Rails.env }
       app.config.autotune.preview = {
         :connect => "file://#{Rails.root.join('public', 'preview')}",
         :base_url => '/preview'

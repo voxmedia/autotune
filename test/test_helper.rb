@@ -23,7 +23,7 @@ Rails.configuration.autotune.working_dir = File.expand_path(
 # puts 'Working dir: ' + Rails.configuration.autotune.working_dir
 
 # Configure the environment for autotune
-Rails.configuration.autotune.environment = {
+Rails.configuration.autotune.build_environment = {
   # 'GITHUB_KEY' => ENV['GITHUB_KEY'],
   # 'GITHUB_SECRET' => ENV['GITHUB_SECRET'],
 
