@@ -45,8 +45,8 @@ module Autotune
 
     def current_user
       @current_user ||= begin
-        if session[:current_user_id].present?
-          User.find_by_id(session[:current_user_id])
+        if session[:api_key].present?
+          User.find_by_api_key(session[:api_key])
         elsif request.headers['Authorization'] =~ AUTH_KEY_RE
           api_key_m = AUTH_KEY_RE.match(request.headers['Authorization'])
           User.find_by_api_key(api_key_m[1])
@@ -58,9 +58,9 @@ module Autotune
 
     def current_user=(u)
       if u.nil?
-        session.delete(:current_user_id)
+        session.delete(:api_key)
       else
-        session[:current_user_id] = u.id
+        session[:api_key] = u.api_key
       end
     end
 
@@ -79,7 +79,7 @@ module Autotune
     end
 
     def respond_to_html
-      return unless request.format == 'text/html'
+      return if request.format == 'application/json'
       respond_to do |format|
         format.html { render 'index' }
       end
