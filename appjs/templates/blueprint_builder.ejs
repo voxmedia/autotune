@@ -1,50 +1,40 @@
-<div>
+<h2><%=model.get('title') %></h2>
+<div class="pane clearfix">
   <ul class="nav nav-tabs">
     <li class="active"><a href="#source" data-toggle="tab" class="tab-item tab-item-source">Source</a></li>
     <li><a href="#designer" data-toggle="tab" class="tab-item tab-item-designer">Designer</a></li>
   </ul>
-</div>
-<div class="tab-content">
-  <div class="tab-pane active" id="source">
-    <div id="schema"></div>
-    <div id="previewWrap">
-      <div class="message"></div>
-      <div id="previewDiv"></div>
+  <div class="tab-content">
+    <div class="tab-pane active" id="source">
+      <div id="schema"></div>
+      <div id="previewWrap">
+        <div class="message"></div>
+        <div id="previewDiv"></div>
+      </div>
     </div>
-  </div>
-  <div class="tab-pane" id="designer">
-    <div class="container-fluid">
+    <div class="tab-pane" id="designer">
       <div class="row">
         <div class="col-md-7">
-          <div class="row">
-            <div class="col-md-12">
-              <div id="designerDiv"></div>
-            </div>
-          </div>
+          <div id="designerDiv"></div>
         </div>
         <div class="col-md-5">
-          <div class="row">
-            <div class="col-md-12">
-              <br />
-              <div>
-                <ul class="nav nav-tabs">
-                  <li class="active"><a href="#types" data-toggle="tab">Types</a></li>
-                  <li><a href="#basic" data-toggle="tab">Basic</a></li>
-                  <li><a href="#advanced" data-toggle="tab">Advanced</a></li>
-                </ul>
-              </div>
-              <div class="tab-content">
-                <div class="tab-pane active" id="types"></div>
-                <div class="tab-pane" id="basic"></div>
-                <div class="tab-pane" id="advanced"></div>
-              </div>
-            </div>
+          <div>
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#types" data-toggle="tab">Types</a></li>
+              <li><a href="#basic" data-toggle="tab">Basic</a></li>
+              <li><a href="#advanced" data-toggle="tab">Advanced</a></li>
+            </ul>
+          </div>
+          <div class="tab-content">
+            <div class="tab-pane active" id="types"></div>
+            <div class="tab-pane" id="basic"></div>
+            <div class="tab-pane" id="advanced"></div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="tab-pane" id="code">
-    <div id="codeDiv"></div>
+    <div class="tab-pane" id="code">
+      <div id="codeDiv"></div>
+    </div>
   </div>
 </div>

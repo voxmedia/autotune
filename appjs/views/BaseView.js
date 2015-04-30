@@ -50,11 +50,11 @@ module.exports = Backbone.View.extend({
   },
 
   render: function() {
-    this.hook('beforeRender', this);
+    this.hook('beforeRender');
 
     this.$el.html(this.template(this));
 
-    this.hook('afterRender', this);
+    this.hook('afterRender');
 
     return this;
   },
@@ -80,8 +80,13 @@ module.exports = Backbone.View.extend({
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
     console.log('hook ' + name);
-    if(_.isFunction(this[name])) { return this[name].apply(this, args); }
-    this.trigger(name, args);
+    if(_.isFunction(this[name])) {
+      _.defer(
+        function(view, args) {
+          view[name](args);
+          view.trigger(name, args);
+        }, this, args);
+    }
   }
 });
 

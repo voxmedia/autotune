@@ -7,6 +7,7 @@ var $ = require('jquery'),
     BaseView = require('./BaseView');
 
 module.exports = BaseView.extend({
+  className: 'container-fluid',
   template: require('../templates/application.ejs'),
 
   display: function(view) {

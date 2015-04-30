@@ -25,7 +25,7 @@ module.exports = Backbone.Router.extend({
     "blueprints/new": "newBlueprint",
     "blueprints/:slug": "showBlueprint",
     "blueprints/:slug/new_project": "newProject",
-    "blueprints/:slug/builder": "builderBlueprint",
+    "blueprints/:slug/builder": "blueprintBuilder",
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
@@ -96,6 +96,18 @@ module.exports = Backbone.Router.extend({
       }, this));
   },
 
+  blueprintBuilder: function(slug) {
+    console.log("blueprintBuilder");
+    this.appView.spinStart();
+    var blueprint = new models.Blueprint({id: slug});
+    blueprint.fetch()
+      .always(_.bind(function() {
+        this.appView.display( new views.BlueprintBuilder({ model: blueprint, app: this.app }) );
+        this.appView.setTab('blueprints');
+        this.appView.spinStop();
+      }, this));
+  },
+
   listProjects: function(params) {
     console.log("listProjects");
     this.appView.spinStart();
@@ -136,7 +148,7 @@ module.exports = Backbone.Router.extend({
       }, this));
   },
 
-  editProject: function( slug) {
+  editProject: function(slug) {
     console.log("editProject");
     this.appView.spinStart();
     var project = new models.Project({id: slug});
