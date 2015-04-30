@@ -327,7 +327,9 @@ __p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="b
 ((__t=(model.url() ))==null?'':__t)+
 '/new_project">New project</a>\n      <a class="btn btn-default" href="'+
 ((__t=(model.url() ))==null?'':__t)+
-'/edit">Edit</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-model-id="'+
+'/edit">Edit</a>\n      <a class="btn btn-default" href="'+
+((__t=(model.url() ))==null?'':__t)+
+'/builder">Form builder</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
@@ -360,9 +362,9 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h2>'+
+__p+='<h3>'+
 ((__t=(model.get('title') ))==null?'':__t)+
-'</h2>\n<div class="pane clearfix">\n  <ul class="nav nav-tabs">\n    <li class="active"><a href="#source" data-toggle="tab" class="tab-item tab-item-source">Source</a></li>\n    <li><a href="#designer" data-toggle="tab" class="tab-item tab-item-designer">Designer</a></li>\n  </ul>\n  <div class="tab-content">\n    <div class="tab-pane active" id="source">\n      <div id="schema"></div>\n      <div id="previewWrap">\n        <div class="message"></div>\n        <div id="previewDiv"></div>\n      </div>\n    </div>\n    <div class="tab-pane" id="designer">\n      <div class="row">\n        <div class="col-md-7">\n          <div id="designerDiv"></div>\n        </div>\n        <div class="col-md-5">\n          <div>\n            <ul class="nav nav-tabs">\n              <li class="active"><a href="#types" data-toggle="tab">Types</a></li>\n              <li><a href="#basic" data-toggle="tab">Basic</a></li>\n              <li><a href="#advanced" data-toggle="tab">Advanced</a></li>\n            </ul>\n          </div>\n          <div class="tab-content">\n            <div class="tab-pane active" id="types"></div>\n            <div class="tab-pane" id="basic"></div>\n            <div class="tab-pane" id="advanced"></div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class="tab-pane" id="code">\n      <div id="codeDiv"></div>\n    </div>\n  </div>\n</div>\n';
+'</h3>\n<div class="pane clearfix">\n  <ul class="nav nav-tabs">\n    <li class="active"><a href="#source" data-toggle="tab" class="tab-item tab-item-source">Source</a></li>\n    <li><a href="#designer" data-toggle="tab" class="tab-item tab-item-designer">Designer</a></li>\n  </ul>\n  <div class="tab-content">\n    <div class="tab-pane active" id="source">\n      <div id="schema"></div>\n      <div id="previewWrap">\n        <div class="message"></div>\n        <div id="previewDiv"></div>\n      </div>\n    </div>\n    <div class="tab-pane" id="designer">\n      <div class="row">\n        <div class="col-md-7">\n          <div id="designerDiv"></div>\n        </div>\n        <div class="col-md-5">\n          <div>\n            <ul class="nav nav-tabs">\n              <li class="active"><a href="#types" data-toggle="tab">Types</a></li>\n              <li><a href="#basic" data-toggle="tab">Basic</a></li>\n              <li><a href="#advanced" data-toggle="tab">Advanced</a></li>\n            </ul>\n          </div>\n          <div class="tab-content">\n            <div class="tab-pane active" id="types"></div>\n            <div class="tab-pane" id="basic"></div>\n            <div class="tab-pane" id="advanced"></div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class="tab-pane" id="code">\n      <div id="codeDiv"></div>\n    </div>\n  </div>\n</div>\n';
 }
 return __p;
 };
