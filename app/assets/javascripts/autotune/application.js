@@ -626,7 +626,7 @@ __p+='disabled="true"';
  } 
 __p+='\n          data-action="build-and-publish" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Build and publish</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  <button type="button" class="btn btn-warning"\n          data-action="update" data-model="Project"\n          data-model-id="'+
+'">Publish</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  <button type="button" class="btn btn-warning"\n          data-action="update" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
