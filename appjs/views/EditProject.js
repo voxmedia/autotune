@@ -32,7 +32,7 @@ module.exports = FormView.extend({
               "data-model": "Project",
               "data-model-id": this.model.isNew() ? '' : this.model.id,
               "data-action": this.model.isNew() ? 'new' : 'edit',
-              "data-next": "/projects"
+              "data-next": "show"
             },
             "buttons": { "submit": { "value": "Save" } }
           },

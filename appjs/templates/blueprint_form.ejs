@@ -1,11 +1,11 @@
 <h3><% if(model.isNew()) { %>New<% } else { %>Edit<% } %> Blueprint</h3>
 <div class="alert alert-danger" role="alert" style="display:none;"></div>
 <form id="new-blueprint" role="form"
+  data-next="show" data-model="Blueprint"
   <% if(model.isNew()) { %>
-  data-model="Blueprint" data-action="new" data-next="/blueprints"
+  data-action="new"
   <% } else { %>
-  data-model="Blueprint" data-action="edit"
-  data-model-id="<%=model.get('id') %>"
+  data-action="edit" data-model-id="<%=model.get('id') %>"
   <% } %>
   >
   <div class="form-group">

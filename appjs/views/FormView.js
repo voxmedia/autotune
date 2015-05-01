@@ -78,7 +78,9 @@ module.exports = BaseView.extend({
         } else {
           this.success(model_class+' updates saved');
         }
-        if(next){
+        if(next === 'show') {
+          Backbone.history.navigate(this.model.url(), {trigger: true});
+        } else if(next){
           Backbone.history.navigate(next, {trigger: true});
         } else {
           if(_.isObject(this.collection)) {

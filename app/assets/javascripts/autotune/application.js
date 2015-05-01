@@ -420,11 +420,11 @@ __p+='New';
  } else { 
 __p+='Edit';
  } 
-__p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n  ';
+__p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n  data-next="show" data-model="Blueprint"\n  ';
  if(model.isNew()) { 
-__p+='\n  data-model="Blueprint" data-action="new" data-next="/blueprints"\n  ';
+__p+='\n  data-action="new"\n  ';
  } else { 
-__p+='\n  data-model="Blueprint" data-action="edit"\n  data-model-id="'+
+__p+='\n  data-action="edit" data-model-id="'+
 ((__t=(model.get('id') ))==null?'':__t)+
 '"\n  ';
  } 
@@ -29837,7 +29837,7 @@ module.exports = FormView.extend({
               "data-model": "Project",
               "data-model-id": this.model.isNew() ? '' : this.model.id,
               "data-action": this.model.isNew() ? 'new' : 'edit',
-              "data-next": "/projects"
+              "data-next": "show"
             },
             "buttons": { "submit": { "value": "Save" } }
           },
@@ -29964,7 +29964,9 @@ module.exports = BaseView.extend({
         } else {
           this.success(model_class+' updates saved');
         }
-        if(next){
+        if(next === 'show') {
+          Backbone.history.navigate(this.model.url(), {trigger: true});
+        } else if(next){
           Backbone.history.navigate(next, {trigger: true});
         } else {
           if(_.isObject(this.collection)) {
