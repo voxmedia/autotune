@@ -14,14 +14,11 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/update_repo'
-    })
-    .done(_.bind(function() {
-      this.success('Updating blueprint repo');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.updateRepo()
+      .done(_.bind(function() {
+        this.success('Updating blueprint repo');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   }
 });

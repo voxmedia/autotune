@@ -70,6 +70,10 @@ module Autotune
 
     private
 
+    def select_from_post(*args)
+      request.POST.select { |k, _| args.include? k.to_sym }
+    end
+
     def require_login
       return true if signed_in?
       respond_to do |format|
@@ -90,6 +94,13 @@ module Autotune
         :error,
         :locals => { :message => message },
         :status => status)
+    end
+
+    def render_accepted(message = 'accepted')
+      render(
+        :accepted,
+        :locals => { :message => message },
+        :status => :accepted)
     end
   end
 end

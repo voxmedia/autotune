@@ -95,11 +95,19 @@ module WorkDir
       FileUtils.rm_rf(expand path)
     end
 
+    # Copy a path from the working directory to another location
+    def cp(path, dest)
+      FileUtils.mkdir_p(expand dest)
+      FileUtils.cp_r(expand(path), expand(dest))
+    end
+
+    # Move this working dir to another path
     def move_to(path)
       FileUtils.mkdir_p(File.dirname(expand path))
       FileUtils.mv(@working_dir, expand(path))
     end
 
+    # Copy this working dir to another path
     def copy_to(path)
       FileUtils.mkdir_p(File.dirname(expand path))
       FileUtils.cp_r(@working_dir, expand(path))

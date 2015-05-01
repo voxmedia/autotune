@@ -4,6 +4,14 @@ var Backbone = require('backbone'),
     _ = require('underscore'),
     markdown = require('markdown').markdown;
 
+function getEmptyJSON(url) {
+  return Backbone.ajax({
+    dataType: 'json',
+    type: 'GET',
+    url: url
+  });
+}
+
 exports.Project = Backbone.Model.extend({
   initialize: function(args) {
     if(_.isObject(args)) {
@@ -23,6 +31,15 @@ exports.Project = Backbone.Model.extend({
     } else {
       return [this.urlRoot, this.id].join('/');
     }
+  },
+  build: function() {
+    return getEmptyJSON(this.url() + '/build');
+  },
+  buildAndPublish: function() {
+    return getEmptyJSON(this.url() + '/build_and_publish');
+  },
+  updateSnapshot: function() {
+    return getEmptyJSON(this.url() + '/update_snapshot');
   },
   hasInstructions: function() {
     return this.blueprint && this.blueprint.get('config')['instructions'];
@@ -52,19 +69,10 @@ exports.Blueprint = Backbone.Model.extend({
       return [this.urlRoot, this.id].join('/');
     }
   },
-  thumbUrl: function() {
-    return [this.url(), 'thumb'].join('/');
-  },
-  placeholderThumbUrl: function() {
-    if(this.attributes.config.thumbnail){
-      console.log(this);
-      // Using github link for now until we grab and host the thumbnail images
-      return [(this.attributes.repo_url).replace('.git', '').replace('github', 'raw.githubusercontent'), 'master', this.attributes.config.thumbnail].join('/');
-    } else {
-      return '/assets/autotune/at_placeholder.png';
-    }
-  },
-  urlRoot: '/blueprints'
+  urlRoot: '/blueprints',
+  updateRepo: function() {
+    return getEmptyJSON(this.url() + '/update_repo');
+  }
 });
 
 exports.BlueprintCollection = Backbone.Collection.extend({

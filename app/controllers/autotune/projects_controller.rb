@@ -57,7 +57,7 @@ module Autotune
         :slug => data['slug'],
         :theme => data['theme'],
         :data => data['data'])
-        render :show, :status => :created
+        render :show
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
@@ -65,17 +65,17 @@ module Autotune
 
     def update_snapshot
       instance.update_snapshot
-      head :accepted
+      render_accepted
     end
 
     def build
       instance.build
-      head :accepted
+      render_accepted
     end
 
     def build_and_publish
       instance.build_and_publish
-      head :accepted
+      render_accepted
     end
 
     def destroy

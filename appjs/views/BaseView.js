@@ -83,7 +83,7 @@ module.exports = Backbone.View.extend({
     if(_.isFunction(this[name])) {
       _.defer(
         function(view, args) {
-          view[name](args);
+          view[name].apply(view, args);
           view.trigger(name, args);
         }, this, args);
     }

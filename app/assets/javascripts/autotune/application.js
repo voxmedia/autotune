@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-04-30
+/*! autotune - v0.1.0 - 2015-05-01
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -37,6 +37,14 @@ var Backbone = require('backbone'),
     _ = require('underscore'),
     markdown = require('markdown').markdown;
 
+function getEmptyJSON(url) {
+  return Backbone.ajax({
+    dataType: 'json',
+    type: 'GET',
+    url: url
+  });
+}
+
 exports.Project = Backbone.Model.extend({
   initialize: function(args) {
     if(_.isObject(args)) {
@@ -56,6 +64,15 @@ exports.Project = Backbone.Model.extend({
     } else {
       return [this.urlRoot, this.id].join('/');
     }
+  },
+  build: function() {
+    return getEmptyJSON(this.url() + '/build');
+  },
+  buildAndPublish: function() {
+    return getEmptyJSON(this.url() + '/build_and_publish');
+  },
+  updateSnapshot: function() {
+    return getEmptyJSON(this.url() + '/update_snapshot');
   },
   hasInstructions: function() {
     return this.blueprint && this.blueprint.get('config')['instructions'];
@@ -85,19 +102,10 @@ exports.Blueprint = Backbone.Model.extend({
       return [this.urlRoot, this.id].join('/');
     }
   },
-  thumbUrl: function() {
-    return [this.url(), 'thumb'].join('/');
-  },
-  placeholderThumbUrl: function() {
-    if(this.attributes.config.thumbnail){
-      console.log(this);
-      // Using github link for now until we grab and host the thumbnail images
-      return [(this.attributes.repo_url).replace('.git', '').replace('github', 'raw.githubusercontent'), 'master', this.attributes.config.thumbnail].join('/');
-    } else {
-      return '/assets/autotune/at_placeholder.png';
-    }
-  },
-  urlRoot: '/blueprints'
+  urlRoot: '/blueprints',
+  updateRepo: function() {
+    return getEmptyJSON(this.url() + '/update_repo');
+  }
 });
 
 exports.BlueprintCollection = Backbone.Collection.extend({
@@ -343,12 +351,8 @@ __p+='\n    <p>'+
 ((__t=(model.get('config').description ))==null?'':__t)+
 '</p>\n    ';
  } 
-__p+='\n  </div>\n  <div class="col-md-6">\n    <!-- <img src="'+
-((__t=(model.thumbUrl() ))==null?'':__t)+
-'" alt="'+
-((__t=(model.get('title') ))==null?'':__t)+
-'" height="200" width="355"> -->\n    <img src="'+
-((__t=(model.placeholderThumbUrl() ))==null?'':__t)+
+__p+='\n  </div>\n  <div class="col-md-6">\n    <img src="'+
+((__t=(model.get('thumb_url') ))==null?'':__t)+
 '" alt="'+
 ((__t=(model.get('title') ))==null?'':__t)+
 '" width="100%">\n  </div>\n</div>\n';
@@ -390,7 +394,7 @@ __p+='</div>';
 __p+='\n<div class="row">\n  ';
  } 
 __p+='\n  <div class="col-md-4">\n    <div class="thumbnail">\n      <img src="'+
-((__t=(blueprint.thumbUrl() ))==null?'':__t)+
+((__t=(blueprint.get('thumb_url') ))==null?'':__t)+
 '" alt="'+
 ((__t=(blueprint.get('title') ))==null?'':__t)+
 '">\n      <div class="caption">\n        <h4>'+
@@ -28951,7 +28955,7 @@ module.exports = Backbone.View.extend({
     if(_.isFunction(this[name])) {
       _.defer(
         function(view, args) {
-          view[name](args);
+          view[name].apply(view, args);
           view.trigger(name, args);
         }, this, args);
     }
@@ -30050,15 +30054,12 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/update_repo'
-    })
-    .done(_.bind(function() {
-      this.success('Updating blueprint repo');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.updateRepo()
+      .done(_.bind(function() {
+        this.success('Updating blueprint repo');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   }
 });
 
@@ -30079,15 +30080,12 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/update_snapshot'
-    })
-    .done(_.bind(function() {
-      this.success('Upgrading the project to use the newest blueprint');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.updateSnapshot()
+      .done(_.bind(function() {
+        this.success('Upgrading the project to use the newest blueprint');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   },
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
@@ -30095,15 +30093,12 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/build'
-    })
-    .done(_.bind(function() {
-      this.success('Building project');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.build()
+      .done(_.bind(function() {
+        this.success('Building project');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   }
 });
 
@@ -30120,19 +30115,16 @@ module.exports = FormView.extend({
   template: require('../templates/blueprint.ejs'),
   handleUpdateAction: function(eve) {
     var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+        model_class = $btn.data('model'),
+        model_id = $btn.data('model-id'),
+        inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/update_repo'
-    })
-    .done(_.bind(function() {
-      this.success('Updating blueprint repo');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.updateRepo()
+      .done(_.bind(function() {
+        this.success('Updating blueprint repo');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   }
 });
 
@@ -30159,15 +30151,12 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/update_snapshot'
-    })
-    .done(_.bind(function() {
-      this.success('Upgrading the project to use the newest blueprint');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.updateSnapshot()
+      .done(_.bind(function() {
+        this.success('Upgrading the project to use the newest blueprint');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   },
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
@@ -30175,15 +30164,12 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/build'
-    })
-    .done(_.bind(function() {
-      this.success('Building project');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.build()
+      .done(_.bind(function() {
+        this.success('Building project');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   },
   handleBuildAndPublishAction: function(eve) {
     var $btn = $(eve.currentTarget),
@@ -30191,15 +30177,12 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/build_and_publish'
-    })
-    .done(_.bind(function() {
-      this.success('Publishing project');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.buildAndPublish()
+      .done(_.bind(function() {
+        this.success('Publishing project');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   }
 });
 

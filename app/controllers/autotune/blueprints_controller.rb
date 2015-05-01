@@ -34,7 +34,7 @@ module Autotune
 
     def create
       @blueprint = Blueprint.new
-      @blueprint.attributes = request.POST
+      @blueprint.attributes = select_from_post :title, :repo_url, :slug
       if @blueprint.valid?
         @blueprint.save
         @blueprint.update_repo
@@ -46,10 +46,10 @@ module Autotune
 
     def update
       @blueprint = instance
-      @blueprint.attributes = request.POST
+      @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status
       if @blueprint.valid?
         @blueprint.save
-        render :show, :status => :created
+        render :show
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
       end
@@ -57,7 +57,7 @@ module Autotune
 
     def update_repo
       instance.update_repo
-      head :accepted
+      render_accepted
     end
 
     def destroy
@@ -66,24 +66,6 @@ module Autotune
         head :no_content
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
-      end
-    end
-
-    def thumb
-      if instance.config.key?('thumbnail') && instance.repo.exist?(instance.config['thumbnail'])
-        mime = instance.repo.mime(instance.config['thumbnail'])
-        if mime.nil?
-          content_type = 'text/plain'
-        else
-          content_type = mime.content_type
-        end
-        send_data(
-          instance.repo.read(instance.config['thumbnail']),
-          :type => content_type,
-          :filename => instance.config['thumbnail'],
-          :disposition => 'inline')
-      else
-        head :not_found
       end
     end
 

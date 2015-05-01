@@ -17,6 +17,10 @@ module Autotune
         :connect => "file://#{Rails.root.join('public', 'preview')}",
         :base_url => '/preview'
       }
+      app.config.autotune.media = {
+        :connect => "file://#{Rails.root.join('public', 'media')}",
+        :base_url => '/media'
+      }
       app.config.autotune.publish = {}
       app.config.autotune.git_ssh = File.expand_path('../../../bin/git_ssh.sh', __FILE__)
       app.config.autotune.git_askpass = File.expand_path('../../../bin/git_ask_pass.sh', __FILE__)

@@ -36,6 +36,13 @@ module Autotune
       # Track the current commit version
       blueprint.version = repo.version
 
+      # Stash the thumbnail
+      if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
+        WorkDir.website(blueprint.working_dir).deploy_file(
+          blueprint.config['thumbnail'],
+          File.join(Rails.configuration.autotune.media[:connect], blueprint.slug))
+      end
+
       # Blueprint is now ready for testing
       blueprint.status = 'testing'
       blueprint.save!

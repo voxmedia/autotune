@@ -74,6 +74,8 @@ class ActiveSupport::TestCase
       if File.exist?(Rails.configuration.autotune.working_dir)
     FileUtils.rm_rf(Rails.root.join 'public', 'preview') \
       if File.exist?(Rails.root.join 'public', 'preview')
+    FileUtils.rm_rf(Rails.root.join 'public', 'media') \
+      if File.exist?(Rails.root.join 'public', 'media')
   end
 
   def mock_auth

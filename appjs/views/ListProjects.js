@@ -14,15 +14,12 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/update_snapshot'
-    })
-    .done(_.bind(function() {
-      this.success('Upgrading the project to use the newest blueprint');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.updateSnapshot()
+      .done(_.bind(function() {
+        this.success('Upgrading the project to use the newest blueprint');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   },
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
@@ -30,14 +27,11 @@ module.exports = FormView.extend({
     model_id = $btn.data('model-id'),
     inst = new models[model_class]({id: model_id});
 
-    Backbone.ajax({
-      type: 'GET',
-      url: inst.url() + '/build'
-    })
-    .done(_.bind(function() {
-      this.success('Building project');
-      inst.fetch();
-    }, this))
-    .fail(_.bind(this.handleRequestError, this));
+    inst.build()
+      .done(_.bind(function() {
+        this.success('Building project');
+        inst.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   }
 });

@@ -13,12 +13,19 @@ module Autotune
 
     validates :title, :repo_url, :presence => true
     validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
-    # validates :repo_url,
-    #           :format => { :with => Autotune::REPO_URL_RE },
-    #           :uniqueness => true
     after_initialize :defaults
 
     search_fields :title
+
+    def thumb_url
+      if config['thumbnail'] && !config['thumbnail'].empty?
+        File.join(
+          Rails.configuration.autotune.media[:base_url],
+          slug, config['thumbnail']).to_s
+      else
+        ActionController::Base.helpers.asset_path('autotune/at_placeholder.png')
+      end
+    end
 
     def installed?
       %w(updating testing ready).include? status
