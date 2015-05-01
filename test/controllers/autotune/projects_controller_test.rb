@@ -48,6 +48,9 @@ module Autotune
     end
 
     test 'update project' do
+      # need to make sure the blueprint is cloned
+      Autotune::SyncBlueprintJob.perform_now autotune_blueprints(:example)
+
       accept_json!
       valid_auth_header!
 
