@@ -3,7 +3,8 @@ require_dependency 'autotune/application_controller'
 module Autotune
   # API for blueprints
   class BlueprintsController < ApplicationController
-    before_action :respond_to_html, :except => [:thumb]
+    before_action :respond_to_html
+    before_action :require_superuser, :only => [:create, :update, :update_repo, :destroy]
     model Blueprint
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|

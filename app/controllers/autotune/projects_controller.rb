@@ -4,6 +4,7 @@ module Autotune
   # API for projects
   class ProjectsController < ApplicationController
     before_action :respond_to_html
+    before_action :require_superuser, :only => [:update_snapshot]
     model Project
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|

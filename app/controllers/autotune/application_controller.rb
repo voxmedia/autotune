@@ -7,7 +7,7 @@ module Autotune
 
     before_action :require_login
 
-    helper_method :current_user, :signed_in?, :omniauth_path, :login_path
+    helper_method :current_user, :signed_in?, :omniauth_path, :login_path, :role?
 
     def self.model(klass = nil)
       return @model if klass.nil?
@@ -68,6 +68,10 @@ module Autotune
       current_user.present?
     end
 
+    def role?(*args)
+      args.reduce { |a, e| a || current_user.meta['roles'].include?(e.to_s) }
+    end
+
     private
 
     def select_from_post(*args)
@@ -76,6 +80,20 @@ module Autotune
 
     def require_login
       return true if signed_in?
+      respond_to do |format|
+        format.html { redirect_to login_path(request.fullpath) }
+        format.json { render_error 'Unauthorized', :unauthorized }
+      end
+    end
+
+    def require_superuser
+      require_role :superuser
+    end
+
+    def require_role(*args)
+      return true if signed_in? && args.reduce do |a, e|
+        a || current_user.meta['roles'].include?(e.to_s)
+      end
       respond_to do |format|
         format.html { redirect_to login_path(request.fullpath) }
         format.json { render_error 'Unauthorized', :unauthorized }

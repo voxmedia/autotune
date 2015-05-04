@@ -12,19 +12,17 @@ module Autotune
           request.env['omniauth.origin'] || root_path,
           :notice => "Welcome #{current_user.name}!")
       else
-        redirect_to(login_path, :alert => 'There was a problem logging you in')
+        render_error('There was a problem logging you in')
       end
     end
 
     def failure
-      redirect_to(
-        login_path,
-        :alert => "There was a problem logging you in: #{params[:message]}.")
+      render_error("There was a problem logging you in: #{params[:message]}.")
     end
 
     def destroy
       self.current_user = nil
-      redirect_to(login_path, :notice => 'You have been logged out.')
+      render_error('You have been logged out.', :ok)
     end
 
     private

@@ -8,7 +8,8 @@ module Autotune
         :project_blueprints => Project.uniq.pluck(:blueprint_id),
         :blueprint_statuses => Autotune::BLUEPRINT_STATUSES,
         :blueprint_types => Blueprint.uniq.pluck(:type),
-        :blueprint_tags => Tag.all.as_json(:only => [:title, :slug])
+        :blueprint_tags => Tag.all.as_json(:only => [:title, :slug]),
+        :user => current_user.as_json
       }
     end
   end

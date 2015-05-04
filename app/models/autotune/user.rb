@@ -24,21 +24,29 @@ module Autotune
     end
 
     def self.create_from_auth_hash(auth_hash)
-      return unless verify_auth_hash(auth_hash)
+      roles = verify_auth_hash(auth_hash)
+      return unless roles
       a = Authorization.new(
         auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
       a.user = User
         .create_with(:name => auth_hash['info']['name'])
         .find_or_create_by!(:email => auth_hash['info']['email'])
+      a.user.meta['roles'] = roles if roles.is_a?(Array)
       a.save!
       a.user
     end
 
     def self.find_by_auth_hash(auth_hash)
-      return unless verify_auth_hash(auth_hash)
+      roles = verify_auth_hash(auth_hash)
+      return unless roles
       a = Authorization.where(
         :provider => auth_hash['provider'],
         :uid => auth_hash['uid']).first
+
+      if roles.is_a?(Array) && a.user.meta['roles'] != roles
+        a.user.meta['roles'] = roles
+        a.user.save
+      end
 
       a.user unless a.nil?
     end
@@ -50,9 +58,9 @@ module Autotune
     def self.verify_auth_hash(auth_hash)
       if Rails.configuration.autotune.verify_omniauth &&
          Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
-        Rails.configuration.autotune.verify_omniauth.call(auth_hash)
+        return Rails.configuration.autotune.verify_omniauth.call(auth_hash)
       else
-        true
+        return true
       end
     end
 
