@@ -1,7 +1,5 @@
 <script>
 $(document).ready(function() {
-    var config = <%=raw config.to_json %>;
-    config.spinner = '<%=image_url 'autotune/spinner.gif' %>';
-    app = new App(config);
+    app = new App(<%=raw config.to_json %>);
 });
 </script>
