@@ -42,13 +42,14 @@ module Autotune
       a = Authorization.where(
         :provider => auth_hash['provider'],
         :uid => auth_hash['uid']).first
+      return if a.nil?
 
       if roles.is_a?(Array) && a.user.meta['roles'] != roles
         a.user.meta['roles'] = roles
         a.user.save
       end
 
-      a.user unless a.nil?
+      a.user
     end
 
     def self.find_by_api_key(api_key)
