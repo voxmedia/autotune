@@ -7,3 +7,27 @@ developer:
   meta:
     roles:
       - superuser
+
+superuser:
+  name: root
+  email: root@example.com
+  api_key: jHJ6FfDS2rlNkCBY4R73
+  meta:
+    roles:
+      - superuser
+
+editor:
+  name: editor
+  email: editor@example.com
+  api_key: nISgtBZrvxRjf58KA6sb
+  meta:
+    roles:
+      - editor
+
+author:
+  name: author
+  email: author@example.com
+  api_key: rz4qSB0LkspAakCmxmbB
+  meta:
+    roles:
+      - author

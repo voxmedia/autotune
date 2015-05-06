@@ -22,6 +22,16 @@ module Autotune
       assert_equal autotune_blueprints(:example).id, decoded_response.first['id']
     end
 
+    test 'listing blueprints as author' do
+      accept_json!
+      valid_auth_header! :author
+
+      get :index
+      assert_response :success
+      assert_instance_of Array, decoded_response
+      assert_equal autotune_blueprints(:example).id, decoded_response.first['id']
+    end
+
     test 'show blueprint' do
       accept_json!
       valid_auth_header!

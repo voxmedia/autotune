@@ -36,7 +36,7 @@ module Autotune
     def create
       data = request.POST.dup
       blueprint = Blueprint.find(data.delete 'blueprint_id')
-      @project = Project.new
+      @project = Project.new(:user_id => current_user.id)
       @project.blueprint = blueprint
       @project.attributes = select_from_post :title, :slug, :theme, :data
       if @project.valid?

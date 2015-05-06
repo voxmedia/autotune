@@ -7,6 +7,7 @@ example_one:
   status: new
   data: {"title": "Example build one"}
   blueprint: example
+  user: developer
 
 example_two:
   title: Example build two
@@ -15,3 +16,4 @@ example_two:
   status: new
   data: {"title": "Example build two"}
   blueprint: example
+  user: developer

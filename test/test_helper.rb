@@ -95,8 +95,8 @@ class ActionController::TestCase
     @routes = Autotune::Engine.routes
   end
 
-  def valid_auth_header!
-    @request.headers['Authorization'] = "API-KEY auth=#{autotune_users(:developer).api_key}"
+  def valid_auth_header!(user = :developer)
+    @request.headers['Authorization'] = "API-KEY auth=#{autotune_users(user).api_key}"
   end
 
   def accept_json!

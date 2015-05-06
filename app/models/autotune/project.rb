@@ -6,8 +6,9 @@ module Autotune
     include WorkingDir
     serialize :data, Hash
     belongs_to :blueprint
+    belongs_to :user
 
-    validates :title, :blueprint, :presence => true
+    validates :title, :blueprint, :user, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
     before_validation :defaults

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150210191559) do
+ActiveRecord::Schema.define(version: 20150506174111) do
 
   create_table "autotune_authorizations", force: :cascade do |t|
     t.integer  "user_id"
@@ -65,12 +65,14 @@ ActiveRecord::Schema.define(version: 20150210191559) do
     t.integer  "blueprint_id"
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
+    t.integer  "user_id"
   end
 
   add_index "autotune_projects", ["blueprint_id"], name: "index_autotune_projects_on_blueprint_id"
   add_index "autotune_projects", ["slug"], name: "index_autotune_projects_on_slug"
   add_index "autotune_projects", ["status"], name: "index_autotune_projects_on_status"
   add_index "autotune_projects", ["theme"], name: "index_autotune_projects_on_theme"
+  add_index "autotune_projects", ["user_id"], name: "index_autotune_projects_on_user_id"
 
   create_table "autotune_tags", force: :cascade do |t|
     t.string   "slug"

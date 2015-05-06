@@ -21,6 +21,15 @@ module Autotune
       assert_instance_of Array, decoded_response
     end
 
+    test 'listing projects as author' do
+      accept_json!
+      valid_auth_header! :author
+
+      get :index
+      assert_response :success
+      assert_instance_of Array, decoded_response
+    end
+
     test 'show project' do
       accept_json!
       valid_auth_header!
