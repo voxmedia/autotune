@@ -19,6 +19,7 @@ module Autotune
       get :index
       assert_response :success
       assert_instance_of Array, decoded_response
+      assert_equal decoded_response.length, 3
     end
 
     test 'listing projects as author' do
@@ -28,6 +29,7 @@ module Autotune
       get :index
       assert_response :success
       assert_instance_of Array, decoded_response
+      assert_equal decoded_response.length, 1
     end
 
     test 'show project' do
@@ -38,6 +40,14 @@ module Autotune
       assert_response :success
       assert_project_data!
       assert_equal autotune_projects(:example_one).id, decoded_response['id']
+    end
+
+    test 'show project not allowed' do
+      accept_json!
+      valid_auth_header! :author
+
+      get :show, :id => autotune_projects(:example_one).id
+      assert_response :forbidden
     end
 
     test 'show non-existant project' do
@@ -113,6 +123,7 @@ module Autotune
         :title => 'New project',
         :slug => 'New project'.parameterize,
         :blueprint_id => autotune_blueprints(:example).id,
+        :user_id => autotune_users(:developer).id,
         :theme => 'default',
         :preview_url => '',
         :data => {

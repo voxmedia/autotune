@@ -5,6 +5,8 @@ module Autotune
   class ProjectsController < ApplicationController
     before_action :respond_to_html
     before_action :require_superuser, :only => [:update_snapshot]
+    before_action :require_authorization,
+                  :only => [:show, :update, :destroy, :build, :build_and_publish]
     model Project
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
@@ -17,10 +19,8 @@ module Autotune
 
     def index
       @projects = Project
-      query = {}
-      query[:status] = params[:status] if params.key? :status
-      query[:theme] = params[:theme] if params.key? :theme
-      query[:blueprint_id] = params[:blueprint_id] if params.key? :blueprint_id
+      query = select_from_get :status, :theme, :blueprint_id
+      query['user'] = current_user unless current_user.role? :editor, :superuser
       @projects = @projects.search(params[:search]) if params.key? :search
       if query.empty?
         @projects = @projects.all
@@ -34,10 +34,9 @@ module Autotune
     end
 
     def create
-      data = request.POST.dup
-      blueprint = Blueprint.find(data.delete 'blueprint_id')
-      @project = Project.new(:user_id => current_user.id)
-      @project.blueprint = blueprint
+      @project = Project.new(
+        :user => current_user,
+        :blueprint => Blueprint.find(request.POST['blueprint_id']))
       @project.attributes = select_from_post :title, :slug, :theme, :data
       if @project.valid?
         @project.save
@@ -82,6 +81,11 @@ module Autotune
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    def require_authorization
+      return if instance.user == current_user
+      require_role :superuser, :editor
     end
   end
 end

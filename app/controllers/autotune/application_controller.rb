@@ -78,6 +78,10 @@ module Autotune
       request.POST.select { |k, _| args.include? k.to_sym }
     end
 
+    def select_from_get(*args)
+      request.GET.select { |k, _| args.include? k.to_sym }
+    end
+
     def require_login
       return true if signed_in?
       respond_to do |format|
@@ -91,12 +95,10 @@ module Autotune
     end
 
     def require_role(*args)
-      return true if signed_in? && args.reduce do |a, e|
-        a || current_user.meta['roles'].include?(e.to_s)
-      end
+      return true if signed_in? && current_user.role?(*args)
       respond_to do |format|
-        format.html { redirect_to login_path(request.fullpath) }
-        format.json { render_error 'Unauthorized', :unauthorized }
+        format.html { redirect_to login_path }
+        format.json { render_error 'Not allowed', :forbidden }
       end
     end
 

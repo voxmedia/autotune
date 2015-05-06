@@ -26,7 +26,7 @@ module Autotune
     end
 
     test 'search projects' do
-      assert_equal 2, Project.search('Example').count
+      assert_equal 3, Project.search('Example').count
       assert_equal 0, Project.search('foo').count
     end
   end

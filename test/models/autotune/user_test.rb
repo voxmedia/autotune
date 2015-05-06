@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class Autotune::UserTest < ActiveSupport::TestCase
+  fixtures 'autotune/users'
   test 'creating user' do
     assert_raises ActiveRecord::RecordInvalid do
       Autotune::User.create!(:name => 'foo')
@@ -45,5 +46,13 @@ class Autotune::UserTest < ActiveSupport::TestCase
     assert_raises ArgumentError do
       Autotune::User.find_or_create_by_auth_hash(:invalid_credentials)
     end
+  end
+
+  test 'roles' do
+    assert autotune_users(:developer).role? :superuser
+    assert autotune_users(:author).role? :author
+    assert autotune_users(:editor).role? :editor
+    assert !autotune_users(:editor).role?(:superuser)
+    assert !autotune_users(:author).role?(:superuser)
   end
 end

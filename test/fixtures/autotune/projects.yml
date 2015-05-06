@@ -17,3 +17,12 @@ example_two:
   data: {"title": "Example build two"}
   blueprint: example
   user: developer
+
+example_three:
+  title: Example build three
+  slug: example-build-three
+  theme: default
+  status: new
+  data: {"title": "Example build three"}
+  blueprint: example
+  user: author

@@ -2,7 +2,7 @@ module Autotune
   # Basic user account
   class User < ActiveRecord::Base
     has_many :authorizations
-    serialize :meta, Hash
+    serialize :meta, JSON
 
     validates :name, :email, :api_key, :presence => true
     validates :email, :api_key, :uniqueness => true
@@ -65,10 +65,15 @@ module Autotune
       end
     end
 
+    def role?(*args)
+      args.reduce(false) { |a, e| a || meta['roles'].include?(e.to_s) }
+    end
+
     private
 
     def defaults
       self.api_key ||= User.generate_api_key
+      self.meta    ||= {}
     end
   end
 end
