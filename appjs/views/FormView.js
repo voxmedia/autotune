@@ -16,27 +16,8 @@ module.exports = BaseView.extend({
     'change select[data-auto-submit=true]': 'submitForm'
   },
 
-  initialize: function() {
-    var args = Array.prototype.slice.call(arguments);
-    this.hook('beforeInit', args);
-
-    if(_.isObject(this.collection)) {
-      this.collection
-        .on("sync sort", this.render, this)
-        .on("error", this.logError, this);
-    }
-
-    if(_.isObject(this.model)) {
-      this.model
-        .on("sync change", this.render, this)
-        .on("error", this.logError, this);
-    }
-
-    if(_.isObject(args[0]['query'])) { this.query = args[0].query; }
-
-    this.render();
-
-    this.hook('afterInit', args);
+  initialize: function(options) {
+    BaseView.prototype.initialize.call(this, options);
   },
 
   handleForm: function(eve) {

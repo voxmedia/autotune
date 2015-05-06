@@ -1,0 +1,5 @@
+<h3><%=resp.statusText %></h3>
+<p>A bad thing happened. Please reload and try again.</p>
+<% if (app.isDev()) { %>
+<pre><%=resp.responseText %></pre>
+<% } %>

@@ -5,7 +5,9 @@
         <a class="navbar-brand" href="/">Autotune</a>
         <ul class="nav navbar-nav">
           <li data-tab="projects"><a href="/projects">Projects</a></li>
+          <% if (hasRole('superuser')) { %>
           <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>
+          <% } %>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li><div class="navbar-text" id="spinner">

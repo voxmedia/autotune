@@ -12,30 +12,24 @@ module.exports = Backbone.View.extend({
     'click a': 'handleLink'
   },
 
-  initialize: function() {
-    var args = Array.prototype.slice.call(arguments);
-    this.hook('beforeInit', args);
+  initialize: function(options) {
+    this.hook('beforeInit', options);
 
-    if (args[0]) {
-      if (args[0].app) { this.app = args[0].app; }
-      if (args[0].query) { this.app = args[0].query; }
+    if (_.isObject(options)) {
+      _.extend(this, options);
     }
 
     if(_.isObject(this.collection)) {
-      this.collection
-        .on("sync sort", this.render, this)
-        .on("error", this.logError, this);
+      this.listenTo(this.collection, 'sync sort', this.render);
+      this.listenTo(this.collection, 'error', this.handleSyncError);
     }
 
     if(_.isObject(this.model)) {
-      this.model
-        .on("sync change", this.render, this)
-        .on("error", this.logError, this);
+      this.listenTo(this.model, 'sync', this.render);
+      this.listenTo(this.model, 'error', this.handleSyncError);
     }
 
-    this.render();
-
-    this.hook('afterInit', args);
+    this.hook('afterInit', options);
   },
 
   handleLink: function(eve) {
@@ -54,13 +48,28 @@ module.exports = Backbone.View.extend({
 
     this.$el.html(this.template(this));
 
+    this.app.view.spinStop();
+
     this.hook('afterRender');
 
     return this;
   },
 
-  logError: function(model_or_collection, resp, options) {
-    console.log(arguments);
+  handleSyncError: function(model_or_collection, resp, options) {
+    var tmpl,
+        tmplObj = {
+          app: this.app, resp: resp, options: options,
+          model_or_collection: model_or_collection };
+    if (resp.status === 404) {
+      tmpl = require('../templates/not_found.ejs');
+    } else if (resp.status === 403) {
+      tmpl = require('../templates/not_allowed.ejs');
+    } else {
+      tmpl = require('../templates/error.ejs');
+    }
+    this.app.debug(tmplObj);
+    this.$el.html(tmpl(tmplObj));
+    this.app.view.spinStop();
   },
 
   error: function(message) {
@@ -74,6 +83,10 @@ module.exports = Backbone.View.extend({
   alert: function(message) {
     var level = arguments[1] || 'info';
     $('#flash').html(alert_template({ level: level, message: message }));
+  },
+
+  hasRole: function(role) {
+    return _.contains(this.app.config.user.meta.roles, role);
   },
 
   hook: function() {

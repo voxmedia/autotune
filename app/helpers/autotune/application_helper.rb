@@ -3,6 +3,7 @@ module Autotune
   module ApplicationHelper
     def config
       {
+        :env => Rails.env,
         :project_statuses => Autotune::PROJECT_STATUSES,
         :project_themes => Project.uniq.pluck(:theme),
         :project_blueprints => Project.uniq.pluck(:blueprint_id),

@@ -10,13 +10,13 @@ var $ = require('jquery'),
 module.exports = Backbone.Router.extend({
 
   initialize: function(options) {
-    console.log("Init router");
+    this.app = options.app;
+    this.app.debug("Init router");
 
-    if(options['app']) { this.app = options.app; }
+    this.app.view = this.app.view = new views.Application({ app: this.app });
+    this.app.view.render();
 
-    this.appView = new views.Application({ app: this.app });
-
-    $('body').empty().append(this.appView.$el);
+    $('body').empty().append(this.app.view.$el);
   },
 
   routes: {
@@ -34,133 +34,116 @@ module.exports = Backbone.Router.extend({
   },
 
   listBlueprints: function(params) {
-    console.log("listBlueprints", params);
-    this.appView.spinStart();
+    this.app.debug("listBlueprints", params);
+    this.app.view.spinStart();
     var blueprints = this.blueprints = new models.BlueprintCollection(),
-        query = {};
+        query = {}, view;
     if(params) { query = queryString.parse(params); }
-    blueprints.fetch({data: query})
-      .always(_.bind(function() {
-        this.appView.display( new views.ListBlueprints(
-          {collection: blueprints, query: query, app: this.app}) );
-        this.appView.setTab('blueprints');
-        this.appView.spinStop();
-      }, this));
+    view = new views.ListBlueprints({collection: blueprints, query: query, app: this.app});
+    this.app.view.display( view );
+    this.app.view.setTab('blueprints');
+    blueprints.fetch({data: query});
   },
 
   newBlueprint: function() {
-    console.log("newBlueprint");
-    this.appView.setTab('blueprints');
-    this.appView.display( new views.EditBlueprint({
-      model: new models.Blueprint(), app: this.app }));
-    this.appView.spinStop();
+    this.app.debug("newBlueprint");
+    var blueprint = new models.Blueprint(),
+        view = new views.EditBlueprint({ model: blueprint, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('blueprints');
+    view.render();
   },
 
   showBlueprint: function(slug) {
-    console.log("showBlueprint");
-    this.appView.spinStart();
-    var blueprint = new models.Blueprint({id: slug});
-    blueprint.fetch()
-      .always(_.bind(function() {
-        this.appView.display( new views.ShowBlueprint({ model: blueprint, app: this.app }) );
-        this.appView.setTab('blueprints');
-        this.appView.spinStop();
-      }, this));
+    this.app.debug("showBlueprint");
+    this.app.view.spinStart();
+    var blueprint = new models.Blueprint({id: slug}),
+        view = new views.ShowBlueprint({ model: blueprint, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('blueprints');
+    blueprint.fetch();
   },
 
   editBlueprint: function(slug) {
-    console.log("editBlueprint");
-    this.appView.spinStart();
-    var blueprint = new models.Blueprint({id: slug});
-    blueprint.fetch()
-      .always(_.bind(function() {
-        this.appView.display( new views.EditBlueprint({ model: blueprint, app: this.app }) );
-        this.appView.setTab('blueprints');
-        this.appView.spinStop();
-      }, this));
+    this.app.debug("editBlueprint");
+    this.app.view.spinStart();
+    var blueprint = new models.Blueprint({id: slug}),
+        view = new views.EditBlueprint({ model: blueprint, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('blueprints');
+    blueprint.fetch();
   },
 
   chooseBlueprint: function(params) {
-    console.log("chooseBlueprint");
-    this.appView.spinStart();
+    this.app.debug("chooseBlueprint");
+    this.app.view.spinStart();
     var blueprints = new models.BlueprintCollection(),
-        query = {};
+        query = {}, view;
     if(params) { query = queryString.parse(params); }
     query['status'] = 'ready';
-    blueprints.fetch({data: query})
-      .always(_.bind(function() {
-        this.appView.display( new views.ChooseBlueprint(
-          { collection: blueprints, query: query, app: this.app }) );
-        this.appView.setTab('projects');
-        this.appView.spinStop();
-      }, this));
+    view = new views.ChooseBlueprint({ collection: blueprints, query: query, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('projects');
+    blueprints.fetch({data: query});
   },
 
   blueprintBuilder: function(slug) {
-    console.log("blueprintBuilder");
-    this.appView.spinStart();
-    var blueprint = new models.Blueprint({id: slug});
-    blueprint.fetch()
-      .always(_.bind(function() {
-        this.appView.display( new views.BlueprintBuilder({ model: blueprint, app: this.app }) );
-        this.appView.setTab('blueprints');
-        this.appView.spinStop();
-      }, this));
+    this.app.debug("blueprintBuilder");
+    this.app.view.spinStart();
+    var blueprint = new models.Blueprint({id: slug}),
+        view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('blueprints');
+    blueprint.fetch();
   },
 
   listProjects: function(params) {
-    console.log("listProjects");
-    this.appView.spinStart();
+    this.app.debug("listProjects");
+    this.app.view.spinStart();
     var projects = new models.ProjectCollection(),
-        query = {};
+        query = {}, view;
     if(params) { query = queryString.parse(params); }
-    projects.fetch({data: query})
-      .always(_.bind(function() {
-        this.appView.display( new views.ListProjects(
-          { collection: projects, query: query, app: this.app }) );
-        this.appView.setTab('projects');
-        this.appView.spinStop();
-      }, this));
+    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('projects');
+    projects.fetch({data: query});
   },
 
   newProject: function(slug) {
-    console.log("newProject");
-    this.appView.spinStart();
-    var blueprint = new models.Blueprint({id: slug});
-    blueprint.fetch()
-      .always(_.bind(function() {
-        this.appView.display( new views.EditProject(
-          { model: new models.Project({ blueprint: blueprint, app: this.app }) }) );
-        this.appView.setTab('projects');
-        this.appView.spinStop();
-      }, this));
+    this.app.debug("newProject");
+    this.app.view.spinStart();
+    var blueprint = new models.Blueprint({id: slug}),
+        project = new models.Project({ blueprint: blueprint }),
+        view = new views.EditProject({ model: project, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('projects');
+    blueprint.fetch();
   },
 
   showProject: function(slug) {
     console.log("showProject");
-    this.appView.spinStart();
-    var project = new models.Project({id: slug});
-    project.fetch()
-      .always(_.bind(function() {
-        this.appView.display( new views.ShowProject({ model: project, app: this.app }) );
-        this.appView.setTab('projects');
-        this.appView.spinStop();
-      }, this));
+    this.app.view.spinStart();
+    var project = new models.Project({id: slug}),
+        view = new views.ShowProject({ model: project, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('projects');
+    project.fetch();
   },
 
   editProject: function(slug) {
-    console.log("editProject");
-    this.appView.spinStart();
-    var project = new models.Project({id: slug});
-    project.fetch()
-      .always(_.bind(function() {
-        project.blueprint = new models.Blueprint({id: project.get('blueprint_id')});
-        project.blueprint.fetch()
-          .always(_.bind(function() {
-            this.appView.display( new views.EditProject({ model: project, app: this.app }) );
-            this.appView.setTab('projects');
-            this.appView.spinStop();
-          }, this));
-      }, this));
+    this.app.debug("editProject");
+    this.app.view.spinStart();
+    var project = new models.Project({id: slug}),
+        view = new views.EditProject({ model: project, app: this.app });
+    this.app.view.display( view );
+    this.app.view.setTab('projects');
+    project.fetch();
+  },
+
+  require_role: function(role) {
+    if (!_.contains(this.app.config.user.meta.roles, role)) {
+
+    }
   }
+
 });

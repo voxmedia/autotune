@@ -11,23 +11,23 @@ module.exports = BaseView.extend({
   template: require('../templates/application.ejs'),
 
   display: function(view) {
-    $('#main').empty().append(view.$el);
+    this.$('#main').empty().append(view.$el);
   },
 
   spinStart: function() {
-    $('#spinner').show();
+    this.$('#spinner').show();
   },
 
   spinStop: function() {
-    $('#spinner').fadeOut('fast');
+    this.$('#spinner').fadeOut('fast');
   },
 
   setTab: function(name) {
-    $('#nav [data-tab]').removeClass('active');
-    if(name) { $('#nav [data-tab='+name+']').addClass('active'); }
+    this.$('#nav [data-tab]').removeClass('active');
+    if(name) { this.$('#nav [data-tab='+name+']').addClass('active'); }
   },
 
   clearError: function() {
-    $('#notice').empty();
+    this.$('#flash').empty();
   }
 });

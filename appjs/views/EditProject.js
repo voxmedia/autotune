@@ -9,6 +9,20 @@ var $ = require('jquery'),
 module.exports = FormView.extend({
   template: require('../templates/project_form.ejs'),
   afterRender: function() {
+    if(_.isUndefined(this.model.blueprint) ||
+       this.model.blueprint.isNew() || !this.model.blueprint.has('config')) {
+      this.app.view.spinStart();
+      this.model.blueprint = new models.Blueprint({id: this.model.get('blueprint_id')});
+      this.model.blueprint.fetch()
+        .done(_.bind(function() {
+          this.renderForm();
+          this.app.view.spinStop();
+        }, this));
+    } else {
+      this.renderForm();
+    }
+  },
+  renderForm: function() {
     var $form = this.$el.find('#projectForm'),
         form_config = this.model.blueprint.get('config').form;
     if(_.isUndefined(form_config)) {
