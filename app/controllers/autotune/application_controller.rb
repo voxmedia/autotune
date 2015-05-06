@@ -24,7 +24,7 @@ module Autotune
         if params[:id] =~ /^\d+$/
           model.find params[:id]
         elsif params.key?(:id) && !params[:id].empty?
-          model.find_by_slug params[:id]
+          model.find_by! :slug => params[:id]
         else
           model.new
         end

@@ -31,6 +31,15 @@ module Autotune
       assert_equal autotune_projects(:example_one).id, decoded_response['id']
     end
 
+    test 'show non-existant project' do
+      accept_json!
+      valid_auth_header!
+
+      assert_raises(ActiveRecord::RecordNotFound) do
+        get :show, :id => 'foobar'
+      end
+    end
+
     test 'create project' do
       # need to make sure the blueprint is cloned
       Autotune::SyncBlueprintJob.perform_now autotune_blueprints(:example)

@@ -32,6 +32,15 @@ module Autotune
       assert_equal autotune_blueprints(:example).id, decoded_response['id']
     end
 
+    test 'show non-existant blueprint' do
+      accept_json!
+      valid_auth_header!
+
+      assert_raises(ActiveRecord::RecordNotFound) do
+        get :show, :id => 'foobar'
+      end
+    end
+
     test 'create blueprint' do
       # make sure we remove the example blueprint
       autotune_blueprints(:example).destroy
