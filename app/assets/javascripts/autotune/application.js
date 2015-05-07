@@ -63,6 +63,8 @@ function getEmptyJSON(url) {
 }
 
 exports.Project = Backbone.Model.extend({
+  urlRoot: '/projects',
+
   initialize: function(args) {
     if(_.isObject(args)) {
       if(_.isObject(args.blueprint)) {
@@ -74,6 +76,7 @@ exports.Project = Backbone.Model.extend({
       }
     }
   },
+
   url: function() {
     if(this.isNew()) { return this.urlRoot; }
     if(this.has('slug')) {
@@ -82,24 +85,35 @@ exports.Project = Backbone.Model.extend({
       return [this.urlRoot, this.id].join('/');
     }
   },
+
   build: function() {
     return getEmptyJSON(this.url() + '/build');
   },
+
   buildAndPublish: function() {
     return getEmptyJSON(this.url() + '/build_and_publish');
   },
+
   updateSnapshot: function() {
     return getEmptyJSON(this.url() + '/update_snapshot');
   },
+
   hasInstructions: function() {
     return this.blueprint && this.blueprint.get('config')['instructions'];
   },
+
   instructions: function() {
     if(this.hasInstructions()) {
       return markdown.toHTML(this.blueprint.get('config')['instructions']);
     }
   },
-  urlRoot: '/projects'
+
+  hasStatus: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'status' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
 });
 
 exports.ProjectCollection = Backbone.Collection.extend({
@@ -111,6 +125,7 @@ exports.Blueprint = Backbone.Model.extend({
   initialize: function() {
     this.projects = new exports.ProjectCollection([], { blueprint: this });
   },
+
   url: function() {
     if(this.isNew()) { return this.urlRoot; }
     if(this.attributes.slug) {
@@ -119,7 +134,16 @@ exports.Blueprint = Backbone.Model.extend({
       return [this.urlRoot, this.id].join('/');
     }
   },
+
+  hasStatus: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'status' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
   urlRoot: '/blueprints',
+
   updateRepo: function() {
     return getEmptyJSON(this.url() + '/update_repo');
   }
@@ -246,15 +270,15 @@ module.exports = Backbone.Router.extend({
     this.app.debug("newProject");
     this.app.view.spinStart();
     var blueprint = new models.Blueprint({id: slug}),
-        project = new models.Project({ blueprint: blueprint });
-    var view = new views.EditProject({ model: project, app: this.app });
+        project = new models.Project({ blueprint: blueprint }),
+        view = new views.EditProject({ model: project, app: this.app });
     this.app.view.display( view );
     this.app.view.setTab('projects');
     blueprint.fetch();
   },
 
   showProject: function(slug) {
-    console.log("showProject");
+    this.app.debug("showProject");
     this.app.view.spinStart();
     var project = new models.Project({id: slug}),
         view = new views.ShowProject({ model: project, app: this.app });
@@ -271,14 +295,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
-  },
-
-  require_role: function(role) {
-    if (!_.contains(this.app.config.user.meta.roles, role)) {
-
-    }
   }
-
 });
 
 },{"./models":2,"./views":19,"backbone":31,"jquery":63,"query-string":67,"underscore":134}],4:[function(require,module,exports){
@@ -634,13 +651,13 @@ module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<h3>\n  '+
-((__t=(model.get('title') ))==null?'':__t)+
+((__t=(model.get( 'title' ) ))==null?'':__t)+
 '\n  ';
- if(model.get('status') == 'built') { 
+ if( model.hasStatus( 'built' ) ) { 
 __p+='\n  <span class="label label-success text-capitalize">'+
 ((__t=(model.get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
- } else if(model.get('status') == 'broken') { 
+ } else if ( model.get('status') == 'broken' ) { 
 __p+='\n  <span class="label label-danger text-capitalize">'+
 ((__t=(model.get('status') ))==null?'':__t)+
 '</span></h4>\n  ';
@@ -652,7 +669,7 @@ __p+='\n  <span class="label label-warning text-capitalize">'+
 __p+='\n</h3>\n<p><div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" href="'+
 ((__t=(model.url() ))==null?'':__t)+
 '/edit">Edit</a>\n  <a class="btn btn-default" target="_blank"\n     ';
- if(model.get('status') != 'built') { 
+ if ( ! model.hasStatus( 'built' ) ) { 
 __p+='disabled="true"';
  } 
 __p+='\n     href="'+
@@ -660,28 +677,62 @@ __p+='\n     href="'+
 '">Preview</a>\n  <button type="button" class="btn btn-default"\n          data-action="build" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Rebuild preview</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" target="_blank"\n     ';
- if(model.get('status') != 'built') { 
+ if ( ! model.hasStatus( 'built' ) ) { 
 __p+='disabled="true"';
  } 
 __p+='\n     href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
 '">View</a>\n  <button type="button" class="btn btn-default"\n          ';
- if(model.get('status') != 'built') { 
+ if ( ! model.hasStatus( 'built' ) ) { 
 __p+='disabled="true"';
  } 
 __p+='\n          data-action="build-and-publish" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Publish</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  <button type="button" class="btn btn-warning"\n          data-action="update" data-model="Project"\n          data-model-id="'+
+'">Publish</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  ';
+ if ( hasRole( 'superuser' ) ) { 
+__p+='\n  <button type="button" class="btn btn-warning"\n          data-action="update" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Upgrade</button>\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
+'">Upgrade</button>\n  ';
+ } 
+__p+='\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Delete</button>\n</div></p>\n\n<div role="tabpanel">\n\n  <!-- Nav tabs -->\n  <ul class="nav nav-tabs" role="tablist">\n    <li role="presentation" class="active"><a\n      href="#preview" aria-controls="preview"\n      role="tab" data-toggle="tab">Preview</a></li>\n    <li role="presentation"><a\n      href="#embed" aria-controls="embed"\n      role="tab" data-toggle="tab">Embed</a></li>\n    <li role="presentation"><a\n      href="#data" aria-controls="data"\n      role="tab" data-toggle="tab">Data</a></li>\n    <li role="presentation"><a\n      href="#output" aria-controls="output"\n      role="tab" data-toggle="tab">Output</a></li>\n  </ul>\n\n  <!-- Tab panes -->\n  <div class="tab-content">\n    <div role="tabpanel" class="tab-pane active" id="preview"></div>\n    <div role="tabpanel" class="tab-pane" id="embed">\n      <iframe src="'+
-((__t=(model.get('preview_url') + 'embed.txt' ))==null?'':__t)+
-'" frameborder="0" width="100%"></iframe>\n    </div>\n    <div role="tabpanel" class="tab-pane" id="data">\n      <h4>Blueprint data:</h4>\n      <pre>'+
+'">Delete</button>\n</div></p>\n\n';
+ if ( model.get('status') === 'built' ) { 
+__p+='\n<div role="tabpanel">\n\n  <!-- Nav tabs -->\n  <ul class="nav nav-tabs" role="tablist">\n    <li role="presentation" class="active"><a\n      href="#preview" aria-controls="preview"\n      role="tab" data-toggle="tab">Preview</a></li>\n    <li role="presentation"><a\n      href="#embed" aria-controls="embed"\n      role="tab" data-toggle="tab">Embed</a></li>\n    ';
+ if (hasRole('superuser')) { 
+__p+='\n    <li role="presentation"><a\n      href="#data" aria-controls="data"\n      role="tab" data-toggle="tab">Data</a></li>\n    <li role="presentation"><a\n      href="#output" aria-controls="output"\n      role="tab" data-toggle="tab">Output</a></li>\n    ';
+ } 
+__p+='\n  </ul>\n\n  <!-- Tab panes -->\n  <div class="tab-content">\n    <div role="tabpanel" class="tab-pane active" id="preview"></div>\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    ';
+ if ( hasRole('superuser') ) { 
+__p+='\n    <div role="tabpanel" class="tab-pane" id="data">\n      <h4>Blueprint data:</h4>\n      <pre>'+
 ((__t=(JSON.stringify(model.get('data'), null, 2) ))==null?'':__t)+
 '</pre>\n    </div>\n    <div role="tabpanel" class="tab-pane" id="output">\n      <h4>Output from last build:</h4>\n      <pre>'+
 ((__t=(model.get('output') ))==null?'':__t)+
-'</pre>\n    </div>\n  </div>\n\n</div>\n';
+'</pre>\n    </div>\n    ';
+ } 
+__p+='\n  </div>\n\n</div>\n';
+ } else { 
+__p+='\n  ';
+ if ( model.hasStatus( 'broken' ) ) { 
+__p+='\n  <div class="jumbotron">\n    <p>This project failed to build properly. Please contact support.</p>\n  </div>\n  ';
+ } else if ( model.hasStatus( 'building', 'updating' ) ) { 
+__p+='\n  <div class="jumbotron">\n    <p>Please wait while the project is '+
+((__t=(model.get('status') ))==null?'':__t)+
+'</p>\n  </div>\n  ';
+ } else if ( model.hasStatus( 'new', 'updated' ) ) { 
+__p+='\n  <div class="jumbotron">\n    <p>The project is ready. Click \'Rebuild preview\' to see a preview here.</p>\n  </div>\n  ';
+ } 
+__p+='\n  ';
+ if ( hasRole( 'superuser' ) ) { 
+__p+='\n  <h3>Geeky stuff</h3>\n  <h4>Blueprint data:</h4>\n  <pre>'+
+((__t=(JSON.stringify(model.get('data'), null, 2) ))==null?'':__t)+
+'</pre>\n  <h4>Output from last build:</h4>\n  <pre>'+
+((__t=(model.get('output') ))==null?'':__t)+
+'</pre>\n  ';
+ } 
+__p+='\n';
+ } 
+__p+='\n';
 }
 return __p;
 };
@@ -30194,11 +30245,17 @@ var $ = require('jquery'),
 
 module.exports = FormView.extend({
   template: require('../templates/project.ejs'),
+
   afterRender: function() {
-    _.defer(_.bind(function() {
-      this.pymParent = new pym.Parent('preview', this.model.get('preview_url'), {});
-    }, this));
+    if( this.model.get('status') === 'built' ) {
+      _.defer(_.bind(function() {
+        this.pymParent = new pym.Parent('preview', this.model.get('preview_url'), {});
+        $.get(this.model.get('preview_url') + 'embed.txt',
+              function(data, status) { $('#embed textarea').text( data ); });
+      }, this));
+    }
   },
+
   handleUpdateAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),
@@ -30212,6 +30269,7 @@ module.exports = FormView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
+
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),
@@ -30225,6 +30283,7 @@ module.exports = FormView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
+
   handleBuildAndPublishAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),

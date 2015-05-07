@@ -13,6 +13,8 @@ function getEmptyJSON(url) {
 }
 
 exports.Project = Backbone.Model.extend({
+  urlRoot: '/projects',
+
   initialize: function(args) {
     if(_.isObject(args)) {
       if(_.isObject(args.blueprint)) {
@@ -24,6 +26,7 @@ exports.Project = Backbone.Model.extend({
       }
     }
   },
+
   url: function() {
     if(this.isNew()) { return this.urlRoot; }
     if(this.has('slug')) {
@@ -32,24 +35,35 @@ exports.Project = Backbone.Model.extend({
       return [this.urlRoot, this.id].join('/');
     }
   },
+
   build: function() {
     return getEmptyJSON(this.url() + '/build');
   },
+
   buildAndPublish: function() {
     return getEmptyJSON(this.url() + '/build_and_publish');
   },
+
   updateSnapshot: function() {
     return getEmptyJSON(this.url() + '/update_snapshot');
   },
+
   hasInstructions: function() {
     return this.blueprint && this.blueprint.get('config')['instructions'];
   },
+
   instructions: function() {
     if(this.hasInstructions()) {
       return markdown.toHTML(this.blueprint.get('config')['instructions']);
     }
   },
-  urlRoot: '/projects'
+
+  hasStatus: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'status' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
 });
 
 exports.ProjectCollection = Backbone.Collection.extend({
@@ -61,6 +75,7 @@ exports.Blueprint = Backbone.Model.extend({
   initialize: function() {
     this.projects = new exports.ProjectCollection([], { blueprint: this });
   },
+
   url: function() {
     if(this.isNew()) { return this.urlRoot; }
     if(this.attributes.slug) {
@@ -69,7 +84,16 @@ exports.Blueprint = Backbone.Model.extend({
       return [this.urlRoot, this.id].join('/');
     }
   },
+
+  hasStatus: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'status' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
   urlRoot: '/blueprints',
+
   updateRepo: function() {
     return getEmptyJSON(this.url() + '/update_repo');
   }

@@ -1,8 +1,8 @@
 <h3>
-  <%=model.get('title') %>
-  <% if(model.get('status') == 'built') { %>
+  <%=model.get( 'title' ) %>
+  <% if( model.hasStatus( 'built' ) ) { %>
   <span class="label label-success text-capitalize"><%=model.get('status') %></span></h4>
-  <% } else if(model.get('status') == 'broken') { %>
+  <% } else if ( model.get('status') == 'broken' ) { %>
   <span class="label label-danger text-capitalize"><%=model.get('status') %></span></h4>
   <% } else { %>
   <span class="label label-warning text-capitalize"><%=model.get('status') %></span></h4>
@@ -11,7 +11,7 @@
 <p><div class="btn-group" role="group" aria-label="project actions">
   <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
   <a class="btn btn-default" target="_blank"
-     <% if(model.get('status') != 'built') { %>disabled="true"<% } %>
+     <% if ( ! model.hasStatus( 'built' ) ) { %>disabled="true"<% } %>
      href="<%=model.get('preview_url') %>">Preview</a>
   <button type="button" class="btn btn-default"
           data-action="build" data-model="Project"
@@ -19,23 +19,26 @@
 </div>
 <div class="btn-group" role="group" aria-label="project actions">
   <a class="btn btn-default" target="_blank"
-     <% if(model.get('status') != 'built') { %>disabled="true"<% } %>
+     <% if ( ! model.hasStatus( 'built' ) ) { %>disabled="true"<% } %>
      href="<%=model.get('publish_url') %>">View</a>
   <button type="button" class="btn btn-default"
-          <% if(model.get('status') != 'built') { %>disabled="true"<% } %>
+          <% if ( ! model.hasStatus( 'built' ) ) { %>disabled="true"<% } %>
           data-action="build-and-publish" data-model="Project"
           data-model-id="<%=model.get('slug') %>">Publish</button>
 </div>
 <div class="btn-group" role="group" aria-label="project actions">
+  <% if ( hasRole( 'superuser' ) ) { %>
   <button type="button" class="btn btn-warning"
           data-action="update" data-model="Project"
           data-model-id="<%=model.get('slug') %>">Upgrade</button>
+  <% } %>
   <button type="button" class="btn btn-danger"
           data-action="delete" data-model="Project"
           data-next="/projects"
           data-model-id="<%=model.get('slug') %>">Delete</button>
 </div></p>
 
+<% if ( model.get('status') === 'built' ) { %>
 <div role="tabpanel">
 
   <!-- Nav tabs -->
@@ -46,20 +49,21 @@
     <li role="presentation"><a
       href="#embed" aria-controls="embed"
       role="tab" data-toggle="tab">Embed</a></li>
+    <% if (hasRole('superuser')) { %>
     <li role="presentation"><a
       href="#data" aria-controls="data"
       role="tab" data-toggle="tab">Data</a></li>
     <li role="presentation"><a
       href="#output" aria-controls="output"
       role="tab" data-toggle="tab">Output</a></li>
+    <% } %>
   </ul>
 
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="preview"></div>
-    <div role="tabpanel" class="tab-pane" id="embed">
-      <iframe src="<%=model.get('preview_url') + 'embed.txt' %>" frameborder="0" width="100%"></iframe>
-    </div>
+    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
+    <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="data">
       <h4>Blueprint data:</h4>
       <pre><%=JSON.stringify(model.get('data'), null, 2) %></pre>
@@ -68,6 +72,29 @@
       <h4>Output from last build:</h4>
       <pre><%=model.get('output') %></pre>
     </div>
+    <% } %>
   </div>
 
 </div>
+<% } else { %>
+  <% if ( model.hasStatus( 'broken' ) ) { %>
+  <div class="jumbotron">
+    <p>This project failed to build properly. Please contact support.</p>
+  </div>
+  <% } else if ( model.hasStatus( 'building', 'updating' ) ) { %>
+  <div class="jumbotron">
+    <p>Please wait while the project is <%=model.get('status') %></p>
+  </div>
+  <% } else if ( model.hasStatus( 'new', 'updated' ) ) { %>
+  <div class="jumbotron">
+    <p>The project is ready. Click 'Rebuild preview' to see a preview here.</p>
+  </div>
+  <% } %>
+  <% if ( hasRole( 'superuser' ) ) { %>
+  <h3>Geeky stuff</h3>
+  <h4>Blueprint data:</h4>
+  <pre><%=JSON.stringify(model.get('data'), null, 2) %></pre>
+  <h4>Output from last build:</h4>
+  <pre><%=model.get('output') %></pre>
+  <% } %>
+<% } %>

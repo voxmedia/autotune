@@ -9,11 +9,17 @@ var $ = require('jquery'),
 
 module.exports = FormView.extend({
   template: require('../templates/project.ejs'),
+
   afterRender: function() {
-    _.defer(_.bind(function() {
-      this.pymParent = new pym.Parent('preview', this.model.get('preview_url'), {});
-    }, this));
+    if( this.model.get('status') === 'built' ) {
+      _.defer(_.bind(function() {
+        this.pymParent = new pym.Parent('preview', this.model.get('preview_url'), {});
+        $.get(this.model.get('preview_url') + 'embed.txt',
+              function(data, status) { $('#embed textarea').text( data ); });
+      }, this));
+    }
   },
+
   handleUpdateAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),
@@ -27,6 +33,7 @@ module.exports = FormView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
+
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),
@@ -40,6 +47,7 @@ module.exports = FormView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
+
   handleBuildAndPublishAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),

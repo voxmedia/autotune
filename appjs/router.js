@@ -121,7 +121,7 @@ module.exports = Backbone.Router.extend({
   },
 
   showProject: function(slug) {
-    console.log("showProject");
+    this.app.debug("showProject");
     this.app.view.spinStart();
     var project = new models.Project({id: slug}),
         view = new views.ShowProject({ model: project, app: this.app });
@@ -138,12 +138,5 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
-  },
-
-  require_role: function(role) {
-    if (!_.contains(this.app.config.user.meta.roles, role)) {
-
-    }
   }
-
 });
