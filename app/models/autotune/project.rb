@@ -13,6 +13,8 @@ module Autotune
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
     before_validation :defaults
 
+    default_scope { order('created_at DESC') }
+
     search_fields :title
 
     def update_snapshot

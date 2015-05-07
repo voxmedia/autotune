@@ -17,6 +17,8 @@ module Autotune
 
     search_fields :title
 
+    default_scope { order('created_at DESC') }
+
     def thumb_url
       if config['thumbnail'] && !config['thumbnail'].empty?
         File.join(

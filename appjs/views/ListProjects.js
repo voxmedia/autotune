@@ -8,6 +8,7 @@ var $ = require('jquery'),
 
 module.exports = FormView.extend({
   template: require('../templates/project_list.ejs'),
+
   handleUpdateAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),
@@ -21,6 +22,7 @@ module.exports = FormView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
+
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),
