@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-05-06
+/*! autotune - v0.1.0 - 2015-05-07
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -246,8 +246,8 @@ module.exports = Backbone.Router.extend({
     this.app.debug("newProject");
     this.app.view.spinStart();
     var blueprint = new models.Blueprint({id: slug}),
-        project = new models.Project({ blueprint: blueprint }),
-        view = new views.EditProject({ model: project, app: this.app });
+        project = new models.Project({ blueprint: blueprint });
+    var view = new views.EditProject({ model: project, app: this.app });
     this.app.view.display( view );
     this.app.view.setTab('projects');
     blueprint.fetch();
@@ -28930,8 +28930,6 @@ module.exports = Backbone.View.extend({
   },
 
   initialize: function(options) {
-    this.hook('beforeInit', options);
-
     if (_.isObject(options)) {
       _.extend(this, options);
     }
@@ -29009,7 +29007,7 @@ module.exports = Backbone.View.extend({
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
-    console.log('hook ' + name);
+    this.app.debug('hook ' + name);
     if(_.isFunction(this[name])) {
       _.defer(
         function(view, args) {
@@ -29871,23 +29869,24 @@ var $ = require('jquery'),
 
 module.exports = FormView.extend({
   template: require('../templates/project_form.ejs'),
-  afterRender: function() {
-    if(_.isUndefined(this.model.blueprint) ||
-       this.model.blueprint.isNew() || !this.model.blueprint.has('config')) {
-      this.app.view.spinStart();
-      this.model.blueprint = new models.Blueprint({id: this.model.get('blueprint_id')});
-      this.model.blueprint.fetch()
-        .done(_.bind(function() {
-          this.renderForm();
-          this.app.view.spinStop();
-        }, this));
-    } else {
-      this.renderForm();
+
+  afterInit: function() {
+    if ( _.isUndefined(this.model.blueprint) ) {
+      if ( this.model.has('blueprint_id') ) {
+        this.model.blueprint = new models.Blueprint({id: this.model.get('blueprint_id')});
+      } else {
+        throw 'New projects need a blueprint id';
+      }
     }
+
+    this.listenTo(this.model.blueprint, 'sync', this.render);
+    this.listenTo(this.model.blueprint, 'error', this.handleSyncError);
   },
-  renderForm: function() {
+
+  afterRender: function() {
     var $form = this.$el.find('#projectForm'),
         form_config = this.model.blueprint.get('config').form;
+
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
     } else {

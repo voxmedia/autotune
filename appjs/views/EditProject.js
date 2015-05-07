@@ -8,23 +8,24 @@ var $ = require('jquery'),
 
 module.exports = FormView.extend({
   template: require('../templates/project_form.ejs'),
-  afterRender: function() {
-    if(_.isUndefined(this.model.blueprint) ||
-       this.model.blueprint.isNew() || !this.model.blueprint.has('config')) {
-      this.app.view.spinStart();
-      this.model.blueprint = new models.Blueprint({id: this.model.get('blueprint_id')});
-      this.model.blueprint.fetch()
-        .done(_.bind(function() {
-          this.renderForm();
-          this.app.view.spinStop();
-        }, this));
-    } else {
-      this.renderForm();
+
+  afterInit: function() {
+    if ( _.isUndefined(this.model.blueprint) ) {
+      if ( this.model.has('blueprint_id') ) {
+        this.model.blueprint = new models.Blueprint({id: this.model.get('blueprint_id')});
+      } else {
+        throw 'New projects need a blueprint id';
+      }
     }
+
+    this.listenTo(this.model.blueprint, 'sync', this.render);
+    this.listenTo(this.model.blueprint, 'error', this.handleSyncError);
   },
-  renderForm: function() {
+
+  afterRender: function() {
     var $form = this.$el.find('#projectForm'),
         form_config = this.model.blueprint.get('config').form;
+
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
     } else {
