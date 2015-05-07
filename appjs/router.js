@@ -133,7 +133,7 @@ module.exports = Backbone.Router.extend({
   editProject: function(slug) {
     this.app.debug("editProject");
     this.app.view.spinStart();
-    var project = new models.Project({id: slug}),
+    var project = new models.Project({ id: slug }),
         view = new views.EditProject({ model: project, app: this.app });
     this.app.view.display( view );
     this.app.view.setTab('projects');

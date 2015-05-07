@@ -290,7 +290,7 @@ module.exports = Backbone.Router.extend({
   editProject: function(slug) {
     this.app.debug("editProject");
     this.app.view.spinStart();
-    var project = new models.Project({id: slug}),
+    var project = new models.Project({ id: slug }),
         view = new views.EditProject({ model: project, app: this.app });
     this.app.view.display( view );
     this.app.view.setTab('projects');
@@ -29922,19 +29922,34 @@ module.exports = FormView.extend({
   template: require('../templates/project_form.ejs'),
 
   afterInit: function() {
-    if ( _.isUndefined(this.model.blueprint) ) {
-      if ( this.model.has('blueprint_id') ) {
-        this.model.blueprint = new models.Blueprint({id: this.model.get('blueprint_id')});
-      } else {
-        throw 'New projects need a blueprint id';
-      }
-    }
-
-    this.listenTo(this.model.blueprint, 'sync', this.render);
-    this.listenTo(this.model.blueprint, 'error', this.handleSyncError);
+    this.setupBlueprint();
   },
 
   afterRender: function() {
+    if ( _.isUndefined( this.model.blueprint ) ) {
+      this.setupBlueprint();
+    }
+
+    if( ! this.model.blueprint.has('config') ) {
+      this.app.view.spinStart();
+      this.model.blueprint.fetch();
+    } else {
+      this.renderForm();
+    }
+  },
+
+  setupBlueprint: function() {
+    if ( _.isUndefined(this.model.blueprint) && this.model.has('blueprint_id') ) {
+      this.model.blueprint = new models.Blueprint({ id: this.model.get('blueprint_id') });
+    }
+
+    if ( _.isObject( this.model.blueprint ) ) {
+      this.listenTo(this.model.blueprint, 'sync', this.render);
+      this.listenTo(this.model.blueprint, 'error', this.handleSyncError);
+    }
+  },
+
+  renderForm: function() {
     var $form = this.$el.find('#projectForm'),
         form_config = this.model.blueprint.get('config').form;
 
