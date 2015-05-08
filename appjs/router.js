@@ -19,12 +19,12 @@ module.exports = Backbone.Router.extend({
     $('body').empty().append(this.app.view.$el);
 
     this.app.dataToRefresh = null;
+    this.app.dataQuery = null;
     
     var source = new EventSource('changemessages');
-
     source.addEventListener('change', function(e) {
        if(app.dataToRefresh){
-          app.dataToRefresh.fetch();
+          app.dataToRefresh.fetch({data: query});
       }
     }, false);
   },
@@ -54,6 +54,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.setTab('blueprints');
     blueprints.fetch({data: query});
     this.app.dataToRefresh = blueprints;
+    this.app.dataQuery = query;
   },
 
   newBlueprint: function() {
@@ -75,6 +76,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.setTab('blueprints');
     blueprint.fetch();
     this.app.dataToRefresh = blueprint;
+    this.app.dataQuery = {};
   },
 
   editBlueprint: function(slug) {
@@ -124,6 +126,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.setTab('projects');
     projects.fetch({data: query});
     this.app.dataToRefresh = projects;
+    this.app.dataQuery = query;
   },
 
   newProject: function(slug) {
@@ -147,6 +150,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.setTab('projects');
     project.fetch();
     this.app.dataToRefresh = project;
+    this.app.dataQuery = {};
   },
 
   editProject: function(slug) {
