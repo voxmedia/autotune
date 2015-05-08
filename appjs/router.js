@@ -21,13 +21,13 @@ module.exports = Backbone.Router.extend({
     this.app.dataToRefresh = null;
     this.app.dataQuery = null;
 
-    if ( window.EventSource ) {
+   if ( window.EventSource ) {
       var source = new window.EventSource('changemessages');
-      source.addEventListener('change', function(e) {
-         if(this.app.dataToRefresh){
-            this.app.dataToRefresh.fetch({data: this.app.dataQuery});
+      source.addEventListener('change', _.bind(function(e) {
+         if(options.app.dataToRefresh){
+            options.app.dataToRefresh.fetch({data: options.app.dataQuery});
         }
-      }, false);
+      }, this), false);
     }
 
     $('body').prepend(this.app.view.$el);
