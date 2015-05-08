@@ -66,6 +66,7 @@ module Autotune
     end
 
     def role?(*args)
+      return false if meta.nil? || meta['roles'].nil?
       args.reduce(false) { |a, e| a || meta['roles'].include?(e.to_s) }
     end
 
