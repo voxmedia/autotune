@@ -36,14 +36,26 @@ _.extend(window.App.prototype, {
   isDev: function() {
     return this.config.env === 'development';
   },
+
   log: function() {
     console.log.apply(console, arguments);
   },
+
   debug: function() {
     if (this.isDev()) { console.debug.apply(console, arguments); }
   },
+
   error: function() {
     console.error.apply(console, arguments);
+  },
+
+  analyticsEvent: function() {
+    if ( window.ga ) {
+      var ga = window.ga;
+      if ( arguments[0] === 'pageview' ) {
+        ga('send', 'pageview');
+      }
+    }
   }
 });
 
@@ -170,20 +182,24 @@ module.exports = Backbone.Router.extend({
     this.app = options.app;
     this.app.debug("Init router");
 
+    this.on("route", this.everyRoute);
+
     this.app.view = this.app.view = new views.Application({ app: this.app });
     this.app.view.render();
 
-    $('body').empty().append(this.app.view.$el);
-
     this.app.dataToRefresh = null;
     this.app.dataQuery = null;
-    
-    var source = new EventSource('changemessages');
-    source.addEventListener('change', function(e) {
-       if(app.dataToRefresh){
-          app.dataToRefresh.fetch({data: app.dataQuery});
-      }
-    }, false);
+
+    if ( window.EventSource ) {
+      var source = new window.EventSource('changemessages');
+      source.addEventListener('change', function(e) {
+         if(this.app.dataToRefresh){
+            this.app.dataToRefresh.fetch({data: this.app.dataQuery});
+        }
+      }, false);
+    }
+
+    $('body').prepend(this.app.view.$el);
   },
 
   routes: {
@@ -200,9 +216,18 @@ module.exports = Backbone.Router.extend({
     "projects/:slug/edit": "editProject"
   },
 
-  listBlueprints: function(params) {
-    this.app.debug("listBlueprints", params);
+  // This is called for every route
+  everyRoute: function(route, params) {
     this.app.view.spinStart();
+    this.app.analyticsEvent( 'pageview' );
+    if ( params ) {
+      this.app.debug(route, params);
+    } else {
+      this.app.debug(route);
+    }
+  },
+
+  listBlueprints: function(params) {
     var blueprints = this.blueprints = new models.BlueprintCollection(),
         query = {}, view;
     if(params) { query = queryString.parse(params); }
@@ -215,7 +240,6 @@ module.exports = Backbone.Router.extend({
   },
 
   newBlueprint: function() {
-    this.app.debug("newBlueprint");
     var blueprint = new models.Blueprint(),
         view = new views.EditBlueprint({ model: blueprint, app: this.app });
     this.app.view.display( view );
@@ -225,7 +249,6 @@ module.exports = Backbone.Router.extend({
   },
 
   showBlueprint: function(slug) {
-    this.app.debug("showBlueprint");
     this.app.view.spinStart();
     var blueprint = new models.Blueprint({id: slug}),
         view = new views.ShowBlueprint({ model: blueprint, app: this.app });
@@ -237,7 +260,6 @@ module.exports = Backbone.Router.extend({
   },
 
   editBlueprint: function(slug) {
-    this.app.debug("editBlueprint");
     this.app.view.spinStart();
     var blueprint = new models.Blueprint({id: slug}),
         view = new views.EditBlueprint({ model: blueprint, app: this.app });
@@ -248,7 +270,6 @@ module.exports = Backbone.Router.extend({
   },
 
   chooseBlueprint: function(params) {
-    this.app.debug("chooseBlueprint");
     this.app.view.spinStart();
     var blueprints = new models.BlueprintCollection(),
         query = {}, view;
@@ -262,7 +283,6 @@ module.exports = Backbone.Router.extend({
   },
 
   blueprintBuilder: function(slug) {
-    this.app.debug("blueprintBuilder");
     this.app.view.spinStart();
     var blueprint = new models.Blueprint({id: slug}),
         view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
@@ -273,7 +293,6 @@ module.exports = Backbone.Router.extend({
   },
 
   listProjects: function(params) {
-    this.app.debug("listProjects");
     this.app.view.spinStart();
     var projects = new models.ProjectCollection(),
         query = {}, view;
@@ -287,7 +306,6 @@ module.exports = Backbone.Router.extend({
   },
 
   newProject: function(slug) {
-    this.app.debug("newProject");
     this.app.view.spinStart();
     var blueprint = new models.Blueprint({id: slug}),
         project = new models.Project({ blueprint: blueprint }),
@@ -299,7 +317,6 @@ module.exports = Backbone.Router.extend({
   },
 
   showProject: function(slug) {
-    this.app.debug("showProject");
     this.app.view.spinStart();
     var project = new models.Project({id: slug}),
         view = new views.ShowProject({ model: project, app: this.app });
@@ -311,7 +328,6 @@ module.exports = Backbone.Router.extend({
   },
 
   editProject: function(slug) {
-    this.app.debug("editProject");
     this.app.view.spinStart();
     var project = new models.Project({ id: slug }),
         view = new views.EditProject({ model: project, app: this.app });
