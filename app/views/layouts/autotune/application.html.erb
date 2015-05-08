@@ -4,20 +4,20 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="">
-  <meta name="author" content="">
 
   <title>Autotune</title>
 
   <!-- Bootstrap core CSS -->
   <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 
-  <%= stylesheet_link_tag 'autotune/application', media: 'all' %>
-  <%= stylesheet_link_tag 'alpaca' %>
-  <%= javascript_include_tag 'autotune/application' %>
-  <%= csrf_meta_tags %>
+  <%=stylesheet_link_tag 'autotune/application', media: 'all' %>
+  <%=stylesheet_link_tag 'alpaca' %>
+  <%=javascript_include_tag 'autotune/application' %>
+  <%=render 'autotune/head_bottom' %>
 </head>
 <body>
+<%=render 'autotune/body_top' %>
 <%= yield %>
+<%=render 'autotune/body_bottom' %>
 </body>
 </html>

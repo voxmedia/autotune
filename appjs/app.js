@@ -31,13 +31,25 @@ _.extend(window.App.prototype, {
   isDev: function() {
     return this.config.env === 'development';
   },
+
   log: function() {
     console.log.apply(console, arguments);
   },
+
   debug: function() {
     if (this.isDev()) { console.debug.apply(console, arguments); }
   },
+
   error: function() {
     console.error.apply(console, arguments);
+  },
+
+  analyticsEvent: function() {
+    if ( window.ga ) {
+      var ga = window.ga;
+      if ( arguments[0] === 'pageview' ) {
+        ga('send', 'pageview');
+      }
+    }
   }
 });
