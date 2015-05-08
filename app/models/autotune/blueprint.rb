@@ -1,5 +1,6 @@
 require 'uri'
 require 'work_dir'
+require 'redis'
 
 module Autotune
   # Blueprint
@@ -14,6 +15,7 @@ module Autotune
     validates :title, :repo_url, :presence => true
     validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
     after_initialize :defaults
+    after_save :pub_to_redis
 
     search_fields :title
 
@@ -62,6 +64,12 @@ module Autotune
     def defaults
       self.status ||= 'new'
       self.type ||= 'app'
+    end
+
+    def pub_to_redis
+      msg = { id: id,
+        status: status }
+      $redis.publish 'blueprints', msg.to_json
     end
   end
 end

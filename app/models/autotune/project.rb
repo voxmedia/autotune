@@ -1,3 +1,5 @@
+require 'redis'
+
 module Autotune
   # Blueprints get built
   class Project < ActiveRecord::Base
@@ -13,6 +15,8 @@ module Autotune
     before_validation :defaults
 
     search_fields :title
+
+    after_save :pub_to_redis
 
     def update_snapshot
       update(:status => 'updating')
@@ -54,6 +58,12 @@ module Autotune
       self.status ||= 'new'
       self.theme ||= 'default'
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
+    end
+
+    def pub_to_redis
+      msg = { id: id,
+        status: status }
+      $redis.publish 'projects', msg.to_json
     end
   end
 end
