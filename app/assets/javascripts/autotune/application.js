@@ -1,4 +1,4 @@
-/*! autotune - v0.1.0 - 2015-05-06
+/*! autotune - v0.1.0 - 2015-05-08
 * https://github.com/voxmedia/autotune
 * Copyright (c) 2015 Ryan Mark; Licensed BSD */
 
@@ -150,6 +150,16 @@ module.exports = Backbone.Router.extend({
     this.app.view.render();
 
     $('body').empty().append(this.app.view.$el);
+
+    this.app.dataToRefresh = null;
+    
+    var source = new EventSource('changemessages');
+
+    source.addEventListener('change', function(e) {
+       if(app.dataToRefresh){
+          app.dataToRefresh.fetch();
+      }
+    }, false);
   },
 
   routes: {
@@ -176,6 +186,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprints.fetch({data: query});
+    this.app.dataToRefresh = blueprints;
   },
 
   newBlueprint: function() {
@@ -185,6 +196,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     view.render();
+    this.app.dataToRefresh = null;
   },
 
   showBlueprint: function(slug) {
@@ -195,6 +207,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprint.fetch();
+    this.app.dataToRefresh = blueprint;
   },
 
   editBlueprint: function(slug) {
@@ -205,6 +218,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprint.fetch();
+    this.app.dataToRefresh = null;
   },
 
   chooseBlueprint: function(params) {
@@ -218,6 +232,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     blueprints.fetch({data: query});
+    this.app.dataToRefresh = null;
   },
 
   blueprintBuilder: function(slug) {
@@ -228,6 +243,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprint.fetch();
+    this.app.dataToRefresh = null;
   },
 
   listProjects: function(params) {
@@ -240,6 +256,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     projects.fetch({data: query});
+    this.app.dataToRefresh = projects;
   },
 
   newProject: function(slug) {
@@ -251,6 +268,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     blueprint.fetch();
+    this.app.dataToRefresh = null;
   },
 
   showProject: function(slug) {
@@ -261,6 +279,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
+    this.app.dataToRefresh = project;
   },
 
   editProject: function(slug) {
@@ -271,6 +290,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
+    this.app.dataToRefresh = null;
   },
 
   require_role: function(role) {
