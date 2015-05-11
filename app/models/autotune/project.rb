@@ -64,11 +64,10 @@ module Autotune
     end
 
     def pub_to_redis
-       if(!$redis.nil?)
-        msg = { id: id,
-          status: status }
-        $redis.publish 'projects', msg.to_json
-      end
+      return if $redis.nil?
+      msg = { id: id,
+              status: status }
+      $redis.publish 'projects', msg.to_json
     end
   end
 end
