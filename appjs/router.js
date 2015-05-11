@@ -21,6 +21,7 @@ module.exports = Backbone.Router.extend({
     this.app.dataToRefresh = null;
     this.app.dataQuery = null;
 
+   /*
    if ( window.EventSource ) {
       var source = new window.EventSource('changemessages');
       source.addEventListener('change', _.bind(function(e) {
@@ -29,6 +30,7 @@ module.exports = Backbone.Router.extend({
         }
       }, this), false);
     }
+    */
 
     $('body').prepend(this.app.view.$el);
   },
