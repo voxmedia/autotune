@@ -49,6 +49,7 @@ module Autotune
 
     def update
       @project = instance
+      @project.user = current_user if @project.user.nil?
       @project.attributes = select_from_post :title, :slug, :theme, :data
       if @project.valid?
         @project.save
