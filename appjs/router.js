@@ -23,7 +23,7 @@ module.exports = Backbone.Router.extend({
 
     if ( window.EventSource ) {
       this.app.debug('Init server event listener');
-      var source = new window.EventSource('changemessages');
+      var source = new window.EventSource('/changemessages');
       source.addEventListener('change', _.bind(function(e) {
          if(this.app.dataToRefresh){
             this.app.debug('server event; updating data');
