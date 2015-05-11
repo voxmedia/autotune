@@ -21,8 +21,8 @@ module.exports = Backbone.Router.extend({
     this.app.dataToRefresh = null;
     this.app.dataQuery = null;
 
-   /*
-   if ( window.EventSource ) {
+    /*
+    if ( window.EventSource ) {
       var source = new window.EventSource('changemessages');
       source.addEventListener('change', _.bind(function(e) {
          if(this.app.dataToRefresh){

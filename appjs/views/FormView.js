@@ -24,6 +24,8 @@ module.exports = BaseView.extend({
     eve.preventDefault();
     eve.stopPropagation();
 
+    this.app.debug('handleForm');
+
     var inst, Model,
         $form = $(eve.currentTarget),
         values = this.formValues($form),
@@ -51,6 +53,8 @@ module.exports = BaseView.extend({
 
     inst.set(values);
     if(!inst.isValid()) { return this.render(); }
+
+    this.app.debug('form is valid, saving...');
 
     inst.save()
       .done(_.bind(function() {
@@ -119,8 +123,7 @@ module.exports = BaseView.extend({
     } else {
       this.error('Something bad happened... Please reload and try again');
     }
-    console.log("REQUEST FAILED!!");
-    console.log(xhr, status, error);
+    this.app.error("REQUEST FAILED!!", xhr, status, error);
   },
 
   submitForm: function(eve) {

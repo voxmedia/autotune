@@ -29,7 +29,7 @@ window.App = function(config) {
 
 _.extend(window.App.prototype, {
   isDev: function() {
-    return this.config.env === 'development';
+    return this.config.env === 'development' || this.config.env === 'staging';
   },
 
   log: function() {
