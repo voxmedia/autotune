@@ -7,6 +7,7 @@ module Autotune
     include Searchable
     include WorkingDir
     serialize :data, Hash
+    serialize :blueprint_config, Hash
     belongs_to :blueprint
     belongs_to :user
 
@@ -15,15 +16,19 @@ module Autotune
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
     before_validation :defaults
 
-    default_scope { order('created_at DESC') }
+    default_scope { order('updated_at DESC') }
 
     search_fields :title
 
     after_save :pub_to_redis
 
     def update_snapshot
-      update(:status => 'updating')
-      SyncProjectJob.perform_later(self)
+      return if blueprint_version == blueprint.version
+      update!(
+        :status => 'building',
+        :blueprint_version => blueprint.version,
+        :blueprint_config => blueprint.config)
+      BuildJob.perform_later(self, 'preview', true)
     rescue
       update!(:status => 'broken')
       raise
@@ -61,6 +66,7 @@ module Autotune
       self.status ||= 'new'
       self.theme ||= 'default'
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
+      self.blueprint_config ||= blueprint.config unless blueprint.nil?
     end
 
     def pub_to_redis

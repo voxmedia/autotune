@@ -69,12 +69,17 @@ module WorkDir
       return false unless python?
       working_dir do
         cmd 'virtualenv', '.virtualenv'
-        cmd '.virtualenv/bin/pip', '-r', 'requirements.txt'
+        cmd './.virtualenv/bin/pip', '-r', 'requirements.txt'
       end
     end
 
     # Setup a node environment
-    def setup_node_environment; end
+    def setup_node_environment
+      return false unless node?
+      working_dir do
+        cmd 'npm', 'install'
+      end
+    end
 
     # Wrapper around Open3.capture2e
     def cmd(*args, **opts, &block)
@@ -82,7 +87,7 @@ module WorkDir
       WorkDir.logger.debug((@env.map { |k, v| "#{k}=#{v}" } + args).join(' '))
       out, status = Open3.capture2e(@env, *args, **opts, &block)
       return out if status.success?
-      raise CommandError, out
+      raise CommandError, "#{args.join(' ')}\n#{out}"
     end
 
     # expand a local path for this working directory

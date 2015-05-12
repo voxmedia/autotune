@@ -19,7 +19,7 @@ module Autotune
 
     search_fields :title
 
-    default_scope { order('created_at DESC') }
+    default_scope { order('updated_at DESC') }
 
     def thumb_url
       if config['thumbnail'] && !config['thumbnail'].empty?
@@ -32,7 +32,7 @@ module Autotune
     end
 
     def installed?
-      %w(updating testing ready).include? status
+      updating? || ready? || testing?
     end
 
     def updating?

@@ -13,11 +13,10 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      Autotune::SyncBlueprintJob.perform_later b.blueprint
       Autotune::BuildJob.perform_later b
     end
 
-    assert_performed_jobs 2
+    assert_performed_jobs 1
 
     b.reload
 

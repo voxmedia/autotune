@@ -37,9 +37,28 @@ module WorkDir
 
     # Get the current commit hash
     def commit_hash(branch_or_tag = nil)
-      git 'rev-parse', branch_or_tag || 'HEAD'
+      version = 'HEAD'
+      working_dir do
+        version = git 'rev-parse', branch_or_tag || 'head'
+      end
+      version.strip
     end
     alias_method :version, :commit_hash
+
+    # Get a tar archive of the repo as a string
+    def archive(branch_or_tag = nil)
+      working_dir do
+        git 'archive', branch_or_tag || 'HEAD', :binmode => true
+      end
+    end
+
+    # Extract an archive to a destination working dir object
+    def export_to(dest, branch_or_tag = nil)
+      FileUtils.mkdir_p(dest.working_dir)
+      dest.working_dir do
+        cmd 'tar', '-x', :stdin_data => archive(branch_or_tag), :binmode => true
+      end
+    end
 
     private
 
