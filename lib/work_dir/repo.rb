@@ -39,7 +39,7 @@ module WorkDir
     def commit_hash(branch_or_tag = nil)
       version = 'HEAD'
       working_dir do
-        version = git 'rev-parse', branch_or_tag || 'head'
+        version = git 'rev-parse', branch_or_tag || 'HEAD'
       end
       version.strip
     end
