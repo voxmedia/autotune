@@ -6,6 +6,9 @@ module Autotune
     # Make sure we load jbuilder for views
     require 'jbuilder'
 
+    # Bootstrap for css
+    require 'bootstrap-sass'
+
     initializer 'autotune.init', :before => :load_config_initializers do |app|
       app.config.autotune = Config.new
       # Figure out where we project our blueprints

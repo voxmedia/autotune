@@ -22,6 +22,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'resque', '~> 1.25.2'
   s.add_dependency 'jbuilder', '~> 2.0'
   s.add_dependency 's3deploy', '~> 0.2'
+  s.add_dependency 'bootstrap-sass', '~> 3.3.4'
+  s.add_dependency 'sass-rails', '>= 3.2'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'pry-rails'
