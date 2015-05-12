@@ -18,7 +18,8 @@ module Autotune
     end
 
     test 'search blueprints' do
-      assert_equal 1, Blueprint.search('Example').count
+      assert_equal 2, Blueprint.search('Example').count
+      assert_equal 1, Blueprint.search('two').count
       assert_equal 0, Blueprint.search('foo').count
     end
 
