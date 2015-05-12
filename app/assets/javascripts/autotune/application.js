@@ -92,9 +92,9 @@ exports.Project = Backbone.Model.extend({
     if(this.isNew()) { return this.urlRoot; }
     // if slug has changed then use id to generate url
     if(this.hasChanged('slug')){
-      return [this.urlRoot, this.get('id')].join('/');
+      return [this.urlRoot, this.id].join('/');
     }
-    if(this.has('slug')) {      
+    if(this.has('slug')) {
       return [this.urlRoot, this.get('slug')].join('/');
     } else {
       return [this.urlRoot, this.id].join('/');
