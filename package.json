@@ -29,20 +29,20 @@
     "test": "grunt nodeunit"
   },
   "devDependencies": {
-    "backbone": "~1.1.2",
-    "bootstrap": "~3.2.0",
-    "browserify": "~5.12.1",
-    "browserify-shim": "~3.8.0",
-    "grunt": "~0.4.5",
-    "grunt-browserify": "^3.4.0",
-    "grunt-contrib-jshint": "~0.11.0",
-    "grunt-contrib-watch": "~0.6.1",
-    "grunt-notify": "^0.4.1",
-    "handlebars": "^1.3.0",
-    "jquery": "~2.1.1",
-    "node-underscorify": "~0.0.14",
-    "underscore": "~1.7.0",
-    "underscore.string": "~3.0.3"
+    "backbone": "1.1.2",
+    "bootstrap": "3.2.0",
+    "browserify": "5.12.1",
+    "browserify-shim": "3.8.0",
+    "grunt": "0.4.5",
+    "grunt-browserify": "3.4.0",
+    "grunt-contrib-jshint": "0.11.0",
+    "grunt-contrib-watch": "0.6.1",
+    "grunt-notify": "0.4.1",
+    "handlebars": "1.3.0",
+    "jquery": "2.1.1",
+    "node-underscorify": "0.0.14",
+    "underscore": "1.7.0",
+    "underscore.string": "3.0.3"
   },
   "browser": {
     "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js"
