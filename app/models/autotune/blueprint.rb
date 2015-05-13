@@ -8,7 +8,7 @@ module Autotune
     include Slugged
     include Searchable
     include WorkingDir
-    serialize :config, Hash
+    serialize :config, JSON
     has_many :blueprint_tags
     has_many :tags, :through => :blueprint_tags
 
@@ -66,6 +66,7 @@ module Autotune
     def defaults
       self.status ||= 'new'
       self.type ||= 'app'
+      self.config ||= {}
     end
 
     def pub_to_redis

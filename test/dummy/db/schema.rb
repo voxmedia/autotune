@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511214129) do
+ActiveRecord::Schema.define(version: 20150512141546) do
 
   create_table "autotune_authorizations", force: :cascade do |t|
     t.integer  "user_id"
@@ -67,6 +67,8 @@ ActiveRecord::Schema.define(version: 20150511214129) do
     t.datetime "updated_at",        null: false
     t.integer  "user_id"
     t.text     "blueprint_config"
+    t.datetime "published_at"
+    t.datetime "data_updated_at"
   end
 
   add_index "autotune_projects", ["blueprint_id"], name: "index_autotune_projects_on_blueprint_id"

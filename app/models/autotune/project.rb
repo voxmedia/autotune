@@ -6,8 +6,8 @@ module Autotune
     include Slugged
     include Searchable
     include WorkingDir
-    serialize :data, Hash
-    serialize :blueprint_config, Hash
+    serialize :data, JSON
+    serialize :blueprint_config, JSON
     belongs_to :blueprint
     belongs_to :user
 
@@ -20,7 +20,21 @@ module Autotune
 
     search_fields :title
 
+    before_save :check_for_updated_data
+
     after_save :pub_to_redis
+
+    def draft?
+      published_at.nil?
+    end
+
+    def published?
+      !draft?
+    end
+
+    def unpublished_updates?
+      published? && published_at < data_updated_at
+    end
 
     def update_snapshot
       return if blueprint_version == blueprint.version
@@ -65,8 +79,13 @@ module Autotune
     def defaults
       self.status ||= 'new'
       self.theme ||= 'default'
+      # self.data ||= {}  # seems to mess up check_for_updated_data
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
       self.blueprint_config ||= blueprint.config unless blueprint.nil?
+    end
+
+    def check_for_updated_data
+      self.data_updated_at = DateTime.current if data_changed?
     end
 
     def pub_to_redis

@@ -4,3 +4,8 @@ example:
   slug: example-blueprint
   title: Example blueprint
   repo_url: https://github.com/voxmedia/autotune-example-blueprint.git
+
+example_two:
+  slug: example-blueprint-two
+  title: Example blueprint two
+  repo_url: https://github.com/voxmedia/autotune-example-blueprint.git

@@ -1,4 +1,5 @@
 require 'work_dir'
+require 'date'
 
 module Autotune
   # project a blueprint
@@ -31,13 +32,17 @@ module Autotune
       if mode == 'publish'
         ws.deploy(File.join(
           Rails.configuration.autotune.publish[:connect], project.slug))
+
+        # Save the results
+        project.update!(
+          :output => out, :status => 'built', :published_at => DateTime.current)
       else
         ws.deploy(File.join(
           Rails.configuration.autotune.preview[:connect], project.slug))
-      end
 
-      # Save the results
-      project.update!(:output => out, :status => 'built')
+        # Save the results
+        project.update!(:output => out, :status => 'built')
+      end
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
