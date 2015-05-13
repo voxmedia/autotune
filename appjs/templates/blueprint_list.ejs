@@ -56,7 +56,8 @@
   </thead>
   <tbody>
     <tr class="m-table-heading">
-    <td colspan="2">Blueprint</td>
+    <td>Blueprint</td>
+    <td>Status</td>
     <td class="text-right" colspan="2">Bold Actions</td>
   </tr>
   <% if(collection.models.length == 0) { %>
@@ -65,14 +66,16 @@
   _.each(collection.models, function(item) { %>
   <tr>
     <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
-    <td class="text-right">
-    <% if(item.get('status') == 'ready') { %>
+    <td>
+      <% if(item.get('status') == 'ready') { %>
       <span class="label label-success text-capitalize"><%=item.get('status') %></span>
-    <% } else if(item.get('status') == 'broken') { %>
-      <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
-    <% } else { %>
-      <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
-    <% } %>
+      <% } else if(item.get('status') == 'broken') { %>
+        <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
+      <% } else { %>
+        <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
+      <% } %>
+    </td>
+    <td class="text-right" colspan="2">
       <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">
         <a class="btn btn-default" href="<%=item.url() %>/edit">Edit</a>
         <button type="button" class="btn btn-default"

@@ -597,7 +597,7 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n          ';
  }) 
-__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n    <td colspan="2">Blueprint</td>\n    <td class="text-right" colspan="2">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n    <td>Blueprint</td>\n    <td>Status</td>\n    <td class="text-right" colspan="2">Bold Actions</td>\n  </tr>\n  ';
  if(collection.models.length == 0) { 
 __p+='\n      <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>\n  ';
  }
@@ -606,21 +606,21 @@ __p+='\n  <tr>\n    <td><a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
 ((__t=( item.attributes.title ))==null?'':__t)+
-'</a></td>\n    <td class="text-right">\n    ';
+'</a></td>\n    <td>\n      ';
  if(item.get('status') == 'ready') { 
 __p+='\n      <span class="label label-success text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span>\n    ';
+'</span>\n      ';
  } else if(item.get('status') == 'broken') { 
-__p+='\n      <span class="label label-danger text-capitalize">'+
+__p+='\n        <span class="label label-danger text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span></h4>\n    ';
+'</span></h4>\n      ';
  } else { 
-__p+='\n      <span class="label label-warning text-capitalize">'+
+__p+='\n        <span class="label label-warning text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span>\n    ';
+'</span>\n      ';
  } 
-__p+='\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
+__p+='\n    </td>\n    <td class="text-right" colspan="2">\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="update" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
