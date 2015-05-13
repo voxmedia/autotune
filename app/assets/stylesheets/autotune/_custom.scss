@@ -33,7 +33,6 @@ $bernino: "jaf-bernino-sans",sans-serif;
 }
 
 //nav
-
 $m : '.m-nav';
 
 #{$m} {
@@ -50,6 +49,9 @@ $m : '.m-nav';
   }
   .navbar-nav > li.active a:after {
     width: 100%;
+  }
+  .navbar-default .navbar-nav > .active > a:hover {
+    color: $grey;
   }
   .navbar-nav > li > a {
     padding: 16px 0 0;
@@ -76,6 +78,7 @@ $m : '.m-nav';
   }
 }
 
+//page headings
 $m : '.m-page-heading';
 
 #{$m} {
@@ -85,3 +88,15 @@ $m : '.m-page-heading';
     font-size: 31px;
   }
 }
+
+//tables
+.table {
+  thead {
+    background-color: $lightgrey;
+  }
+  tbody > tr:nth-of-type(even) {
+    background: $lightgrey;
+  }
+}
+
+
