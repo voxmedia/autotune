@@ -28993,7 +28993,9 @@ module.exports = BaseView.extend({
   },
 
   spinStop: function() {
-    this.$('#spinner').fadeOut('fast');
+    _.defer(_.bind(function() {
+      this.$('#spinner').fadeOut('fast');
+    }, this));
   },
 
   setTab: function(name) {
@@ -29992,7 +29994,13 @@ module.exports = FormView.extend({
 
   renderForm: function() {
     var $form = this.$el.find('#projectForm'),
-        form_config = this.model.blueprint.get('config').form;
+        form_config;
+
+    if ( this.model.isNew() ) {
+     form_config = this.model.blueprint.get('config').form;
+    } else {
+     form_config = this.model.get('blueprint_config').form;
+    }
 
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
