@@ -19,7 +19,9 @@ module.exports = BaseView.extend({
   },
 
   spinStop: function() {
-    this.$('#spinner').fadeOut('fast');
+    _.defer(_.bind(function() {
+      this.$('#spinner').fadeOut('fast');
+    }, this));
   },
 
   setTab: function(name) {
