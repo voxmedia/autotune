@@ -360,13 +360,13 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="row m-nav">\n  <div class="col-lg-8 col-lg-offset-2">\n    <nav class="navbar navbar-default" id="nav">\n      <div class="container-fluid">\n        <a class="navbar-brand" href="/">Autotune</a>\n        <ul class="nav navbar-nav">\n          <li data-tab="projects"><a href="/projects">Projects</a></li>\n          ';
+__p+='<div class="row m-nav">\n  <div class="col-lg-8 col-lg-offset-2">\n    <nav class="navbar navbar-default" id="nav">\n      <div class="container-fluid">\n        <a class="navbar-brand" href="/">Autotune</a>\n        <div class="navbar-text" id="spinner">\n            <img src="'+
+((__t=(app.config.spinner ))==null?'':__t)+
+'">\n        </div>\n        <ul class="nav navbar-nav">\n          <li data-tab="projects"><a href="/projects">Projects</a></li>\n          ';
  if (hasRole('superuser')) { 
 __p+='\n          <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>\n          ';
  } 
-__p+='\n        </ul>\n        <ul class="nav navbar-nav navbar-right">\n          <li><div class="navbar-text" id="spinner">\n            <img src="'+
-((__t=(app.config.spinner ))==null?'':__t)+
-'"></div></li>\n        </ul>\n      </div>\n    </nav>\n  </div>\n</div>\n<div class="row">\n  <div id="flash"></div>\n  <div class="col-lg-8 col-lg-offset-2" id="main"></div>\n</div>\n';
+__p+='\n        </ul>\n      </div>\n    </nav>\n  </div>\n</div>\n<div class="row">\n  <div id="flash"></div>\n  <div class="col-lg-8 col-lg-offset-2" id="main"></div>\n</div>\n';
 }
 return __p;
 };
@@ -545,7 +545,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/blueprints">clear</a>\n        ';
  } 
-__p+='\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td>\n        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>\n      </td>\n      <td class="text-right">\n        <form class="form-inline" method="get" action="/blueprints">\n          Filters\n          ';
+__p+='\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td colspan="2">\n        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>\n      </td>\n      <td class="text-right" colspan="2">\n        <form class="form-inline" method="get" action="/blueprints">\n          Filters\n          ';
  if(query.type || query.tag || query.status) { 
 __p+='\n            (<a href="/blueprints">clear</a>)\n          ';
  } 
@@ -597,9 +597,9 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n          ';
  }) 
-__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n';
+__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n    <td colspan="2">Blueprint</td>\n    <td class="text-right" colspan="2">Bold Actions</td>\n  </tr>\n  ';
  if(collection.models.length == 0) { 
-__p+='\n    <td class="text-center"><h4>No blueprints found</h4></td>\n';
+__p+='\n      <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>\n  ';
  }
   _.each(collection.models, function(item) { 
 __p+='\n  <tr>\n    <td><a href="'+
@@ -819,7 +819,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
-__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
+__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td colspan="2">\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="2">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
  if(query.theme || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
@@ -871,30 +871,30 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n          ';
  }) 
-__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n';
+__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Editorial Status</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(collection.models.length == 0) { 
-__p+='\n  <tr><td class="text-center"><h4>No projects found</h4></td></tr>\n';
+__p+='\n  <tr><td class="text-center" colspan="4"><h4>No projects found</h4></td></tr>\n  ';
  }
    _.each(collection.models, function(item) { 
 __p+='\n   <tr>\n    <td><a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
 ((__t=( item.get('title') ))==null?'':__t)+
-'</a></td>\n    <td class="text-right">\n    ';
+'</a></td>\n    <td>\n      ';
  if(item.get('status') == 'built') { 
 __p+='\n      <span class="label label-success text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span>\n    ';
+'</span>\n      ';
  } else if(item.get('status') == 'broken') { 
-__p+='\n      <span class="label label-danger text-capitalize">'+
+__p+='\n        <span class="label label-danger text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span></h4>\n    ';
+'</span></h4>\n      ';
  } else { 
-__p+='\n      <span class="label label-warning text-capitalize">'+
+__p+='\n        <span class="label label-warning text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span>\n    ';
+'</span>\n      ';
  } 
-__p+='\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
+__p+='\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="build" data-model="Project"\n                data-model-id="'+
 ((__t=( item.get('slug') ))==null?'':__t)+

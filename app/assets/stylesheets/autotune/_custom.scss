@@ -79,9 +79,7 @@ $m : '.m-nav';
 }
 
 //page headings
-$m : '.m-page-heading';
-
-#{$m} {
+.m-page-heading {
   padding: 50px 0;
   h3 {
     margin: 0;
@@ -90,6 +88,13 @@ $m : '.m-page-heading';
 }
 
 //tables
+.m-table-heading {
+  background-color: $darkgrey;
+}
+.table > tbody > tr.m-table-heading > td {
+  padding: 5px 15px;
+  color: #FFF;
+}
 .table {
   thead {
     background-color: $lightgrey;
