@@ -1,0 +1,36 @@
+//global
+body {
+  @extend .-bernino;
+}
+
+//buttons
+.btn {
+  border-bottom: 5px solid;
+}
+
+.btn-primary {
+  border: none;
+  border-bottom: 5px solid darken($primary, 20%);
+}
+
+.btn-xs, .btn-group-xs > .btn {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+//input
+.form-control {
+  @include box-shadow(none);
+  border: 2px solid $grey;
+  border-radius: 0;
+  color: $darkgrey;
+  &:focus {
+    @include box-shadow(none);
+  }
+}
+
+select {
+  -webkit-appearance: none;
+  -webkit-border-radius: 0px;
+}

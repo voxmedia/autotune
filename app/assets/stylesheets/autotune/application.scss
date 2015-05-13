@@ -3,8 +3,10 @@
  * the desired effect by adjusting the vars and the html structure first.
  */
 @import "bootstrap-sprockets";
+@import "custom";
 @import "vars";
 @import "bootstrap";
+@import "bootstrap-overrides";
 
 #spinner {
   width:20px;

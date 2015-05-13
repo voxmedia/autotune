@@ -1,0 +1,33 @@
+//VARS
+
+//color
+$black: #282828;
+$darkgrey: #3F3F3F;
+$grey: #CCC;
+$lightgrey: #F1F1F1;
+$primary: #048AAF;
+$green: #5CB85C; //success
+$orange: #FFA039; //info
+$red: #D9534F; //danger
+
+//type
+
+$bernino: "jaf-bernino-sans",sans-serif;
+
+.-bernino {
+  font-family: $bernino;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.-bernino-ital {
+  font-family: $bernino;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.-bernino-semibold {
+  font-family: $bernino;
+  font-style: normal;
+  font-weight: 600;
+}
