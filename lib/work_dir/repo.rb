@@ -30,11 +30,6 @@ module WorkDir
       git 'clone', '--recursive', repo_url, working_dir
     end
 
-    # Get the config data from this repo
-    def config
-      read WorkDir::BLUEPRINT_CONFIG_FILENAME
-    end
-
     # Get the current commit hash
     def commit_hash(branch_or_tag = nil)
       version = 'HEAD'

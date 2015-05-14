@@ -1,6 +1,5 @@
 require 'logger'
 require 'work_dir/base'
-require 'work_dir/snapshot'
 require 'work_dir/repo'
 require 'work_dir/website'
 
@@ -28,10 +27,6 @@ module WorkDir
 
     def new(*args)
       Base.new(*args)
-    end
-
-    def snapshot(*args)
-      Snapshot.new(*args)
     end
 
     def repo(*args)

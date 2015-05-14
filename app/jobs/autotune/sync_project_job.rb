@@ -1,30 +1,40 @@
 require 'work_dir'
 
 module Autotune
-  # Job that updates the snapshot
+  # Job that updates the project working dir
   class SyncProjectJob < ActiveJob::Base
     queue_as :default
 
     def perform(project)
       # Create a new repo object based on the blueprints working dir
-      repo = WorkDir.repo(project.blueprint.working_dir,
-                          Rails.configuration.autotune.setup_environment)
+      blueprint_dir = WorkDir.repo(
+        project.blueprint.working_dir,
+        Rails.configuration.autotune.setup_environment)
 
       # Make sure the blueprint exists
-      SyncBlueprintJob.perform_now(project.blueprint) unless repo.exist?
+      SyncBlueprintJob.perform_now(project.blueprint) unless blueprint_dir.exist?
 
-      # Create a new snapshot object based on the projects working dir
-      snapshot = WorkDir.snapshot(project.working_dir,
-                                  Rails.configuration.autotune.setup_environment)
+      # Create a new repo object based on the projects working dir
+      project_dir = WorkDir.repo(
+        project.working_dir,
+        Rails.configuration.autotune.setup_environment)
 
-      # use git archive to export a specific version to our snapshot
-      repo.export_to(snapshot, project.blueprint_version)
+      # copy the blueprint to the project working dir
+      blueprint_dir.copy_to(project_dir.working_dir)
 
-      # Make sure the environment is setup
-      snapshot.setup_environment
-
-      # update the status
-      project.update!(:status => 'updated')
+      if project_dir.commit_hash != project.blueprint_version
+        # checkout the right git version
+        project_dir.switch(project.blueprint_version)
+        # Make sure the environment is correct for this version
+        project_dir.setup_environment
+        # update the status
+        project.update!(
+          :status => 'updated',
+          :blueprint_config => project_dir.read(BLUEPRINT_CONFIG_FILENAME))
+      else
+        # update the status
+        project.update!(:status => 'updated')
+      end
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)

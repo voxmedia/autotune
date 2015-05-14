@@ -12,6 +12,9 @@ module Autotune
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
   ROLES = %w(author editor superuser)
 
+  BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
+  BLUEPRINT_BUILD_COMMAND = './autotune-build'
+
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :preview, :publish, :media,
                       :verify_omniauth, :git_ssh, :git_askpass)

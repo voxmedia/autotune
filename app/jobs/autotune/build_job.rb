@@ -8,12 +8,12 @@ module Autotune
 
     def perform(project, mode = 'preview', force_sync = false)
       out = nil
-      # Create a new snapshot object based on the projects working dir
-      snapshot = WorkDir.snapshot(project.working_dir,
-                                  Rails.configuration.autotune.build_environment)
+      # Create a new repo object based on the projects working dir
+      repo = WorkDir.repo(project.working_dir,
+                          Rails.configuration.autotune.build_environment)
 
-      # Make sure the snapshot exists and is up to date (if necessary)
-      SyncProjectJob.perform_now(project) if !snapshot.exist? || force_sync
+      # Make sure the repo exists and is up to date (if necessary)
+      SyncProjectJob.perform_now(project) if !repo.exist? || force_sync
 
       # Add a few extras to the build data
       build_data = project.data.dup
@@ -24,11 +24,13 @@ module Autotune
       end
 
       # Run the build
-      out = snapshot.build(build_data)
+      repo.working_dir do
+        out = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data)
+      end
 
       # Upload build
       deploy_dir = project.blueprint_config['deploy_dir'] || 'build'
-      ws = WorkDir.website(snapshot.expand(deploy_dir))
+      ws = WorkDir.website(repo.expand(deploy_dir))
       if mode == 'publish'
         ws.deploy(File.join(
           Rails.configuration.autotune.publish[:connect], project.slug))

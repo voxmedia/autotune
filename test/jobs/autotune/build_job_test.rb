@@ -26,9 +26,9 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
     assert File.exist?(Rails.root.join('public', 'preview', b.slug, 'index.html')),
            'Built file should be deployed to public/preview'
 
-    snapshot = WorkDir.snapshot(b.working_dir)
+    snapshot = WorkDir.repo(b.working_dir)
 
     assert snapshot.exist?, 'Snapshot should exist'
-    assert !snapshot.git?, 'Snapshot should not be a git repo'
+    assert snapshot.git?, 'Snapshot should be a git repo'
   end
 end

@@ -14,7 +14,7 @@ class Autotune::WorkDirTest < ActionDispatch::IntegrationTest
       assert !r.git?, "Shouldn't have git"
       assert !r.exist?, "Shouldn't exist"
       assert !r.dir?, "Shouldn't be a dir"
-      assert r.config.nil?, 'Should not have a config file'
+      assert r.read(Autotune::BLUEPRINT_CONFIG_FILENAME).nil?, 'Should not have a config file'
 
       # clone git url
       r.clone repo_url
@@ -26,7 +26,7 @@ class Autotune::WorkDirTest < ActionDispatch::IntegrationTest
       assert r.exist?, 'Should exist'
       assert r.dir?, 'Should be a dir'
 
-      assert r.config, 'Should have a config file'
+      assert r.read(Autotune::BLUEPRINT_CONFIG_FILENAME), 'Should have a config file'
 
       assert !r.environment?, 'Should not have an environment'
 
@@ -45,56 +45,6 @@ class Autotune::WorkDirTest < ActionDispatch::IntegrationTest
 
       # update bundle
       r.setup_environment
-    end
-  end
-
-  test 'snapshot' do
-    in_tmpdir do |rdir|
-      r = WorkDir.repo rdir
-      r.clone repo_url
-      r.setup_environment
-
-      in_tmpdir do |sdir|
-        s = WorkDir.snapshot sdir
-
-        # working dir is empty, so
-        assert !s.ruby?, "Shouldn't have ruby"
-        assert !s.python?, "Shouldn't have python"
-        assert !s.node?, "Shouldn't have node"
-        assert !s.git?, "Shouldn't have git"
-        assert !s.exist?, "Shouldn't exist"
-        assert !s.dir?, "Shouldn't be a dir"
-        assert !s.environment?, 'Should not have an environment'
-
-        # create a snapshot!
-        s.sync(r)
-
-        # now should have stuff
-        assert s.ruby?, 'Should have ruby'
-        assert !s.python?, "Shouldn't have python"
-        assert !s.node?, "Shouldn't have node"
-        assert !s.git?, 'Should not have git'
-        assert s.exist?, 'Should exist'
-        assert s.dir?, 'Should be a dir'
-        assert s.environment?, 'Should have environment'
-
-        s.build(:foo => 'bar')
-
-        # checkout a different branch in the repo
-        r.switch 'test'
-        assert r.exist?('testfile'), 'Should have a test file'
-
-        # update the snapshot
-        s.sync(r)
-        assert s.exist?('testfile'), 'Should have a test file'
-
-        # update the bundle
-        FileUtils.rm_rf(s.expand '.bundle')
-        assert !s.environment?, 'Should not have an environment'
-
-        s.setup_environment
-        assert s.environment?, 'Should have environment'
-      end
     end
   end
 

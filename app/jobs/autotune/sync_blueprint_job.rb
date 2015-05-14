@@ -22,7 +22,7 @@ module Autotune
       repo.setup_environment
 
       # Load the blueprint config file into the DB
-      blueprint.config = repo.config
+      blueprint.config = repo.read BLUEPRINT_CONFIG_FILENAME
 
       # look in the config for stuff like descriptions, sample images, tags
       blueprint.config['tags'].each do |t|
