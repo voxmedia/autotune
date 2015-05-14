@@ -43,9 +43,21 @@ $m : '.m-nav';
   .navbar-brand {
     @extend .-bernino-semibold;
     font-size: 37px;
-    padding: 5px 15px;
+    padding: 5px 0;
     height: auto;
     line-height: 1;
+    &:before {
+      content: "";
+      background-image: image-url('autotune/logo.png');
+      background-image: image-url('autotune/logo.svg');
+      background-size: 100%;
+      background-repeat: no-repeat;
+      display: inline-block;
+      height: 33px;
+      margin-bottom: -5px;
+      margin-right: 8px;
+      width: 30px;
+    }
   }
   .navbar-nav > li.active a:after {
     width: 100%;
