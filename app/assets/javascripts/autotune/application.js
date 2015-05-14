@@ -646,13 +646,19 @@ __p+='\n        <span class="label label-warning text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n      ';
  } 
-__p+='\n    </td>\n    <td class="text-right" colspan="2">\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
+__p+='\n    </td>\n    <td class="text-right" colspan="2">\n\n      <a data-tooltip="edit" href="'+
+((__t=(item.url() ))==null?'':__t)+
+'/edit" class="icon-edit"></a>\n      <a data-tooltip="update" href="#" class="icon-refresh" data-action="update" data-model="Blueprint"\n                data-model-id="'+
+((__t=( item.attributes.slug ))==null?'':__t)+
+'"></a>\n      <a data-tooltip="delete" href="#" class="icon-delete" data-action="delete" data-model="Blueprint"\n                data-model-id="'+
+((__t=( item.attributes.slug ))==null?'':__t)+
+'"></a>\n      <!-- to do: delete this after approval of above icons\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="update" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
 '">Update</button>\n        <button type="button" class="btn btn-danger"\n                data-action="delete" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
-'">Delete</button>\n      </div>\n    </td>\n  </tr>\n';
+'">Delete</button>\n      </div>\n      -->\n    </td>\n  </tr>\n';
  }); 
 __p+='\n  </tbody>\n</table>\n';
 }
@@ -920,7 +926,17 @@ __p+='\n        <span class="label label-warning text-capitalize">'+
 ((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n      ';
  } 
-__p+='\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
+__p+='\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">\n\n      <a data-tooltip="edit" class="icon-edit" href="'+
+((__t=(item.url() ))==null?'':__t)+
+'/edit"></a>\n      <a data-tooltip="preview" class="icon-preview" target="_blank" ';
+ if ( ! item.hasStatus( 'built' ) ) { 
+__p+='disabled="true"';
+ } 
+__p+=' href="'+
+((__t=(item.get('preview_url') ))==null?'':__t)+
+'"></a>\n      <a data-tooltip="delete" href="" class="icon-delete" data-action="delete" data-model="Project" data-model-id="'+
+((__t=( item.get('slug') ))==null?'':__t)+
+'"></a>\n      <!--  to do: delete this after approval of above icons\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="build" data-model="Project"\n                data-model-id="'+
 ((__t=( item.get('slug') ))==null?'':__t)+
@@ -928,7 +944,7 @@ __p+='\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">
 ((__t=( item.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n        <button type="button" class="btn btn-danger"\n                data-action="delete" data-model="Project"\n                data-model-id="'+
 ((__t=( item.get('slug') ))==null?'':__t)+
-'">Delete</button>\n      </div>\n    </td>\n  </tr>\n';
+'">Delete</button>\n      </div>\n      -->\n    </td>\n  </tr>\n';
  }); 
 __p+='\n  </tbody>\n</table>\n';
 }

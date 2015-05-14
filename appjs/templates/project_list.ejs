@@ -87,6 +87,11 @@
     </td>
     <td>Blueprint name here</td>
     <td class="text-right">
+
+      <a data-tooltip="edit" class="icon-edit" href="<%=item.url() %>/edit"></a>
+      <a data-tooltip="preview" class="icon-preview" target="_blank" <% if ( ! item.hasStatus( 'built' ) ) { %>disabled="true"<% } %> href="<%=item.get('preview_url') %>"></a>
+      <a data-tooltip="delete" href="" class="icon-delete" data-action="delete" data-model="Project" data-model-id="<%= item.get('slug') %>"></a>
+      <!--  to do: delete this after approval of above icons
       <div class="btn-group btn-group-sm" role="group" aria-label="project actions">
         <a class="btn btn-default" href="<%=item.url() %>/edit">Edit</a>
         <button type="button" class="btn btn-default"
@@ -99,6 +104,7 @@
                 data-action="delete" data-model="Project"
                 data-model-id="<%= item.get('slug') %>">Delete</button>
       </div>
+      -->
     </td>
   </tr>
 <% }); %>
