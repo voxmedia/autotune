@@ -10,16 +10,12 @@
    _.each(collection.models, function(blueprint) { %>
   <% if(index % 3 == 0) { %>
   <% if(index != 0) { %></div><% } %>
-<div class="row">
+<div class="row m-blueprint-chooser">
   <% } %>
   <div class="col-md-4">
-    <div class="thumbnail">
-      <img src="<%=blueprint.get('thumb_url') %>" alt="<%=blueprint.get('title') %>">
-      <div class="caption">
-        <h4><%=blueprint.get('title') %></h4>
-        <p><a href="<%=blueprint.url() %>/new_project"
-              class="btn btn-sm btn-primary" role="button">Use this</a></p>
-      </div>
+    <div class="thumbnail" style="background-image:url('<%=blueprint.get('thumb_url') %>');"> 
+      <h4><%=blueprint.get('title') %></h4>
+      <a href="<%=blueprint.url() %>/new_project"></a>
     </div>
   </div>
 <% index++; }); %>

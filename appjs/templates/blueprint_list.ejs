@@ -29,27 +29,33 @@
             (<a href="/blueprints">clear</a>)
           <% } %>
           &nbsp;
-          <select name="type" id="type" class="form-control" data-auto-submit="true">
-            <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
-          <% _.each(app.config.blueprint_types, function(type) { %>
-            <option <% if(type === query.type) { %>selected<% } %>
+          <div class="select">  
+            <select name="type" id="type" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
+            <% _.each(app.config.blueprint_types, function(type) { %>
+              <option <% if(type === query.type) { %>selected<% } %>
                     value="<%=type %>"><%=type %></option>
-          <% }) %>
-          </select>
-          <select name="tag" id="tag" class="form-control" data-auto-submit="true">
-            <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
-          <% _.each(app.config.blueprint_tags, function(tag) { %>
-            <option <% if(tag.slug === query.tag) { %>selected<% } %>
+            <% }) %>
+            </select>
+          </div>
+          <div class="select">  
+            <select name="tag" id="tag" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
+            <% _.each(app.config.blueprint_tags, function(tag) { %>
+              <option <% if(tag.slug === query.tag) { %>selected<% } %>
                     value="<%=tag.slug %>"><%=tag.title %></option>
-          <% }) %>
-          </select>
-          <select name="status" id="status" class="form-control" data-auto-submit="true">
-            <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
-          <% _.each(app.config.blueprint_statuses, function(status) { %>
-            <option <% if(status === query.status) { %>selected<% } %>
+            <% }) %>
+            </select>
+          </div>
+          <div class="select">  
+            <select name="status" id="status" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
+            <% _.each(app.config.blueprint_statuses, function(status) { %>
+              <option <% if(status === query.status) { %>selected<% } %>
                     value="<%=status %>"><%=status %></option>
-          <% }) %>
-          </select>
+            <% }) %>
+            </select>
+          </div>
         </form>
       </td>
     </tr>

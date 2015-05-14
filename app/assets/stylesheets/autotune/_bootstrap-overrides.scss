@@ -5,6 +5,9 @@ body {
 
 //buttons
 .btn {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   border: none;
   border-bottom: 5px solid;
   border-bottom: 5px solid $btn-default-border;
@@ -28,12 +31,6 @@ body {
 
 .btn-danger {
   border-bottom: 5px solid $btn-danger-border;
-}
-
-.btn-xs, .btn-group-xs > .btn {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 //input

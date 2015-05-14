@@ -481,17 +481,15 @@ __p+='\n  ';
  if(index != 0) { 
 __p+='</div>';
  } 
-__p+='\n<div class="row">\n  ';
+__p+='\n<div class="row m-blueprint-chooser">\n  ';
  } 
-__p+='\n  <div class="col-md-4">\n    <div class="thumbnail">\n      <img src="'+
+__p+='\n  <div class="col-md-4">\n    <div class="thumbnail" style="background-image:url(\''+
 ((__t=(blueprint.get('thumb_url') ))==null?'':__t)+
-'" alt="'+
+'\');"> \n      <h4>'+
 ((__t=(blueprint.get('title') ))==null?'':__t)+
-'">\n      <div class="caption">\n        <h4>'+
-((__t=(blueprint.get('title') ))==null?'':__t)+
-'</h4>\n        <p><a href="'+
+'</h4>\n      <a href="'+
 ((__t=(blueprint.url() ))==null?'':__t)+
-'/new_project"\n              class="btn btn-sm btn-primary" role="button">Use this</a></p>\n      </div>\n    </div>\n  </div>\n';
+'/new_project"></a>\n    </div>\n  </div>\n';
  index++; }); 
 __p+='\n</div>\n';
 }
@@ -577,13 +575,13 @@ __p+='\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <t
  if(query.type || query.tag || query.status) { 
 __p+='\n            (<a href="/blueprints">clear</a>)\n          ';
  } 
-__p+='\n          &nbsp;\n          <select name="type" id="type" class="form-control" data-auto-submit="true">\n            <option disabled ';
+__p+='\n          &nbsp;\n          <div class="select">  \n            <select name="type" id="type" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.type) { 
 __p+='selected';
  } 
-__p+='>Type</option>\n          ';
+__p+='>Type</option>\n            ';
  _.each(app.config.blueprint_types, function(type) { 
-__p+='\n            <option ';
+__p+='\n              <option ';
  if(type === query.type) { 
 __p+='selected';
  } 
@@ -591,15 +589,15 @@ __p+='\n                    value="'+
 ((__t=(type ))==null?'':__t)+
 '">'+
 ((__t=(type ))==null?'':__t)+
-'</option>\n          ';
+'</option>\n            ';
  }) 
-__p+='\n          </select>\n          <select name="tag" id="tag" class="form-control" data-auto-submit="true">\n            <option disabled ';
+__p+='\n            </select>\n          </div>\n          <div class="select">  \n            <select name="tag" id="tag" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.tag) { 
 __p+='selected';
  } 
-__p+='>Tag</option>\n          ';
+__p+='>Tag</option>\n            ';
  _.each(app.config.blueprint_tags, function(tag) { 
-__p+='\n            <option ';
+__p+='\n              <option ';
  if(tag.slug === query.tag) { 
 __p+='selected';
  } 
@@ -607,15 +605,15 @@ __p+='\n                    value="'+
 ((__t=(tag.slug ))==null?'':__t)+
 '">'+
 ((__t=(tag.title ))==null?'':__t)+
-'</option>\n          ';
+'</option>\n            ';
  }) 
-__p+='\n          </select>\n          <select name="status" id="status" class="form-control" data-auto-submit="true">\n            <option disabled ';
+__p+='\n            </select>\n          </div>\n          <div class="select">  \n            <select name="status" id="status" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.status) { 
 __p+='selected';
  } 
-__p+='>Status</option>\n          ';
+__p+='>Status</option>\n            ';
  _.each(app.config.blueprint_statuses, function(status) { 
-__p+='\n            <option ';
+__p+='\n              <option ';
  if(status === query.status) { 
 __p+='selected';
  } 
@@ -623,9 +621,9 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '">'+
 ((__t=(status ))==null?'':__t)+
-'</option>\n          ';
+'</option>\n            ';
  }) 
-__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n    <td>Blueprint</td>\n    <td>Status</td>\n    <td class="text-right" colspan="2">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n    <td>Blueprint</td>\n    <td>Status</td>\n    <td class="text-right" colspan="2">Bold Actions</td>\n  </tr>\n  ';
  if(collection.models.length == 0) { 
 __p+='\n      <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>\n  ';
  }
@@ -851,13 +849,13 @@ __p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table clas
  if(query.theme || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
-__p+='\n          &nbsp;\n          <select name="theme" id="theme" class="form-control" data-auto-submit="true">\n            <option disabled ';
+__p+='\n          &nbsp;\n          <div class="select">\n            <select name="theme" id="theme" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.theme) { 
 __p+='selected';
  } 
-__p+='>Theme</option>\n          ';
+__p+='>Theme</option>\n            ';
  _.each(app.config.project_themes, function(theme) { 
-__p+='\n            <option ';
+__p+='\n              <option ';
  if(theme === query.theme) { 
 __p+='selected';
  } 
@@ -865,15 +863,15 @@ __p+='\n                    value="'+
 ((__t=(theme ))==null?'':__t)+
 '">'+
 ((__t=(theme ))==null?'':__t)+
-'</option>\n          ';
+'</option>\n            ';
  }) 
-__p+='\n          </select>\n          <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n            <option disabled ';
+__p+='\n            </select>\n          </div>\n          <div class="select">\n            <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.blueprint_type) { 
 __p+='selected';
  } 
-__p+='>Type</option>\n          ';
+__p+='>Type</option>\n            ';
  _.each(app.config.blueprint_types, function(type) { 
-__p+='\n            <option ';
+__p+='\n              <option ';
  if(type === query.blueprint_type) { 
 __p+='selected';
  } 
@@ -881,15 +879,15 @@ __p+='\n                    value="'+
 ((__t=(type ))==null?'':__t)+
 '">'+
 ((__t=(type ))==null?'':__t)+
-'</option>\n          ';
+'</option>\n            ';
  }) 
-__p+='\n          </select>\n          <select name="status" id="status" class="form-control" data-auto-submit="true">\n            <option disabled ';
+__p+='\n            </select>\n          </div>\n          <div class="select">\n            <select name="status" id="status" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.status) { 
 __p+='selected';
  } 
-__p+='>Status</option>\n          ';
+__p+='>Status</option>\n            ';
  _.each(app.config.project_statuses, function(status) { 
-__p+='\n            <option ';
+__p+='\n              <option ';
  if(status === query.status) { 
 __p+='selected';
  } 
@@ -897,9 +895,9 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '">'+
 ((__t=(status ))==null?'':__t)+
-'</option>\n          ';
+'</option>\n            ';
  }) 
-__p+='\n          </select>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Editorial Status</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Editorial Status</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(collection.models.length == 0) { 
 __p+='\n  <tr><td class="text-center" colspan="4"><h4>No projects found</h4></td></tr>\n  ';
  }
