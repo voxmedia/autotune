@@ -32008,7 +32008,7 @@ module.exports = FormView.extend({
 (function (global){
 
 ; jQuery = global.jQuery = require("jquery");
-;__browserify_shim_require__=require;(function browserifyShim(module, define, require) {
+; var __browserify_shim_require__=require;(function browserifyShim(module, define, require) {
 /*!
  * Bootstrap v3.2.0 (http://getbootstrap.com)
  * Copyright 2011-2014 Twitter, Inc.
@@ -53644,32 +53644,64 @@ if (typeof Object.create === 'function') {
 var process = module.exports = {};
 var queue = [];
 var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
 
 function drainQueue() {
     if (draining) {
         return;
     }
+    var timeout = setTimeout(cleanUpNextTick);
     draining = true;
-    var currentQueue;
+
     var len = queue.length;
     while(len) {
         currentQueue = queue;
         queue = [];
-        var i = -1;
-        while (++i < len) {
-            currentQueue[i]();
+        while (++queueIndex < len) {
+            currentQueue[queueIndex].run();
         }
+        queueIndex = -1;
         len = queue.length;
     }
+    currentQueue = null;
     draining = false;
+    clearTimeout(timeout);
 }
+
 process.nextTick = function (fun) {
-    queue.push(fun);
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
     if (!draining) {
         setTimeout(drainQueue, 0);
     }
 };
 
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
 process.title = 'browser';
 process.browser = true;
 process.env = {};
@@ -59517,7 +59549,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 
 },{"jquery":63}],63:[function(require,module,exports){
 /*!
- * jQuery JavaScript Library v2.1.3
+ * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
  *
  * Includes Sizzle.js
@@ -59527,7 +59559,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2014-12-18T15:11Z
+ * Date: 2015-04-28T16:01Z
  */
 
 (function( global, factory ) {
@@ -59585,7 +59617,7 @@ var
 	// Use the correct document accordingly with window argument (sandbox)
 	document = window.document,
 
-	version = "2.1.3",
+	version = "2.1.4",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
@@ -60049,7 +60081,12 @@ jQuery.each("Boolean Number String Function Array Date RegExp Object Error".spli
 });
 
 function isArraylike( obj ) {
-	var length = obj.length,
+
+	// Support: iOS 8.2 (not reproducible in simulator)
+	// `in` check used to prevent JIT error (gh-2145)
+	// hasOwn isn't used here due to false negatives
+	// regarding Nodelist length in IE
+	var length = "length" in obj && obj.length,
 		type = jQuery.type( obj );
 
 	if ( type === "function" || jQuery.isWindow( obj ) ) {
@@ -70455,6 +70492,7 @@ function merge_text_nodes( jsonml ) {
 } )() );
 
 },{"util":42}],66:[function(require,module,exports){
+/*! pym.js - v0.4.2 - 2015-04-24 */
 /*
 * Pym.js is library that resizes an iframe based on the width of the parent and the resulting height of the child.
 * Check out the docs at http://blog.apps.npr.org/pym.js/ or the readme at README.md for usage.
@@ -70596,8 +70634,11 @@ function merge_text_nodes( jsonml ) {
             xdomain: '*'
         };
 
-        this.messageRegex = _makeMessageRegex(this.id); 
+        this.messageRegex = _makeMessageRegex(this.id);
         this.messageHandlers = {};
+
+        // ensure a config object
+        config = (config || {});
 
         /**
          * Construct the iframe.
@@ -70610,7 +70651,7 @@ function merge_text_nodes( jsonml ) {
             var width = this.el.offsetWidth.toString();
 
             // Create an iframe element attached to the document.
-            this.iframe = document.createElement("iframe");
+            this.iframe = document.createElement('iframe');
 
             // Save fragment id
             var hash = '';
@@ -70628,7 +70669,7 @@ function merge_text_nodes( jsonml ) {
             } else {
                 this.url += '&';
             }
-            
+
             // Append the initial width as a querystring parameter, and the fragment id
             this.iframe.src = this.url + 'initialWidth=' + width + '&childId=' + this.id + hash;
 
@@ -70702,16 +70743,31 @@ function merge_text_nodes( jsonml ) {
          */
         this._onHeightMessage = function(message) {
             /*
-             * Handle parent message from child.
+             * Handle parent height message from child.
              */
             var height = parseInt(message);
-            
+
             this.iframe.setAttribute('height', height + 'px');
         };
 
+        /**
+         * Navigate parent to a new url.
+         *
+         * @memberof Parent.prototype
+         * @method _onNavigateToMessage
+         * @param {String} message The url to navigate to.
+         */
+        this._onNavigateToMessage = function(message) {
+            /*
+             * Handle parent scroll message from child.
+             */
+             document.location.href = message;
+        };
 
         /**
          * Bind a callback to a given messageType from the child.
+         *
+         * Reserved message names are: "height", "scrollTo" and "navigateTo".
          *
          * @memberof Parent.prototype
          * @method onMessage
@@ -70757,8 +70813,9 @@ function merge_text_nodes( jsonml ) {
             this.settings[key] = config[key];
         }
 
-        // Add height event callback 
+        // Bind required message handlers
         this.onMessage('height', this._onHeightMessage);
+        this.onMessage('navigateTo', this._onNavigateToMessage);
 
         // Add a listener for processing messages from the child.
         var that = this;
@@ -70791,8 +70848,13 @@ function merge_text_nodes( jsonml ) {
         this.messageRegex = null;
         this.messageHandlers = {};
 
+        // ensure a config object
+        config = (config || {});
+
         /**
          * Bind a callback to a given messageType from the child.
+         *
+         * Reserved message names are: "width".
          *
          * @memberof Child.prototype
          * @method onMessage
@@ -70858,6 +70920,33 @@ function merge_text_nodes( jsonml ) {
         };
 
         /**
+         * Resize iframe in response to new width message from parent.
+         *
+         * @memberof Child.prototype
+         * @method _onWidthMessage
+         * @param {String} message The new width.
+         */
+        this._onWidthMessage = function(message) {
+            /*
+             * Handle width message from the child.
+             */
+            var width = parseInt(message);
+
+            // Change the width if it's different.
+            if (width !== this.parentWidth) {
+                this.parentWidth = width;
+
+                // Call the callback function if it exists.
+                if (this.settings.renderCallback) {
+                    this.settings.renderCallback(width);
+                }
+
+                // Send the height back to the parent.
+                this.sendHeight();
+            }
+        };
+
+        /**
          * Send a message to the the Parent.
          *
          * @memberof Child.prototype
@@ -70894,30 +70983,25 @@ function merge_text_nodes( jsonml ) {
         };
 
         /**
-         * Resize iframe in response to new width message from parent.
+         * Scroll parent to a given element id.
          *
          * @memberof Child.prototype
-         * @method _onWidthMessage
-         * @param {String} message The new width.
+         * @method scrollParentTo
+         * @param {String} hash The id of the element to scroll to.
          */
-        this._onWidthMessage = function(message) {
-            /*
-             * Handle width message from the child.
-             */
-            var width = parseInt(message);
+        this.scrollParentTo = function(hash) {
+            this.sendMessage('navigateTo', '#' + hash);
+        };
 
-            // Change the width if it's different.
-            if (width !== this.parentWidth) {
-                this.parentWidth = width;
-
-                // Call the callback function if it exists.
-                if (this.settings.renderCallback) {
-                    this.settings.renderCallback(width);
-                }
-
-                // Send the height back to the parent.
-                this.sendHeight();
-            }
+        /**
+         * Navigate parent to a given url.
+         *
+         * @memberof Parent.prototype
+         * @method navigateParentTo
+         * @param {String} url The url to navigate to.
+         */
+        this.navigateParentTo = function(url) {
+            this.sendMessage('navigateTo', url);
         };
 
         // Identify what ID the parent knows this child as.
@@ -70927,7 +71011,7 @@ function merge_text_nodes( jsonml ) {
         // Get the initial width from a URL parameter.
         var width = parseInt(_getParameterByName('initialWidth'));
 
-        // Bind the width message handler
+        // Bind the required message handlers
         this.onMessage('width', this._onWidthMessage);
 
         // Initialize settings with overrides.
@@ -71027,7 +71111,7 @@ function merge_text_nodes( jsonml ) {
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = queryString;
 	} else {
-		window.queryString = queryString;
+		self.queryString = queryString;
 	}
 })();
 
