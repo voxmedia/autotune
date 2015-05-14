@@ -25,7 +25,7 @@ module Autotune
 
       # Run the build
       repo.working_dir do
-        out = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data)
+        out = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
       end
 
       # Upload build
