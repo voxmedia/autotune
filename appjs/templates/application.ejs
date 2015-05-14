@@ -3,21 +3,21 @@
     <nav class="navbar navbar-default" id="nav">
       <div class="container-fluid">
         <a class="navbar-brand" href="/">Autotune</a>
+        <div class="navbar-text" id="spinner">
+            <img src="<%=app.config.spinner %>">
+        </div>
         <ul class="nav navbar-nav">
           <li data-tab="projects"><a href="/projects">Projects</a></li>
           <% if (hasRole('superuser')) { %>
           <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>
           <% } %>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <li><div class="navbar-text" id="spinner">
-            <img src="<%=app.config.spinner %>"></div></li>
+          <li data-tab="feedback"><a href="https://docs.google.com/a/voxmedia.com/forms/d/1FZGfxov-3BcclKUMa0LkpaYL_4SOmCGGvuATBgNbzdg/viewform" target="_blank">Feedback</a></li>
         </ul>
       </div>
     </nav>
-    <div id="flash"></div>
   </div>
 </div>
 <div class="row">
+  <div id="flash"></div>
   <div class="col-lg-8 col-lg-offset-2" id="main"></div>
 </div>

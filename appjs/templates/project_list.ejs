@@ -18,59 +18,69 @@
     </form>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-5">
-    <a id="new-project" class="btn btn-primary btn-xs"
-       href="/projects/new">New project</a>
-  </div>
-  <div class="col-sm-7 text-right">
-    <form class="form-inline" method="get" action="/projects">
-      Filters
-      <% if(query.theme || query.blueprint_type || query.status) { %>
-        (<a href="/projects">clear</a>)
-      <% } %>
-      &nbsp;
-      <select name="theme" id="theme" class="form-control" data-auto-submit="true">
-        <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
-      <% _.each(app.config.project_themes, function(theme) { %>
-        <option <% if(theme === query.theme) { %>selected<% } %>
-                value="<%=theme %>"><%=theme %></option>
-      <% }) %>
-      </select>
-      <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">
-        <option disabled <% if(!query.blueprint_type) { %>selected<% } %>>Type</option>
-      <% _.each(app.config.blueprint_types, function(type) { %>
-        <option <% if(type === query.blueprint_type) { %>selected<% } %>
-                value="<%=type %>"><%=type %></option>
-      <% }) %>
-      </select>
-      <select name="status" id="status" class="form-control" data-auto-submit="true">
-        <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
-      <% _.each(app.config.project_statuses, function(status) { %>
-        <option <% if(status === query.status) { %>selected<% } %>
-                value="<%=status %>"><%=status %></option>
-      <% }) %>
-      </select>
-    </form>
-  </div>
-</div>
-<br>
 <table class="table">
+  <thead>
+    <tr>
+      <td colspan="2">
+        <a id="new-project" class="btn btn-primary btn-xs"
+       href="/projects/new">New project</a>
+      </td>
+      <td class="text-right" colspan="2">
+        <form class="form-inline" method="get" action="/projects">
+          Filters
+          <% if(query.theme || query.blueprint_type || query.status) { %>
+            (<a href="/projects">clear</a>)
+          <% } %>
+          &nbsp;
+          <select name="theme" id="theme" class="form-control" data-auto-submit="true">
+            <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
+          <% _.each(app.config.project_themes, function(theme) { %>
+            <option <% if(theme === query.theme) { %>selected<% } %>
+                    value="<%=theme %>"><%=theme %></option>
+          <% }) %>
+          </select>
+          <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">
+            <option disabled <% if(!query.blueprint_type) { %>selected<% } %>>Type</option>
+          <% _.each(app.config.blueprint_types, function(type) { %>
+            <option <% if(type === query.blueprint_type) { %>selected<% } %>
+                    value="<%=type %>"><%=type %></option>
+          <% }) %>
+          </select>
+          <select name="status" id="status" class="form-control" data-auto-submit="true">
+            <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
+          <% _.each(app.config.project_statuses, function(status) { %>
+            <option <% if(status === query.status) { %>selected<% } %>
+                    value="<%=status %>"><%=status %></option>
+          <% }) %>
+          </select>
+        </form>
+      </td>
+    </tr>
+  </thead>
   <tbody>
-<% if(collection.models.length == 0) { %>
-  <tr><td class="text-center"><h4>No projects found</h4></td></tr>
-<% }
+  <tr class="m-table-heading">
+    <td>Project</td>
+    <td>Editorial Status</td>
+    <td>Blueprint</td>
+    <td class="text-right">Bold Actions</td>
+  </tr>
+  <% if(collection.models.length == 0) { %>
+  <tr><td class="text-center" colspan="4"><h4>No projects found</h4></td></tr>
+  <% }
    _.each(collection.models, function(item) { %>
    <tr>
     <td><a href="<%=item.url() %>"><%= item.get('title') %></a></td>
-    <td class="text-right">
-    <% if(item.get('status') == 'built') { %>
+    <td>
+      <% if(item.get('status') == 'built') { %>
       <span class="label label-success text-capitalize"><%=item.get('status') %></span>
-    <% } else if(item.get('status') == 'broken') { %>
-      <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
-    <% } else { %>
-      <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
-    <% } %>
+      <% } else if(item.get('status') == 'broken') { %>
+        <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
+      <% } else { %>
+        <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
+      <% } %>
+    </td>
+    <td>Blueprint name here</td>
+    <td class="text-right">
       <div class="btn-group btn-group-sm" role="group" aria-label="project actions">
         <a class="btn btn-default" href="<%=item.url() %>/edit">Edit</a>
         <button type="button" class="btn btn-default"

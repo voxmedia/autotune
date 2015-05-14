@@ -5,12 +5,29 @@ body {
 
 //buttons
 .btn {
+  border: none;
   border-bottom: 5px solid;
+  border-bottom: 5px solid $btn-default-border;
 }
 
 .btn-primary {
-  border: none;
-  border-bottom: 5px solid darken($primary, 20%);
+  border-bottom: 5px solid $btn-primary-border;
+}
+
+.btn-success {
+  border-bottom: 5px solid $btn-success-border;
+}
+
+.btn-info {
+  border-bottom: 5px solid $btn-info-border;
+}
+
+.btn-warning {
+  border-bottom: 5px solid $btn-warning-border;
+}
+
+.btn-danger {
+  border-bottom: 5px solid $btn-danger-border;
 }
 
 .btn-xs, .btn-group-xs > .btn {

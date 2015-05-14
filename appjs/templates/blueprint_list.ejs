@@ -16,58 +16,66 @@
     </form>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-5">
-    <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>
-  </div>
-  <div class="col-sm-7 text-right">
-    <form class="form-inline" method="get" action="/blueprints">
-      Filters
-      <% if(query.type || query.tag || query.status) { %>
-        (<a href="/blueprints">clear</a>)
-      <% } %>
-      &nbsp;
-      <select name="type" id="type" class="form-control" data-auto-submit="true">
-        <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
-      <% _.each(app.config.blueprint_types, function(type) { %>
-        <option <% if(type === query.type) { %>selected<% } %>
-                value="<%=type %>"><%=type %></option>
-      <% }) %>
-      </select>
-      <select name="tag" id="tag" class="form-control" data-auto-submit="true">
-        <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
-      <% _.each(app.config.blueprint_tags, function(tag) { %>
-        <option <% if(tag.slug === query.tag) { %>selected<% } %>
-                value="<%=tag.slug %>"><%=tag.title %></option>
-      <% }) %>
-      </select>
-      <select name="status" id="status" class="form-control" data-auto-submit="true">
-        <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
-      <% _.each(app.config.blueprint_statuses, function(status) { %>
-        <option <% if(status === query.status) { %>selected<% } %>
-                value="<%=status %>"><%=status %></option>
-      <% }) %>
-      </select>
-    </form>
-  </div>
-</div>
-<br>
 <table class="table">
+  <thead>
+    <tr>
+      <td colspan="2">
+        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>
+      </td>
+      <td class="text-right" colspan="2">
+        <form class="form-inline" method="get" action="/blueprints">
+          Filters
+          <% if(query.type || query.tag || query.status) { %>
+            (<a href="/blueprints">clear</a>)
+          <% } %>
+          &nbsp;
+          <select name="type" id="type" class="form-control" data-auto-submit="true">
+            <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
+          <% _.each(app.config.blueprint_types, function(type) { %>
+            <option <% if(type === query.type) { %>selected<% } %>
+                    value="<%=type %>"><%=type %></option>
+          <% }) %>
+          </select>
+          <select name="tag" id="tag" class="form-control" data-auto-submit="true">
+            <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
+          <% _.each(app.config.blueprint_tags, function(tag) { %>
+            <option <% if(tag.slug === query.tag) { %>selected<% } %>
+                    value="<%=tag.slug %>"><%=tag.title %></option>
+          <% }) %>
+          </select>
+          <select name="status" id="status" class="form-control" data-auto-submit="true">
+            <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
+          <% _.each(app.config.blueprint_statuses, function(status) { %>
+            <option <% if(status === query.status) { %>selected<% } %>
+                    value="<%=status %>"><%=status %></option>
+          <% }) %>
+          </select>
+        </form>
+      </td>
+    </tr>
+  </thead>
   <tbody>
-<% if(collection.models.length == 0) { %>
-    <td class="text-center"><h4>No blueprints found</h4></td>
-<% }
+    <tr class="m-table-heading">
+    <td>Blueprint</td>
+    <td>Status</td>
+    <td class="text-right" colspan="2">Bold Actions</td>
+  </tr>
+  <% if(collection.models.length == 0) { %>
+      <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>
+  <% }
   _.each(collection.models, function(item) { %>
   <tr>
     <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
-    <td class="text-right">
-    <% if(item.get('status') == 'ready') { %>
+    <td>
+      <% if(item.get('status') == 'ready') { %>
       <span class="label label-success text-capitalize"><%=item.get('status') %></span>
-    <% } else if(item.get('status') == 'broken') { %>
-      <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
-    <% } else { %>
-      <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
-    <% } %>
+      <% } else if(item.get('status') == 'broken') { %>
+        <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
+      <% } else { %>
+        <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
+      <% } %>
+    </td>
+    <td class="text-right" colspan="2">
       <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">
         <a class="btn btn-default" href="<%=item.url() %>/edit">Edit</a>
         <button type="button" class="btn btn-default"
