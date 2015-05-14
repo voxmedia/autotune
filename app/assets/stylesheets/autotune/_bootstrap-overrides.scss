@@ -48,3 +48,16 @@ select {
   -webkit-appearance: none;
   -webkit-border-radius: 0px;
 }
+
+//alpaca overrides
+.alpaca-container-label {
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+// star for required fields? this is the easeist way to adjust that
+.glyphicon-star:before {
+  @extend .-bernino;
+  content: "*";
+  margin-right: 3px;
+}

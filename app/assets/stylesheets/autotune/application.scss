@@ -8,6 +8,11 @@
 @import "bootstrap";
 @import "bootstrap-overrides";
 
+//lets add some padding to crunched page bottoms
+#main {
+  padding-bottom: 25px;
+}
+
 #spinner {
   width:20px;
   height:20px;

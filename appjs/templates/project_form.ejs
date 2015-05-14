@@ -1,4 +1,8 @@
-<h3><small><% if(model.isNew()) { %>New<% } else { %>Edit<% } %> project</small></h3>
+<div class="row m-page-heading">
+  <div class="col-xs-12 col-sm-6">
+    <h3><% if(model.isNew()) { %>New<% } else { %>Edit<% } %> project</h3>
+  </div>
+</div>
 <% if(model.hasInstructions()) { %>
 <div class="row">
   <div class="col-md-8"><div id="projectForm"></div></div>

@@ -31,6 +31,10 @@ $bernino: "jaf-bernino-sans",sans-serif;
   font-weight: 600;
 }
 
+label {
+  font-weight: normal;
+}
+
 //nav
 $m : '.m-nav';
 
@@ -93,6 +97,7 @@ $m : '.m-nav';
 .m-page-heading {
   padding: 50px 0;
   h3 {
+    @extend .-bernino-semibold;
     margin: 0;
     font-size: 31px;
   }
@@ -138,7 +143,8 @@ input {
 }
 
 //dropdowns
-.select {
+.select,
+.alpaca-field-select {
   display: inline-block;
   position: relative;
   select {
@@ -155,8 +161,7 @@ input {
     width: 10px;
     position: absolute;
     right: 15px;
-    top: 50%;
-    margin-top: -4px;
+    bottom: 12px;
   }
 }
 

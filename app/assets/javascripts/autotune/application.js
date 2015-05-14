@@ -502,13 +502,13 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h3>';
+__p+='<div class="row m-page-heading">\n  <div class="col-xs-12 col-sm-6">\n    <h3>';
  if(model.isNew()) { 
 __p+='New';
  } else { 
 __p+='Edit';
  } 
-__p+=' Blueprint</h3>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n  data-next="show" data-model="Blueprint"\n  ';
+__p+=' Blueprint</h3>\n  </div>\n</div>\n<div class="alert alert-danger" role="alert" style="display:none;"></div>\n<form id="new-blueprint" role="form"\n  data-next="show" data-model="Blueprint"\n  ';
  if(model.isNew()) { 
 __p+='\n  data-action="new"\n  ';
  } else { 
@@ -810,13 +810,13 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h3><small>';
+__p+='<div class="row m-page-heading">\n  <div class="col-xs-12 col-sm-6">\n    <h3>';
  if(model.isNew()) { 
 __p+='New';
  } else { 
 __p+='Edit';
  } 
-__p+=' project</small></h3>\n';
+__p+=' project</h3>\n  </div>\n</div>\n';
  if(model.hasInstructions()) { 
 __p+='\n<div class="row">\n  <div class="col-md-8"><div id="projectForm"></div></div>\n  <div class="col-md-4">'+
 ((__t=(model.instructions() ))==null?'':__t)+
