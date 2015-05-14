@@ -17,21 +17,6 @@ module.exports = Backbone.Router.extend({
 
     this.app.view = this.app.view = new views.Application({ app: this.app });
     this.app.view.render();
-
-    this.app.dataToRefresh = null;
-    this.app.dataQuery = null;
-
-    if ( window.EventSource ) {
-      this.app.debug('Init server event listener');
-      var source = new window.EventSource('/changemessages');
-      source.addEventListener('change', _.bind(function(e) {
-         if(this.app.dataToRefresh){
-            this.app.debug('server event; updating data');
-            this.app.dataToRefresh.fetch({data: this.app.dataQuery});
-        }
-      }, this), false);
-    }
-
     $('body').prepend(this.app.view.$el);
   },
 
@@ -68,8 +53,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprints.fetch({data: query});
-    this.app.dataToRefresh = blueprints;
-    this.app.dataQuery = query;
+    this.app.setActiveData(blueprints,query);
   },
 
   newBlueprint: function() {
@@ -78,7 +62,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     view.render();
-    this.app.dataToRefresh = null;
+    this.app.setActiveData();
   },
 
   showBlueprint: function(slug) {
@@ -88,8 +72,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprint.fetch();
-    this.app.dataToRefresh = blueprint;
-    this.app.dataQuery = {};
+    this.app.setActiveData(blueprint);
   },
 
   editBlueprint: function(slug) {
@@ -99,7 +82,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprint.fetch();
-    this.app.dataToRefresh = null;
+    this.app.setActiveData();
   },
 
   chooseBlueprint: function(params) {
@@ -112,7 +95,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     blueprints.fetch({data: query});
-    this.app.dataToRefresh = null;
+    this.app.setActiveData();
   },
 
   blueprintBuilder: function(slug) {
@@ -122,7 +105,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprint.fetch();
-    this.app.dataToRefresh = null;
+    this.app.setActiveData();
   },
 
   listProjects: function(params) {
@@ -134,8 +117,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     projects.fetch({data: query});
-    this.app.dataToRefresh = projects;
-    this.app.dataQuery = query;
+    this.app.setActiveData(projects,query);
   },
 
   newProject: function(slug) {
@@ -146,7 +128,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     blueprint.fetch();
-    this.app.dataToRefresh = null;
+    this.app.setActiveData();
   },
 
   showProject: function(slug) {
@@ -156,8 +138,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
-    this.app.dataToRefresh = project;
-    this.app.dataQuery = {};
+    this.app.setActiveData(project);
   },
 
   editProject: function(slug) {
@@ -167,6 +148,6 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
-    this.app.dataToRefresh = null;
+    this.app.setActiveData();
   }
 });

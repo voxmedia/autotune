@@ -23,8 +23,24 @@ var Router = require('./router');
 window.App = function(config) {
   this.config = config;
   this.router = new Router({app: this});
+  this.msgListener = null;
+  this.has_focus = true;
 
   Backbone.history.start({pushState: true});
+
+  if ( window.EventSource ) {
+    $(window).on('focus', _.bind(function(){
+       this.has_focus = true;
+      this.startListeningForChanges();
+    }, this));
+
+    $(window).on('blur', _.bind(function(){
+      this.has_focus = false;
+      setTimeout(_.bind(this.stopListeningForChanges,this), 10000);
+    }, this));
+
+    this.startListeningForChanges();
+  }
 };
 
 _.extend(window.App.prototype, {
@@ -51,5 +67,36 @@ _.extend(window.App.prototype, {
         ga('send', 'pageview');
       }
     }
+  },
+
+  startListeningForChanges: function(){
+    if(this.msgListener && (this.msgListener.readyState === this.msgListener.OPEN || this.msgListener.readyState === this.msgListener.CONNECTING)){
+      return;
+    }
+    this.debug('Init server event listener');
+    this.msgListener = new window.EventSource('/changemessages');
+
+    this.msgListener.addEventListener('change', _.bind(function(e) {
+     if(this.dataToRefresh){
+        this.debug('server event; updating data');
+        this.dataToRefresh.fetch({data: this.dataQuery});
+      }
+    }, this));
+  },
+
+  stopListeningForChanges: function(ignoreFocus){
+    this.debug('Checking for focus');
+    if(ignoreFocus || this.has_focus){
+      return;
+    }
+    if(this.msgListener && this.msgListener.readyState === this.msgListener.OPEN){
+      this.debug('Close event listener');
+      this.msgListener.close();
+    }
+  },
+
+  setActiveData: function(data, query){
+    this.dataToRefresh = data;
+    this.dataQuery = query;
   }
 });
