@@ -163,12 +163,16 @@ label {
     padding-right: 30px;
   }
   &:after {
-    content: "";
-    background-image: image-url('autotune/icons/dropdown.png');
-    background-image: image-url('autotune/icons/dropdown.svg');
-    background-size: 100%;
-    background-repeat: no-repeat;
+    content: "\e114";
     display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: $darkgrey;
+    font-size: 10px;
     height: 10px;
     width: 10px;
     position: absolute;
