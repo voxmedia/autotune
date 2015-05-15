@@ -2,7 +2,7 @@ require 'test_helper'
 
 # test the job for updating projects
 class Autotune::SyncProjectJobTest < ActiveJob::TestCase
-  fixtures 'autotune/blueprints', 'autotune/projects'
+  fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/users'
   test 'update snapshot' do
     b = autotune_projects(:example_one)
 
@@ -11,11 +11,10 @@ class Autotune::SyncProjectJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      Autotune::SyncBlueprintJob.perform_later b.blueprint
       Autotune::SyncProjectJob.perform_later b
     end
 
-    assert_performed_jobs 2
+    assert_performed_jobs 1
 
     b.reload
 
