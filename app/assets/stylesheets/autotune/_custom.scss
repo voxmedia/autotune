@@ -68,6 +68,52 @@ $red: #D9534F; //danger
   }
 }
 
+//status notifications and alerts
+$m : '.m-status';
+
+#{$m} {
+  display: block;
+  font-size: 11px;
+  text-transform: capitalize;
+  &.status-ok {
+    color: $green;
+  }
+  &.status-info {
+    color: $orange;
+  }
+  &.status-alert {
+    color: $red;
+  }
+}
+
+//alerts in tables
+.table td {
+  &.ok,
+  &.info,
+  &.alert {
+    padding-top: 20px;
+    position: relative;
+    &:before {
+      content: "";
+      position: absolute;
+      width: 5px;
+      height: 100%;
+      left: 0;
+      top: -1px;
+      bottom: 0;
+    }
+  }
+  &.ok:before {
+    background-color: $green;
+  }
+  &.info:before {
+    background-color: $orange;
+  }
+  &.alert:before {
+    background-color: $red;
+  }
+}
+
 //nav
 $m : '.m-nav';
 
