@@ -106,14 +106,21 @@ module WorkDir
       FileUtils.cp_r(expand(path), expand(dest))
     end
 
+    # Return an array of filenames
+    def ls
+      Dir.entries(@working_dir)
+    end
+
     # Move this working dir to another path
     def move_to(path)
+      raise CommandError, 'Destination exists' if File.exist?(expand path)
       FileUtils.mkdir_p(File.dirname(expand path))
       FileUtils.mv(@working_dir, expand(path))
     end
 
     # Copy this working dir to another path
     def copy_to(path)
+      raise CommandError, 'Destination exists' if File.exist?(expand path)
       FileUtils.mkdir_p(File.dirname(expand path))
       FileUtils.cp_r(@working_dir, expand(path))
     end

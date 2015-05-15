@@ -20,7 +20,7 @@ module Autotune
         Rails.configuration.autotune.setup_environment)
 
       # copy the blueprint to the project working dir
-      blueprint_dir.copy_to(project_dir.working_dir)
+      blueprint_dir.copy_to(project_dir.working_dir) unless project_dir.exist?
 
       if project_dir.commit_hash != project.blueprint_version
         # checkout the right git version

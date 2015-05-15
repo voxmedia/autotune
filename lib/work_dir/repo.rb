@@ -12,8 +12,8 @@ module WorkDir
     def update
       working_dir do
         git 'fetch', 'origin'
-        git 'checkout', branch
         git 'reset', '--hard', "origin/#{branch}"
+        git 'clean', '-fd'
         git 'submodule', 'update', '--init'
       end
     end

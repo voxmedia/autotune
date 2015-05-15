@@ -1,6 +1,7 @@
 # Configure Rails Environment
 ENV['RAILS_ENV'] = 'test'
 
+# Setup the rails app in test/dummy in order to test the engine
 require File.expand_path('../../test/dummy/config/environment.rb',  __FILE__)
 ActiveRecord::Migrator.migrations_paths = [
   File.expand_path('../../test/dummy/db/migrate', __FILE__)]
@@ -8,6 +9,7 @@ ActiveRecord::Migrator.migrations_paths << File.expand_path(
   '../../db/migrate', __FILE__)
 require 'rails/test_help'
 
+# put omniauth into test mode
 OmniAuth.config.test_mode = true
 OmniAuth.config.add_mock(:developer, OmniAuth::AuthHash.new(
   :provider => 'developer',
@@ -20,7 +22,7 @@ require 'tmpdir'
 require 'fileutils'
 Rails.configuration.autotune.working_dir = File.expand_path(
   "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/")
-# puts 'Working dir: ' + Rails.configuration.autotune.working_dir
+#puts 'Working dir: ' + Rails.configuration.autotune.working_dir
 
 # Configure the environment for autotune
 Rails.configuration.autotune.build_environment = {
