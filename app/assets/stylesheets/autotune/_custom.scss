@@ -10,31 +10,6 @@ $green: #5CB85C; //success
 $orange: #FFA039; //info
 $red: #D9534F; //danger
 
-//type
-$bernino: "jaf-bernino-sans",sans-serif;
-
-.-bernino {
-  font-family: $bernino;
-  font-style: normal;
-  font-weight: 400;
-}
-
-.-bernino-ital {
-  font-family: $bernino;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.-bernino-semibold {
-  font-family: $bernino;
-  font-style: normal;
-  font-weight: 600;
-}
-
-label {
-  font-weight: normal;
-}
-
 //icons
 [class^="icon-"] {
   position: relative;
@@ -77,7 +52,7 @@ $m : '.m-nav';
     float: right;
   }
   .navbar-brand {
-    @extend .-bernino-semibold;
+    font-weight: bold;
     font-size: 37px;
     padding: 5px 0;
     height: auto;
@@ -130,9 +105,9 @@ $m : '.m-nav';
 .m-page-heading {
   padding: 50px 0;
   h3 {
-    @extend .-bernino-semibold;
     margin: 0;
     font-size: 31px;
+    font-weight: bold;
   }
 }
 
@@ -173,6 +148,10 @@ input {
     border-color: #048AAF;
     outline: 0;
   }
+}
+
+label {
+  font-weight: normal;
 }
 
 //dropdowns
