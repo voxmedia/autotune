@@ -571,7 +571,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/blueprints">clear</a>\n        ';
  } 
-__p+='\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td colspan="2">\n        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>\n      </td>\n      <td class="text-right" colspan="2">\n        <form class="form-inline" method="get" action="/blueprints">\n          Filters\n          ';
+__p+='\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td>\n        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>\n      </td>\n      <td class="text-right" colspan="3">\n        <form class="form-inline" method="get" action="/blueprints">\n          Filters\n          ';
  if(query.type || query.tag || query.status) { 
 __p+='\n            (<a href="/blueprints">clear</a>)\n          ';
  } 
@@ -851,7 +851,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
-__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td colspan="2">\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="2">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
+__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="3">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
  if(query.theme || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
