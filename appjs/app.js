@@ -31,7 +31,9 @@ window.App = function(config) {
   if ( window.EventSource ) {
     $(window).on('focus', _.bind(function(){
        this.has_focus = true;
-      this.startListeningForChanges();
+       if(!this.sseRetryCount || this.sseRetryCount === 0){
+        this.startListeningForChanges();
+      }
     }, this));
 
     $(window).on('blur', _.bind(function(){
@@ -73,15 +75,34 @@ _.extend(window.App.prototype, {
     if(this.msgListener && (this.msgListener.readyState === this.msgListener.OPEN || this.msgListener.readyState === this.msgListener.CONNECTING)){
       return;
     }
+    if(!this.has_focus){
+      return;
+    }
     this.debug('Init server event listener');
     this.msgListener = new window.EventSource('/changemessages');
 
-    this.msgListener.addEventListener('change', _.bind(function(e) {
+    this.msgListener.addEventListener('change', _.bind(function() {
      if(this.dataToRefresh){
         this.debug('server event; updating data');
         this.dataToRefresh.fetch({data: this.dataQuery});
       }
     }, this));
+
+    this.msgListener.onerror = _.bind(function(){
+      if(!this.sseRetryCount){
+        this.sseRetryCount = 0;
+      }
+      this.sseRetryCount++;
+      this.debug('Could not connect to event stream "changemessages"');
+      if(this.msgListener){
+        this.msgListener.close();
+      }
+      setTimeout(_.bind(this.startListeningForChanges,this), this.sseRetryCount * 1000);
+    },this);
+
+    this.msgListener.onopen = function(){
+      this.sseRetryCount = 0;
+    };
   },
 
   stopListeningForChanges: function(ignoreFocus){
