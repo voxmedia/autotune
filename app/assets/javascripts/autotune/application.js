@@ -910,11 +910,11 @@ __p+='\n  <tr><td class="text-center" colspan="4"><h4>No projects found</h4></td
    _.each(collection.models, function(item) { 
 __p+='\n   <tr>\n    <td ';
  if(item.get('status') == 'built') { 
-__p+='\n      class="ok"\n      ';
+__p+='\n      class="ok-notice"\n      ';
  } else if(item.get('status') == 'broken') { 
-__p+='\n      class="alert"\n      ';
+__p+='\n      class="alert-notice"\n      ';
  } else { 
-__p+='\n      class="info"\n      ';
+__p+='\n      class="info-notice"\n      ';
  } 
 __p+='>\n      ';
  if(item.get('status') == 'built') { 

@@ -88,9 +88,9 @@ $m : '.m-status';
 
 //alerts in tables
 .table td {
-  &.ok,
-  &.info,
-  &.alert {
+  &.ok-notice,
+  &.info-notice,
+  &.alert-notice {
     padding-top: 20px;
     position: relative;
     &:before {
@@ -102,13 +102,13 @@ $m : '.m-status';
       bottom: 0;
     }
   }
-  &.ok:before {
+  &.ok-notice:before {
     background-color: $green;
   }
-  &.info:before {
+  &.info-notice:before {
     background-color: $orange;
   }
-  &.alert:before {
+  &.alert-notice:before {
     background-color: $red;
   }
 }

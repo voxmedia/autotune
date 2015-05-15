@@ -76,11 +76,11 @@
    _.each(collection.models, function(item) { %>
    <tr>
     <td <% if(item.get('status') == 'built') { %>
-      class="ok"
+      class="ok-notice"
       <% } else if(item.get('status') == 'broken') { %>
-      class="alert"
+      class="alert-notice"
       <% } else { %>
-      class="info"
+      class="info-notice"
       <% } %>>
       <% if(item.get('status') == 'built') { %>
         <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
