@@ -1,1 +1,0 @@
-$redis = Redis.new(:host => ENV['REDIS_SERVER'] || 'localhost')

@@ -20,7 +20,7 @@ module Autotune
     private
 
     def stream_events(sse)
-      $redis.subscribe('blueprints', 'projects') do |on|
+      Autotune.redis.subscribe('blueprints', 'projects') do |on|
         on.message do |_channel, msg|
           sse.write({ msg: msg }, event: 'change')
         end

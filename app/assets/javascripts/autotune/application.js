@@ -592,7 +592,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/blueprints">clear</a>\n        ';
  } 
-__p+='\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td colspan="2">\n        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>\n      </td>\n      <td class="text-right" colspan="2">\n        <form class="form-inline" method="get" action="/blueprints">\n          Filters\n          ';
+__p+='\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td>\n        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>\n      </td>\n      <td class="text-right" colspan="3">\n        <form class="form-inline" method="get" action="/blueprints">\n          Filters\n          ';
  if(query.type || query.tag || query.status) { 
 __p+='\n            (<a href="/blueprints">clear</a>)\n          ';
  } 
@@ -872,7 +872,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
-__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table">\n  <thead>\n    <tr>\n      <td colspan="2">\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="2">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
+__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="3">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
  if(query.theme || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
@@ -929,25 +929,33 @@ __p+='\n            </select>\n          </div>\n        </form>\n      </td>\n 
 __p+='\n  <tr><td class="text-center" colspan="4"><h4>No projects found</h4></td></tr>\n  ';
  }
    _.each(collection.models, function(item) { 
-__p+='\n   <tr>\n    <td><a href="'+
-((__t=(item.url() ))==null?'':__t)+
-'">'+
-((__t=( item.get('title') ))==null?'':__t)+
-'</a></td>\n    <td>\n      ';
+__p+='\n   <tr>\n    <td ';
  if(item.get('status') == 'built') { 
-__p+='\n      <span class="label label-success text-capitalize">'+
+__p+='\n      class="ok-notice"\n      ';
+ } else if(item.get('status') == 'broken') { 
+__p+='\n      class="alert-notice"\n      ';
+ } else { 
+__p+='\n      class="info-notice"\n      ';
+ } 
+__p+='>\n      ';
+ if(item.get('status') == 'built') { 
+__p+='\n        <span class="m-status status-ok"><i class="icon-ok"></i>'+
 ((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n      ';
  } else if(item.get('status') == 'broken') { 
-__p+='\n        <span class="label label-danger text-capitalize">'+
+__p+='\n        <span class="m-status status-alert"><i class="icon-alert"></i>'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span></h4>\n      ';
+'</span>\n      ';
  } else { 
-__p+='\n        <span class="label label-warning text-capitalize">'+
+__p+='\n        <span class="m-status status-info"><i class="icon-info"></i>'+
 ((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n      ';
  } 
-__p+='\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">\n\n      <a data-tooltip="edit" class="icon-edit" href="'+
+__p+='\n      <a href="'+
+((__t=(item.url() ))==null?'':__t)+
+'">'+
+((__t=( item.get('title') ))==null?'':__t)+
+'</a></td>\n    <td>\n      “Published” with timestamp or “Draft” status here.\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">\n\n      <a data-tooltip="edit" class="icon-edit" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit"></a>\n      <a data-tooltip="preview" class="icon-preview" target="_blank" ';
  if ( ! item.hasStatus( 'built' ) ) { 

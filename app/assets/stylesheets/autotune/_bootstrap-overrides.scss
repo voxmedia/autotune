@@ -45,6 +45,11 @@ select {
   -webkit-border-radius: 0px;
 }
 
+//tables
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
 //alpaca overrides
 .alpaca-container-label {
   border: none;

@@ -89,10 +89,10 @@ module Autotune
     end
 
     def pub_to_redis
-      return if $redis.nil?
+      return if Autotune.redis.nil?
       msg = { id: id,
               status: status }
-      $redis.publish 'projects', msg.to_json
+      Autotune.redis.publish 'projects', msg.to_json
     end
   end
 end

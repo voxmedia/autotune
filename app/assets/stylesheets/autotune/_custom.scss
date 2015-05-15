@@ -42,6 +42,76 @@ $red: #D9534F; //danger
 .icon-refresh {
   &:after { content: "\e031"; }
 }
+ //alert icons
+.icon-ok,
+.icon-alert,
+.icon-info {
+  font-size: 11px;
+  margin: 0 3px 0 0;
+}
+.icon-ok {
+  &:after { 
+    content: "\e013";
+    color: $green;
+  }
+}
+.icon-alert {
+  &:after { 
+    content: "\e209";
+    color: $red;
+  }
+}
+.icon-info {
+  &:after { 
+    content: "\e086";
+    color: $orange;
+  }
+}
+
+//status notifications and alerts
+$m : '.m-status';
+
+#{$m} {
+  display: block;
+  font-size: 11px;
+  text-transform: capitalize;
+  &.status-ok {
+    color: $green;
+  }
+  &.status-info {
+    color: $orange;
+  }
+  &.status-alert {
+    color: $red;
+  }
+}
+
+//alerts in tables
+.table td {
+  &.ok-notice,
+  &.info-notice,
+  &.alert-notice {
+    padding-top: 20px;
+    position: relative;
+    &:before {
+      content: "";
+      position: absolute;
+      width: 5px;
+      left: 0;
+      top: -1px;
+      bottom: 0;
+    }
+  }
+  &.ok-notice:before {
+    background-color: $green;
+  }
+  &.info-notice:before {
+    background-color: $orange;
+  }
+  &.alert-notice:before {
+    background-color: $red;
+  }
+}
 
 //nav
 $m : '.m-nav';
@@ -125,6 +195,18 @@ $m : '.m-nav';
   }
   tbody > tr:nth-of-type(even) {
     background: $lightgrey;
+  }
+  &.projects {
+    tbody > tr > td {
+      &:nth-child(1) {
+        width: 40%;
+      }
+      &:nth-child(2),
+      &:nth-child(3),
+      &:nth-child(4) {
+        width: 20%;
+      }
+    }
   }
 }
 
