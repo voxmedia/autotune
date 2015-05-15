@@ -1,4 +1,5 @@
 require 'autotune/engine'
+require 'redis'
 
 # Top-level autotune module
 module Autotune
@@ -18,4 +19,11 @@ module Autotune
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :preview, :publish, :media,
                       :verify_omniauth, :git_ssh, :git_askpass)
+
+  class << self
+    attr_writer :redis
+    def redis
+      @redis ||= Redis.new(:host => ENV['REDIS_SERVER'])
+    end
+  end
 end
