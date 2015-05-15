@@ -42,6 +42,31 @@ $red: #D9534F; //danger
 .icon-refresh {
   &:after { content: "\e031"; }
 }
+ //alert icons
+.icon-ok,
+.icon-alert,
+.icon-info {
+  font-size: 11px;
+  margin: 0 3px 0 0;
+}
+.icon-ok {
+  &:after { 
+    content: "\e013";
+    color: $green;
+  }
+}
+.icon-alert {
+  &:after { 
+    content: "\e209";
+    color: $red;
+  }
+}
+.icon-info {
+  &:after { 
+    content: "\e086";
+    color: $orange;
+  }
+}
 
 //nav
 $m : '.m-nav';

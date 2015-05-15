@@ -75,15 +75,23 @@
   <% }
    _.each(collection.models, function(item) { %>
    <tr>
-    <td><a href="<%=item.url() %>"><%= item.get('title') %></a></td>
-    <td>
-      <% if(item.get('status') == 'built') { %>
-      <span class="label label-success text-capitalize"><%=item.get('status') %></span>
+    <td <% if(item.get('status') == 'built') { %>
+      class="ok"
       <% } else if(item.get('status') == 'broken') { %>
-        <span class="label label-danger text-capitalize"><%=item.get('status') %></span></h4>
+      class="alert"
       <% } else { %>
-        <span class="label label-warning text-capitalize"><%=item.get('status') %></span>
+      class="info"
+      <% } %>>
+      <% if(item.get('status') == 'built') { %>
+        <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
+      <% } else if(item.get('status') == 'broken') { %>
+        <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
+      <% } else { %>
+        <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
       <% } %>
+      <a href="<%=item.url() %>"><%= item.get('title') %></a></td>
+    <td>
+      “Published” with timestamp or “Draft” status here.
     </td>
     <td>Blueprint name here</td>
     <td class="text-right">
