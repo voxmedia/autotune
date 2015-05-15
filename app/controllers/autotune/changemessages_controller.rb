@@ -10,7 +10,7 @@ module Autotune
     def index
       response.headers['Content-Type'] = 'text/event-stream'
       sse = SSE.new(response.stream, retry: 300, event: 'connectionopen')
-      sse.write(msg: 'Channel init')      
+      sse.write(msg: 'Channel init')
       heartbeat(sse)
       stream_events(sse)
     ensure
@@ -31,14 +31,18 @@ module Autotune
       Thread.new do
         counter = 1
         while counter <= KEEPALIVE_SEC
-          sse.write({ msg: counter }, retry: 3000, event: 'heartbeats')
-          counter += 1
-          sleep 1
+          begin
+            sse.write({ msg: counter }, retry: 3000, event: 'heartbeats')
+            counter += 1
+            sleep 1
+          rescue IOError
+            sse.close
+            Thread.exit
+          end
         end
-          sse.write({ msg: 'Channel close'}, event: 'connectionclose')
-          sse.close
-          Thread.exit
-
+        sse.write({ msg: 'Channel close' }, event: 'connectionclose')
+        sse.close
+        Thread.exit
       end
     end
   end
