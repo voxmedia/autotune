@@ -32,6 +32,7 @@
 .form-control {
   @include box-shadow(none);
   border: 2px solid $grey;
+  padding: 8px;
   border-radius: 0;
   color: $darkgrey;
   &:focus {
