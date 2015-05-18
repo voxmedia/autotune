@@ -9,7 +9,7 @@ module Autotune
     include Searchable
     include WorkingDir
     serialize :config, JSON
-    has_many :blueprint_tags
+    has_many :blueprint_tags, :dependent => :destroy
     has_many :tags, :through => :blueprint_tags
 
     validates :title, :repo_url, :presence => true

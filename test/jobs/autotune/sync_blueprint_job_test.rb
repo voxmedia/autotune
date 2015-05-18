@@ -5,7 +5,6 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
   fixtures 'autotune/blueprints', 'autotune/projects'
   test 'install blueprint' do
     bp = autotune_blueprints(:example)
-    bp.repo.rm if bp.installed?
 
     assert_performed_jobs 0
 

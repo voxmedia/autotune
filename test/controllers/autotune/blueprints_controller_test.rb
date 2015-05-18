@@ -85,10 +85,19 @@ module Autotune
     end
 
     test 'delete blueprint' do
+      # make sure we remove the example blueprint
+      autotune_blueprints(:example).destroy
+
       accept_json!
       valid_auth_header!
 
-      delete :destroy, :id => autotune_blueprints(:example).id
+      title = 'New blueprint'
+
+      post :create, :title => title, :repo_url => repo_url
+      assert_response :created
+      assert_blueprint_data!
+
+      delete :destroy, :id => decoded_response['id']
       assert_response :no_content
     end
 

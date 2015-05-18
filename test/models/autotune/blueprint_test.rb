@@ -56,5 +56,15 @@ module Autotune
         :repo_url => repo_url + '#1')
       assert_equal b.slug, 'new-blueprint-1'
     end
+
+    test 'delete a blueprint' do
+      autotune_blueprints(:example).destroy
+      b = Blueprint.create!(
+        :title => 'new blueprint',
+        :repo_url => repo_url)
+      assert_equal b.slug, 'new-blueprint'
+
+      assert b.destroy, 'can delete blueprints'
+    end
   end
 end
