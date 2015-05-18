@@ -21,43 +21,34 @@ module.exports = FormView.extend({
   },
 
   handleUpdateAction: function(eve) {
-    var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+    var $btn = $(eve.currentTarget);
 
-    inst.updateSnapshot()
+    this.model.updateSnapshot()
       .done(_.bind(function() {
         this.success('Upgrading the project to use the newest blueprint');
-        inst.fetch();
+        this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
 
   handleBuildAction: function(eve) {
-    var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+    var $btn = $(eve.currentTarget);
 
-    inst.build()
+    this.model.build()
       .done(_.bind(function() {
         this.success('Building project');
-        inst.fetch();
+        this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
 
   handleBuildAndPublishAction: function(eve) {
-    var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+    var $btn = $(eve.currentTarget);
 
-    inst.buildAndPublish()
+    this.model.buildAndPublish()
       .done(_.bind(function() {
         this.success('Publishing project');
-        inst.fetch();
+        this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
