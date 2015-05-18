@@ -1,35 +1,45 @@
-<h3>
-  <%=model.get('title') %>
-  <% if(model.get('status') == 'ready') { %>
-  <span class="label label-success text-capitalize"><%=model.get('status') %></span></h4>
-  <% } else if(model.get('status') == 'broken') { %>
-  <span class="label label-danger text-capitalize"><%=model.get('status') %></span></h4>
-  <% } else { %>
-  <span class="label label-warning text-capitalize"><%=model.get('status') %></span></h4>
-  <% } %>
-</h3>
+<div class="row m-page-heading">
+  <div class="col-xs-12">
+    <h3><%=model.get('title') %></h3>
+    <% if(model.get('status') == 'ready') { %>
+    <span class="m-status status-ok"><i class="icon-ok"></i><%=model.get('status') %></span>
+    <% } else if(model.get('status') == 'broken') { %>
+    <span class="m-status status-alert"><i class="icon-alert"></i><%=model.get('status') %></span>
+    <% } else { %>
+    <span class="m-status status-info"><i class="icon-info"></i><%=model.get('status') %></span>
+    <% } %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-12">
+    <ul class="m-sub-nav">
+      <li><a href="<%=model.url() %>/new_project">New Project</a></li>
+      <li><a href="<%=model.url() %>/builder">Form Builder</a></li>
+      <li><button type="button" data-action="update" data-model="Blueprint"
+              data-loading-text="Updating..."
+              data-model-id="<%=model.get('slug') %>">Update</button></li>
+    </ul>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-6">
-    <p><div class="btn-group" role="group" aria-label="blueprint actions">
-      <a class="btn btn-default" href="<%=model.url() %>/new_project">New project</a>
-      <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
-      <a class="btn btn-default" href="<%=model.url() %>/builder">Form builder</a>
-      <button type="button" class="btn btn-default"
-              data-action="update" data-model="Blueprint"
-              data-loading-text="Updating..."
-              data-model-id="<%=model.get('slug') %>">Update</button>
-      <button type="button" class="btn btn-danger"
+    <% if(model.has('config')) { %>
+    <p><%=model.get('config').description %></p>
+    <% } %>
+    <p><strong>Type:</strong> <%=model.get('type') %></p>
+    <p><strong>Repo:</strong> <%=model.get('repo_url') %></p>
+    <p>
+      <div class="btn-group" role="group" aria-label="blueprint actions">
+        <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
+        <button type="button" class="btn btn-danger"
               data-action="delete" data-model="Blueprint"
               data-next="/blueprints"
               data-loading-text="Deleting..."
               data-model-id="<%=model.get('slug') %>">Delete</button>
-    </div></p>
-    <p><strong>Type:</strong> <%=model.get('type') %></p>
-    <p><strong>Repo:</strong><br>
-    <input value="<%=model.get('repo_url') %>" style="width:100%;"></p>
-    <% if(model.has('config')) { %>
-    <p><%=model.get('config').description %></p>
-    <% } %>
+      </div>
+    </p>
   </div>
   <div class="col-md-6">
     <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">

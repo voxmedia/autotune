@@ -426,43 +426,43 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h3>\n  '+
+__p+='<div class="row m-page-heading">\n  <div class="col-xs-12">\n    <h3>'+
 ((__t=(model.get('title') ))==null?'':__t)+
-'\n  ';
+'</h3>\n    ';
  if(model.get('status') == 'ready') { 
-__p+='\n  <span class="label label-success text-capitalize">'+
+__p+='\n    <span class="m-status status-ok"><i class="icon-ok"></i>'+
 ((__t=(model.get('status') ))==null?'':__t)+
-'</span></h4>\n  ';
+'</span>\n    ';
  } else if(model.get('status') == 'broken') { 
-__p+='\n  <span class="label label-danger text-capitalize">'+
+__p+='\n    <span class="m-status status-alert"><i class="icon-alert"></i>'+
 ((__t=(model.get('status') ))==null?'':__t)+
-'</span></h4>\n  ';
+'</span>\n    ';
  } else { 
-__p+='\n  <span class="label label-warning text-capitalize">'+
+__p+='\n    <span class="m-status status-info"><i class="icon-info"></i>'+
 ((__t=(model.get('status') ))==null?'':__t)+
-'</span></h4>\n  ';
+'</span>\n    ';
  } 
-__p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="btn-group" role="group" aria-label="blueprint actions">\n      <a class="btn btn-default" href="'+
+__p+='\n  </div>\n</div>\n\n<div class="row">\n  <div class="col-xs-12">\n    <ul class="m-sub-nav">\n      <li><a href="'+
 ((__t=(model.url() ))==null?'':__t)+
-'/new_project">New project</a>\n      <a class="btn btn-default" href="'+
+'/new_project">New Project</a></li>\n      <li><a href="'+
 ((__t=(model.url() ))==null?'':__t)+
-'/edit">Edit</a>\n      <a class="btn btn-default" href="'+
-((__t=(model.url() ))==null?'':__t)+
-'/builder">Form builder</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-loading-text="Updating..."\n              data-model-id="'+
+'/builder">Form Builder</a></li>\n      <li><button type="button" data-action="update" data-model="Blueprint"\n              data-loading-text="Updating..."\n              data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-loading-text="Deleting..."\n              data-model-id="'+
-((__t=(model.get('slug') ))==null?'':__t)+
-'">Delete</button>\n    </div></p>\n    <p><strong>Type:</strong> '+
-((__t=(model.get('type') ))==null?'':__t)+
-'</p>\n    <p><strong>Repo:</strong><br>\n    <input value="'+
-((__t=(model.get('repo_url') ))==null?'':__t)+
-'" style="width:100%;"></p>\n    ';
+'">Update</button></li>\n    </ul>\n  </div>\n</div>\n\n<div class="row">\n  <div class="col-md-6">\n    ';
  if(model.has('config')) { 
 __p+='\n    <p>'+
 ((__t=(model.get('config').description ))==null?'':__t)+
 '</p>\n    ';
  } 
-__p+='\n  </div>\n  <div class="col-md-6">\n    <img src="'+
+__p+='\n    <p><strong>Type:</strong> '+
+((__t=(model.get('type') ))==null?'':__t)+
+'</p>\n    <p><strong>Repo:</strong> '+
+((__t=(model.get('repo_url') ))==null?'':__t)+
+'</p>\n    <p>\n      <div class="btn-group" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
+((__t=(model.url() ))==null?'':__t)+
+'/edit">Edit</a>\n        <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-loading-text="Deleting..."\n              data-model-id="'+
+((__t=(model.get('slug') ))==null?'':__t)+
+'">Delete</button>\n      </div>\n    </p>\n  </div>\n  <div class="col-md-6">\n    <img src="'+
 ((__t=(model.get('thumb_url') ))==null?'':__t)+
 '" alt="'+
 ((__t=(model.get('title') ))==null?'':__t)+
