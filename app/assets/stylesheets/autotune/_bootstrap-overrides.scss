@@ -38,6 +38,9 @@ select {
   -webkit-appearance: none;
   -webkit-border-radius: 0px;
 }
+select::-ms-expand{
+  display:none;
+}
 
 //tables
 .table > tbody > tr > td {
