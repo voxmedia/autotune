@@ -16,10 +16,12 @@
       <a class="btn btn-default" href="<%=model.url() %>/builder">Form builder</a>
       <button type="button" class="btn btn-default"
               data-action="update" data-model="Blueprint"
+              data-loading-text="Updating..."
               data-model-id="<%=model.get('slug') %>">Update</button>
       <button type="button" class="btn btn-danger"
               data-action="delete" data-model="Blueprint"
               data-next="/blueprints"
+              data-loading-text="Deleting..."
               data-model-id="<%=model.get('slug') %>">Delete</button>
     </div></p>
     <p><strong>Type:</strong> <%=model.get('type') %></p>
