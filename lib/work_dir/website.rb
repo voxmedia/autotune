@@ -34,7 +34,7 @@ module WorkDir
 
     def deploy_to_file(url)
       url_parts = URI.parse(url)
-      FileUtils.mkdir_p(File.dirname url_parts.path)
+      rm(url_parts.path) if File.exist?(url_parts.path)
       copy_to(url_parts.path)
     end
 
