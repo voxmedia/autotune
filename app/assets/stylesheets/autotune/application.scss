@@ -54,6 +54,21 @@ footer {
   overflow:hidden;
 }
 
+//broken radio button fixes
+.radio label, .checkbox label {
+  padding-left: 25px;
+}
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  margin-left: -25px;
+}
+input[type="radio"],
+input[type="checkbox"] {
+  margin: -10px 10px 0;
+}
+
 /* Form editor */
 #schema {
   float: right;
