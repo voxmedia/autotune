@@ -8,6 +8,16 @@ $bootstrap-sass-asset-helper: false !default;
 //
 //## Gray and brand colors for use across Bootstrap.
 
+//color
+$black: #282828;
+$darkgrey: #3F3F3F;
+$grey: #CCC;
+$lightgrey: #F1F1F1;
+$primary: #048AAF;
+$green: #5CB85C; //success
+$orange: #FFA039; //info
+$red: #D9534F; //danger
+
 $gray-base:              $black !default;
 $gray-darker:            lighten($gray-base, 13.5%) !default; // #222
 $gray-dark:              $darkgrey !default; 

@@ -3,10 +3,13 @@
  * the desired effect by adjusting the vars and the html structure first.
  */
 @import "bootstrap-sprockets";
-@import "custom";
-@import "vars";
+@import "autotune/custom_vars";
+@import "autotune/vars";
 @import "bootstrap";
-@import "bootstrap-overrides";
+
+// TODO: merge bootstrap_overrides, custom and the rest of this file
+@import "autotune/bootstrap_overrides";
+@import "autotune/custom";
 
 //lets add some padding to crunched page bottoms
 #main {
@@ -33,6 +36,7 @@ label.block {
 
 .alpaca-field-array.alpaca-top,
 .alpaca-field-object.alpaca-top { padding:10px 0; }
+.alpaca-form-buttons-container { text-align:left; }
 
 .tab-content {
   margin-top:20px;
@@ -149,3 +153,6 @@ input[type="checkbox"] {
   border-width:0 0 0 1px;
 }
 /* end form editor */
+
+// let the rails project override anything
+@import "autotune/custom_overrides";
