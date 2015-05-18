@@ -11,9 +11,12 @@ module WorkDir
     # Update the repo on disk
     def update
       working_dir do
-        git 'fetch', 'origin'
-        git 'reset', '--hard', "origin/#{branch}"
+        git 'checkout', working_dir
         git 'clean', '-fd'
+        git 'checkout', 'master'
+        git 'pull'
+        git 'fetch', 'origin'
+        git 'checkout', branch
         git 'submodule', 'update', '--init'
       end
     end
