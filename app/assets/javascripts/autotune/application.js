@@ -448,9 +448,9 @@ __p+='\n</h3>\n<div class="row">\n  <div class="col-md-6">\n    <p><div class="b
 ((__t=(model.url() ))==null?'':__t)+
 '/edit">Edit</a>\n      <a class="btn btn-default" href="'+
 ((__t=(model.url() ))==null?'':__t)+
-'/builder">Form builder</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-model-id="'+
+'/builder">Form builder</a>\n      <button type="button" class="btn btn-default"\n              data-action="update" data-model="Blueprint"\n              data-loading-text="Updating..."\n              data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-model-id="'+
+'">Update</button>\n      <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-loading-text="Deleting..."\n              data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n    </div></p>\n    <p><strong>Type:</strong> '+
 ((__t=(model.get('type') ))==null?'':__t)+
@@ -571,7 +571,7 @@ __p+='selected';
  } 
 __p+='\n          >Ready</option>\n      </select>\n    </div>\n  </div>\n  ';
  } 
-__p+='\n  <button type="submit" class="btn btn-primary">Save changes</button>\n</form>\n';
+__p+='\n  <button type="submit" class="btn btn-primary"\n          data-loading-text="Saving...">Save changes</button>\n</form>\n';
 }
 return __p;
 };
@@ -768,7 +768,7 @@ __p+='disabled="true"';
  } 
 __p+='\n     href="'+
 ((__t=(model.get('preview_url') ))==null?'':__t)+
-'">Preview</a>\n  <button type="button" class="btn btn-default"\n          data-action="build" data-model="Project"\n          data-model-id="'+
+'">Preview</a>\n  <button type="button" class="btn btn-default"\n          data-action="build" data-model="Project"\n          data-loading-text="Rebuilding..."\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Rebuild preview</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  <a class="btn btn-default" target="_blank"\n     ';
  if ( ! model.hasStatus( 'built' ) ) { 
@@ -780,15 +780,15 @@ __p+='\n     href="'+
  if ( ! model.hasStatus( 'built' ) ) { 
 __p+='disabled="true"';
  } 
-__p+='\n          data-action="build-and-publish" data-model="Project"\n          data-model-id="'+
+__p+='\n          data-action="build-and-publish" data-model="Project"\n          data-loading-text="Publishing..."\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Publish</button>\n</div>\n<div class="btn-group" role="group" aria-label="project actions">\n  ';
  if ( hasRole( 'superuser' ) ) { 
-__p+='\n  <button type="button" class="btn btn-warning"\n          data-action="update" data-model="Project"\n          data-model-id="'+
+__p+='\n  <button type="button" class="btn btn-warning"\n          data-action="update" data-model="Project"\n          data-loading-text="Upgrading..."\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n  ';
  } 
-__p+='\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
+__p+='\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-loading-text="Deleting..."\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n</div></p>\n\n';
  if ( model.get('status') === 'built' ) { 
@@ -30407,43 +30407,34 @@ module.exports = FormView.extend({
   },
 
   handleUpdateAction: function(eve) {
-    var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+    var $btn = $(eve.currentTarget);
 
-    inst.updateSnapshot()
+    this.model.updateSnapshot()
       .done(_.bind(function() {
         this.success('Upgrading the project to use the newest blueprint');
-        inst.fetch();
+        this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
 
   handleBuildAction: function(eve) {
-    var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+    var $btn = $(eve.currentTarget);
 
-    inst.build()
+    this.model.build()
       .done(_.bind(function() {
         this.success('Building project');
-        inst.fetch();
+        this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   },
 
   handleBuildAndPublishAction: function(eve) {
-    var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+    var $btn = $(eve.currentTarget);
 
-    inst.buildAndPublish()
+    this.model.buildAndPublish()
       .done(_.bind(function() {
         this.success('Publishing project');
-        inst.fetch();
+        this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
