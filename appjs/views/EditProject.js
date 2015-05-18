@@ -90,6 +90,9 @@ module.exports = FormView.extend({
         "options": {
           "form": options_form,
           "fields": options_fields
+        },
+        "postRender": function(control) {
+          control.form.getButtonEl("submit").data('loading-text', 'Saving...');
         }
       };
       if(!this.model.isNew()) {
@@ -102,6 +105,7 @@ module.exports = FormView.extend({
       $form.alpaca(opts);
     }
   },
+
   formValues: function($form) {
     var data = $form.alpaca('get').getValue();
     return {

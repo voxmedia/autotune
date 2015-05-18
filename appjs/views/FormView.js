@@ -61,6 +61,7 @@ module.exports = BaseView.extend({
 
     inst.save()
       .done(_.bind(function() {
+        this.app.debug('form finished saving');
         if(action === 'new') {
           this.success('New '+model_class+' saved');
         } else {
