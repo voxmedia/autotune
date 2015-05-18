@@ -24,6 +24,7 @@ module.exports = BaseView.extend({
     eve.preventDefault();
     eve.stopPropagation();
 
+    this.app.view.spinStart();
     this.app.debug('handleForm');
 
     var inst, Model,
@@ -33,6 +34,8 @@ module.exports = BaseView.extend({
         model_id = $form.data('model-id'),
         action = $form.data('action'),
         next = $form.data('next');
+
+    $form.find('[type=submit]').button('loading');
 
     if(model_class && action === 'new') {
       Model = models[model_class];
@@ -89,8 +92,10 @@ module.exports = BaseView.extend({
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+    this.app.view.spinStart();
     var $btn = $(eve.currentTarget),
         action = $btn.data('action');
+    $btn.button('loading');
     this.hook(camelize('handle-' + action + '-action'), eve);
   },
 
