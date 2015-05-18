@@ -159,6 +159,30 @@ $m : '.m-nav';
   }
 }
 
+//subnav
+.m-sub-nav {
+  background-color: $lightgrey;
+  display: block;
+  margin: 0 0 25px 0;
+  padding: 0;
+  li {
+    list-style: none;
+    display: inline-block;
+    a,
+    button {
+      border: none;
+      background-color: transparent;
+      color: $darkgrey;
+      display: block;
+      padding: 10px;
+      &:hover {
+        background-color: darken($lightgrey, 5%);
+        text-decoration: none;
+      }
+    }
+  }
+}
+
 //page headings
 .m-page-heading {
   padding: 50px 0;
