@@ -7,7 +7,7 @@ var $ = require('jquery'),
     FormView = require('./FormView');
 
 module.exports = FormView.extend({
-  template: require('../templates/project_form.ejs'),
+  template: require('../templates/project.ejs'),
 
   afterInit: function() {
     this.setupBlueprint();
@@ -16,6 +16,11 @@ module.exports = FormView.extend({
   afterRender: function() {
     if ( _.isUndefined( this.model.blueprint ) ) {
       this.setupBlueprint();
+    }
+
+    if ( this.model.isPublished() ) {
+      $.get(this.model.get('publish_url') + 'embed.txt',
+            function(data, status) { $('#embed textarea').text( data ); });
     }
 
     if( ! this.model.blueprint.has('config') ) {
@@ -39,12 +44,13 @@ module.exports = FormView.extend({
 
   renderForm: function() {
     var $form = this.$el.find('#projectForm'),
+        button_tmpl = require('../templates/project_buttons.ejs'),
         form_config;
 
     if ( this.model.isNew() ) {
-     form_config = this.model.blueprint.get('config').form;
+      form_config = this.model.blueprint.get('config').form;
     } else {
-     form_config = this.model.get('blueprint_config').form;
+      form_config = this.model.get('blueprint_config').form;
     }
 
     if(_.isUndefined(form_config)) {
@@ -68,9 +74,8 @@ module.exports = FormView.extend({
               "data-model": "Project",
               "data-model-id": this.model.isNew() ? '' : this.model.id,
               "data-action": this.model.isNew() ? 'new' : 'edit',
-              "data-next": "show"
-            },
-            "buttons": { "submit": { "value": "Save" } }
+              "data-next": 'show'
+            }
           },
           options_fields = {};
 
@@ -91,9 +96,9 @@ module.exports = FormView.extend({
           "form": options_form,
           "fields": options_fields
         },
-        "postRender": function(control) {
-          control.form.getButtonEl("submit").data('loading-text', 'Saving...');
-        }
+        "postRender": _.bind(function(control) {
+          control.form.form.append( button_tmpl(this) );
+        }, this)
       };
       if(!this.model.isNew()) {
         opts.data = {
@@ -115,5 +120,51 @@ module.exports = FormView.extend({
       data:  data,
       blueprint_id: this.model.blueprint.get('id')
     };
+  },
+
+  formValidate: function(inst, $form) {
+    var control = $form.alpaca('get'),
+        valid = control.form.isFormValid();
+    if ( !valid ) {
+      control.form.refreshValidationState(true);
+      $form.find('#validation-error').removeClass('hidden');
+    } else {
+      $form.find('#success-message').removeClass('hidden');
+      $form.find('#validation-error').addClass('hidden');
+    }
+    return valid;
+  },
+
+  handleUpdateAction: function(eve) {
+    var $btn = $(eve.currentTarget);
+
+    this.model.updateSnapshot()
+      .done(_.bind(function() {
+        this.success('Upgrading the project to use the newest blueprint');
+        this.model.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
+  },
+
+  handleBuildAction: function(eve) {
+    var $btn = $(eve.currentTarget);
+
+    this.model.build()
+      .done(_.bind(function() {
+        this.success('Building project');
+        this.model.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
+  },
+
+  handleBuildAndPublishAction: function(eve) {
+    var $btn = $(eve.currentTarget);
+
+    this.model.buildAndPublish()
+      .done(_.bind(function() {
+        this.success('Publishing project');
+        this.model.fetch();
+      }, this))
+      .fail(_.bind(this.handleRequestError, this));
   }
 });

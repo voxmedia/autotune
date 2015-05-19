@@ -91,13 +91,8 @@ module.exports = Backbone.View.extend({
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
     this.app.debug('hook ' + name);
-    if(_.isFunction(this[name])) {
-      _.defer(
-        function(view, args) {
-          view[name].apply(view, args);
-          view.trigger(name, args);
-        }, this, args);
-    }
+    this.trigger(name, args);
+    if(_.isFunction(this[name])) { return this[name].apply(this, args); }
   }
 });
 

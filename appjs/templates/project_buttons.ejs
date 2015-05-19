@@ -1,0 +1,55 @@
+<p>
+<button type="submit" class="btn btn-default"
+        data-loading-text="Saving...">Save</button>
+
+<% if ( ! model.isNew() ) { %>
+  <% if ( model.hasUnpublishedUpdates() || model.isDraft() ) { %>
+  <a class="btn btn-default" target="_blank"
+     <% if(model.get('status') != 'built') { %>disabled="true"<% } %>
+     href="<%=model.get('preview_url') %>">Preview</a>
+  <% } else { %>
+  <a class="btn btn-default" target="_blank"
+     <% if(model.get('status') != 'built') { %>disabled="true"<% } %>
+     href="<%=model.get('publish_url') %>">View</a>
+  <% } %>
+
+  <button type="button" class="btn btn-success"
+          <% if(model.get('status') != 'built') { %>disabled="true"<% } %>
+          data-action="build-and-publish" data-model="Project"
+          data-model-id="<%=model.get('slug') %>">Publish</button>
+
+  <button type="button" class="btn btn-danger"
+          data-action="delete" data-model="Project"
+          data-next="/projects"
+          data-model-id="<%=model.get('slug') %>">Delete</button>
+<% } %>
+</p>
+
+<p id="validation-error" class="text-danger hidden">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  <span class="sr-only">Error:</span>
+  You are missing required fields. Please edit and re-save.</p>
+<p id="success-message" class="text-success hidden">
+  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+  You project has successfully saved.</p>
+
+<% if ( ! model.isNew() ) { %>
+  <% if ( model.hasStatus('broken') ) { %>
+  <p class="text-danger">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>
+    There were errors during the build.</p>
+  <% } else if ( model.isDraft() ) { %>
+  <p class="text-warning">
+    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+    You are currently editing a draft.</p>
+  <p class="text-warning">
+    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+    You must publish to see your updates live.</p>
+  <% } else if ( model.hasUnpublishedUpdates() ) { %>
+  <p class="text-warning">
+    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+    This project has unpublished changes. To preview your changes, click ‘Preview’.
+  If you are satisfied with your changes, you must republish.</p>
+  <% } %>
+<% } %>

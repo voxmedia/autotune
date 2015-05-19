@@ -2,6 +2,7 @@
 
 var Backbone = require('backbone'),
     _ = require('underscore'),
+    moment = require('moment'),
     markdown = require('markdown').markdown;
 
 function getEmptyJSON(url) {
@@ -64,6 +65,18 @@ exports.Project = Backbone.Model.extend({
     };
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
+
+  isDraft: function() {
+    return ! this.isPublished();
+  },
+
+  isPublished: function() {
+    return !!this.get('published_at');
+  },
+
+  hasUnpublishedUpdates: function() {
+    return moment(this.get('data_updated_at')).isAfter(this.get('published_at'));
+  }
 });
 
 exports.ProjectCollection = Backbone.Collection.extend({

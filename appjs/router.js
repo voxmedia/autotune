@@ -30,7 +30,7 @@ module.exports = Backbone.Router.extend({
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
-    "projects/:slug": "showProject",
+    "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject"
   },
 
@@ -129,16 +129,6 @@ module.exports = Backbone.Router.extend({
     this.app.view.setTab('projects');
     blueprint.fetch();
     this.app.setActiveData();
-  },
-
-  showProject: function(slug) {
-    this.app.view.spinStart();
-    var project = new models.Project({id: slug}),
-        view = new views.ShowProject({ model: project, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('projects');
-    project.fetch();
-    this.app.setActiveData(project);
   },
 
   editProject: function(slug) {

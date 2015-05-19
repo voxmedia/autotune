@@ -55,12 +55,17 @@ module.exports = BaseView.extend({
     } else { throw "Don't know how to handle this form"; }
 
     inst.set(values);
-    if(!inst.isValid()) { return this.render(); }
+    if(!this.formValidate(inst, $form)) {
+      $form.find('[type=submit]').button('reset');
+      this.app.debug('form is not valid');
+      return false;
+    }
 
     this.app.debug('form is valid, saving...');
 
     inst.save()
       .done(_.bind(function() {
+        $form.find('[type=submit]').button('reset');
         this.app.debug('form finished saving');
         if(action === 'new') {
           this.success('New '+model_class+' saved');
@@ -88,6 +93,10 @@ module.exports = BaseView.extend({
       function(memo, i) { memo[i.name] = i.value; return memo; },
       {}
     );
+  },
+
+  formValidate: function(inst, $form) {
+    return inst.isValid();
   },
 
   handleAction: function(eve) {

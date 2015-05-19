@@ -7,6 +7,9 @@
   border-bottom: 5px solid;
   border-bottom: 5px solid $btn-default-border;
 }
+.btn+.btn {
+  margin-left:10px;
+}
 .btn-primary {
   border-bottom: 5px solid $btn-primary-border;
 }
@@ -58,4 +61,9 @@ select::-ms-expand{
   font-family: $font-family-sans-serif;
   content: "*";
   margin-right: 3px;
+}
+
+// so we can keep alert box content flush
+.alert > .container-fluid {
+  padding:0;
 }
