@@ -767,17 +767,17 @@ __p+='</h3>\n\n    ';
  if ( !model.isNew() ) { 
 __p+='\n    <p class="text-muted">\n      Status:\n      ';
  if ( model.hasUnpublishedUpdates() ) { 
-__p+='\n      <a target="_blank" href="'+
+__p+='\n      <a data-tooltip="Your Published Version Has Updates" target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
-'">Published</a> (updates)\n      ';
+'">Published</a> (has updates)\n      ';
  } else if ( model.isPublished() ) { 
-__p+='\n      <a target="_blank" href="'+
+__p+='\n      <a data-tooltip="View Published Preview" target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
 '">Published</a>\n      ';
  } else if ( model.hasStatus('broken') ) { 
-__p+='\n      <span class="text-danger">Broken</span>\n      ';
+__p+='\n      <span class="m-status status-alert"><i class="icon-alert"></i>Broken</span>\n      ';
  } else { 
-__p+='\n      <a target="_blank" href="'+
+__p+='\n      <a data-tooltip="View Draft Preview" target="_blank" href="'+
 ((__t=(model.get('preview_url') ))==null?'':__t)+
 '">Draft</a>\n      ';
  } 
@@ -834,7 +834,7 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<p>\n<button type="submit" class="btn btn-default"\n        data-loading-text="Saving...">Save</button>\n\n';
+__p+='<p class="margin-top">\n<button type="submit" class="btn btn-default"\n        data-loading-text="Saving...">Save</button>\n\n';
  if ( ! model.isNew() ) { 
 __p+='\n  ';
  if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
@@ -864,15 +864,15 @@ __p+='\n          data-action="build-and-publish" data-model="Project"\n        
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n';
  } 
-__p+='\n</p>\n\n<p id="validation-error" class="text-danger hidden">\n  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n  <span class="sr-only">Error:</span>\n  You are missing required fields. Please edit and re-save.</p>\n<p id="success-message" class="text-success hidden">\n  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>\n  You project has successfully saved.</p>\n\n';
+__p+='\n</p>\n\n<p id="validation-error" class="text-danger hidden">\n  <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> You are missing required fields. Please edit and re-save.</span>\n  </p>\n<p id="success-message" class="text-success hidden">\n  <span class="m-status status-ok"><i class="icon-ok"></i>You project has successfully saved.</span>\n</p>\n\n';
  if ( ! model.isNew() ) { 
 __p+='\n  ';
  if ( model.hasStatus('broken') ) { 
-__p+='\n  <p class="text-danger">\n    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n    <span class="sr-only">Error:</span>\n    There were errors during the build.</p>\n  ';
+__p+='\n  <p class="text-danger">\n     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>\n    </p>\n  ';
  } else if ( model.isDraft() ) { 
-__p+='\n  <p class="text-warning">\n    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>\n    You are currently editing a draft.</p>\n  <p class="text-warning">\n    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>\n    You must publish to see your updates live.</p>\n  ';
+__p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You are currently editing a draft</span>\n  </p>\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>\n  </p>\n  ';
  } else if ( model.hasUnpublishedUpdates() ) { 
-__p+='\n  <p class="text-warning">\n    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>\n    This project has unpublished changes. To preview your changes, click ‘Preview’.\n  If you are satisfied with your changes, you must republish.</p>\n  ';
+__p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>\n  </p>\n  ';
  } 
 __p+='\n';
  } 

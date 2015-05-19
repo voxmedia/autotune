@@ -6,13 +6,13 @@
     <p class="text-muted">
       Status:
       <% if ( model.hasUnpublishedUpdates() ) { %>
-      <a target="_blank" href="<%=model.get('publish_url') %>">Published</a> (updates)
+      <a data-tooltip="Your Published Version Has Updates" target="_blank" href="<%=model.get('publish_url') %>">Published</a> (has updates)
       <% } else if ( model.isPublished() ) { %>
-      <a target="_blank" href="<%=model.get('publish_url') %>">Published</a>
+      <a data-tooltip="View Published Preview" target="_blank" href="<%=model.get('publish_url') %>">Published</a>
       <% } else if ( model.hasStatus('broken') ) { %>
-      <span class="text-danger">Broken</span>
+      <span class="m-status status-alert"><i class="icon-alert"></i>Broken</span>
       <% } else { %>
-      <a target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
+      <a data-tooltip="View Draft Preview" target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
       <% } %>
       <% if ( model.get('published_at') ) { %><%=model.get('published_at') %><% } %>
     </p>

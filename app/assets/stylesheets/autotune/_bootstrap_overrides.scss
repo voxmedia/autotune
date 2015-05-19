@@ -59,6 +59,23 @@ select::-ms-expand{
   text-transform: uppercase;
   letter-spacing: 1px;
 }
+button.alpaca-array-actionbar-action {
+  background-color: transparent;
+  border: none;
+  color: $darkgrey;
+  font-size: 1.5em;
+  padding: 5px;
+  line-height: 1;
+  &[disabled],
+  &[disabled]:hover {
+    background: transparent;
+  }
+  &:hover {
+    color: $primary;
+    background: transparent;
+  }
+}
+
 // star for required fields? this is the easeist way to adjust that
 .glyphicon-star:before {
   font-family: $font-family-sans-serif;
