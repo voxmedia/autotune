@@ -16,6 +16,17 @@
     color: $primary;
     text-decoration: none;
   }
+  &[disabled] {
+    opacity: 0.5;
+    cursor: default;
+    &:hover {
+      color: $darkgrey;
+    }
+    &:hover:before,
+    &:hover:after {
+      content: "";
+    }
+  }
 }
 
 .icon-edit {
