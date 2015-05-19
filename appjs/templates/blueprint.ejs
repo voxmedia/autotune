@@ -26,20 +26,18 @@
 <div class="row">
   <div class="col-md-6">
     <% if(model.has('config')) { %>
-    <p><%=model.get('config').description %></p>
+    <p class="margin-bottom"><%=model.get('config').description %></p>
     <% } %>
     <p><strong>Type:</strong> <%=model.get('type') %></p>
-    <p><strong>Repo:</strong> <%=model.get('repo_url') %></p>
-    <p>
-      <div class="btn-group" role="group" aria-label="blueprint actions">
-        <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
-        <button type="button" class="btn btn-danger"
-              data-action="delete" data-model="Blueprint"
-              data-next="/blueprints"
-              data-loading-text="Deleting..."
-              data-model-id="<%=model.get('slug') %>">Delete</button>
-      </div>
-    </p>
+    <p><strong>Repo:</strong> <input disabled="disabled" value="<%=model.get('repo_url') %>"></input></p>
+    <div class="btn-group margin-top" role="group" aria-label="blueprint actions">
+      <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
+      <button type="button" class="btn btn-danger"
+            data-action="delete" data-model="Blueprint"
+            data-next="/blueprints"
+            data-loading-text="Deleting..."
+            data-model-id="<%=model.get('slug') %>">Delete</button>
+    </div>
   </div>
   <div class="col-md-6">
     <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">

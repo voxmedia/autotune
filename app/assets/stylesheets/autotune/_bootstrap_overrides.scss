@@ -26,6 +26,12 @@
   border-bottom: 5px solid $btn-danger-border;
 }
 
+.btn-group {
+  .btn, button {
+    margin-right: 10px;
+  }
+}
+
 //input
 .form-control {
   @include box-shadow(none);

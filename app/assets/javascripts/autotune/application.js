@@ -453,19 +453,19 @@ __p+='\n  </div>\n</div>\n\n<div class="row">\n  <div class="col-xs-12">\n    <u
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Update</button></li>\n    </ul>\n  </div>\n</div>\n\n<div class="row">\n  <div class="col-md-6">\n    ';
  if(model.has('config')) { 
-__p+='\n    <p>'+
+__p+='\n    <p class="margin-bottom">'+
 ((__t=(model.get('config').description ))==null?'':__t)+
 '</p>\n    ';
  } 
 __p+='\n    <p><strong>Type:</strong> '+
 ((__t=(model.get('type') ))==null?'':__t)+
-'</p>\n    <p><strong>Repo:</strong> '+
+'</p>\n    <p><strong>Repo:</strong> <input disabled="disabled" value="'+
 ((__t=(model.get('repo_url') ))==null?'':__t)+
-'</p>\n    <p>\n      <div class="btn-group" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
+'"></input></p>\n    <div class="btn-group margin-top" role="group" aria-label="blueprint actions">\n      <a class="btn btn-default" href="'+
 ((__t=(model.url() ))==null?'':__t)+
-'/edit">Edit</a>\n        <button type="button" class="btn btn-danger"\n              data-action="delete" data-model="Blueprint"\n              data-next="/blueprints"\n              data-loading-text="Deleting..."\n              data-model-id="'+
+'/edit">Edit</a>\n      <button type="button" class="btn btn-danger"\n            data-action="delete" data-model="Blueprint"\n            data-next="/blueprints"\n            data-loading-text="Deleting..."\n            data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Delete</button>\n      </div>\n    </p>\n  </div>\n  <div class="col-md-6">\n    <img src="'+
+'">Delete</button>\n    </div>\n  </div>\n  <div class="col-md-6">\n    <img src="'+
 ((__t=(model.get('thumb_url') ))==null?'':__t)+
 '" alt="'+
 ((__t=(model.get('title') ))==null?'':__t)+
@@ -647,26 +647,34 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n    <td>Blueprint</td>\n    <td>Status</td>\n    <td class="text-right" colspan="2">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n      <td>Blueprint</td>\n      <td>Status</td>\n      <td class="text-right" colspan="2">Bold Actions</td>\n    </tr>\n  ';
  if(collection.models.length == 0) { 
 __p+='\n      <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>\n  ';
  }
   _.each(collection.models, function(item) { 
-__p+='\n  <tr>\n    <td><a href="'+
+__p+='\n  <tr>\n    <td ';
+ if(item.get('status') == 'ready') { 
+__p+='\n      class="ok-notice"\n      ';
+ } else if(item.get('status') == 'broken') { 
+__p+='\n      class="alert-notice"\n      ';
+ } else { 
+__p+='\n      class="info-notice"\n      ';
+ } 
+__p+='><a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
 ((__t=( item.attributes.title ))==null?'':__t)+
 '</a></td>\n    <td>\n      ';
  if(item.get('status') == 'ready') { 
-__p+='\n      <span class="label label-success text-capitalize">'+
+__p+='\n      <span class="m-status status-ok"><i class="icon-ok"></i>'+
 ((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n      ';
  } else if(item.get('status') == 'broken') { 
-__p+='\n        <span class="label label-danger text-capitalize">'+
+__p+='\n        <span class="m-status status-alert"><i class="icon-alert"></i>'+
 ((__t=(item.get('status') ))==null?'':__t)+
-'</span></h4>\n      ';
+'</span>\n      ';
  } else { 
-__p+='\n        <span class="label label-warning text-capitalize">'+
+__p+='\n        <span class="m-status status-info"><i class="icon-info"></i>'+
 ((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n      ';
  } 
