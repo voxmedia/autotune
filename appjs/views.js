@@ -8,6 +8,5 @@ module.exports = {
   BlueprintBuilder: require('./views/BlueprintBuilder'),
   ListProjects: require('./views/ListProjects'),
   EditProject: require('./views/EditProject'),
-  ShowProject: require('./views/ShowProject'),
   Application: require('./views/Application')
 };

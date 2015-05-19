@@ -28,15 +28,21 @@
     <li role="presentation" class="active"><a
         href="#edit" aria-controls="edit"
         role="tab" data-toggle="tab">Project info</a></li>
-    <li role="presentation"
-        <% if ( !model.isPublished() ) { %>class="disabled"<% } %>><a
+    <% if ( model.isPublished() ) { %>
+    <li role="presentation"><a
         href="#embed" aria-controls="embed"
         role="tab" data-toggle="tab">Embed</a></li>
+    <% } else { %>
+    <li role="presentation" class="disabled"><a>Embed</a></li>
+    <% } %>
     <% if ( hasRole('superuser') ) { %>
-    <li role="presentation"
-        <% if ( model.isNew() ) { %>class="disabled"<% } %>><a
-        href="#developer" aria-controls="data"
-        role="tab" data-toggle="tab">Developer</a></li>
+      <% if ( model.isNew() ) { %>
+      <li role="presentation" class="disabled"><a>Developer</a></li>
+      <% } else { %>
+      <li role="presentation"><a
+          href="#developer" aria-controls="data"
+          role="tab" data-toggle="tab">Developer</a></li>
+      <% } %>
     <% } %>
   </ul>
 

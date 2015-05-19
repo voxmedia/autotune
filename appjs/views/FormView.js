@@ -12,7 +12,7 @@ module.exports = BaseView.extend({
   events: {
     'click a': 'handleLink',
     'submit form': 'handleForm',
-    'click button[data-action]': 'handleAction',
+    'click [data-action]': 'handleAction',
     'change select[data-auto-submit=true]': 'submitForm'
   },
 
@@ -128,6 +128,8 @@ module.exports = BaseView.extend({
           }
         }, this))
         .fail(_.bind(this.handleRequestError, this));
+    } else {
+      $btn.button('reset');
     }
   },
 
