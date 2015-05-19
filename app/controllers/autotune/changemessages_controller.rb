@@ -11,7 +11,7 @@ module Autotune
       response.headers['Content-Type'] = 'text/event-stream'
       sse = SSE.new(response.stream, retry: 300, event: 'connectionopen')
       sse.write(msg: 'Channel init')
-      heartbeat(sse)
+      # heartbeat(sse)
       stream_events(sse)
     ensure
       sse.close
