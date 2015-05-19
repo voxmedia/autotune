@@ -680,11 +680,11 @@ __p+='\n        <span class="m-status status-info"><i class="icon-info"></i>'+
  } 
 __p+='\n    </td>\n    <td class="text-right" colspan="2">\n\n      <a data-tooltip="edit" href="'+
 ((__t=(item.url() ))==null?'':__t)+
-'/edit" class="icon-edit"></a>\n      <a data-tooltip="update" href="#" class="icon-refresh" data-action="update" data-model="Blueprint"\n                data-model-id="'+
+'/edit"><span class="icon-edit"></span></a>\n      <a data-tooltip="update" href="#" data-action="update" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
-'"></a>\n      <a data-tooltip="delete" href="#" class="icon-delete" data-action="delete" data-model="Blueprint"\n                data-model-id="'+
+'"><span class="icon-refresh"></span></a>\n      <a data-tooltip="delete" href="#" data-action="delete" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
-'"></a>\n      <!-- to do: delete this after approval of above icons\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
+'"><span class="icon-delete"></span></a>\n      <!-- to do: delete this after approval of above icons\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="update" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
@@ -755,7 +755,7 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h3>';
+__p+='<div class="row m-page-heading">\n  <div class="col-xs-12">\n    <h3>';
  if ( model.isNew() ) { 
 __p+='New Project';
  } else { 
@@ -763,33 +763,33 @@ __p+=''+
 ((__t=(model.get( 'title' ) ))==null?'':__t)+
 '';
  } 
-__p+='</h3>\n\n';
+__p+='</h3>\n\n    ';
  if ( !model.isNew() ) { 
-__p+='\n<p class="text-muted">\n  Status:\n  ';
+__p+='\n    <p class="text-muted">\n      Status:\n      ';
  if ( model.hasUnpublishedUpdates() ) { 
-__p+='\n  <a target="_blank" href="'+
+__p+='\n      <a target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
-'">Published</a> (updates)\n  ';
+'">Published</a> (updates)\n      ';
  } else if ( model.isPublished() ) { 
-__p+='\n  <a target="_blank" href="'+
+__p+='\n      <a target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
-'">Published</a>\n  ';
+'">Published</a>\n      ';
  } else if ( model.hasStatus('broken') ) { 
-__p+='\n  <span class="text-danger">Broken</span>\n  ';
+__p+='\n      <span class="text-danger">Broken</span>\n      ';
  } else { 
-__p+='\n  <a target="_blank" href="'+
+__p+='\n      <a target="_blank" href="'+
 ((__t=(model.get('preview_url') ))==null?'':__t)+
-'">Draft</a>\n  ';
+'">Draft</a>\n      ';
  } 
-__p+='\n  ';
+__p+='\n      ';
  if ( model.get('published_at') ) { 
 __p+=''+
 ((__t=(model.get('published_at') ))==null?'':__t)+
 '';
  } 
-__p+='\n</p>\n';
+__p+='\n    </p>\n    ';
  } 
-__p+='\n\n<div role="tabpanel">\n\n  <!-- Nav tabs -->\n  <ul class="nav nav-tabs" role="tablist">\n    <li role="presentation" class="active"><a\n        href="#edit" aria-controls="edit"\n        role="tab" data-toggle="tab">Project info</a></li>\n    <li role="presentation"\n        ';
+__p+='\n  </div>\n\n</div>\n\n<div role="tabpanel">\n\n  <!-- Nav tabs -->\n  <ul class="nav nav-tabs" role="tablist">\n    <li role="presentation" class="active"><a\n        href="#edit" aria-controls="edit"\n        role="tab" data-toggle="tab">Project info</a></li>\n    <li role="presentation"\n        ';
  if ( !model.isPublished() ) { 
 __p+='class="disabled"';
  } 
@@ -980,17 +980,17 @@ __p+='\n      <a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
 ((__t=( item.get('title') ))==null?'':__t)+
-'</a></td>\n    <td>\n      “Published” with timestamp or “Draft” status here.\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">\n\n      <a data-tooltip="edit" class="icon-edit" href="'+
+'</a></td>\n    <td>\n      “Published” with timestamp or “Draft” status here.\n    </td>\n    <td>Blueprint name here</td>\n    <td class="text-right">\n\n      <a data-tooltip="edit" href="'+
 ((__t=(item.url() ))==null?'':__t)+
-'/edit"></a>\n      <a data-tooltip="preview" class="icon-preview" target="_blank" ';
+'/edit"><span class="icon-edit"></span></a>\n      <a data-tooltip="preview" target="_blank" ';
  if ( ! item.hasStatus( 'built' ) ) { 
 __p+='disabled="true"';
  } 
 __p+=' href="'+
 ((__t=(item.get('preview_url') ))==null?'':__t)+
-'"></a>\n      <a data-tooltip="delete" href="" class="icon-delete" data-action="delete" data-model="Project" data-model-id="'+
+'"><span class="icon-preview"></span></a>\n      <a data-tooltip="delete" href="" data-action="delete" data-model="Project" data-model-id="'+
 ((__t=( item.get('slug') ))==null?'':__t)+
-'"></a>\n      <!--  to do: delete this after approval of above icons\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
+'"><span class="icon-delete"></span></a>\n      <!--  to do: delete this after approval of above icons\n      <div class="btn-group btn-group-sm" role="group" aria-label="project actions">\n        <a class="btn btn-default" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="build" data-model="Project"\n                data-model-id="'+
 ((__t=( item.get('slug') ))==null?'':__t)+
@@ -73678,6 +73678,7 @@ function merge_text_nodes( jsonml ) {
 
 }));
 },{}],67:[function(require,module,exports){
+/*! pym.js - v0.4.2 - 2015-04-24 */
 /*
 * Pym.js is library that resizes an iframe based on the width of the parent and the resulting height of the child.
 * Check out the docs at http://blog.apps.npr.org/pym.js/ or the readme at README.md for usage.
@@ -73819,8 +73820,11 @@ function merge_text_nodes( jsonml ) {
             xdomain: '*'
         };
 
-        this.messageRegex = _makeMessageRegex(this.id); 
+        this.messageRegex = _makeMessageRegex(this.id);
         this.messageHandlers = {};
+
+        // ensure a config object
+        config = (config || {});
 
         /**
          * Construct the iframe.
@@ -73833,7 +73837,7 @@ function merge_text_nodes( jsonml ) {
             var width = this.el.offsetWidth.toString();
 
             // Create an iframe element attached to the document.
-            this.iframe = document.createElement("iframe");
+            this.iframe = document.createElement('iframe');
 
             // Save fragment id
             var hash = '';
@@ -73851,7 +73855,7 @@ function merge_text_nodes( jsonml ) {
             } else {
                 this.url += '&';
             }
-            
+
             // Append the initial width as a querystring parameter, and the fragment id
             this.iframe.src = this.url + 'initialWidth=' + width + '&childId=' + this.id + hash;
 
@@ -73925,16 +73929,31 @@ function merge_text_nodes( jsonml ) {
          */
         this._onHeightMessage = function(message) {
             /*
-             * Handle parent message from child.
+             * Handle parent height message from child.
              */
             var height = parseInt(message);
-            
+
             this.iframe.setAttribute('height', height + 'px');
         };
 
+        /**
+         * Navigate parent to a new url.
+         *
+         * @memberof Parent.prototype
+         * @method _onNavigateToMessage
+         * @param {String} message The url to navigate to.
+         */
+        this._onNavigateToMessage = function(message) {
+            /*
+             * Handle parent scroll message from child.
+             */
+             document.location.href = message;
+        };
 
         /**
          * Bind a callback to a given messageType from the child.
+         *
+         * Reserved message names are: "height", "scrollTo" and "navigateTo".
          *
          * @memberof Parent.prototype
          * @method onMessage
@@ -73980,8 +73999,9 @@ function merge_text_nodes( jsonml ) {
             this.settings[key] = config[key];
         }
 
-        // Add height event callback 
+        // Bind required message handlers
         this.onMessage('height', this._onHeightMessage);
+        this.onMessage('navigateTo', this._onNavigateToMessage);
 
         // Add a listener for processing messages from the child.
         var that = this;
@@ -74014,8 +74034,13 @@ function merge_text_nodes( jsonml ) {
         this.messageRegex = null;
         this.messageHandlers = {};
 
+        // ensure a config object
+        config = (config || {});
+
         /**
          * Bind a callback to a given messageType from the child.
+         *
+         * Reserved message names are: "width".
          *
          * @memberof Child.prototype
          * @method onMessage
@@ -74081,6 +74106,33 @@ function merge_text_nodes( jsonml ) {
         };
 
         /**
+         * Resize iframe in response to new width message from parent.
+         *
+         * @memberof Child.prototype
+         * @method _onWidthMessage
+         * @param {String} message The new width.
+         */
+        this._onWidthMessage = function(message) {
+            /*
+             * Handle width message from the child.
+             */
+            var width = parseInt(message);
+
+            // Change the width if it's different.
+            if (width !== this.parentWidth) {
+                this.parentWidth = width;
+
+                // Call the callback function if it exists.
+                if (this.settings.renderCallback) {
+                    this.settings.renderCallback(width);
+                }
+
+                // Send the height back to the parent.
+                this.sendHeight();
+            }
+        };
+
+        /**
          * Send a message to the the Parent.
          *
          * @memberof Child.prototype
@@ -74117,30 +74169,25 @@ function merge_text_nodes( jsonml ) {
         };
 
         /**
-         * Resize iframe in response to new width message from parent.
+         * Scroll parent to a given element id.
          *
          * @memberof Child.prototype
-         * @method _onWidthMessage
-         * @param {String} message The new width.
+         * @method scrollParentTo
+         * @param {String} hash The id of the element to scroll to.
          */
-        this._onWidthMessage = function(message) {
-            /*
-             * Handle width message from the child.
-             */
-            var width = parseInt(message);
+        this.scrollParentTo = function(hash) {
+            this.sendMessage('navigateTo', '#' + hash);
+        };
 
-            // Change the width if it's different.
-            if (width !== this.parentWidth) {
-                this.parentWidth = width;
-
-                // Call the callback function if it exists.
-                if (this.settings.renderCallback) {
-                    this.settings.renderCallback(width);
-                }
-
-                // Send the height back to the parent.
-                this.sendHeight();
-            }
+        /**
+         * Navigate parent to a given url.
+         *
+         * @memberof Parent.prototype
+         * @method navigateParentTo
+         * @param {String} url The url to navigate to.
+         */
+        this.navigateParentTo = function(url) {
+            this.sendMessage('navigateTo', url);
         };
 
         // Identify what ID the parent knows this child as.
@@ -74150,7 +74197,7 @@ function merge_text_nodes( jsonml ) {
         // Get the initial width from a URL parameter.
         var width = parseInt(_getParameterByName('initialWidth'));
 
-        // Bind the width message handler
+        // Bind the required message handlers
         this.onMessage('width', this._onWidthMessage);
 
         // Initialize settings with overrides.
@@ -74250,7 +74297,7 @@ function merge_text_nodes( jsonml ) {
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = queryString;
 	} else {
-		window.queryString = queryString;
+		self.queryString = queryString;
 	}
 })();
 

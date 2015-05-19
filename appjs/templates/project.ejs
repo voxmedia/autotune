@@ -1,20 +1,25 @@
-<h3><% if ( model.isNew() ) { %>New Project<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+<div class="row m-page-heading">
+  <div class="col-xs-12">
+    <h3><% if ( model.isNew() ) { %>New Project<% } else { %><%=model.get( 'title' ) %><% } %></h3>
 
-<% if ( !model.isNew() ) { %>
-<p class="text-muted">
-  Status:
-  <% if ( model.hasUnpublishedUpdates() ) { %>
-  <a target="_blank" href="<%=model.get('publish_url') %>">Published</a> (updates)
-  <% } else if ( model.isPublished() ) { %>
-  <a target="_blank" href="<%=model.get('publish_url') %>">Published</a>
-  <% } else if ( model.hasStatus('broken') ) { %>
-  <span class="text-danger">Broken</span>
-  <% } else { %>
-  <a target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
-  <% } %>
-  <% if ( model.get('published_at') ) { %><%=model.get('published_at') %><% } %>
-</p>
-<% } %>
+    <% if ( !model.isNew() ) { %>
+    <p class="text-muted">
+      Status:
+      <% if ( model.hasUnpublishedUpdates() ) { %>
+      <a target="_blank" href="<%=model.get('publish_url') %>">Published</a> (updates)
+      <% } else if ( model.isPublished() ) { %>
+      <a target="_blank" href="<%=model.get('publish_url') %>">Published</a>
+      <% } else if ( model.hasStatus('broken') ) { %>
+      <span class="text-danger">Broken</span>
+      <% } else { %>
+      <a target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
+      <% } %>
+      <% if ( model.get('published_at') ) { %><%=model.get('published_at') %><% } %>
+    </p>
+    <% } %>
+  </div>
+
+</div>
 
 <div role="tabpanel">
 
