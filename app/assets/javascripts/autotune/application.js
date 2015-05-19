@@ -495,7 +495,7 @@ var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments
 with(obj||{}){
 __p+='<h3>Choose a blueprint</h3>\n';
  if(collection.models.length == 0) { 
-__p+='\n  <div class="well text-center">\n    <h4>There are no blueprints ready for use.</h4>\n    <p>You must change the status of a blueprint to\n      <span class="label label-success text-capitalize">ready</span> for it to appear here.</p>\n  </div>\n';
+__p+='\n  <div class="well text-center">\n    <h4>There are no blueprints ready for use.</h4>\n    <p>You must change the status of a blueprint to\n      <span class="m-status status-ok"><i class="icon-ok"></i>Ready</span> for it to appear here.</p>\n  </div>\n';
  }
    var index = 0;
    _.each(collection.models, function(blueprint) { 
