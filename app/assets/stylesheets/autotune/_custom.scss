@@ -74,6 +74,16 @@ $m : '.m-status';
   }
 }
 
+.status-ok {
+  color: $green;
+}
+.status-info {
+  color: $orange;
+}
+.status-alert {
+  color: $red;
+}
+
 //alerts in tables
 .table td {
   &.ok-notice,
