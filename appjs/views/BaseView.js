@@ -76,6 +76,10 @@ module.exports = Backbone.View.extend({
     this.alert(message, 'danger');
   },
 
+  warning: function(message) {
+    this.alert(message, 'warning');
+  },
+
   success: function(message) {
     this.alert(message, 'success');
   },
