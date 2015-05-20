@@ -117,7 +117,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     projects.fetch({data: query});
-    this.app.setActiveData(projects,query);
+    this.app.setActiveData(projects, query);
   },
 
   newProject: function(slug) {
@@ -138,6 +138,6 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
-    this.app.setActiveData();
+    this.app.setActiveData(project);
   }
 });

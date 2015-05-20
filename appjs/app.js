@@ -30,15 +30,15 @@ window.App = function(config) {
 
   if ( window.EventSource ) {
     $(window).on('focus', _.bind(function(){
-       this.has_focus = true;
-       if(!this.sseRetryCount || this.sseRetryCount === 0){
+      this.has_focus = true;
+      if(!this.sseRetryCount || this.sseRetryCount === 0){
         this.startListeningForChanges();
       }
     }, this));
 
     $(window).on('blur', _.bind(function(){
       this.has_focus = false;
-      setTimeout(_.bind(this.stopListeningForChanges,this), 10000);
+      setTimeout(_.bind(this.stopListeningForChanges, this), 10000);
     }, this));
 
     this.startListeningForChanges();
@@ -84,7 +84,11 @@ _.extend(window.App.prototype, {
     this.msgListener.addEventListener('change', _.bind(function() {
      if(this.dataToRefresh){
         this.debug('server event; updating data');
-        this.dataToRefresh.fetch({data: this.dataQuery});
+        if ( this.dataQuery ) {
+          this.dataToRefresh.fetch({data: this.dataQuery});
+        } else {
+          this.dataToRefresh.fetch();
+        }
       }
     }, this));
 

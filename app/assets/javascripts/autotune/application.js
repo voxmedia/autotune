@@ -34,15 +34,15 @@ window.App = function(config) {
 
   if ( window.EventSource ) {
     $(window).on('focus', _.bind(function(){
-       this.has_focus = true;
-       if(!this.sseRetryCount || this.sseRetryCount === 0){
+      this.has_focus = true;
+      if(!this.sseRetryCount || this.sseRetryCount === 0){
         this.startListeningForChanges();
       }
     }, this));
 
     $(window).on('blur', _.bind(function(){
       this.has_focus = false;
-      setTimeout(_.bind(this.stopListeningForChanges,this), 10000);
+      setTimeout(_.bind(this.stopListeningForChanges, this), 10000);
     }, this));
 
     this.startListeningForChanges();
@@ -88,7 +88,11 @@ _.extend(window.App.prototype, {
     this.msgListener.addEventListener('change', _.bind(function() {
      if(this.dataToRefresh){
         this.debug('server event; updating data');
-        this.dataToRefresh.fetch({data: this.dataQuery});
+        if ( this.dataQuery ) {
+          this.dataToRefresh.fetch({data: this.dataQuery});
+        } else {
+          this.dataToRefresh.fetch();
+        }
       }
     }, this));
 
@@ -366,7 +370,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     projects.fetch({data: query});
-    this.app.setActiveData(projects,query);
+    this.app.setActiveData(projects, query);
   },
 
   newProject: function(slug) {
@@ -387,7 +391,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
-    this.app.setActiveData();
+    this.app.setActiveData(project);
   }
 });
 
@@ -846,12 +850,16 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<p class="margin-top">\n<button type="submit" class="btn btn-default"\n        data-loading-text="Saving...">Save</button>\n\n';
+__p+='<p class="margin-top">\n<button type="submit" class="btn btn-default"\n        ';
+ if ( model.hasStatus('building') ) { 
+__p+='disabled="true"';
+ } 
+__p+='\n        data-loading-text="Saving...">Save</button>\n\n';
  if ( ! model.isNew() ) { 
 __p+='\n  ';
  if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
 __p+='\n  <a class="btn btn-default" target="_blank"\n     ';
- if(model.get('status') != 'built') { 
+ if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
 __p+='\n     href="'+
@@ -859,7 +867,7 @@ __p+='\n     href="'+
 '">Preview</a>\n  ';
  } else { 
 __p+='\n  <a class="btn btn-default" target="_blank"\n     ';
- if(model.get('status') != 'built') { 
+ if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
 __p+='\n     href="'+
@@ -867,12 +875,16 @@ __p+='\n     href="'+
 '">View</a>\n  ';
  } 
 __p+='\n\n  <button type="button" class="btn btn-success"\n          ';
- if(model.get('status') != 'built') { 
+ if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
 __p+='\n          data-action="build-and-publish" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Publish</button>\n\n  <button type="button" class="btn btn-danger"\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
+'">Publish</button>\n\n  <button type="button" class="btn btn-danger"\n          ';
+ if ( model.hasStatus('building') ) { 
+__p+='disabled="true"';
+ } 
+__p+='\n          data-action="delete" data-model="Project"\n          data-next="/projects"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n';
  } 
@@ -881,8 +893,10 @@ __p+='\n</p>\n\n<p id="validation-error" class="text-danger hidden">\n  <span cl
 __p+='\n  ';
  if ( model.hasStatus('broken') ) { 
 __p+='\n  <p class="text-danger">\n     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>\n    </p>\n  ';
+ } else if ( model.hasStatus('building') ) { 
+__p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>Building the project, gimmie a sec.</span>\n  </p>\n  ';
  } else if ( model.isDraft() ) { 
-__p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You are currently editing a draft</span>\n  </p>\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>\n  </p>\n  ';
+__p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You are currently editing a draft.</span>\n  </p>\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>\n  </p>\n  ';
  } else if ( model.hasUnpublishedUpdates() ) { 
 __p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>\n  </p>\n  ';
  } 
