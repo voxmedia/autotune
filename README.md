@@ -1,31 +1,17 @@
+![Autotune Log](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
+
 # Chorus Autotune
 
-EXTREMELY ALPHA!!!
+>**Current project status**: Alpha
+
+---
 
 Platform and UI for creating new websites and html snippets from templates stored in git repos.
 Basically a fancy thing for turning templates into web pages.
 
-## Getting started
-
-You'll need to setup a new Rails app to start. First make sure you have redis, sqlite, some sort
-of ruby, and rails.
-
-```sh
-gem install rails
-```
-
-Then create a new rails app:
-
-```sh
-rails new autotune_app -m https://raw.githubusercontent.com/voxmedia/autotune/master/rails_template.rb
-
-cd autotune_app
-bundle exec foreman start
-```
-
 ## Documentation
 
-TKTK
+See project [wiki](https://github.com/voxmedia/autotune/wiki) for documentation on getting started.
 
 ## Examples
 
@@ -34,10 +20,6 @@ TK
 ## Authors
 
 TK
-
-## Contribute
-
-This is an active project and we encourage contributions. [Please review our guidelines and code of conduct before contributing.](https://github.com/voxmedia/open-source-contribution-guidelines)
 
 ## License
 
