@@ -28,7 +28,13 @@
   "scripts": {
     "test": "grunt nodeunit"
   },
-  "devDependencies": {
+  "dependencies": {
+    "brace": "0.5.1",
+    "jquery-ui": "1.10.5",
+    "markdown": "0.5.0",
+    "moment": "2.10.3",
+    "pym.js": "0.4.1",
+    "query-string": "1.0.0",
     "backbone": "1.1.2",
     "bootstrap": "3.2.0",
     "browserify": "5.12.1",
@@ -76,13 +82,5 @@
         "jquery:jQuery"
       ]
     }
-  },
-  "dependencies": {
-    "brace": "^0.5.1",
-    "jquery-ui": "^1.10.5",
-    "markdown": "^0.5.0",
-    "moment": "^2.10.3",
-    "pym.js": "^0.4.1",
-    "query-string": "^1.0.0"
   }
 }
