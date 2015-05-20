@@ -555,21 +555,19 @@ __p+='value="'+
 __p+='\n           id="repo_url" name="repo_url" placeholder="Enter repo url">\n  </div>\n  ';
  if(!model.isNew()) { 
 __p+='\n  <div class="form-group">\n    <label for="status" class="block">Status</label>\n    <div class="select"> \n      <select id="status" name="status" class="form-control"\n        ';
- if(model.get('status') != 'testing'
-              && model.get('status') != 'broken'
-              && model.get('status') != 'ready') { 
+ if ( model.hasStatus('new', 'updating') ) { 
 __p+='disabled';
  } 
 __p+='>\n        <option value="testing"\n          ';
- if(model.get('status') == 'testing') { 
+ if ( model.hasStatus('testing') ) { 
 __p+='selected';
  } 
 __p+='\n          >Testing</option>\n        <option value="broken"\n          ';
- if(model.get('status') == 'broken') { 
+ if ( model.hasStatus('broken') ) { 
 __p+='selected';
  } 
 __p+='\n          >Broken</option>\n        <option value="ready"\n          ';
- if(model.get('status') == 'ready') { 
+ if ( model.hasStatus('ready') ) { 
 __p+='selected';
  } 
 __p+='\n          >Ready</option>\n      </select>\n    </div>\n  </div>\n  ';
@@ -29135,7 +29133,7 @@ var $ = require('jquery'),
 
 module.exports = Backbone.View.extend({
   events: {
-    'click a[href]': 'handleLink' // doesn't work, matches all a tags
+    'click a[href]': 'handleLink'
   },
 
   initialize: function(options) {
@@ -29159,7 +29157,6 @@ module.exports = Backbone.View.extend({
   handleLink: function(eve) {
     var href = $(eve.currentTarget).attr('href'),
         target = $(eve.currentTarget).attr('target');
-    // have to double check that href exists because of bug in events ^
     if (href && !target && !/^(https?:\/\/|#)/.test(href) && !eve.metaKey && !eve.ctrlKey) {
       // only handle this link if it's a fragment and you didn't hold down a modifer key
       eve.preventDefault();
@@ -30250,9 +30247,9 @@ var $ = require('jquery'),
 
 module.exports = BaseView.extend({
   events: {
-    'click a': 'handleLink',
+    'click a[href]': 'handleLink',
     'submit form': 'handleForm',
-    'click [data-action]': 'handleAction',
+    'click button[data-action],a[data-action]': 'handleAction',
     'change select[data-auto-submit=true]': 'submitForm'
   },
 

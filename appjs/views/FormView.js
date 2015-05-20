@@ -10,9 +10,9 @@ var $ = require('jquery'),
 
 module.exports = BaseView.extend({
   events: {
-    'click a': 'handleLink',
+    'click a[href]': 'handleLink',
     'submit form': 'handleForm',
-    'click [data-action]': 'handleAction',
+    'click button[data-action],a[data-action]': 'handleAction',
     'change select[data-auto-submit=true]': 'submitForm'
   },
 

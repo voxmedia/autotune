@@ -9,7 +9,7 @@ var $ = require('jquery'),
 
 module.exports = Backbone.View.extend({
   events: {
-    'click a[href]': 'handleLink' // doesn't work, matches all a tags
+    'click a[href]': 'handleLink'
   },
 
   initialize: function(options) {
@@ -33,7 +33,6 @@ module.exports = Backbone.View.extend({
   handleLink: function(eve) {
     var href = $(eve.currentTarget).attr('href'),
         target = $(eve.currentTarget).attr('target');
-    // have to double check that href exists because of bug in events ^
     if (href && !target && !/^(https?:\/\/|#)/.test(href) && !eve.metaKey && !eve.ctrlKey) {
       // only handle this link if it's a fragment and you didn't hold down a modifer key
       eve.preventDefault();

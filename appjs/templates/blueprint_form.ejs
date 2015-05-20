@@ -29,17 +29,15 @@
     <label for="status" class="block">Status</label>
     <div class="select"> 
       <select id="status" name="status" class="form-control"
-        <% if(model.get('status') != 'testing'
-              && model.get('status') != 'broken'
-              && model.get('status') != 'ready') { %>disabled<% } %>>
+        <% if ( model.hasStatus('new', 'updating') ) { %>disabled<% } %>>
         <option value="testing"
-          <% if(model.get('status') == 'testing') { %>selected<% } %>
+          <% if ( model.hasStatus('testing') ) { %>selected<% } %>
           >Testing</option>
         <option value="broken"
-          <% if(model.get('status') == 'broken') { %>selected<% } %>
+          <% if ( model.hasStatus('broken') ) { %>selected<% } %>
           >Broken</option>
         <option value="ready"
-          <% if(model.get('status') == 'ready') { %>selected<% } %>
+          <% if ( model.hasStatus('ready') ) { %>selected<% } %>
           >Ready</option>
       </select>
     </div>
