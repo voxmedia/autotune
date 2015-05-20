@@ -68,6 +68,10 @@ module Autotune
       current_user.present?
     end
 
+    def any_roles?
+      !current_user.meta['roles'].nil? && !current_user.meta['roles'].empty?
+    end
+
     def role?(*args)
       args.reduce { |a, e| a || current_user.meta['roles'].include?(e.to_s) }
     end
@@ -83,10 +87,14 @@ module Autotune
     end
 
     def require_login
-      return true if signed_in?
-      respond_to do |format|
-        format.html { redirect_to login_path(request.fullpath) }
-        format.json { render_error 'Unauthorized', :unauthorized }
+      return true if signed_in? && any_roles?
+      if signed_in?
+        render_error 'Not allowed', :forbidden
+      else
+        respond_to do |format|
+          format.html { redirect_to login_path(request.fullpath) }
+          format.json { render_error 'Unauthorized', :unauthorized }
+        end
       end
     end
 

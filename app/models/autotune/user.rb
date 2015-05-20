@@ -1,7 +1,7 @@
 module Autotune
   # Basic user account
   class User < ActiveRecord::Base
-    has_many :authorizations
+    has_many :authorizations, :dependent => :destroy
     serialize :meta, JSON
 
     validates :name, :email, :api_key, :presence => true
@@ -25,26 +25,25 @@ module Autotune
 
     def self.create_from_auth_hash(auth_hash)
       roles = verify_auth_hash(auth_hash)
-      return unless roles
+      return unless roles.is_a?(Array) && roles.any?
       a = Authorization.new(
         auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
       a.user = User
-        .create_with(:name => auth_hash['info']['name'])
+        .create_with(:name => auth_hash['info']['name'], :meta => { 'roles' => roles })
         .find_or_create_by!(:email => auth_hash['info']['email'])
-      a.user.meta['roles'] = roles if roles.is_a?(Array)
       a.save!
       a.user
     end
 
     def self.find_by_auth_hash(auth_hash)
       roles = verify_auth_hash(auth_hash)
-      return unless roles
+      return unless roles.is_a?(Array) && roles.any?
       a = Authorization.where(
         :provider => auth_hash['provider'],
         :uid => auth_hash['uid']).first
       return if a.nil?
 
-      if roles.is_a?(Array) && a.user.meta['roles'] != roles
+      if a.user.meta['roles'] != roles
         a.user.meta['roles'] = roles
         a.user.save
       end
@@ -59,7 +58,11 @@ module Autotune
     def self.verify_auth_hash(auth_hash)
       if Rails.configuration.autotune.verify_omniauth &&
          Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
-        return Rails.configuration.autotune.verify_omniauth.call(auth_hash)
+        logger.debug 'verify_auth_hash'
+        logger.debug auth_hash
+        roles = Rails.configuration.autotune.verify_omniauth.call(auth_hash)
+        logger.debug "roles: #{roles}"
+        return roles
       else
         return true
       end
