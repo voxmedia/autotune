@@ -1,7 +1,7 @@
 # ![Autotune Log](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
 
 
->**Current project status**: Alpha
+**Current project status**: Alpha
 
 ---
 
