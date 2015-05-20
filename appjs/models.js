@@ -94,7 +94,8 @@ exports.Project = Backbone.Model.extend({
 
   publishedTime: function(){
     if(this.isPublished){
-      return moment.utc(this.get('published_at')).fromNow();
+      var localTime = moment.utc(this.get('published_at')).toDate();
+      return moment(localTime).format('MMM DD, YYYY - hh:mmA');
     }
   }
 });
