@@ -90,6 +90,12 @@ exports.Project = Backbone.Model.extend({
 
   hasUnpublishedUpdates: function() {
     return moment(this.get('data_updated_at')).isAfter(this.get('published_at'));
+  },
+
+  publishedTime: function(){
+    if(this.isPublished){
+      return moment.utc(this.get('published_at')).fromNow();
+    }
   }
 });
 

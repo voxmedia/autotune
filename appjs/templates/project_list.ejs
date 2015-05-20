@@ -100,7 +100,7 @@
       <% } else { %>
         <span class="text-warning">Draft</span>
       <% } %>
-      <% if ( item.get('published_at') ) { %><br><%=item.get('published_at') %><% } %>
+      <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
     </td>
     <td><%=item.get('blueprint_config').name %></td>
     <td class="text-right">
