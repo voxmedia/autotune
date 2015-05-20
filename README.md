@@ -1,12 +1,11 @@
-![Autotune Log](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
+# ![Autotune Log](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
 
-# Chorus Autotune
 
 >**Current project status**: Alpha
 
 ---
 
-Platform and UI for creating new websites and html snippets from templates stored in git repos.
+Autotune is a platform and UI for creating new websites and html snippets from templates stored in git repos.
 Basically a fancy thing for turning templates into web pages.
 
 ## Documentation
