@@ -192,6 +192,20 @@ exports.Project = Backbone.Model.extend({
     }
   },
 
+  buildData: function() {
+    return _.extend({
+      'base_url': (this.isDraft() || this.hasUnpublishedUpdates()) ? this.get('preview_url') : this.get('publish_url')
+    }, this.formData());
+  },
+
+  formData: function() {
+    return _.extend({
+      'title': this.get('title'),
+      'slug': this.get('slug'),
+      'theme': this.get('theme')
+    }, this.get('data'));
+  },
+
   hasStatus: function() {
     var iteratee = function(m, i) {
       return m || this.get( 'status' ) === i;
@@ -834,7 +848,7 @@ __p+='\n      </p>\n\n      <p>\n        <button type="button" class="btn btn-de
 '">Rebuild</button>\n        <button type="button" class="btn btn-warning"\n                data-action="update" data-model="Project"\n                data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n      </p>\n\n      <h4>Blueprint data:</h4>\n      <pre>'+
-((__t=(JSON.stringify(model.get('data'), null, 2) ))==null?'':__t)+
+((__t=(JSON.stringify(model.buildData(), null, 2) ))==null?'':__t)+
 '</pre>\n\n      <h4>Output from last build:</h4>\n      <pre>'+
 ((__t=(model.get('output') ))==null?'':__t)+
 '</pre>\n    </div>\n    ';
@@ -30190,11 +30204,7 @@ module.exports = FormView.extend({
         }, this)
       };
       if(!this.model.isNew()) {
-        opts.data = {
-          'title': this.model.get('title'),
-          'slug': this.model.get('slug')
-        };
-        _.extend(opts.data, this.model.get('data'));
+        opts.data = this.model.formData();
       }
       $form.alpaca(opts);
     }

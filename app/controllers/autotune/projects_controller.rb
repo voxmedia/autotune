@@ -38,6 +38,12 @@ module Autotune
         :user => current_user,
         :blueprint => Blueprint.find(request.POST['blueprint_id']))
       @project.attributes = select_from_post :title, :slug, :theme, :data
+
+      # make sure data doesn't contain title, slug or theme
+      @project.data.delete('title')
+      @project.data.delete('slug')
+      @project.data.delete('theme')
+
       if @project.valid?
         @project.save
         @project.build
@@ -51,6 +57,12 @@ module Autotune
       @project = instance
       @project.user = current_user if @project.user.nil?
       @project.attributes = select_from_post :title, :slug, :theme, :data
+
+      # make sure data doesn't contain title, slug or theme
+      @project.data.delete('title')
+      @project.data.delete('slug')
+      @project.data.delete('theme')
+
       if @project.valid?
         @project.save
         @project.build

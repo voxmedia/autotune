@@ -59,6 +59,20 @@ exports.Project = Backbone.Model.extend({
     }
   },
 
+  buildData: function() {
+    return _.extend({
+      'base_url': (this.isDraft() || this.hasUnpublishedUpdates()) ? this.get('preview_url') : this.get('publish_url')
+    }, this.formData());
+  },
+
+  formData: function() {
+    return _.extend({
+      'title': this.get('title'),
+      'slug': this.get('slug'),
+      'theme': this.get('theme')
+    }, this.get('data'));
+  },
+
   hasStatus: function() {
     var iteratee = function(m, i) {
       return m || this.get( 'status' ) === i;

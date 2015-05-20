@@ -101,11 +101,7 @@ module.exports = FormView.extend({
         }, this)
       };
       if(!this.model.isNew()) {
-        opts.data = {
-          'title': this.model.get('title'),
-          'slug': this.model.get('slug')
-        };
-        _.extend(opts.data, this.model.get('data'));
+        opts.data = this.model.formData();
       }
       $form.alpaca(opts);
     }

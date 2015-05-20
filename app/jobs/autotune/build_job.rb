@@ -17,11 +17,11 @@ module Autotune
 
       # Add a few extras to the build data
       build_data = project.data.dup
-      if mode == :publish
-        build_data['base_url'] = project.publish_url
-      else
-        build_data['base_url'] = project.preview_url
-      end
+      build_data.update(
+        'title' => project.title,
+        'slug' => project.slug,
+        'theme' => project.theme,
+        'base_url' => (mode == :publish) ? project.publish_url : project.preview_url)
 
       # Run the build
       repo.working_dir do
