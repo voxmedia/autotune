@@ -820,7 +820,7 @@ __p+='\n      <a data-tooltip="View Draft Preview" target="_blank" href="'+
 __p+='\n      ';
  if ( model.get('published_at') ) { 
 __p+='<br>'+
-((__t=(model.get('published_at') ))==null?'':__t)+
+((__t=(model.publishedTime() ))==null?'':__t)+
 '';
  } 
 __p+='\n    </p>\n    ';
