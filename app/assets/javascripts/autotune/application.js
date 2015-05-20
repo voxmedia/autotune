@@ -35,15 +35,14 @@ window.App = function(config) {
   if ( window.EventSource ) {
     $(window).on('focus', _.bind(function(){
       this.has_focus = true;
-      if(this.sseClosingTimeout){
-        this.debug('Clearing sse closing timeout');
-        clearTimeout(this.sseClosingTimeout);
+      if(!this.sseRetryCount || this.sseRetryCount === 0){
+        this.startListeningForChanges();
       }
     }, this));
 
     $(window).on('blur', _.bind(function(){
       this.has_focus = false;
-      this.sseClosingTimeout = setTimeout(_.bind(this.stopListeningForChanges, this), 10000);
+      setTimeout(_.bind(this.stopListeningForChanges, this), 10000);
     }, this));
 
     this.startListeningForChanges();
@@ -80,12 +79,9 @@ _.extend(window.App.prototype, {
     if(this.msgListener && (this.msgListener.readyState === this.msgListener.OPEN || this.msgListener.readyState === this.msgListener.CONNECTING)){
       return;
     }
-
     if(!this.has_focus){
-      this.view.warning("Stopped automatic status update due to inactivity. Refresh page to see recent changes.");
       return;
     }
-
     this.debug('Init server event listener');
     this.msgListener = new window.EventSource('/changemessages');
 
@@ -109,15 +105,7 @@ _.extend(window.App.prototype, {
       if(this.msgListener){
         this.msgListener.close();
       }
-      if(this.sseRetryCount <= 10){
-        this.sseRetryTimeout = setTimeout(_.bind(this.startListeningForChanges,this), 2000);
-      }
-      if(this.sseRetryCount > 2){
-        this.view.warning("Could not get automatic status updates. Retrying...");
-      }
-      if(this.sseRetryCount >=10){
-        this.view.error("Could not get automatic status updates. Refresh page to see recent changes.");
-      }
+      setTimeout(_.bind(this.startListeningForChanges,this), this.sseRetryCount * 1000);
     },this);
 
     this.msgListener.onopen = function(){
@@ -132,8 +120,7 @@ _.extend(window.App.prototype, {
     }
     if(this.msgListener && this.msgListener.readyState === this.msgListener.OPEN){
       this.debug('Close event listener');
-      this.msgListener.close();      
-      this.view.warning("Stopped automatic status update due to inactivity. Refresh page to see recent changes.");
+      this.msgListener.close();
     }
   },
 
@@ -73756,7 +73743,7 @@ function merge_text_nodes( jsonml ) {
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = queryString;
 	} else {
-		window.queryString = queryString;
+		self.queryString = queryString;
 	}
 })();
 
