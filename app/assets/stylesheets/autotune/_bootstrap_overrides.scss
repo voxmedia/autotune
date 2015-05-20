@@ -1,3 +1,14 @@
+//warnings
+.text-warning {
+  color: $orange;
+}
+.text-danger {
+  color: $red;
+}
+.test-success {
+  color: $green;
+}
+
 //buttons
 .btn {
   font-size: 13px;
