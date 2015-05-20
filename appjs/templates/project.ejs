@@ -14,7 +14,7 @@
       <% } else { %>
       <a data-tooltip="View Draft Preview" target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
       <% } %>
-      <% if ( model.get('published_at') ) { %><%=model.get('published_at') %><% } %>
+      <% if ( model.get('published_at') ) { %><br><%=model.get('published_at') %><% } %>
     </p>
     <% } %>
   </div>
@@ -63,12 +63,20 @@
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">
-      <button type="button" class="btn btn-default"
-              data-action="build" data-model="Project"
-              data-model-id="<%=model.get('slug') %>">Rebuild</button>
-      <button type="button" class="btn btn-warning"
-              data-action="update" data-model="Project"
-              data-model-id="<%=model.get('slug') %>">Upgrade</button>
+      <p>Status:
+        <% if ( model.hasStatus('broken') ) { %><span class="text-danger">Broken</span>
+        <% } else if ( model.hasStatus('built') ) { %><span class="text-success">Built</span>
+        <% } else { %><span class="text-warning"><%=s.capitalize(model.get('status')) %></span><% } %>
+      </p>
+
+      <p>
+        <button type="button" class="btn btn-default"
+                data-action="build" data-model="Project"
+                data-model-id="<%=model.get('slug') %>">Rebuild</button>
+        <button type="button" class="btn btn-warning"
+                data-action="update" data-model="Project"
+                data-model-id="<%=model.get('slug') %>">Upgrade</button>
+      </p>
 
       <h4>Blueprint data:</h4>
       <pre><%=JSON.stringify(model.get('data'), null, 2) %></pre>

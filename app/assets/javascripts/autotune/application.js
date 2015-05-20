@@ -781,7 +781,7 @@ __p+='\n      <a data-tooltip="View Draft Preview" target="_blank" href="'+
  } 
 __p+='\n      ';
  if ( model.get('published_at') ) { 
-__p+=''+
+__p+='<br>'+
 ((__t=(model.get('published_at') ))==null?'':__t)+
 '';
  } 
@@ -815,11 +815,21 @@ __p+='\n        </div>\n        <div class="col-md-4">'+
  } 
 __p+='\n    </div>\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    ';
  if ( hasRole('superuser') ) { 
-__p+='\n    <div role="tabpanel" class="tab-pane" id="developer">\n      <button type="button" class="btn btn-default"\n              data-action="build" data-model="Project"\n              data-model-id="'+
+__p+='\n    <div role="tabpanel" class="tab-pane" id="developer">\n      <p>Status:\n        ';
+ if ( model.hasStatus('broken') ) { 
+__p+='<span class="text-danger">Broken</span>\n        ';
+ } else if ( model.hasStatus('built') ) { 
+__p+='<span class="text-success">Built</span>\n        ';
+ } else { 
+__p+='<span class="text-warning">'+
+((__t=(s.capitalize(model.get('status')) ))==null?'':__t)+
+'</span>';
+ } 
+__p+='\n      </p>\n\n      <p>\n        <button type="button" class="btn btn-default"\n                data-action="build" data-model="Project"\n                data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Rebuild</button>\n      <button type="button" class="btn btn-warning"\n              data-action="update" data-model="Project"\n              data-model-id="'+
+'">Rebuild</button>\n        <button type="button" class="btn btn-warning"\n                data-action="update" data-model="Project"\n                data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Upgrade</button>\n\n      <h4>Blueprint data:</h4>\n      <pre>'+
+'">Upgrade</button>\n      </p>\n\n      <h4>Blueprint data:</h4>\n      <pre>'+
 ((__t=(JSON.stringify(model.get('data'), null, 2) ))==null?'':__t)+
 '</pre>\n\n      <h4>Output from last build:</h4>\n      <pre>'+
 ((__t=(model.get('output') ))==null?'':__t)+
