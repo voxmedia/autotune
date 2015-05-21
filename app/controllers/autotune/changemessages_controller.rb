@@ -18,9 +18,10 @@ module Autotune
 
       redis_thread = Thread.new do
         Thread.current.abort_on_exception = true
-        Autotune.redis.subscribe('blueprints', 'projects') do |on|
-          on.message do |_channel, msg|
+        Autotune.redis.subscribe('blueprint', 'project') do |on|
+          on.message do |channel, msg|
             msgObj = JSON.parse(msg)
+            msgObj["type"] = channel
             sse.write(msgObj , event: 'change')
           end
         end
