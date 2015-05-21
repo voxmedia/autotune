@@ -11,6 +11,8 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone');
 
+// Make libraries accessible to global scope, for console use and error logging
+window.Backbone = Backbone;
 window.$ = Backbone.$ = $;
 window._ = _;
 
