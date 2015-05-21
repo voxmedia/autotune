@@ -10,4 +10,14 @@ namespace :autotune do
     puts 'Rebuilding all previews'
     Autotune::Project.all.each { |p| p.build }
   end
+
+  desc "Delete users that haven't created projects"
+  task :clean_users => :environment do
+    puts 'Deleting users'
+    Autotune::User.all.each do |u|
+      next if Autotune::Project.where(user: u).count > 0
+      puts "#{u.name} <#{u.email}>"
+      u.destroy
+    end
+  end
 end
