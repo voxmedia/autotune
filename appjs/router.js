@@ -53,7 +53,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprints.fetch({data: query});
-    this.app.setActiveData(blueprints,query);
+    this.app.setActiveData('blueprint',blueprints,query);
   },
 
   newBlueprint: function() {
@@ -72,7 +72,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('blueprints');
     blueprint.fetch();
-    this.app.setActiveData(blueprint);
+    this.app.setActiveData('blueprint',blueprint);
   },
 
   editBlueprint: function(slug) {
@@ -117,7 +117,7 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     projects.fetch({data: query});
-    this.app.setActiveData(projects, query);
+    this.app.setActiveData('project',projects, query);
   },
 
   newProject: function(slug) {
@@ -138,6 +138,6 @@ module.exports = Backbone.Router.extend({
     this.app.view.display( view );
     this.app.view.setTab('projects');
     project.fetch();
-    this.app.setActiveData(project);
+    this.app.setActiveData('project',project);
   }
 });

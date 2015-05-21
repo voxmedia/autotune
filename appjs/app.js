@@ -85,8 +85,24 @@ _.extend(window.App.prototype, {
     this.debug('Init server event listener');
     this.msgListener = new window.EventSource('/changemessages');
 
-    this.msgListener.addEventListener('change', _.bind(function() {
-     if(this.dataToRefresh){
+    this.msgListener.addEventListener('change', _.bind(function(evt) {
+      var msg = JSON.parse(evt.data);
+      var refresh = false;
+
+      // Don't proceed if the change is on a different type of data
+      if(!this.dataToRefresh || (msg.type !== this.dataType)){
+        return;
+      }
+
+      // check if the changed object id is in the activedata
+      if(this.dataToRefresh instanceof Backbone.Collection){
+        refresh = _.where(this.dataToRefresh.models, {id: msg.id}).length !== 0;
+      }
+      else {
+        refresh = this.dataToRefresh.get("id") === msg.id;
+      }
+
+      if(refresh){
         this.debug('server event; updating data');
         if ( this.dataQuery ) {
           this.dataToRefresh.fetch({data: this.dataQuery});
@@ -133,7 +149,8 @@ _.extend(window.App.prototype, {
     }
   },
 
-  setActiveData: function(data, query){
+  setActiveData: function(type, data, query){    
+    this.dataType = type;
     this.dataToRefresh = data;
     this.dataQuery = query;
   }
