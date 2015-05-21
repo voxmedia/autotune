@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150512141546) do
+ActiveRecord::Schema.define(version: 20150521184916) do
 
   create_table "autotune_authorizations", force: :cascade do |t|
     t.integer  "user_id"
@@ -19,9 +19,9 @@ ActiveRecord::Schema.define(version: 20150512141546) do
     t.string   "uid"
     t.text     "info"
     t.text     "credentials"
-    t.text     "extra"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.text     "extra",       limit: 131072
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
   end
 
   add_index "autotune_authorizations", ["provider"], name: "index_autotune_authorizations_on_provider"
