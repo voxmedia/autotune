@@ -10,7 +10,7 @@ module Autotune
     TIMEOUT = 60
 
     def index
-      t1 = Time.now.to_f
+      t1 = Time.zone.now.to_f
       logger.info 'Client stream connected'
       response.headers['Content-Type'] = 'text/event-stream'
       sse = SSE.new(response.stream, retry: 300, event: 'connectionopen')
@@ -20,15 +20,15 @@ module Autotune
         Thread.current.abort_on_exception = true
         Autotune.redis.subscribe('blueprint', 'project') do |on|
           on.message do |channel, msg|
-            msgObj = JSON.parse(msg)
-            msgObj["type"] = channel
-            sse.write(msgObj , event: 'change')
+            msg_obj = JSON.parse(msg)
+            msg_obj['type'] = channel
+            sse.write(msg_obj, event: 'change')
           end
         end
       end
 
       loop do
-        if Time.now.to_f - t1 > TIMEOUT
+        if Time.zone.now.to_f - t1 > TIMEOUT
           logger.info 'Preemptive stream timeout'
           sse.write({ msg: 'Channel close' }, event: 'connectionclose')
           break
