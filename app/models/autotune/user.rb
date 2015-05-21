@@ -64,7 +64,7 @@ module Autotune
         logger.debug "roles: #{roles}"
         return roles
       else
-        return true
+        return [:superuser]
       end
     end
 
