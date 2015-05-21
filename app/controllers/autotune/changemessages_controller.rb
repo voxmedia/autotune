@@ -20,7 +20,8 @@ module Autotune
         Thread.current.abort_on_exception = true
         Autotune.redis.subscribe('blueprints', 'projects') do |on|
           on.message do |_channel, msg|
-            sse.write({ msg: msg }, event: 'change')
+            msgObj = JSON.parse(msg)
+            sse.write(msgObj , event: 'change')
           end
         end
       end
@@ -28,10 +29,10 @@ module Autotune
       loop do
         if Time.now.to_f - t1 > TIMEOUT
           logger.info 'Preemptive stream timeout'
-          sse.write(msg: 'Channel close', event: 'connectionclose')
+          sse.write({ msg: 'Channel close' }, event: 'connectionclose')
           break
         end
-        sse.write(msg: 'pong', event: 'ping')
+        sse.write({ msg: 'pong' }, event: 'ping')
         sleep 2
       end
     rescue ClientDisconnected
