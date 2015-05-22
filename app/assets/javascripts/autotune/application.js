@@ -334,7 +334,7 @@ exports.Project = Backbone.Model.extend({
     if ( base.match(/^http/) ) {
       return base;
     } else if ( base.match(/^\/\//) ) {
-      return preferredProto + base;
+      return preferredProto + ':' + base;
     } else {
       return base;
     }
