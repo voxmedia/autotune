@@ -97,6 +97,43 @@ exports.Project = Backbone.Model.extend({
       var localTime = moment.utc(this.get('published_at')).toDate();
       return moment(localTime).format('MMM DD, YYYY - hh:mmA');
     }
+  },
+
+  /**
+   * Get the url to the preview
+   * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @returns {string} url
+   **/
+  getPreviewUrl: function(preferredProto) {
+    return this.getBuildUrl('preview', preferredProto);
+  },
+
+  /**
+   * Get the url to the published project
+   * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @returns {string} url
+   **/
+  getPublishUrl: function(preferredProto) {
+    return this.getBuildUrl('publish', preferredProto);
+  },
+
+  /**
+   * Get the url for one of the built projects (preview or publish)
+   * @param {string} type - Type of the url (preview, publish)
+   * @param {string} preferredProto - Protocol to use if possible (http, https)
+   * @returns {string} url
+   **/
+  getBuildUrl: function(type, preferredProto) {
+    var key = ( type === 'publish' ) ? 'publish_url' : 'preview_url';
+    if ( !this.has(key) ) { return ''; }
+    var base = this.get(key);
+    if ( base.match(/^http/) ) {
+      return base;
+    } else if ( base.match(/^\/\//) ) {
+      return preferredProto + base;
+    } else {
+      return base;
+    }
   }
 });
 

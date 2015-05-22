@@ -6,8 +6,7 @@
  * autotune
  * https://github.com/voxmedia/autotune
  *
- * Copyright (c) 2015 Ryan Mark
- * Licensed under the BSD license.
+ * @file Top level class for the Autotune admin UI
  */
 
 // Load jQuery and Backbone, make sure Backbone uses jQuery
@@ -15,7 +14,7 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone');
 
-// Make libraries accessible to global scope, for console and error logging
+// Make libraries accessible to global scope, for console use and error logging
 window.Backbone = Backbone;
 window.$ = Backbone.$ = $;
 window._ = _;
@@ -26,6 +25,17 @@ var bootstrap = require('bootstrap'),
 // Load our components and run the app
 var Router = require('./router');
 
+/**
+ * Autotune admin UI
+ * @constructor
+ * @param {Object} config - Configure the admin UI
+ * @param {string} config.env - Environment (production, staging or development)
+ * @param {string[]} config.project_statuses - Possible project statuses
+ * @param {string[]} config.project_themes - Possible project themes
+ * @param {int[]} config.project_blueprints - Blueprint IDs used by existing projects
+ * @param {string[]} config.blueprints_tags - Blueprint tags
+ * @param {Object} config.user - Current user info
+ */
 window.App = function(config) {
   this.config = config;
   this.router = new Router({app: this});
@@ -53,22 +63,39 @@ window.App = function(config) {
 };
 
 _.extend(window.App.prototype, {
+  /**
+   * Is the app running in dev mode
+   * @return {bool}
+   */
   isDev: function() {
     return this.config.env === 'development' || this.config.env === 'staging';
   },
 
+  /**
+   * Put an informational message into the log
+   */
   log: function() {
     console.log.apply(console, arguments);
   },
 
+  /**
+   * Put a debugging message into the log
+   */
   debug: function() {
     if (this.isDev()) { console.debug.apply(console, arguments); }
   },
 
+  /**
+   * Put an error message into the log
+   */
   error: function() {
     console.error.apply(console, arguments);
   },
 
+  /**
+   * Log an analytic event
+   * @param {string} type - Event type (pageview)
+   */
   analyticsEvent: function() {
     if ( window.ga ) {
       var ga = window.ga;
@@ -78,6 +105,9 @@ _.extend(window.App.prototype, {
     }
   },
 
+  /**
+   * Initialize the server-side events listener
+   */
   startListeningForChanges: function(){
     if(this.msgListener && (this.msgListener.readyState === this.msgListener.OPEN || this.msgListener.readyState === this.msgListener.CONNECTING)){
       return;
@@ -143,6 +173,9 @@ _.extend(window.App.prototype, {
     };
   },
 
+  /**
+   * Disable the server side event listener
+   */
   stopListeningForChanges: function(ignoreFocus){
     this.debug('Checking for focus');
     if(ignoreFocus || this.has_focus){
@@ -155,6 +188,12 @@ _.extend(window.App.prototype, {
     }
   },
 
+  /**
+   * Provide references to the models or collections that the event listener should refresh
+   * @param {string} type - Type of data to refresh (model, collection)
+   * @param {Object} data - Backbone object to refresh
+   * @param {Object} query - Optional query to use in the refresh
+   */
   setActiveData: function(type, data, query){    
     this.dataType = type;
     this.dataToRefresh = data;
@@ -261,6 +300,43 @@ exports.Project = Backbone.Model.extend({
     if(this.isPublished){
       var localTime = moment.utc(this.get('published_at')).toDate();
       return moment(localTime).format('MMM DD, YYYY - hh:mmA');
+    }
+  },
+
+  /**
+   * Get the url to the preview
+   * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @returns {string} url
+   **/
+  getPreviewUrl: function(preferredProto) {
+    return this.getBuildUrl('preview', preferredProto);
+  },
+
+  /**
+   * Get the url to the published project
+   * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @returns {string} url
+   **/
+  getPublishUrl: function(preferredProto) {
+    return this.getBuildUrl('publish', preferredProto);
+  },
+
+  /**
+   * Get the url for one of the built projects (preview or publish)
+   * @param {string} type - Type of the url (preview, publish)
+   * @param {string} preferredProto - Protocol to use if possible (http, https)
+   * @returns {string} url
+   **/
+  getBuildUrl: function(type, preferredProto) {
+    var key = ( type === 'publish' ) ? 'publish_url' : 'preview_url';
+    if ( !this.has(key) ) { return ''; }
+    var base = this.get(key);
+    if ( base.match(/^http/) ) {
+      return base;
+    } else if ( base.match(/^\/\//) ) {
+      return preferredProto + base;
+    } else {
+      return base;
     }
   }
 });
@@ -916,7 +992,7 @@ __p+='\n  <a class="btn btn-default" target="_blank"\n     ';
 __p+='disabled="true"';
  } 
 __p+='\n     href="'+
-((__t=(model.get('preview_url') ))==null?'':__t)+
+((__t=(model.getPreviewUrl('http') ))==null?'':__t)+
 '">Preview</a>\n  ';
  } else { 
 __p+='\n  <a class="btn btn-default" target="_blank"\n     ';
@@ -924,7 +1000,7 @@ __p+='\n  <a class="btn btn-default" target="_blank"\n     ';
 __p+='disabled="true"';
  } 
 __p+='\n     href="'+
-((__t=(model.get('publish_url') ))==null?'':__t)+
+((__t=(model.getPublishUrl('http') ))==null?'':__t)+
 '">View</a>\n  ';
  } 
 __p+='\n\n  <button type="button" class="btn btn-success"\n          ';
@@ -1084,11 +1160,11 @@ __p+='\n    </td>\n    <td>'+
 __p+='\n      <a data-tooltip="preview" disabled="true"><span class="icon-preview"></span></a>\n    ';
  } else if ( item.published ) { 
 __p+='\n      <a data-tooltip="preview" target="_blank" disabled="true"\n         href="'+
-((__t=(item.get('publish_url') ))==null?'':__t)+
+((__t=(item.getPublishUrl('http') ))==null?'':__t)+
 '"><span class="icon-preview"></span></a>\n    ';
  } else { 
 __p+='\n      <a data-tooltip="preview" target="_blank" disabled="true"\n         href="'+
-((__t=(item.get('preview_url') ))==null?'':__t)+
+((__t=(item.getPreviewUrl('http') ))==null?'':__t)+
 '"><span class="icon-preview"></span></a>\n    ';
  } 
 __p+='\n      <a data-tooltip="delete" data-loading-text=""\n         data-action="delete" data-model="Project"\n         data-model-id="'+
@@ -30165,7 +30241,7 @@ module.exports = FormView.extend({
     }
 
     if ( this.model.isPublished() ) {
-      $.get(this.model.get('publish_url') + 'embed.txt',
+      $.get(this.model.getPublishUrl(window.location.protocol.replace(':', '')) + 'embed.txt',
             function(data, status) { $('#embed textarea').text( data ); });
     }
 

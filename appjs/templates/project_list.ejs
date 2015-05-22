@@ -110,10 +110,10 @@
       <a data-tooltip="preview" disabled="true"><span class="icon-preview"></span></a>
     <% } else if ( item.published ) { %>
       <a data-tooltip="preview" target="_blank" disabled="true"
-         href="<%=item.get('publish_url') %>"><span class="icon-preview"></span></a>
+         href="<%=item.getPublishUrl('http') %>"><span class="icon-preview"></span></a>
     <% } else { %>
       <a data-tooltip="preview" target="_blank" disabled="true"
-         href="<%=item.get('preview_url') %>"><span class="icon-preview"></span></a>
+         href="<%=item.getPreviewUrl('http') %>"><span class="icon-preview"></span></a>
     <% } %>
       <a data-tooltip="delete" data-loading-text=""
          data-action="delete" data-model="Project"

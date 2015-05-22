@@ -7,11 +7,11 @@
   <% if ( model.hasUnpublishedUpdates() || model.isDraft() ) { %>
   <a class="btn btn-default" target="_blank"
      <% if ( !model.hasStatus('built') ) { %>disabled="true"<% } %>
-     href="<%=model.get('preview_url') %>">Preview</a>
+     href="<%=model.getPreviewUrl('http') %>">Preview</a>
   <% } else { %>
   <a class="btn btn-default" target="_blank"
      <% if ( !model.hasStatus('built') ) { %>disabled="true"<% } %>
-     href="<%=model.get('publish_url') %>">View</a>
+     href="<%=model.getPublishUrl('http') %>">View</a>
   <% } %>
 
   <button type="button" class="btn btn-success"

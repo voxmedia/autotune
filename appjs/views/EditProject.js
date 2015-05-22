@@ -19,7 +19,7 @@ module.exports = FormView.extend({
     }
 
     if ( this.model.isPublished() ) {
-      $.get(this.model.get('publish_url') + 'embed.txt',
+      $.get(this.model.getPublishUrl(window.location.protocol.replace(':', '')) + 'embed.txt',
             function(data, status) { $('#embed textarea').text( data ); });
     }
 
