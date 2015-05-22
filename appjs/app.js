@@ -2,8 +2,7 @@
  * autotune
  * https://github.com/voxmedia/autotune
  *
- * Copyright (c) 2015 Ryan Mark
- * Licensed under the BSD license.
+ * @file Top level class for the Autotune admin UI
  */
 
 // Load jQuery and Backbone, make sure Backbone uses jQuery
@@ -22,6 +21,17 @@ var bootstrap = require('bootstrap'),
 // Load our components and run the app
 var Router = require('./router');
 
+/**
+ * Autotune admin UI
+ * @constructor
+ * @param {Object} config - Configure the admin UI
+ * @param {string} config.env - Environment (production, staging or development)
+ * @param {string[]} config.project_statuses - Possible project statuses
+ * @param {string[]} config.project_themes - Possible project themes
+ * @param {int[]} config.project_blueprints - Blueprint IDs used by existing projects
+ * @param {string[]} config.blueprints_tags - Blueprint tags
+ * @param {Object} config.user - Current user info
+ */
 window.App = function(config) {
   this.config = config;
   this.router = new Router({app: this});
@@ -49,22 +59,39 @@ window.App = function(config) {
 };
 
 _.extend(window.App.prototype, {
+  /**
+   * Is the app running in dev mode
+   * @return {bool}
+   */
   isDev: function() {
     return this.config.env === 'development' || this.config.env === 'staging';
   },
 
+  /**
+   * Put an informational message into the log
+   */
   log: function() {
     console.log.apply(console, arguments);
   },
 
+  /**
+   * Put a debugging message into the log
+   */
   debug: function() {
     if (this.isDev()) { console.debug.apply(console, arguments); }
   },
 
+  /**
+   * Put an error message into the log
+   */
   error: function() {
     console.error.apply(console, arguments);
   },
 
+  /**
+   * Log an analytic event
+   * @param {string} type - Event type (pageview)
+   */
   analyticsEvent: function() {
     if ( window.ga ) {
       var ga = window.ga;
@@ -74,6 +101,9 @@ _.extend(window.App.prototype, {
     }
   },
 
+  /**
+   * Initialize the server-side events listener
+   */
   startListeningForChanges: function(){
     if(this.msgListener && (this.msgListener.readyState === this.msgListener.OPEN || this.msgListener.readyState === this.msgListener.CONNECTING)){
       return;
@@ -139,6 +169,9 @@ _.extend(window.App.prototype, {
     };
   },
 
+  /**
+   * Disable the server side event listener
+   */
   stopListeningForChanges: function(ignoreFocus){
     this.debug('Checking for focus');
     if(ignoreFocus || this.has_focus){
@@ -151,6 +184,12 @@ _.extend(window.App.prototype, {
     }
   },
 
+  /**
+   * Provide references to the models or collections that the event listener should refresh
+   * @param {string} type - Type of data to refresh (model, collection)
+   * @param {Object} data - Backbone object to refresh
+   * @param {Object} query - Optional query to use in the refresh
+   */
   setActiveData: function(type, data, query){    
     this.dataType = type;
     this.dataToRefresh = data;
