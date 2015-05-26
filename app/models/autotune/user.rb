@@ -2,6 +2,7 @@ module Autotune
   # Basic user account
   class User < ActiveRecord::Base
     has_many :authorizations, :dependent => :destroy
+    has_many :projects
     serialize :meta, JSON
 
     validates :email, :api_key, :presence => true
