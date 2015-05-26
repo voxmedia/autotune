@@ -2,10 +2,11 @@ module Autotune
   # Basic user account
   class User < ActiveRecord::Base
     has_many :authorizations, :dependent => :destroy
+    has_many :projects
     serialize :meta, JSON
 
-    validates :name, :email, :api_key, :presence => true
-    validates :email, :api_key, :uniqueness => true
+    validates :email, :api_key, :presence => true
+    validates :api_key, :uniqueness => true
     validates :email,
               :uniqueness => { :case_sensitive => false },
               :format => { :with => /\A.+@.+\..+\z/ }

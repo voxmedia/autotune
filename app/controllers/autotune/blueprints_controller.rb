@@ -63,7 +63,11 @@ module Autotune
 
     def destroy
       @blueprint = instance
-      if @blueprint.destroy
+      if @blueprint.projects.count > 0
+        render_error(
+          'This blueprint is in use. You must delete the projects which use this blueprint.',
+          :bad_request)
+      elsif @blueprint.destroy
         head :no_content
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request

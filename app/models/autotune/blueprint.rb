@@ -11,6 +11,7 @@ module Autotune
     serialize :config, JSON
     has_many :blueprint_tags, :dependent => :destroy
     has_many :tags, :through => :blueprint_tags
+    has_many :projects
 
     validates :title, :repo_url, :presence => true
     validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }

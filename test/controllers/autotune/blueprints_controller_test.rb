@@ -101,6 +101,18 @@ module Autotune
       assert_response :no_content
     end
 
+    test 'delete blueprint with projects' do
+      # make sure we remove the example blueprint
+      bp = autotune_blueprints(:example)
+      assert bp.projects.count > 0
+
+      accept_json!
+      valid_auth_header!
+
+      delete :destroy, :id => bp.id
+      assert_response :bad_request
+    end
+
     test 'filter blueprints' do
       accept_json!
       valid_auth_header!

@@ -57,6 +57,14 @@ module Autotune
       assert_equal b.slug, 'new-blueprint-1'
     end
 
+    test 'ensure unique slug fails gracefully' do
+      autotune_blueprints(:example).destroy
+
+      assert_raises ActiveRecord::RecordInvalid do
+        Blueprint.create!(:repo_url => repo_url)
+      end
+    end
+
     test 'delete a blueprint' do
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
