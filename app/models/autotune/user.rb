@@ -4,8 +4,8 @@ module Autotune
     has_many :authorizations, :dependent => :destroy
     serialize :meta, JSON
 
-    validates :name, :email, :api_key, :presence => true
-    validates :email, :api_key, :uniqueness => true
+    validates :email, :api_key, :presence => true
+    validates :api_key, :uniqueness => true
     validates :email,
               :uniqueness => { :case_sensitive => false },
               :format => { :with => /\A.+@.+\..+\z/ }
