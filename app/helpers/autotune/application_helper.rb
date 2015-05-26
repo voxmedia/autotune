@@ -11,7 +11,8 @@ module Autotune
         :blueprint_types => Blueprint.uniq.pluck(:type),
         :blueprint_tags => Tag.all.as_json(:only => [:title, :slug]),
         :user => current_user.as_json,
-        :spinner => ActionController::Base.helpers.asset_path('autotune/spinner.gif')
+        :spinner => ActionController::Base.helpers.asset_path('autotune/spinner.gif'),
+        :faq_url => Rails.configuration.autotune.faq_url
       }
     end
   end

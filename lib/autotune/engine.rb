@@ -30,6 +30,7 @@ module Autotune
       }
       app.config.autotune.git_ssh = File.expand_path('../../../bin/git_ssh.sh', __FILE__)
       app.config.autotune.git_askpass = File.expand_path('../../../bin/git_ask_pass.sh', __FILE__)
+      app.config.autotune.faq_url = 'http://voxmedia.helpscoutdocs.com/category/19-autotune'
 
       Rails.application.config.assets.precompile += ['alpaca.css']
     end

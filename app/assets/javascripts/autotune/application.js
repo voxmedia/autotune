@@ -551,7 +551,9 @@ __p+='<div class="row m-nav">\n  <div class="col-lg-8 col-lg-offset-2">\n    <na
  if (hasRole('superuser')) { 
 __p+='\n          <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>\n          ';
  } 
-__p+='\n          <li data-tab="faq"><a href="http://voxmedia.helpscoutdocs.com/category/19-autotune" target="_blank">FAQ</a></li>\n          <li data-tab="feedback"><a href="https://docs.google.com/a/voxmedia.com/forms/d/1FZGfxov-3BcclKUMa0LkpaYL_4SOmCGGvuATBgNbzdg/viewform" target="_blank">Feedback</a></li>\n        </ul>\n      </div>\n    </nav>\n  </div>\n</div>\n<div class="row">\n  <div id="flash"></div>\n  <div class="col-lg-8 col-lg-offset-2" id="main"></div>\n</div>\n';
+__p+='\n          <li data-tab="faq"><a href="'+
+((__t=(app.config.faq_url ))==null?'':__t)+
+'" target="_blank">FAQ</a></li>\n          <li data-tab="feedback"><a href="https://docs.google.com/a/voxmedia.com/forms/d/1FZGfxov-3BcclKUMa0LkpaYL_4SOmCGGvuATBgNbzdg/viewform" target="_blank">Feedback</a></li>\n        </ul>\n      </div>\n    </nav>\n  </div>\n</div>\n<div class="row">\n  <div id="flash"></div>\n  <div class="col-lg-8 col-lg-offset-2" id="main"></div>\n</div>\n';
 }
 return __p;
 };
