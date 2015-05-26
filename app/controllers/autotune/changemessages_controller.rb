@@ -16,13 +16,20 @@ module Autotune
       sse = SSE.new(response.stream, retry: 300, event: 'connectionopen')
       sse.write(msg: 'Channel init')
 
+      @client_id = generate_clientid
+
       redis_thread = Thread.new do
         Thread.current.abort_on_exception = true
-        Autotune.redis.subscribe('blueprint', 'project') do |on|
+        Autotune.redis_sub.subscribe('blueprint', 'project', @client_id) do |on|
           on.message do |channel, msg|
-            msg_obj = JSON.parse(msg)
-            msg_obj['type'] = channel
-            sse.write(msg_obj, event: 'change')
+            if (channel == @client_id)
+              logger.info 'Unsubscribing client: ' + @client_id
+              Autotune.redis_sub.unsubscribe
+            else
+              msg_obj = JSON.parse(msg)
+              msg_obj['type'] = channel
+              sse.write(msg_obj, event: 'change')
+            end
           end
         end
       end
@@ -39,11 +46,13 @@ module Autotune
     rescue ClientDisconnected
       logger.info 'Client stream disconnected'
     ensure
+      Autotune.redis_pub.publish @client_id, 'exit'.to_json
+      # give the subscriber a second to exit
+      sleep 1
       sse.close
       if redis_thread.alive?
         logger.info 'Teardown redis thread'
         redis_thread.exit
-        Autotune.redis.quit
       end
       logger.info 'Cleaned up stream threads'
     end
@@ -52,6 +61,11 @@ module Autotune
 
     def close_db_connection
       ActiveRecord::Base.connection_pool.release_connection
+    end
+
+    def generate_clientid
+      range = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
+      5.times.map { range[rand(61)] }.join('')
     end
   end
 end
