@@ -22,8 +22,12 @@ module Autotune
 
   class << self
     attr_writer :redis
-    def redis
-      @redis ||= Redis.new(:host => ENV['REDIS_SERVER'])
+    def redis_pub
+      @redis_pub ||= Redis.new(:host => ENV['REDIS_SERVER'])
+    end
+
+    def redis_sub
+      @redis_sub ||= Redis.new(:host => ENV['REDIS_SERVER'])
     end
   end
 end

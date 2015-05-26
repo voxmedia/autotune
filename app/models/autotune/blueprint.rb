@@ -70,10 +70,10 @@ module Autotune
     end
 
     def pub_to_redis
-      return if Autotune.redis.nil?
+      return if Autotune.redis_pub.nil?
       msg = { id: id,
               status: status }
-      Autotune.redis.publish 'blueprint', msg.to_json
+      Autotune.redis_pub.publish 'blueprint', msg.to_json
     end
   end
 end
