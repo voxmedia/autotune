@@ -20,4 +20,11 @@ namespace :autotune do
       u.destroy
     end
   end
+
+  desc 'Remove all working dir files'
+  task :clean_working => :environment do
+    puts 'Deleting folders'
+    require 'fileutils'
+    FileUtils.rm_rf(Rails.configuration.autotune.working_dir)
+  end
 end
