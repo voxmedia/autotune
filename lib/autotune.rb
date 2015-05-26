@@ -22,7 +22,6 @@ module Autotune
                       :faq_url)
 
   class << self
-    attr_writer :redis
     def redis_pub
       @redis_pub ||= Redis.new(:host => ENV['REDIS_SERVER'])
     end
