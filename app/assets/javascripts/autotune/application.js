@@ -190,7 +190,7 @@ _.extend(window.App.prototype, {
 
   /**
    * Provide references to the models or collections that the event listener should refresh
-   * @param {string} type - Type of data to refresh (model, collection)
+   * @param {string} type - Type of data to refresh (blueprint, project)
    * @param {Object} data - Backbone object to refresh
    * @param {Object} query - Optional query to use in the refresh
    */
