@@ -41,9 +41,9 @@ module Autotune
     ensure
       sse.close
       if redis_thread.alive?
-        logger.info 'Teardown redis thread'     
-        redis_thread.exit        
-        Autotune.redis_sub.quit   
+        logger.info 'Teardown redis thread'
+        redis_thread.exit
+        Autotune.redis_sub.quit
       end
       logger.info 'Cleaned up stream threads'
     end
