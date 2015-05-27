@@ -14,6 +14,7 @@ module Autotune
     has_many :projects
 
     validates :title, :repo_url, :presence => true
+    validates :repo_url, :uniqueness => { :case_sensitive => false }
     validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
     after_initialize :defaults
     after_save :pub_to_redis

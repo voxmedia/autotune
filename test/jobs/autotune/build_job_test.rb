@@ -2,11 +2,12 @@ require 'test_helper'
 
 # test the project job
 class Autotune::BuildJobTest < ActiveJob::TestCase
-  fixtures 'autotune/blueprints', 'autotune/projects'
+  fixtures 'autotune/users', 'autotune/blueprints', 'autotune/projects'
   test 'building' do
     b = autotune_projects(:example_one)
 
     assert_equal autotune_blueprints(:example), b.blueprint
+    assert_equal autotune_users(:developer), b.user
 
     assert_not_nil Rails.configuration.autotune.preview
 

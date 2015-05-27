@@ -6,7 +6,7 @@ module Autotune
     serialize :meta, JSON
 
     validates :email, :api_key, :presence => true
-    validates :api_key, :uniqueness => true
+    validates :api_key, :email, :uniqueness => true
     validates :email,
               :uniqueness => { :case_sensitive => false },
               :format => { :with => /\A.+@.+\..+\z/ }

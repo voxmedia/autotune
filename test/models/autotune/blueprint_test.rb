@@ -44,6 +44,16 @@ module Autotune
       assert_equal b.slug, 'foobar'
     end
 
+    test 'no duplicate blueprints allowed' do
+      bp = autotune_blueprints(:example)
+
+      assert_raises ActiveRecord::RecordInvalid do
+        Blueprint.create!(
+          :title => 'another new blueprint',
+          :repo_url => bp.repo_url)
+      end
+    end
+
     test 'automatic slugs are unique' do
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
