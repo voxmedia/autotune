@@ -2,14 +2,15 @@
 gem 'resque', '~> 1.25.2'
 gem 'omniauth-github', '~> 1.1.2'
 gem 'foreman', '~> 0.77.0'
+gem 'unicorn-rails', '~> 2.2.0'
 gem 's3deploy', :git => 'https://github.com/ryanmark/s3deploy-ruby.git'
 gem 'autotune', git: 'https://github.com/voxmedia/autotune', branch: 'master'
 
 # Setup foreman
 file 'Procfile', <<-CODE
 redis: redis-server
-resque_worker: bundle exec rake environment resque:work QUEUE=default
-rails: bundle exec rails s
+resque_worker: bundle exec rake environment resque:work QUEUE=default TERM_CHILD=1
+rails: bundle exec unicorn_rails -p 3000 -c config/unicorn.rb
 CODE
 
 # Setup resque
