@@ -35,6 +35,11 @@ CODE
 
 initializer 'autotune.rb', "require 'autotune'"
 
+file 'config/unicorn.rb', <<-CODE
+  worker_processes 6
+  timeout 90
+CODE
+
 # add engine routes
 route "mount Autotune::Engine => '/'"
 
