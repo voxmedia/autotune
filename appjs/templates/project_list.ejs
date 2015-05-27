@@ -102,7 +102,7 @@
       <% } %>
       <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
     </td>
-    <td><%=item.get('blueprint_config').name %></td>
+    <td><%=item.get('blueprint_title') %></td>
     <td class="text-right">
 
       <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>

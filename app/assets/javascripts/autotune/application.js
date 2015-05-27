@@ -1154,7 +1154,7 @@ __p+='<br>'+
 '';
  } 
 __p+='\n    </td>\n    <td>'+
-((__t=(item.get('blueprint_config').name ))==null?'':__t)+
+((__t=(item.get('blueprint_title') ))==null?'':__t)+
 '</td>\n    <td class="text-right">\n\n      <a data-tooltip="edit" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit"><span class="icon-edit"></span></a>\n    ';
