@@ -35,7 +35,7 @@ CODE
 initializer 'autotune.rb', "require 'autotune'"
 
 # add engine routes
-route "mount Autotune::Engine => '/autotune'"
+route "mount Autotune::Engine => '/'"
 
 # disable magic
 run 'rm config/initializers/wrap_parameters.rb'
