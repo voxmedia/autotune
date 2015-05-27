@@ -2,6 +2,7 @@
 gem 'resque', '~> 1.25.2'
 gem 'omniauth-github', '~> 1.1.2'
 gem 'foreman', '~> 0.77.0'
+gem 's3deploy', :git => 'https://github.com/ryanmark/s3deploy-ruby.git'
 gem 'autotune', git: 'https://github.com/voxmedia/autotune', branch: 'master'
 
 # Setup foreman
