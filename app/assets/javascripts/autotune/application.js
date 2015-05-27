@@ -30290,7 +30290,8 @@ module.exports = FormView.extend({
             "slug": {
               "title": "Slug",
               "description": "hello world?",
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-z\-_]+$"
             }
           },
           options_form = {

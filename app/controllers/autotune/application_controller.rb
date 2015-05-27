@@ -118,17 +118,17 @@ module Autotune
     end
 
     def render_error(message, status = :internal_server_error)
-      render(
-        :error,
-        :locals => { :message => message },
-        :status => status)
+      respond_to do |format|
+        format.json { render(:error, :locals => { :message => message }, :status => status) }
+        format.html { render(:error, :locals => { :message => message }, :status => status) }
+      end
     end
 
     def render_accepted(message = 'accepted')
-      render(
-        :accepted,
-        :locals => { :message => message },
-        :status => :accepted)
+      respond_to do |format|
+        format.json { render(:accepted, :locals => { :message => message }, :status => :accepted) }
+        format.html { render(:accepted, :locals => { :message => message }, :status => :accepted) }
+      end
     end
   end
 end
