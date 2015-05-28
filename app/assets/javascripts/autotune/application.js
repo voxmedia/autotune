@@ -1054,7 +1054,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
-__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="3">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
+__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="4">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
  if(query.theme || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
@@ -1106,9 +1106,9 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Editorial Status</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>    \n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(collection.models.length == 0) { 
-__p+='\n  <tr><td class="text-center" colspan="4"><h4>No projects found</h4></td></tr>\n  ';
+__p+='\n  <tr><td class="text-center" colspan="5"><h4>No projects found</h4></td></tr>\n  ';
  }
    _.each(collection.models, function(item) { 
 __p+='\n   <tr>\n    <td ';
@@ -1137,7 +1137,9 @@ __p+='\n      <a href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '">'+
 ((__t=( item.get('title') ))==null?'':__t)+
-'</a></td>\n    <td>\n      ';
+'</a></td>\n    <td>'+
+((__t=(item.get('created_by') ))==null?'':__t)+
+'</td>\n    <td>\n      ';
  if ( item.hasUnpublishedUpdates() ) { 
 __p+='\n        <span class="text-success">Published</span>\n      ';
  } else if ( item.isPublished() ) { 

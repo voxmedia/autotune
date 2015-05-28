@@ -25,7 +25,7 @@
         <a id="new-project" class="btn btn-primary btn-xs"
        href="/projects/new">New project</a>
       </td>
-      <td class="text-right" colspan="3">
+      <td class="text-right" colspan="4">
         <form class="form-inline" method="get" action="/projects">
           Filters
           <% if(query.theme || query.blueprint_type || query.status) { %>
@@ -65,13 +65,14 @@
   </thead>
   <tbody>
   <tr class="m-table-heading">
-    <td>Project</td>
+    <td>Project</td>    
+    <td>Author</td>
     <td>Editorial Status</td>
     <td>Blueprint</td>
     <td class="text-right">Bold Actions</td>
   </tr>
   <% if(collection.models.length == 0) { %>
-  <tr><td class="text-center" colspan="4"><h4>No projects found</h4></td></tr>
+  <tr><td class="text-center" colspan="5"><h4>No projects found</h4></td></tr>
   <% }
    _.each(collection.models, function(item) { %>
    <tr>
@@ -90,6 +91,7 @@
         <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
       <% } %>
       <a href="<%=item.url() %>"><%= item.get('title') %></a></td>
+    <td><%=item.get('created_by') %></td>
     <td>
       <% if ( item.hasUnpublishedUpdates() ) { %>
         <span class="text-success">Published</span>
