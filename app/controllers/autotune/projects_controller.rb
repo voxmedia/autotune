@@ -31,7 +31,7 @@ module Autotune
       # include the current name of the blueprint
       respond_to do |format|
         format.json do
-          render :json => @projects.to_json(:methods => :blueprint_title)
+          render :json => @projects.to_json(:methods => [:blueprint_title, :created_by])
         end
       end
     end
