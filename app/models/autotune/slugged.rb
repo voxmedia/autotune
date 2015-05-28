@@ -5,7 +5,10 @@ module Autotune
 
     included do
       before_validation :ensure_unique_slug
-      validates :slug, :presence => true, :uniqueness => true, :format => { :with => /\A[0-9a-z\-]+\z/ }
+      validates :slug,
+                :presence => true,
+                :uniqueness => true,
+                :format => { :with => /\A[0-9a-z\-_]+\z/ }
     end
 
     private
