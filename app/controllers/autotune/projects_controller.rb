@@ -19,7 +19,7 @@ module Autotune
 
     def index
       @projects = Project
-      query = select_from_get :status, :theme, :blueprint_id
+      query = select_from_get :status, :theme_id, :blueprint_id
       query['user'] = current_user unless current_user.role? :editor, :superuser
       @projects = @projects.search(params[:search]) if params.key? :search
       if query.empty?
@@ -41,10 +41,12 @@ module Autotune
     end
 
     def create
-      @project = Project.new(
-        :user => current_user,
-        :blueprint => Blueprint.find(request.POST['blueprint_id']))
-      @project.attributes = select_from_post :title, :slug, :theme, :data
+      @project = Project.new(:user => current_user)
+      @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
+
+      if request.POST.key? 'theme'
+        @project.theme = Theme.find_by_value request.POST['theme']
+      end
 
       # make sure data doesn't contain title, slug or theme
       @project.data.delete('title')
@@ -63,7 +65,11 @@ module Autotune
     def update
       @project = instance
       @project.user = current_user if @project.user.nil?
-      @project.attributes = select_from_post :title, :slug, :theme, :data
+      @project.attributes = select_from_post :title, :slug, :data
+
+      if request.POST.key? 'theme'
+        @project.theme = Theme.find_by_value request.POST['theme']
+      end
 
       # make sure data doesn't contain title, slug or theme
       @project.data.delete('title')

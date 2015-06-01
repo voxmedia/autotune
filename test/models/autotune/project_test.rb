@@ -3,9 +3,7 @@ require 'test_helper'
 module Autotune
   # Test the projects
   class ProjectTest < ActiveSupport::TestCase
-    fixtures 'autotune/blueprints'
-    fixtures 'autotune/users'
-    fixtures 'autotune/projects'
+    fixtures 'autotune/blueprints', 'autotune/users', 'autotune/projects', 'autotune/themes'
 
     test 'creating a project' do
       assert_raises ActiveRecord::RecordInvalid do
@@ -20,8 +18,14 @@ module Autotune
 
       user = autotune_users(:developer)
 
+      assert_raises ActiveRecord::RecordInvalid do
+        Project.create!(:title => 'new project', :blueprint => bp, :user => user)
+      end
+
+      theme = autotune_themes(:generic)
+
       b = Project.create!(
-        :title => 'new project', :blueprint => bp, :user => user)
+        :title => 'new project', :blueprint => bp, :user => user, :theme => theme)
       assert_equal b.blueprint, bp
       assert_equal b.user, user
       assert_equal 'new', b.status

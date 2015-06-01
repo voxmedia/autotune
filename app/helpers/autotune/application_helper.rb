@@ -4,8 +4,8 @@ module Autotune
     def config
       {
         :env => Rails.env,
+        :themes => Theme.all.as_json,
         :project_statuses => Autotune::PROJECT_STATUSES,
-        :project_themes => Project.uniq.pluck(:theme),
         :project_blueprints => Project.uniq.pluck(:blueprint_id),
         :blueprint_statuses => Autotune::BLUEPRINT_STATUSES,
         :blueprint_types => Blueprint.uniq.pluck(:type),

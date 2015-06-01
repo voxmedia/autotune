@@ -3,7 +3,7 @@
 example_one:
   title: Example build one
   slug: example-build-one
-  theme: default
+  theme: generic
   status: new
   data: '{"title": "Example build one"}'
   blueprint: example
@@ -12,7 +12,7 @@ example_one:
 example_two:
   title: Example build two
   slug: example-build-two
-  theme: default
+  theme: generic
   status: new
   data: '{"title": "Example build two"}'
   blueprint: example
@@ -21,7 +21,7 @@ example_two:
 example_three:
   title: Example build three
   slug: example-build-three
-  theme: default
+  theme: generic
   status: new
   data: '{"title": "Example build three"}'
   blueprint: example

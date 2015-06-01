@@ -1,0 +1,26 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+generic:
+  label: Generic
+  value: generic
+  blueprints: example, example_two
+
+sbn:
+  label: SBNation
+  value: sbnation
+  blueprints: example
+
+theverge:
+  label: The Verge
+  value: theverge
+  blueprints: example
+
+polygon:
+  label: Polygon
+  value: polygon
+  blueprints: example
+
+vox:
+  label: Vox
+  value: vox
+  blueprints: example

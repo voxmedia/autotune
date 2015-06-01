@@ -19,7 +19,7 @@ module Autotune
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :preview, :publish, :media,
                       :verify_omniauth, :git_ssh, :git_askpass,
-                      :faq_url)
+                      :faq_url, :themes)
 
   class << self
     attr_writer :redis

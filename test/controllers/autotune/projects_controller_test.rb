@@ -3,7 +3,7 @@ require 'test_helper'
 module Autotune
   # Test project api
   class ProjectsControllerTest < ActionController::TestCase
-    fixtures 'autotune/blueprints', 'autotune/projects'
+    fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes'
     test 'that listing projects requires authentication' do
       accept_json!
 
@@ -60,9 +60,6 @@ module Autotune
     end
 
     test 'create project' do
-      # need to make sure the blueprint is cloned
-      Autotune::SyncBlueprintJob.perform_now autotune_blueprints(:example)
-
       accept_json!
       valid_auth_header!
 
@@ -71,14 +68,11 @@ module Autotune
       assert_response :created, decoded_response['error']
       assert_project_data!
 
-      new_bp = Project.find decoded_response['id']
-      assert_equal project_data[:title], new_bp.title
+      new_p = Project.find decoded_response['id']
+      assert_equal project_data[:title], new_p.title
     end
 
     test 'update project' do
-      # need to make sure the blueprint is cloned
-      Autotune::SyncBlueprintJob.perform_now autotune_blueprints(:example)
-
       accept_json!
       valid_auth_header!
 
@@ -90,8 +84,8 @@ module Autotune
       assert_response :success, decoded_response['error']
       assert_project_data!
 
-      new_bp = Project.find decoded_response['id']
-      assert_equal title, new_bp.title
+      new_p = Project.find decoded_response['id']
+      assert_equal title, new_p.title
     end
 
     test 'delete project' do
@@ -124,7 +118,7 @@ module Autotune
         :slug => 'New project'.parameterize,
         :blueprint_id => autotune_blueprints(:example).id,
         :user_id => autotune_users(:developer).id,
-        :theme => 'default',
+        :theme => autotune_themes(:generic).value,
         :preview_url => '',
         :data => {
           :title => 'New project',

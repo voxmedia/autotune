@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150521184916) do
+ActiveRecord::Schema.define(version: 20150527142316) do
 
   create_table "autotune_authorizations", force: :cascade do |t|
     t.integer  "user_id"
@@ -54,9 +54,16 @@ ActiveRecord::Schema.define(version: 20150521184916) do
   add_index "autotune_blueprints", ["status"], name: "index_autotune_blueprints_on_status"
   add_index "autotune_blueprints", ["type"], name: "index_autotune_blueprints_on_type"
 
+  create_table "autotune_blueprints_themes", id: false, force: :cascade do |t|
+    t.integer "theme_id"
+    t.integer "blueprint_id"
+  end
+
+  add_index "autotune_blueprints_themes", ["blueprint_id"], name: "index_autotune_blueprints_themes_on_blueprint_id"
+  add_index "autotune_blueprints_themes", ["theme_id"], name: "index_autotune_blueprints_themes_on_theme_id"
+
   create_table "autotune_projects", force: :cascade do |t|
     t.string   "slug"
-    t.string   "theme"
     t.string   "status"
     t.string   "title"
     t.string   "blueprint_version"
@@ -69,12 +76,13 @@ ActiveRecord::Schema.define(version: 20150521184916) do
     t.text     "blueprint_config"
     t.datetime "published_at"
     t.datetime "data_updated_at"
+    t.integer  "theme_id"
   end
 
   add_index "autotune_projects", ["blueprint_id"], name: "index_autotune_projects_on_blueprint_id"
   add_index "autotune_projects", ["slug"], name: "index_autotune_projects_on_slug"
   add_index "autotune_projects", ["status"], name: "index_autotune_projects_on_status"
-  add_index "autotune_projects", ["theme"], name: "index_autotune_projects_on_theme"
+  add_index "autotune_projects", ["theme_id"], name: "index_autotune_projects_on_theme_id"
   add_index "autotune_projects", ["user_id"], name: "index_autotune_projects_on_user_id"
 
   create_table "autotune_tags", force: :cascade do |t|
@@ -85,6 +93,11 @@ ActiveRecord::Schema.define(version: 20150521184916) do
   end
 
   add_index "autotune_tags", ["slug"], name: "index_autotune_tags_on_slug"
+
+  create_table "autotune_themes", force: :cascade do |t|
+    t.string "value"
+    t.string "label"
+  end
 
   create_table "autotune_users", force: :cascade do |t|
     t.string   "email"

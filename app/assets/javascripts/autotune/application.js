@@ -37,6 +37,10 @@ var Router = require('./router');
  * @param {Object} config.user - Current user info
  */
 window.App = function(config) {
+  this.themes = new Backbone.Collection();
+  this.themes.reset(config.themes);
+  delete config.themes;
+
   this.config = config;
   this.router = new Router({app: this});
   this.msgListener = null;
@@ -1055,23 +1059,23 @@ __p+='>\n        ';
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
 __p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="3">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
- if(query.theme || query.blueprint_type || query.status) { 
+ if(query.theme_id || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
-__p+='\n          &nbsp;\n          <div class="select">\n            <select name="theme" id="theme" class="form-control" data-auto-submit="true">\n              <option disabled ';
- if(!query.theme) { 
+__p+='\n          &nbsp;\n          <div class="select">\n            <select name="theme_id" id="theme_id" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.theme_id) { 
 __p+='selected';
  } 
 __p+='>Theme</option>\n            ';
- _.each(app.config.project_themes, function(theme) { 
+ app.themes.each(function(theme) { 
 __p+='\n              <option ';
- if(theme === query.theme) { 
+ if(theme.id == query.theme_id) { 
 __p+='selected';
  } 
 __p+='\n                    value="'+
-((__t=(theme ))==null?'':__t)+
+((__t=(theme.id ))==null?'':__t)+
 '">'+
-((__t=(theme ))==null?'':__t)+
+((__t=(theme.get('label') ))==null?'':__t)+
 '</option>\n            ';
  }) 
 __p+='\n            </select>\n          </div>\n          <div class="select">\n            <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n              <option disabled ';
@@ -30230,6 +30234,10 @@ var $ = require('jquery'),
     models = require('../models'),
     FormView = require('./FormView');
 
+function pluckAttr(models, attribute) {
+  return _.map(models, function(t) { return t.get(attribute); });
+}
+
 module.exports = FormView.extend({
   template: require('../templates/project.ejs'),
 
@@ -30269,29 +30277,39 @@ module.exports = FormView.extend({
   renderForm: function() {
     var $form = this.$el.find('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
-        form_config;
+        form_config, config_themes;
 
     if ( this.model.isNew() ) {
       form_config = this.model.blueprint.get('config').form;
+      config_themes = this.model.blueprint.get('config').themes || ['generic'];
     } else {
       form_config = this.model.get('blueprint_config').form;
+      config_themes = this.model.get('blueprint_config').themes || ['generic'];
     }
 
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
     } else {
-      var schema_properties = {
+      var themes = this.app.themes.filter(function(theme) {
+            return config_themes.indexOf(theme.get('value')) >= 0;
+          }),
+          schema_properties = {
             "title": {
               "title": "Title",
-              "description": "hello world?",
               "type": "string",
               "required": true
             },
             "slug": {
               "title": "Slug",
-              "description": "hello world?",
               "type": "string",
               "pattern": "^[0-9a-z\-_]+$"
+            },
+            "theme": {
+              "title": "Theme",
+              "type": "string",
+              "required": true,
+              "default": pluckAttr(themes, 'value')[0],
+              "enum": pluckAttr(themes, 'value')
             }
           },
           options_form = {
@@ -30302,7 +30320,12 @@ module.exports = FormView.extend({
               "data-next": 'show'
             }
           },
-          options_fields = {};
+          options_fields = {
+            "theme": {
+              "type": "select",
+              "optionLabels": pluckAttr(themes, 'label')
+            }
+          };
 
       _.extend(schema_properties, form_config['schema']['properties'] || {});
       if(form_config['options']) {

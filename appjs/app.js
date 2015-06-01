@@ -33,6 +33,10 @@ var Router = require('./router');
  * @param {Object} config.user - Current user info
  */
 window.App = function(config) {
+  this.themes = new Backbone.Collection();
+  this.themes.reset(config.themes);
+  delete config.themes;
+
   this.config = config;
   this.router = new Router({app: this});
   this.msgListener = null;

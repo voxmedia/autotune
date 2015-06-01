@@ -6,6 +6,10 @@ var $ = require('jquery'),
     models = require('../models'),
     FormView = require('./FormView');
 
+function pluckAttr(models, attribute) {
+  return _.map(models, function(t) { return t.get(attribute); });
+}
+
 module.exports = FormView.extend({
   template: require('../templates/project.ejs'),
 
@@ -45,29 +49,39 @@ module.exports = FormView.extend({
   renderForm: function() {
     var $form = this.$el.find('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
-        form_config;
+        form_config, config_themes;
 
     if ( this.model.isNew() ) {
       form_config = this.model.blueprint.get('config').form;
+      config_themes = this.model.blueprint.get('config').themes || ['generic'];
     } else {
       form_config = this.model.get('blueprint_config').form;
+      config_themes = this.model.get('blueprint_config').themes || ['generic'];
     }
 
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
     } else {
-      var schema_properties = {
+      var themes = this.app.themes.filter(function(theme) {
+            return config_themes.indexOf(theme.get('value')) >= 0;
+          }),
+          schema_properties = {
             "title": {
               "title": "Title",
-              "description": "hello world?",
               "type": "string",
               "required": true
             },
             "slug": {
               "title": "Slug",
-              "description": "hello world?",
               "type": "string",
               "pattern": "^[0-9a-z\-_]+$"
+            },
+            "theme": {
+              "title": "Theme",
+              "type": "string",
+              "required": true,
+              "default": pluckAttr(themes, 'value')[0],
+              "enum": pluckAttr(themes, 'value')
             }
           },
           options_form = {
@@ -78,7 +92,12 @@ module.exports = FormView.extend({
               "data-next": 'show'
             }
           },
-          options_fields = {};
+          options_fields = {
+            "theme": {
+              "type": "select",
+              "optionLabels": pluckAttr(themes, 'label')
+            }
+          };
 
       _.extend(schema_properties, form_config['schema']['properties'] || {});
       if(form_config['options']) {

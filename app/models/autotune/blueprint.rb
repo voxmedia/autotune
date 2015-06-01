@@ -12,6 +12,7 @@ module Autotune
     has_many :blueprint_tags, :dependent => :destroy
     has_many :tags, :through => :blueprint_tags
     has_many :projects
+    has_and_belongs_to_many :themes
 
     validates :title, :repo_url, :presence => true
     validates :repo_url, :uniqueness => { :case_sensitive => false }

@@ -10,8 +10,9 @@ module Autotune
     serialize :blueprint_config, JSON
     belongs_to :blueprint
     belongs_to :user
+    belongs_to :theme
 
-    validates :title, :blueprint, :user, :presence => true
+    validates :title, :blueprint, :user, :theme, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
     before_validation :defaults
@@ -83,7 +84,6 @@ module Autotune
 
     def defaults
       self.status ||= 'new'
-      self.theme ||= 'default'
       # self.data ||= {}  # seems to mess up check_for_updated_data
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
       self.blueprint_config ||= blueprint.config unless blueprint.nil?
@@ -95,8 +95,8 @@ module Autotune
 
     def pub_to_redis
       return if Autotune.redis_pub.nil?
-      msg = { id: id,
-              status: status }
+      msg = { :id => id,
+              :status => status }
       Autotune.redis_pub.publish 'project', msg.to_json
     end
   end

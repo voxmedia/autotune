@@ -20,7 +20,7 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme,
+        'theme' => project.theme.value,
         'base_url' => (mode == :publish) ? project.publish_url : project.preview_url)
 
       # Run the build

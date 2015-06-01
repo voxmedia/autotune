@@ -9,8 +9,10 @@ AllCops:
   RunRailsCops: true
 
 Style/HashSyntax:
-  Enabled: false
   EnforcedStyle: hash_rockets
+
+Style/GuardClause:
+  Enabled: false
 
 Style/LineLength:
   Max: 100
@@ -31,4 +33,7 @@ Style/MethodLength:
   Enabled: false
 
 Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Rails/HasAndBelongsToMany:
   Enabled: false

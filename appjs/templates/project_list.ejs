@@ -28,16 +28,16 @@
       <td class="text-right" colspan="3">
         <form class="form-inline" method="get" action="/projects">
           Filters
-          <% if(query.theme || query.blueprint_type || query.status) { %>
+          <% if(query.theme_id || query.blueprint_type || query.status) { %>
             (<a href="/projects">clear</a>)
           <% } %>
           &nbsp;
           <div class="select">
-            <select name="theme" id="theme" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
-            <% _.each(app.config.project_themes, function(theme) { %>
-              <option <% if(theme === query.theme) { %>selected<% } %>
-                    value="<%=theme %>"><%=theme %></option>
+            <select name="theme_id" id="theme_id" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.theme_id) { %>selected<% } %>>Theme</option>
+            <% app.themes.each(function(theme) { %>
+              <option <% if(theme.id == query.theme_id) { %>selected<% } %>
+                    value="<%=theme.id %>"><%=theme.get('label') %></option>
             <% }) %>
             </select>
           </div>
