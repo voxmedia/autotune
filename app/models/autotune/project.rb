@@ -37,16 +37,6 @@ module Autotune
       published? && published_at < data_updated_at
     end
 
-    def blueprint_title
-      return if blueprint.nil?
-      blueprint.title
-    end
-
-    def created_by
-      return if user.nil?
-      user.name
-    end
-
     def update_snapshot
       return if blueprint_version == blueprint.version
       update!(
