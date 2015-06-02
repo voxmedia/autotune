@@ -24,7 +24,10 @@ module.exports = FormView.extend({
 
     if ( this.model.isPublished() ) {
       $.get(this.model.getPublishUrl(window.location.protocol.replace(':', '')) + 'embed.txt',
-            function(data, status) { $('#embed textarea').text( data ); });
+            function(data, status) {
+              data = data.replace(/(?:\r\n|\r|\n)/gm, '');
+              $('#embed textarea').text( data );
+            });
     }
 
     if( ! this.model.blueprint.has('config') ) {
