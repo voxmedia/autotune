@@ -61,7 +61,9 @@ module Autotune
 
       # is this user allowed to use this theme?
       unless current_user.author_themes.include? @project.theme
-        return render_error 'Forbidden', :forbidden
+        return render_error(
+          "You can't use the #{@project.theme.label} theme. Please choose another theme or contact support",
+          :bad_request)
       end
 
       # make sure data doesn't contain title, slug or theme
@@ -89,7 +91,9 @@ module Autotune
 
       # is this user allowed to use this theme?
       unless current_user.author_themes.include? @project.theme
-        return render_error 'Forbidden', :forbidden
+        return render_error(
+          "You can't use the #{@project.theme.label} theme. Please choose another theme or contact support",
+          :bad_request)
       end
 
       # make sure data doesn't contain title, slug or theme

@@ -30295,6 +30295,7 @@ module.exports = FormView.extend({
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
     } else {
+      this.app.debug(config_themes);
       var themes = this.app.themes.filter(function(theme) {
             return config_themes.indexOf(theme.get('value')) >= 0;
           }),
