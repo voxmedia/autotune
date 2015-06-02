@@ -25,4 +25,32 @@ example_three:
   status: new
   data: '{"title": "Example build three"}'
   blueprint: example
+  user: generic_author
+
+example_four:
+  title: Example build four
+  slug: example-build-four
+  theme: vox
+  status: new
+  data: '{"title": "Example build four"}'
+  blueprint: example
+  user: developer
+
+example_five:
+  title: Example build five
+  slug: example-build-five
+  theme: vox
+  status: new
+  data: '{"title": "Example build five"}'
+  blueprint: example
+  user: developer
+
+example_six:
+  title: Example build six
+  slug: example-build-six
+  theme: vox
+  status: new
+  data: '{"title": "Example build six"}'
+  blueprint: example
   user: author
+

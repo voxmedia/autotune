@@ -4,22 +4,34 @@ developer:
   name: test
   email: test@example.com
   api_key: u1H4xLSckbnJSYiM5VE0
-  meta: '{"roles": "superuser"}'
+  meta: '{"roles": ["superuser"]}'
 
 superuser:
   name: root
   email: root@example.com
   api_key: jHJ6FfDS2rlNkCBY4R73
-  meta: '{"roles": "superuser"}'
+  meta: '{"roles": ["superuser"]}'
 
 editor:
   name: editor
   email: editor@example.com
   api_key: nISgtBZrvxRjf58KA6sb
-  meta: '{"roles": "editor"}'
+  meta: '{"roles": ["editor"]}'
 
 author:
   name: author
   email: author@example.com
   api_key: rz4qSB0LkspAakCmxmbB
-  meta: '{"roles": "author"}'
+  meta: '{"roles": ["author"]}'
+
+generic_editor:
+  name: generic editor
+  email: editor@example.com
+  api_key: ALpfHEllZiLJIcHv3jDe
+  meta: '{"roles": {"editor": ["generic"]}}'
+
+generic_author:
+  name: generic author
+  email: author@example.com
+  api_key: ao3j4frsdasfkdjalsjf
+  meta: '{"roles": {"author": ["generic"]}}'

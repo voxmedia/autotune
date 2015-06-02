@@ -1,7 +1,8 @@
 require 'test_helper'
 
+# test user model
 class Autotune::UserTest < ActiveSupport::TestCase
-  fixtures 'autotune/users'
+  fixtures 'autotune/users', 'autotune/themes'
   test 'creating user' do
     assert_raises ActiveRecord::RecordInvalid do
       Autotune::User.create!(:name => 'foo')
@@ -52,7 +53,22 @@ class Autotune::UserTest < ActiveSupport::TestCase
     assert autotune_users(:developer).role? :superuser
     assert autotune_users(:author).role? :author
     assert autotune_users(:editor).role? :editor
+    assert autotune_users(:author).role? :author => 'generic'
+    assert autotune_users(:editor).role? :editor => 'generic'
     assert !autotune_users(:editor).role?(:superuser)
     assert !autotune_users(:author).role?(:superuser)
+    assert autotune_users(:generic_author).role?(:author)
+    assert autotune_users(:generic_author).role?(:author => 'generic')
+    assert !autotune_users(:generic_author).role?(:editor => 'generic')
+    assert autotune_users(:generic_editor).role?(:editor)
+    assert autotune_users(:generic_editor).role?(:author => 'generic', :editor => 'generic')
+    assert autotune_users(:generic_editor).role?(:editor => 'generic')
+  end
+
+  test 'themes' do
+    assert_equal autotune_users(:generic_author).author_themes.first, autotune_themes(:generic)
+    assert autotune_users(:generic_author).editor_themes.empty?
+    assert_equal autotune_users(:generic_editor).author_themes.first, autotune_themes(:generic)
+    assert_equal autotune_users(:generic_editor).editor_themes.first, autotune_themes(:generic)
   end
 end

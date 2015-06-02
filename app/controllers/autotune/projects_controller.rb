@@ -5,12 +5,18 @@ module Autotune
   class ProjectsController < ApplicationController
     before_action :respond_to_html
     before_action :require_superuser, :only => [:update_snapshot]
-    before_action :require_authorization,
-                  :only => [:show, :update, :destroy, :build, :build_and_publish]
     model Project
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
+    end
+
+    before_action :only => [:show, :update, :destroy, :build, :build_and_publish] do
+      unless current_user.role?(:superuser) ||
+             instance.user == current_user ||
+             current_user.role?(:editor => instance.theme.value)
+        render_error 'Forbidden', :forbidden
+      end
     end
 
     def new; end
@@ -19,9 +25,21 @@ module Autotune
 
     def index
       @projects = Project
+
+      # Filter and search query
       query = select_from_get :status, :theme_id, :blueprint_id
-      query['user'] = current_user unless current_user.role? :editor, :superuser
       @projects = @projects.search(params[:search]) if params.key? :search
+
+      unless current_user.role? :superuser
+        if current_user.role? :editor
+          @projects = @projects.where(
+            '(user_id = ? OR theme_id IN (?))',
+            current_user.id, current_user.editor_themes.pluck(:id))
+        else
+          query[:user_id] = current_user.id
+        end
+      end
+
       if query.empty?
         @projects = @projects.all
       else
@@ -39,6 +57,11 @@ module Autotune
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
+      end
+
+      # is this user allowed to use this theme?
+      unless current_user.author_themes.include? @project.theme
+        return render_error 'Forbidden', :forbidden
       end
 
       # make sure data doesn't contain title, slug or theme
@@ -62,6 +85,11 @@ module Autotune
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
+      end
+
+      # is this user allowed to use this theme?
+      unless current_user.author_themes.include? @project.theme
+        return render_error 'Forbidden', :forbidden
       end
 
       # make sure data doesn't contain title, slug or theme
@@ -100,11 +128,6 @@ module Autotune
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
-    end
-
-    def require_authorization
-      return if instance.user == current_user
-      require_role :superuser, :editor
     end
   end
 end
