@@ -21,7 +21,8 @@ class CreateThemes < ActiveRecord::Migration
 
     Autotune::Project.all.each do |project|
       old_theme = project.attributes['theme']
-      if old_theme == 'default' || old_theme == '' || old_theme.nil?
+      if old_theme == 'default' || old_theme == '' ||
+         old_theme.nil? || themes[old_theme.to_sym].nil?
         project.theme = themes[:generic]
       else
         project.theme = themes[old_theme.to_sym]
