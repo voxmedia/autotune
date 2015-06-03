@@ -25,7 +25,7 @@
         <a id="new-project" class="btn btn-primary btn-xs"
        href="/projects/new">New project</a>
       </td>
-      <td class="text-right" colspan="4">
+      <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
           Filters
           <% if(query.theme_id || query.blueprint_type || query.status) { %>
@@ -65,9 +65,10 @@
   </thead>
   <tbody>
   <tr class="m-table-heading">
-    <td>Project</td>    
+    <td>Project</td>
     <td>Author</td>
     <td>Editorial Status</td>
+    <td>Theme</td>
     <td>Blueprint</td>
     <td class="text-right">Bold Actions</td>
   </tr>
@@ -104,6 +105,7 @@
       <% } %>
       <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
     </td>
+    <td><%=app.themes.findWhere({value: item.get('theme')}).get('label') %></td>
     <td><%=item.get('blueprint_title') %></td>
     <td class="text-right">
 
