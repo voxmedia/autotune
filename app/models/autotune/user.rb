@@ -44,6 +44,8 @@ module Autotune
         :uid => auth_hash['uid']).first
       return if a.nil?
 
+      a.update(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
+
       if a.user.meta['roles'] != roles
         a.user.meta['roles'] = roles
         a.user.save

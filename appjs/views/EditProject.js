@@ -65,9 +65,12 @@ module.exports = FormView.extend({
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
     } else {
-      this.app.debug(config_themes);
       var themes = this.app.themes.filter(function(theme) {
-            return config_themes.indexOf(theme.get('value')) >= 0;
+            if ( _.isEqual(config_themes, ['generic']) ) {
+              return true;
+            } else {
+              return _.contains(config_themes, theme.get('value'));
+            }
           }),
           schema_properties = {
             "title": {
@@ -103,6 +106,11 @@ module.exports = FormView.extend({
             }
           };
 
+      // if there is only one theme option, hide the dropdown
+      if ( themes.length === 1 ) {
+        options_fields['theme']['type'] = 'hidden';
+      }
+
       _.extend(schema_properties, form_config['schema']['properties'] || {});
       if(form_config['options']) {
         _.extend(options_form, form_config['options']['form'] || {});
@@ -126,6 +134,9 @@ module.exports = FormView.extend({
       };
       if(!this.model.isNew()) {
         opts.data = this.model.formData();
+        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
+          opts.data.theme = pluckAttr(themes, 'value')[0];
+        }
       }
       $form.alpaca(opts);
     }

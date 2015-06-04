@@ -1156,7 +1156,9 @@ __p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table clas
  if(query.theme_id || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
-__p+='\n          &nbsp;\n          <div class="select">\n            <select name="theme_id" id="theme_id" class="form-control" data-auto-submit="true">\n              <option disabled ';
+__p+='\n          &nbsp;\n          ';
+ if ( app.themes.length > 1 ) { 
+__p+='\n          <div class="select">\n            <select name="theme_id" id="theme_id" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.theme_id) { 
 __p+='selected';
  } 
@@ -1172,7 +1174,9 @@ __p+='\n                    value="'+
 ((__t=(theme.get('label') ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n          <div class="select">\n            <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n              <option disabled ';
+__p+='\n            </select>\n          </div>\n          ';
+ } 
+__p+='\n          <div class="select">\n            <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.blueprint_type) { 
 __p+='selected';
  } 
@@ -1206,7 +1210,7 @@ __p+='\n                    value="'+
  }) 
 __p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(collection.models.length == 0) { 
-__p+='\n  <tr><td class="text-center" colspan="5"><h4>No projects found</h4></td></tr>\n  ';
+__p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }
    _.each(collection.models, function(item) { 
 __p+='\n   <tr>\n    <td ';
@@ -1253,9 +1257,17 @@ __p+='<br>'+
 ((__t=(item.publishedTime() ))==null?'':__t)+
 '';
  } 
-__p+='\n    </td>\n    <td>'+
+__p+='\n    </td>\n    <td>\n      ';
+ if ( app.themes.findWhere({value: item.get('theme')}) ) { 
+__p+='\n      '+
 ((__t=(app.themes.findWhere({value: item.get('theme')}).get('label') ))==null?'':__t)+
-'</td>\n    <td>'+
+'\n      ';
+ } else { 
+__p+='\n      <em class="text-muted">'+
+((__t=(item.get('theme') ))==null?'':__t)+
+'</em>\n      ';
+ } 
+__p+='\n    </td>\n    <td>'+
 ((__t=(item.get('blueprint_title') ))==null?'':__t)+
 '</td>\n    <td class="text-right">\n\n      <a data-tooltip="edit" href="'+
 ((__t=(item.url() ))==null?'':__t)+
@@ -30391,9 +30403,12 @@ module.exports = FormView.extend({
     if(_.isUndefined(form_config)) {
       this.error('This blueprint does not have a form!');
     } else {
-      this.app.debug(config_themes);
       var themes = this.app.themes.filter(function(theme) {
-            return config_themes.indexOf(theme.get('value')) >= 0;
+            if ( _.isEqual(config_themes, ['generic']) ) {
+              return true;
+            } else {
+              return _.contains(config_themes, theme.get('value'));
+            }
           }),
           schema_properties = {
             "title": {
@@ -30429,6 +30444,11 @@ module.exports = FormView.extend({
             }
           };
 
+      // if there is only one theme option, hide the dropdown
+      if ( themes.length === 1 ) {
+        options_fields['theme']['type'] = 'hidden';
+      }
+
       _.extend(schema_properties, form_config['schema']['properties'] || {});
       if(form_config['options']) {
         _.extend(options_form, form_config['options']['form'] || {});
@@ -30452,6 +30472,9 @@ module.exports = FormView.extend({
       };
       if(!this.model.isNew()) {
         opts.data = this.model.formData();
+        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
+          opts.data.theme = pluckAttr(themes, 'value')[0];
+        }
       }
       $form.alpaca(opts);
     }

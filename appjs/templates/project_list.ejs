@@ -32,6 +32,7 @@
             (<a href="/projects">clear</a>)
           <% } %>
           &nbsp;
+          <% if ( app.themes.length > 1 ) { %>
           <div class="select">
             <select name="theme_id" id="theme_id" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.theme_id) { %>selected<% } %>>Theme</option>
@@ -41,6 +42,7 @@
             <% }) %>
             </select>
           </div>
+          <% } %>
           <div class="select">
             <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.blueprint_type) { %>selected<% } %>>Type</option>
@@ -73,7 +75,7 @@
     <td class="text-right">Bold Actions</td>
   </tr>
   <% if(collection.models.length == 0) { %>
-  <tr><td class="text-center" colspan="5"><h4>No projects found</h4></td></tr>
+  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>
   <% }
    _.each(collection.models, function(item) { %>
    <tr>
@@ -105,7 +107,13 @@
       <% } %>
       <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
     </td>
-    <td><%=app.themes.findWhere({value: item.get('theme')}).get('label') %></td>
+    <td>
+      <% if ( app.themes.findWhere({value: item.get('theme')}) ) { %>
+      <%=app.themes.findWhere({value: item.get('theme')}).get('label') %>
+      <% } else { %>
+      <em class="text-muted"><%=item.get('theme') %></em>
+      <% } %>
+    </td>
     <td><%=item.get('blueprint_title') %></td>
     <td class="text-right">
 
