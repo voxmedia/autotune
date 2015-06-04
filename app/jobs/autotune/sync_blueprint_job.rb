@@ -25,24 +25,10 @@ module Autotune
       blueprint.config = repo.read BLUEPRINT_CONFIG_FILENAME
 
       # look in the config for stuff like descriptions, sample images, tags
-      blueprint.tags = blueprint.config['tags'].map do |t|
-        Tag.find_or_create_by(:title => t.humanize)
-      end if blueprint.config['tags']
+      blueprint.initialize_tags_from_config
 
       # Associate themes
-      if blueprint.config['themes']
-        themes = []
-        blueprint.config['themes'].each do |t|
-          next unless Rails.configuration.autotune.themes.include? t.to_sym
-          themes << Theme.find_or_create_by(
-            :value => t, :label => Rails.configuration.autotune.themes[t.to_sym])
-        end
-        blueprint.themes = themes
-      else
-        blueprint.themes = [
-          Theme.find_or_create_by(:value => 'generic', :label => 'Generic')
-        ]
-      end
+      blueprint.initialize_themes_from_config
 
       # Get the type from the config
       blueprint.type = blueprint.config['type'].downcase

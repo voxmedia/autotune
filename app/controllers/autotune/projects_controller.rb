@@ -57,13 +57,15 @@ module Autotune
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
-      end
 
-      # is this user allowed to use this theme?
-      unless current_user.author_themes.include? @project.theme
-        return render_error(
-          "You can't use the #{@project.theme.label} theme. Please choose another theme or contact support",
-          :bad_request)
+        # is this user allowed to use this theme?
+        unless @project.theme.nil? ||
+               current_user.author_themes.include?(@project.theme)
+          return render_error(
+            "You can't use the #{@project.theme.label} theme. Please " \
+            'choose another theme or contact support',
+            :bad_request)
+        end
       end
 
       # make sure data doesn't contain title, slug or theme
@@ -87,13 +89,15 @@ module Autotune
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
-      end
 
-      # is this user allowed to use this theme?
-      unless current_user.author_themes.include? @project.theme
-        return render_error(
-          "You can't use the #{@project.theme.label} theme. Please choose another theme or contact support",
-          :bad_request)
+        # is this user allowed to use this theme?
+        unless @project.theme.nil? ||
+               current_user.author_themes.include?(@project.theme)
+          return render_error(
+            "You can't use the #{@project.theme.label} theme. Please " \
+            'choose another theme or contact support',
+            :bad_request)
+        end
       end
 
       # make sure data doesn't contain title, slug or theme

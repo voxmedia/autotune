@@ -130,8 +130,8 @@ module Autotune
       accept_json!
       valid_auth_header! :generic_author
 
-      post :create, project_data.update(:theme => autotune_themes(:vox))
-      assert_response :forbidden, decoded_response['error']
+      post :create, project_data.update(:theme => autotune_themes(:vox).value)
+      assert_response :bad_request, decoded_response['error']
     end
 
     test 'update project' do
