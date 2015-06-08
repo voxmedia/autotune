@@ -61,10 +61,8 @@ module Autotune
     def self.verify_auth_hash(auth_hash)
       if Rails.configuration.autotune.verify_omniauth &&
          Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
-        logger.debug 'verify_auth_hash'
-        logger.debug auth_hash
         roles = Rails.configuration.autotune.verify_omniauth.call(auth_hash)
-        logger.debug "roles: #{roles}"
+        logger.debug "#{auth_hash['nickname']} roles: #{roles}"
         return unless (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
         return roles
       else
