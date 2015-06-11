@@ -5,13 +5,14 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('./models'),
     views = require('./views'),
+    logger = require('./logger'),
     queryString = require('query-string');
 
 module.exports = Backbone.Router.extend({
 
   initialize: function(options) {
     this.app = options.app;
-    this.app.debug("Init router");
+    logger.debug("Init router");
 
     this.on("route", this.everyRoute);
 
@@ -39,9 +40,9 @@ module.exports = Backbone.Router.extend({
     this.app.view.spinStart();
     this.app.analyticsEvent( 'pageview' );
     if ( params ) {
-      this.app.debug(route, params);
+      logger.debug(route, params);
     } else {
-      this.app.debug(route);
+      logger.debug(route);
     }
   },
 

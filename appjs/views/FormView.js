@@ -4,6 +4,7 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
+    logger = require('../logger'),
     camelize = require('underscore.string/camelize'),
     alert_template = require('../templates/alert.ejs'),
     BaseView = require('./BaseView');
@@ -25,7 +26,7 @@ module.exports = BaseView.extend({
     eve.stopPropagation();
 
     this.app.view.spinStart();
-    this.app.debug('handleForm');
+    logger.debug('handleForm');
 
     var inst, Model,
         $form = $(eve.currentTarget),
@@ -57,16 +58,16 @@ module.exports = BaseView.extend({
     inst.set(values);
     if(!this.formValidate(inst, $form)) {
       $form.find('[type=submit]').button('reset');
-      this.app.debug('form is not valid');
+      logger.debug('form is not valid');
       return false;
     }
 
-    this.app.debug('form is valid, saving...');
+    logger.debug('form is valid, saving...');
 
     inst.save()
       .done(_.bind(function() {
         $form.find('[type=submit]').button('reset');
-        this.app.debug('form finished saving');
+        logger.debug('form finished saving');
         if(action === 'new') {
           this.success('New '+model_class+' saved');
         } else {
@@ -140,7 +141,7 @@ module.exports = BaseView.extend({
     } else {
       this.error('Something bad happened... Please reload and try again');
     }
-    this.app.error("REQUEST FAILED!!", xhr, status, error);
+    logger.error("REQUEST FAILED!!", xhr, status, error);
   },
 
   submitForm: function(eve) {

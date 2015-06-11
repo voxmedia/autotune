@@ -4,6 +4,7 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
+    logger = require('../logger'),
     camelize = require('underscore.string/camelize'),
     alert_template = require('../templates/alert.ejs');
 
@@ -67,7 +68,7 @@ module.exports = Backbone.View.extend({
     } else {
       tmpl = require('../templates/error.ejs');
     }
-    this.app.debug(tmplObj);
+    logger.debug(tmplObj);
     this.$el.html(tmpl(tmplObj));
     this.app.view.spinStop();
   },
@@ -96,7 +97,7 @@ module.exports = Backbone.View.extend({
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
-    this.app.debug('hook ' + name);
+    logger.debug('hook ' + name);
     this.trigger(name, args);
     if(_.isFunction(this[name])) { return this[name].apply(this, args); }
   }
