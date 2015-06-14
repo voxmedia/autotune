@@ -12,65 +12,75 @@
 // Load jQuery and Backbone, make sure Backbone uses jQuery
 var $ = require('jquery'),
     _ = require('underscore'),
-    Backbone = require('backbone');
-
-var bootstrap = require('bootstrap'),
-    Alpaca = require('./vendor/alpaca');
-
-// required to make Backbone work
-Backbone.$ = $;
-
-// Load our components and run the app
-var Router = require('./router'),
+    Backbone = require('backbone'),
+    bootstrap = require('bootstrap'),
+    Alpaca = require('./vendor/alpaca'),
+    // Load our components and run the app
+    Router = require('./router'),
     Listener = require('./listener'),
-    logger = require('./logger');
+    logger = require('./logger'),
+    models = require('./models');
+
+// required to make Backbone work in browserify
+Backbone.$ = $;
 
 /**
  * Autotune admin UI
  * @constructor
  * @param {Object} config - Configure the admin UI
  * @param {string} config.env - Environment (production, staging or development)
- * @param {string[]} config.project_statuses - Possible project statuses
- * @param {string[]} config.project_themes - Possible project themes
- * @param {int[]} config.project_blueprints - Blueprint IDs used by existing projects
- * @param {string[]} config.blueprints_tags - Blueprint tags
  * @param {Object} config.user - Current user info
+ * @param {Object[]} config.themes - Possible project themes
+ * @param {Object[]} config.tags - Blueprint tags
+ * @param {Object[]} config.blueprints - Blueprints
+ * @param {Object[]} config.projects - Projects
  */
 function App(config) {
-  _.extend(this, Backbone.Events);
-
   this.themes = new Backbone.Collection();
   this.themes.reset(config.themes);
   delete config.themes;
 
+  this.tags = new Backbone.Collection();
+  this.tags.reset(config.tags);
+  delete config.tags;
+
+  this.user = new Backbone.Model(config.user);
+  delete config.user;
+
+  this.blueprints = new models.BlueprintCollection();
+  this.projects = new models.ProjectCollection();
+
+  this.listener = new Listener();
+  this.listener.on('change:blueprint', this.handleBlueprintChange, this);
+  this.listener.on('change:project',   this.handleProjectChange, this);
+  this.listener.on('stop',             this.handleListenerStop, this);
+  this.listener.start();
+
   this.config = config;
-  this.router = new Router({app: this});
-  this.msgListener = null;
-  this.has_focus = true;
 
   if ( this.isDev() ) { logger.level = 'debug'; }
 
-  Backbone.history.start({pushState: true});
+  this.router = new Router({ app: this });
+  Backbone.history.start({ pushState: true });
 
-  if ( window.EventSource ) {
+  this.hasFocus = true;
+  if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
-      this.has_focus = true;
-      if(this.sseClosingTimeout){
-        this.debug('Clearing sse closing timeout');
-        clearTimeout(this.sseClosingTimeout);
-      }
+      this.listener
+        .cancelStop()
+        .start();
+      this.view.clearError();
+      this.trigger('focus');
     }, this));
 
     $(window).on('blur', _.bind(function(){
-      this.has_focus = false;
-      this.sseClosingTimeout = setTimeout(_.bind(this.stopListeningForChanges, this), 10000);
+      this.listener.stopAfter(20);
+      this.trigger('blur');
     }, this));
-
-    this.startListeningForChanges();
   }
 }
 
-_.extend(App.prototype, {
+_.extend(App.prototype, Backbone.Events, {
   /**
    * Is the app running in dev mode
    * @return {bool}
@@ -84,7 +94,7 @@ _.extend(App.prototype, {
    * @param {string} type - Event type (pageview)
    */
   analyticsEvent: function() {
-    if ( window && window.ga ) {
+    if ( typeof(window) !== 'undefined' && window.ga ) {
       var ga = window.ga;
       if ( arguments[0] === 'pageview' ) {
         ga('send', 'pageview');
@@ -93,101 +103,168 @@ _.extend(App.prototype, {
   },
 
   /**
-   * Provide references to the models or collections that the event listener should refresh
-   * @param {string} type - Type of data to refresh (blueprint, project)
-   * @param {Object} data - Backbone object to refresh
-   * @param {Object} query - Optional query to use in the refresh
-   */
-  setActiveData: function(type, data, query){    
-    this.dataType = type;
-    this.dataToRefresh = data;
-    this.dataQuery = query;
+   * Handle updating a blueprint
+   **/
+  handleBlueprintChange: function(data) {
+    var inst = this.blueprints.get(data.id);
+    if ( !inst ) { return; }
+    switch (data.status) {
+      case 'new':
+      case 'testing':
+      case 'broken':
+        inst.fetch();
+        break;
+      default:
+        inst.set('status', data.status);
+    }
+  },
+
+  /**
+   * Handle updating a blueprint
+   **/
+  handleProjectChange: function(data) {
+    var inst = this.projects.get(data.id);
+    if ( !inst ) { return; }
+    switch (data.status) {
+      case 'new':
+      case 'built':
+        inst.fetch();
+        break;
+      default:
+        inst.set('status', data.status);
+    }
+  },
+
+  handleListenerStop: function() {
+    this.view.alert('Updates are stopped', 'notice', true);
   }
 });
 
 module.exports = App;
 
-// Make libraries accessible to global scope, for console use and error logging
-if ( _.isObject(window) ) {
+if ( typeof(window) !== 'undefined' ) {
+  // Make App a global so we can initialize from our webpage
   window.App = App;
+  // Make libraries accessible to global scope for console use
   window.Backbone = Backbone;
   window.$ = $;
   window._ = _;
 }
 
-},{"./listener":2,"./logger":3,"./router":5,"./vendor/alpaca":20,"backbone":32,"bootstrap":33,"jquery":64,"underscore":135}],2:[function(require,module,exports){
+},{"./listener":2,"./logger":3,"./models":4,"./router":5,"./vendor/alpaca":20,"backbone":32,"bootstrap":33,"jquery":64,"underscore":137}],2:[function(require,module,exports){
 "use strict";
 
 var _ = require('underscore'),
     Backbone = require('backbone'),
     logger = require('./logger');
 
+/**
+ * Initialize the listener
+ */
 function Listener(opts) {
-  _.extend(this, Backbone.Events);
+  this.config = _.defaults(opts || {}, {
+    url: '/changemessages'
+  });
 }
 
-_.extend(Listener.prototype, {
+_.extend(Listener.prototype, Backbone.Events, {
   /**
-   * Initialize the server-side events listener
+   * Start the server-side events listener
    */
   start: function(){
+    if ( this.paused ) { this.paused = false; }
     if ( this.hasStatus('open', 'connecting') ) { return; }
 
-    logger.debug('Init server event listener');
-    this.conn = new window.EventSource('/changemessages');
+    if ( typeof(window) !== 'undefined' && window.EventSource ) {
+      this.conn = new window.EventSource(this.config.url);
+    } else {
+      return this;
+    }
 
-    this.conn.addEventListener('change', _.bind(function(evt) {
-      logger.debug('Fire change event', evt.data);
-      this.trigger('change', JSON.parse(evt.data));
-    }, this));
+    this.conn.addEventListener('change', _.bind(this.handleChange, this));
+    this.conn.addEventListener('error',  _.bind(this.handleError, this));
+    this.conn.addEventListener('open',   _.bind(this.handleOpen, this));
+    this.conn.addEventListener('close',  _.bind(this.handleClose, this));
 
-    this.conn.onerror = _.bind(function(){
-      if(!this.sseRetryCount){
-        this.sseRetryCount = 0;
-      }
-      this.sseRetryCount++;
-      logger.debug('Could not connect to event stream "changemessages"');
-      if(this.conn){
-        this.conn.close();
-      }
-      if(this.sseRetryCount <= 10){
-        this.sseRetryTimeout = setTimeout(_.bind(this.startListeningForChanges,this), 2000);
-      }
-      if(this.sseRetryCount > 2){
-        this.view.warning("Could not get automatic status updates. Retrying...");
-      }
-      if(this.sseRetryCount >=10){
-        this.view.error("Could not get automatic status updates. Refresh page to see recent changes.");
-      }
-    },this);
-
-    this.conn.onopen = function(){
-      this.sseRetryCount = 0;
-    };
+    return this;
   },
 
   /**
    * Disable the server side event listener
    */
-  stop: function stop() {
+  stop: function() {
     if ( this.hasStatus('open') ) {
       logger.debug('Close event listener');
       this.conn.close();
       this.trigger('stop');
     }
+
+    return this;
   },
 
-  hasStatus: function hasStatus() {
+  stopAfter: function(seconds) {
+    this.cancelStop();
+    this.stopTimeout = setTimeout(_.bind(this.stop, this), seconds*1000);
+    return this;
+  },
+
+  cancelStop: function() {
+    if ( this.stopTimeout ) {
+      clearTimeout(this.stopTimeout);
+    }
+    return this;
+  },
+
+  pause: function() {
+    logger.debug('Pausing event listener');
+    this.paused = true;
+  },
+
+  /**
+   * Check the status of the listener.
+   * @param string status Status of the connection (open, closed, connecting)
+   * @return boolean
+   */
+  hasStatus: function() {
     var iteratee = function(m, i) {
-      return m || this.conn.readyState === i;
+      return m || this.conn.readyState === this.conn[i.toUpperCase()];
     };
     return this.conn && _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  handleChange: function(evt) {
+    if ( !this.paused ) {
+      var data = JSON.parse(evt.data),
+          eventName = 'change:' + data.type,
+          eventData = _.pick(data, 'id', 'status');
+      logger.debug(eventName, eventData);
+      this.trigger(eventName, eventData);
+    }
+  },
+
+  handleError: function(evt) {
+    logger.error('Connection error', evt);
+    this.trigger('error', evt);
+  },
+
+  handleOpen: function(evt){
+    logger.debug('Connection open', evt);
+    this.openTime = evt.timeStamp;
+    this.trigger('open', evt);
+  },
+
+  handleClose: function(evt){
+    var timeConnected = ( evt.timeStamp - this.openTime ) / 1000;
+    logger.debug(
+      'Connection closed by server in ' + timeConnected + ' seconds', evt);
+    this.conn.close();
+    if ( !this.paused ) { this.start(); }
   }
 });
 
 module.exports = Listener;
 
-},{"./logger":3,"backbone":32,"underscore":135}],3:[function(require,module,exports){
+},{"./logger":3,"backbone":32,"underscore":137}],3:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -305,7 +382,13 @@ exports.Project = Backbone.Model.extend({
    * @returns {boolean}
    **/
   hasInstructions: function() {
-    return this.blueprint && this.blueprint.get('config')['instructions'];
+    if ( this.get('blueprint_config') && this.get('blueprint_config').instructions ) {
+      return true;
+    } else if ( this.blueprint && this.blueprint.get('config') &&
+                this.blueprint.get('config').instructions ) {
+      return true;
+    }
+    return false;
   },
 
   /**
@@ -314,7 +397,13 @@ exports.Project = Backbone.Model.extend({
    **/
   instructions: function() {
     if(this.hasInstructions()) {
-      return markdown.toHTML(this.blueprint.get('config')['instructions']);
+      var instructions;
+      if ( this.get('blueprint_config') ) {
+        instructions = this.get('blueprint_config').instructions;
+      } else {
+        instructions = this.blueprint.get('config')['instructions'];
+      }
+      return markdown.toHTML(instructions);
     }
   },
 
@@ -490,7 +579,7 @@ exports.BlueprintCollection = Backbone.Collection.extend({
   url: '/blueprints'
 });
 
-},{"backbone":32,"markdown":65,"moment":67,"underscore":135}],5:[function(require,module,exports){
+},{"backbone":32,"markdown":65,"moment":67,"underscore":137}],5:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -540,103 +629,101 @@ module.exports = Backbone.Router.extend({
   },
 
   listBlueprints: function(params) {
-    var blueprints = this.blueprints = new models.BlueprintCollection(),
+    var blueprints = this.app.blueprints,
         query = {}, view;
     if(params) { query = queryString.parse(params); }
-    view = new views.ListBlueprints({collection: blueprints, query: query, app: this.app});
-    this.app.view.display( view );
-    this.app.view.setTab('blueprints');
-    blueprints.fetch({data: query});
-    this.app.setActiveData('blueprint',blueprints,query);
+    view = new views.ListBlueprints({ collection: blueprints, query: query, app: this.app });
+    this.app.view
+      .display( view )
+      .setTab('blueprints');
+    blueprints.fetch();
   },
 
   newBlueprint: function() {
     var blueprint = new models.Blueprint(),
         view = new views.EditBlueprint({ model: blueprint, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('blueprints');
+    this.app.view
+      .display( view )
+      .setTab('blueprints');
     view.render();
-    this.app.setActiveData();
   },
 
   showBlueprint: function(slug) {
-    this.app.view.spinStart();
-    var blueprint = new models.Blueprint({id: slug}),
+    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
+                      new models.Blueprint({ id: slug }),
         view = new views.ShowBlueprint({ model: blueprint, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('blueprints');
+    this.app.view
+      .display( view )
+      .setTab('blueprints');
     blueprint.fetch();
-    this.app.setActiveData('blueprint',blueprint);
   },
 
   editBlueprint: function(slug) {
-    this.app.view.spinStart();
-    var blueprint = new models.Blueprint({id: slug}),
+    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
+                      new models.Blueprint({ id: slug }),
         view = new views.EditBlueprint({ model: blueprint, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('blueprints');
+    this.app.view
+      .display( view )
+      .setTab('blueprints');
     blueprint.fetch();
-    this.app.setActiveData();
   },
 
   chooseBlueprint: function(params) {
-    this.app.view.spinStart();
-    var blueprints = new models.BlueprintCollection(),
+    var blueprints = this.app.blueprints,
         query = {}, view;
     if(params) { query = queryString.parse(params); }
     query['status'] = 'ready';
     view = new views.ChooseBlueprint({ collection: blueprints, query: query, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('projects');
-    blueprints.fetch({data: query});
-    this.app.setActiveData();
+    this.app.view
+      .display( view )
+      .setTab('projects');
+    blueprints.fetch();
   },
 
   blueprintBuilder: function(slug) {
-    this.app.view.spinStart();
-    var blueprint = new models.Blueprint({id: slug}),
+    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
+                      new models.Blueprint({ id: slug }),
         view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('blueprints');
+    this.app.view
+      .display( view )
+      .setTab('blueprints');
     blueprint.fetch();
-    this.app.setActiveData();
   },
 
   listProjects: function(params) {
-    this.app.view.spinStart();
-    var projects = new models.ProjectCollection(),
+    var projects = this.app.projects,
         query = {}, view;
     if(params) { query = queryString.parse(params); }
     view = new views.ListProjects({ collection: projects, query: query, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('projects');
-    projects.fetch({data: query});
-    this.app.setActiveData('project',projects, query);
+    this.app.view
+      .display( view )
+      .setTab('projects');
+    projects.fetch();
   },
 
   newProject: function(slug) {
-    this.app.view.spinStart();
-    var blueprint = new models.Blueprint({id: slug}),
+    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
+                      new models.Blueprint({ id: slug }),
         project = new models.Project({ blueprint: blueprint }),
         view = new views.EditProject({ model: project, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('projects');
+    this.app.view
+      .display( view )
+      .setTab('projects');
     blueprint.fetch();
-    this.app.setActiveData();
   },
 
   editProject: function(slug) {
-    this.app.view.spinStart();
-    var project = new models.Project({ id: slug }),
+    var project = this.app.projects.findWhere({ slug: slug }) ||
+                    new models.Project({ id: slug }),
         view = new views.EditProject({ model: project, app: this.app });
-    this.app.view.display( view );
-    this.app.view.setTab('projects');
+    this.app.view
+      .display( view )
+      .setTab('projects');
     project.fetch();
-    this.app.setActiveData('project',project);
   }
 });
 
-},{"./logger":3,"./models":4,"./views":21,"backbone":32,"jquery":64,"query-string":68,"underscore":135}],6:[function(require,module,exports){
+},{"./logger":3,"./models":4,"./views":21,"backbone":32,"jquery":64,"query-string":70,"underscore":137}],6:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -651,7 +738,7 @@ __p+='<div class="alert alert-'+
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],7:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],7:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -670,7 +757,7 @@ __p+='\n          <li data-tab="faq"><a href="'+
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],8:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],8:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -721,7 +808,7 @@ __p+='\n    <p><strong>Type:</strong> '+
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],9:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],9:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -734,7 +821,7 @@ __p+='<h3>'+
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],10:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],10:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -767,7 +854,7 @@ __p+='\n</div>\n';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],11:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],11:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -824,7 +911,7 @@ __p+='\n  <button type="submit" class="btn btn-primary"\n          data-loading-
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],12:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],12:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -893,10 +980,10 @@ __p+='\n                    value="'+
 '</option>\n            ';
  }) 
 __p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class="m-table-heading">\n      <td>Blueprint</td>\n      <td>Status</td>\n      <td class="text-right" colspan="2">Bold Actions</td>\n    </tr>\n  ';
- if(collection.models.length == 0) { 
+ if(getObjects().length == 0) { 
 __p+='\n      <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>\n  ';
  }
-  _.each(collection.models, function(item) { 
+  _.each(getObjects(), function(item) { 
 __p+='\n  <tr>\n    <td ';
  if(item.get('status') == 'ready') { 
 __p+='\n      class="ok-notice"\n      ';
@@ -923,26 +1010,20 @@ __p+='\n        <span class="m-status status-info"><i class="icon-info"></i>'+
 ((__t=(item.get('status') ))==null?'':__t)+
 '</span>\n      ';
  } 
-__p+='\n    </td>\n    <td class="text-right" colspan="2">\n\n      <a data-tooltip="edit" href="'+
+__p+='\n    </td>\n    <td class="text-right" colspan="2">\n      <a data-tooltip="edit" href="'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit"><span class="icon-edit"></span></a>\n      <a data-tooltip="update" href="#" data-action="update" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
 '"><span class="icon-refresh"></span></a>\n      <a data-tooltip="delete" href="#" data-action="delete" data-model="Blueprint"\n                data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
-'"><span class="icon-delete"></span></a>\n      <!-- to do: delete this after approval of above icons\n      <div class="btn-group btn-group-sm" role="group" aria-label="blueprint actions">\n        <a class="btn btn-default" href="'+
-((__t=(item.url() ))==null?'':__t)+
-'/edit">Edit</a>\n        <button type="button" class="btn btn-default"\n                data-action="update" data-model="Blueprint"\n                data-model-id="'+
-((__t=( item.attributes.slug ))==null?'':__t)+
-'">Update</button>\n        <button type="button" class="btn btn-danger"\n                data-action="delete" data-model="Blueprint"\n                data-model-id="'+
-((__t=( item.attributes.slug ))==null?'':__t)+
-'">Delete</button>\n      </div>\n      -->\n    </td>\n  </tr>\n';
+'"><span class="icon-delete"></span></a>\n    </td>\n  </tr>\n';
  }); 
 __p+='\n  </tbody>\n</table>\n';
 }
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],13:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],13:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -961,7 +1042,7 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],14:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],14:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -972,7 +1053,7 @@ __p+='';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],15:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],15:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -983,7 +1064,7 @@ __p+='<h3>Not allowed</h3>\n<p>You need a higher access level.</p>\n';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],16:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],16:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -994,7 +1075,7 @@ __p+='<h3>Not found</h3>\n<p>I dinna ken what ye want</p>\n';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],17:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],17:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -1087,7 +1168,7 @@ __p+='\n  </div>\n\n</div>\n';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],18:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],18:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -1150,7 +1231,7 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],19:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],19:[function(require,module,exports){
 var _ = require("underscore");
 var s = require("underscore.string");
 module.exports = function(obj){
@@ -1223,10 +1304,10 @@ __p+='\n                    value="'+
 '</option>\n            ';
  }) 
 __p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
- if(collection.models.length == 0) { 
+ if(getObjects().length == 0) { 
 __p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }
-   _.each(collection.models, function(item) { 
+   _.each(getObjects(), function(item) { 
 __p+='\n   <tr>\n    <td ';
  if ( item.hasStatus('built') ) { 
 __p+='\n      class="ok-notice"\n      ';
@@ -1306,7 +1387,7 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"underscore":135,"underscore.string":91}],20:[function(require,module,exports){
+},{"underscore":137,"underscore.string":93}],20:[function(require,module,exports){
 (function (process){
 
 (function(root, factory)
@@ -29373,38 +29454,81 @@ module.exports = {
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
+    PNotify = require('pnotify'),
     models = require('../models'),
     BaseView = require('./BaseView');
 
 module.exports = BaseView.extend({
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
+  notifications: [],
 
   display: function(view) {
     this.$('#main').empty().append(view.$el);
+    return this;
   },
 
   spinStart: function() {
     this.$('#spinner').show();
+    return this;
   },
 
   spinStop: function() {
     _.defer(_.bind(function() {
       this.$('#spinner').fadeOut('fast');
     }, this));
+    return this;
   },
 
   setTab: function(name) {
     this.$('#nav [data-tab]').removeClass('active');
     if(name) { this.$('#nav [data-tab='+name+']').addClass('active'); }
+    return this;
+  },
+
+  error: function(message) {
+    return this.alert(message, 'error');
+  },
+
+  warning: function(message) {
+    return this.alert(message, 'notice');
+  },
+
+  success: function(message) {
+    return this.alert(message, 'success');
+  },
+
+  alert: function(message, level, permanent) {
+    var opts = {
+      text: message,
+      type: level || 'info',
+      addclass: "stack-bottomright",
+      stack: this.stack,
+      buttons: { sticker: false }
+    };
+
+    if ( permanent ) {
+      _.extend(opts, {
+        buttons: { close: false, sticker: false },
+        hide: false
+      });
+      this.notifications.push( new PNotify(opts) );
+    } else {
+      new PNotify(opts);
+    }
+    return this;
   },
 
   clearError: function() {
-    this.$('#flash').empty();
+    _.each(this.notifications, function(n) {
+      if ( n.remove ) { n.remove(); }
+    });
+    this.notifications = [];
+    return this;
   }
 });
 
-},{"../models":4,"../templates/application.ejs":7,"./BaseView":23,"backbone":32,"jquery":64,"underscore":135}],23:[function(require,module,exports){
+},{"../models":4,"../templates/application.ejs":7,"./BaseView":23,"backbone":32,"jquery":64,"pnotify":69,"underscore":137}],23:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29412,8 +29536,9 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    camelize = require('underscore.string/camelize'),
-    alert_template = require('../templates/alert.ejs');
+    camelize = require('underscore.string/camelize');
+
+require('pnotify/pnotify.buttons');
 
 module.exports = Backbone.View.extend({
   events: {
@@ -29426,14 +29551,18 @@ module.exports = Backbone.View.extend({
     }
 
     if(_.isObject(this.collection)) {
-      this.listenTo(this.collection, 'sync sort', this.render);
+      this.listenTo(this.collection, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
+      this.listenTo(this.collection, 'reset change sort sync', _.debounce(this.render, 300, true));
       this.listenTo(this.collection, 'error', this.handleSyncError);
     }
 
     if(_.isObject(this.model)) {
-      this.listenTo(this.model, 'sync', this.render);
+      this.listenTo(this.model, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
+      this.listenTo(this.model, 'reset change sync', _.debounce(this.render, 300, true));
       this.listenTo(this.model, 'error', this.handleSyncError);
     }
+
+    this.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
 
     this.hook('afterInit', options);
   },
@@ -29480,25 +29609,16 @@ module.exports = Backbone.View.extend({
     this.app.view.spinStop();
   },
 
-  error: function(message) {
-    this.alert(message, 'danger');
-  },
-
-  warning: function(message) {
-    this.alert(message, 'warning');
-  },
-
-  success: function(message) {
-    this.alert(message, 'success');
-  },
-
-  alert: function(message) {
-    var level = arguments[1] || 'info';
-    $('#flash').html(alert_template({ level: level, message: message }));
+  getObjects: function() {
+    if ( _.size(this.query) > 0 ) {
+      return this.collection.where(this.query);
+    } else {
+      return this.collection.models;
+    }
   },
 
   hasRole: function(role) {
-    return _.contains(this.app.config.user.meta.roles, role);
+    return _.contains(this.app.user.get('meta').roles, role);
   },
 
   hook: function() {
@@ -29511,7 +29631,7 @@ module.exports = Backbone.View.extend({
 });
 
 
-},{"../logger":3,"../models":4,"../templates/alert.ejs":6,"../templates/error.ejs":13,"../templates/not_allowed.ejs":15,"../templates/not_found.ejs":16,"backbone":32,"jquery":64,"underscore":135,"underscore.string/camelize":69}],24:[function(require,module,exports){
+},{"../logger":3,"../models":4,"../templates/error.ejs":13,"../templates/not_allowed.ejs":15,"../templates/not_found.ejs":16,"backbone":32,"jquery":64,"pnotify/pnotify.buttons":68,"underscore":137,"underscore.string/camelize":71}],24:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30324,7 +30444,7 @@ module.exports = FormView.extend({
   }
 });
 
-},{"../models":4,"../templates/blueprint_builder.ejs":9,"../templates/modal.ejs":14,"../vendor/alpaca":20,"./FormView":28,"backbone":32,"brace":34,"brace/mode/javascript":35,"brace/theme/textmate":37,"jquery":64,"jquery-ui/draggable":60,"jquery-ui/droppable":61,"underscore":135}],25:[function(require,module,exports){
+},{"../models":4,"../templates/blueprint_builder.ejs":9,"../templates/modal.ejs":14,"../vendor/alpaca":20,"./FormView":28,"backbone":32,"brace":34,"brace/mode/javascript":35,"brace/theme/textmate":37,"jquery":64,"jquery-ui/draggable":60,"jquery-ui/droppable":61,"underscore":137}],25:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30337,7 +30457,7 @@ module.exports = FormView.extend({
   template: require('../templates/blueprint_chooser.ejs')
 });
 
-},{"../models":4,"../templates/blueprint_chooser.ejs":10,"./FormView":28,"backbone":32,"jquery":64,"underscore":135}],26:[function(require,module,exports){
+},{"../models":4,"../templates/blueprint_chooser.ejs":10,"./FormView":28,"backbone":32,"jquery":64,"underscore":137}],26:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30350,7 +30470,7 @@ module.exports = FormView.extend({
   template: require('../templates/blueprint_form.ejs')
 });
 
-},{"../models":4,"../templates/blueprint_form.ejs":11,"./FormView":28,"backbone":32,"jquery":64,"underscore":135}],27:[function(require,module,exports){
+},{"../models":4,"../templates/blueprint_form.ejs":11,"./FormView":28,"backbone":32,"jquery":64,"underscore":137}],27:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30416,7 +30536,7 @@ module.exports = FormView.extend({
     }
 
     if(_.isUndefined(form_config)) {
-      this.error('This blueprint does not have a form!');
+      this.app.view.error('This blueprint does not have a form!');
     } else {
       var themes = this.app.themes.filter(function(theme) {
             if ( _.isEqual(config_themes, ['generic']) ) {
@@ -30524,7 +30644,7 @@ module.exports = FormView.extend({
 
     this.model.updateSnapshot()
       .done(_.bind(function() {
-        this.success('Upgrading the project to use the newest blueprint');
+        this.app.view.success('Upgrading the project to use the newest blueprint');
         this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
@@ -30535,7 +30655,7 @@ module.exports = FormView.extend({
 
     this.model.build()
       .done(_.bind(function() {
-        this.success('Building project');
+        this.app.view.success('Building project');
         this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
@@ -30546,14 +30666,14 @@ module.exports = FormView.extend({
 
     this.model.buildAndPublish()
       .done(_.bind(function() {
-        this.success('Publishing project');
+        this.app.view.success('Publishing project');
         this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
 });
 
-},{"../models":4,"../templates/project.ejs":17,"../templates/project_buttons.ejs":18,"./FormView":28,"backbone":32,"jquery":64,"underscore":135}],28:[function(require,module,exports){
+},{"../models":4,"../templates/project.ejs":17,"../templates/project_buttons.ejs":18,"./FormView":28,"backbone":32,"jquery":64,"underscore":137}],28:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30570,7 +30690,8 @@ module.exports = BaseView.extend({
     'click a[href]': 'handleLink',
     'submit form': 'handleForm',
     'click button[data-action],a[data-action]': 'handleAction',
-    'change select[data-auto-submit=true]': 'submitForm'
+    'change select[data-auto-submit=true]': 'submitForm',
+    'change :input': 'pauseListener'
   },
 
   initialize: function(options) {
@@ -30625,9 +30746,9 @@ module.exports = BaseView.extend({
         $form.find('[type=submit]').button('reset');
         logger.debug('form finished saving');
         if(action === 'new') {
-          this.success('New '+model_class+' saved');
+          this.app.view.success('New '+model_class+' saved');
         } else {
-          this.success(model_class+' updates saved');
+          this.app.view.success(model_class+' updates saved');
         }
         if(next === 'show') {
           Backbone.history.navigate(this.model.url(), {trigger: true});
@@ -30677,7 +30798,7 @@ module.exports = BaseView.extend({
       inst = new models[model_class]({id: model_id});
       inst.destroy()
         .done(_.bind(function() {
-          this.success('Deleted '+model_class);
+          this.app.view.success('Deleted '+model_class);
           if(_.isObject(this.model)) {
             Backbone.history.navigate(this.model.urlRoot, {trigger: true});
           } else {
@@ -30693,15 +30814,19 @@ module.exports = BaseView.extend({
   handleRequestError: function(xhr, status, error){
     if(error === 'Bad Request') {
       var data = $.parseJSON(xhr.responseText);
-      this.error(data.error);
+      this.app.view.error(data.error);
     } else {
-      this.error('Something bad happened... Please reload and try again');
+      this.app.view.error('Something bad happened... Please reload and try again');
     }
     logger.error("REQUEST FAILED!!", xhr, status, error);
   },
 
   submitForm: function(eve) {
     $(eve.currentTarget).parents('form').submit();
+  },
+
+  pauseListener: function(evt) {
+    this.app.listener.pause();
   },
 
   _modelOrCollection: function() {
@@ -30711,7 +30836,7 @@ module.exports = BaseView.extend({
 });
 
 
-},{"../logger":3,"../models":4,"../templates/alert.ejs":6,"./BaseView":23,"backbone":32,"jquery":64,"underscore":135,"underscore.string/camelize":69}],29:[function(require,module,exports){
+},{"../logger":3,"../models":4,"../templates/alert.ejs":6,"./BaseView":23,"backbone":32,"jquery":64,"underscore":137,"underscore.string/camelize":71}],29:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30730,14 +30855,14 @@ module.exports = FormView.extend({
 
     inst.updateRepo()
       .done(_.bind(function() {
-        this.success('Updating blueprint repo');
+        this.app.view.success('Updating blueprint repo');
         inst.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
 });
 
-},{"../models":4,"../templates/blueprint_list.ejs":12,"./FormView":28,"backbone":32,"jquery":64,"underscore":135}],30:[function(require,module,exports){
+},{"../models":4,"../templates/blueprint_list.ejs":12,"./FormView":28,"backbone":32,"jquery":64,"underscore":137}],30:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30757,7 +30882,7 @@ module.exports = FormView.extend({
 
     inst.updateSnapshot()
       .done(_.bind(function() {
-        this.success('Upgrading the project to use the newest blueprint');
+        this.app.view.success('Upgrading the project to use the newest blueprint');
         inst.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
@@ -30771,14 +30896,14 @@ module.exports = FormView.extend({
 
     inst.build()
       .done(_.bind(function() {
-        this.success('Building project');
+        this.app.view.success('Building project');
         inst.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
 });
 
-},{"../models":4,"../templates/project_list.ejs":19,"./FormView":28,"backbone":32,"jquery":64,"underscore":135}],31:[function(require,module,exports){
+},{"../models":4,"../templates/project_list.ejs":19,"./FormView":28,"backbone":32,"jquery":64,"underscore":137}],31:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30797,14 +30922,14 @@ module.exports = FormView.extend({
 
     inst.updateRepo()
       .done(_.bind(function() {
-        this.success('Updating blueprint repo');
+        this.app.view.success('Updating blueprint repo');
         inst.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
 });
 
-},{"../models":4,"../templates/blueprint.ejs":8,"./FormView":28,"backbone":32,"jquery":64,"underscore":135}],32:[function(require,module,exports){
+},{"../models":4,"../templates/blueprint.ejs":8,"./FormView":28,"backbone":32,"jquery":64,"underscore":137}],32:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -32414,7 +32539,7 @@ module.exports = FormView.extend({
 
 }));
 
-},{"underscore":135}],33:[function(require,module,exports){
+},{"underscore":137}],33:[function(require,module,exports){
 (function (global){
 
 ; jQuery = global.jQuery = require("jquery");
@@ -73962,6 +74087,934 @@ function merge_text_nodes( jsonml ) {
 
 }));
 },{}],68:[function(require,module,exports){
+// Buttons
+// Uses AMD or browser globals for jQuery.
+(function (factory) {
+    if (typeof(exports) === 'object' && typeof(module) !== 'undefined') {
+        // CommonJS
+        module.exports = factory(require('jquery'), require('pnotify'));
+    } else if (typeof define === 'function' && define.amd) {
+        // AMD. Register as a module.
+        define('pnotify.buttons', ['jquery', 'pnotify'], factory);
+    } else {
+        // Browser globals
+        factory(jQuery, PNotify);
+    }
+}(function($, PNotify){
+	PNotify.prototype.options.buttons = {
+		// Provide a button for the user to manually close the notice.
+		closer: true,
+		// Only show the closer button on hover.
+		closer_hover: true,
+		// Provide a button for the user to manually stick the notice.
+		sticker: true,
+		// Only show the sticker button on hover.
+		sticker_hover: true,
+		// The various displayed text, helps facilitating internationalization.
+		labels: {
+			close: "Close",
+			stick: "Stick"
+		}
+	};
+	PNotify.prototype.modules.buttons = {
+		// This lets us update the options available in the closures.
+		myOptions: null,
+
+		closer: null,
+		sticker: null,
+
+		init: function(notice, options){
+			var that = this;
+			this.myOptions = options;
+			notice.elem.on({
+				"mouseenter": function(e){
+					// Show the buttons.
+					if (that.myOptions.sticker && !(notice.options.nonblock && notice.options.nonblock.nonblock)) that.sticker.trigger("pnotify_icon").css("visibility", "visible");
+					if (that.myOptions.closer && !(notice.options.nonblock && notice.options.nonblock.nonblock)) that.closer.css("visibility", "visible");
+				},
+				"mouseleave": function(e){
+					// Hide the buttons.
+					if (that.myOptions.sticker_hover)
+						that.sticker.css("visibility", "hidden");
+					if (that.myOptions.closer_hover)
+						that.closer.css("visibility", "hidden");
+				}
+			});
+
+			// Provide a button to stick the notice.
+			this.sticker = $("<div />", {
+				"class": "ui-pnotify-sticker",
+				"css": {"cursor": "pointer", "visibility": options.sticker_hover ? "hidden" : "visible"},
+				"click": function(){
+					notice.options.hide = !notice.options.hide;
+					if (notice.options.hide)
+						notice.queueRemove();
+					else
+						notice.cancelRemove();
+					$(this).trigger("pnotify_icon");
+				}
+			})
+			.bind("pnotify_icon", function(){
+				$(this).children().removeClass(notice.styles.pin_up+" "+notice.styles.pin_down).addClass(notice.options.hide ? notice.styles.pin_up : notice.styles.pin_down);
+			})
+			.append($("<span />", {"class": notice.styles.pin_up, "title": options.labels.stick}))
+			.prependTo(notice.container);
+			if (!options.sticker || (notice.options.nonblock && notice.options.nonblock.nonblock))
+				this.sticker.css("display", "none");
+
+			// Provide a button to close the notice.
+			this.closer = $("<div />", {
+				"class": "ui-pnotify-closer",
+				"css": {"cursor": "pointer", "visibility": options.closer_hover ? "hidden" : "visible"},
+				"click": function(){
+					notice.remove(false);
+					that.sticker.css("visibility", "hidden");
+					that.closer.css("visibility", "hidden");
+				}
+			})
+			.append($("<span />", {"class": notice.styles.closer, "title": options.labels.close}))
+			.prependTo(notice.container);
+			if (!options.closer || (notice.options.nonblock && notice.options.nonblock.nonblock))
+				this.closer.css("display", "none");
+		},
+		update: function(notice, options){
+			this.myOptions = options;
+			// Update the sticker and closer buttons.
+			if (!options.closer || (notice.options.nonblock && notice.options.nonblock.nonblock))
+				this.closer.css("display", "none");
+			else if (options.closer)
+				this.closer.css("display", "block");
+			if (!options.sticker || (notice.options.nonblock && notice.options.nonblock.nonblock))
+				this.sticker.css("display", "none");
+			else if (options.sticker)
+				this.sticker.css("display", "block");
+			// Update the sticker icon.
+			this.sticker.trigger("pnotify_icon");
+			// Update the hover status of the buttons.
+			if (options.sticker_hover)
+				this.sticker.css("visibility", "hidden");
+			else if (!(notice.options.nonblock && notice.options.nonblock.nonblock))
+				this.sticker.css("visibility", "visible");
+			if (options.closer_hover)
+				this.closer.css("visibility", "hidden");
+			else if (!(notice.options.nonblock && notice.options.nonblock.nonblock))
+				this.closer.css("visibility", "visible");
+		}
+	};
+	$.extend(PNotify.styling.jqueryui, {
+		closer: "ui-icon ui-icon-close",
+		pin_up: "ui-icon ui-icon-pin-w",
+		pin_down: "ui-icon ui-icon-pin-s"
+	});
+	$.extend(PNotify.styling.bootstrap2, {
+		closer: "icon-remove",
+		pin_up: "icon-pause",
+		pin_down: "icon-play"
+	});
+	$.extend(PNotify.styling.bootstrap3, {
+		closer: "glyphicon glyphicon-remove",
+		pin_up: "glyphicon glyphicon-pause",
+		pin_down: "glyphicon glyphicon-play"
+	});
+	$.extend(PNotify.styling.fontawesome, {
+		closer: "fa fa-times",
+		pin_up: "fa fa-pause",
+		pin_down: "fa fa-play"
+	});
+}));
+
+},{"jquery":64,"pnotify":69}],69:[function(require,module,exports){
+/*
+PNotify 2.0.1 sciactive.com/pnotify/
+(C) 2014 Hunter Perrin
+license GPL/LGPL/MPL
+*/
+/*
+ * ====== PNotify ======
+ *
+ * http://sciactive.com/pnotify/
+ *
+ * Copyright 2009-2014 Hunter Perrin
+ *
+ * Triple licensed under the GPL, LGPL, and MPL.
+ * 	http://gnu.org/licenses/gpl.html
+ * 	http://gnu.org/licenses/lgpl.html
+ * 	http://mozilla.org/MPL/MPL-1.1.html
+ */
+
+// Uses AMD or browser globals for jQuery.
+(function (factory) {
+    if (typeof(exports) === 'object' && typeof(module) !== 'undefined') {
+        // CommonJS
+        module.exports = factory(require('jquery'));
+    } else if (typeof define === 'function' && define.amd) {
+        // AMD. Register as a module.
+        define('pnotify', ['jquery'], factory);
+    } else {
+        // Browser globals
+        factory(jQuery);
+    }
+}(function($){
+	var default_stack = {
+		dir1: "down",
+		dir2: "left",
+		push: "bottom",
+		spacing1: 25,
+		spacing2: 25,
+		context: $("body")
+	};
+	var timer, // Position all timer.
+		body,
+		jwindow = $(window);
+	// Set global variables.
+	var do_when_ready = function(){
+		body = $("body");
+		PNotify.prototype.options.stack.context = body;
+		jwindow = $(window);
+		// Reposition the notices when the window resizes.
+		jwindow.bind('resize', function(){
+			if (timer)
+				clearTimeout(timer);
+			timer = setTimeout(function(){ PNotify.positionAll(true) }, 10);
+		});
+	};
+	PNotify = function(options){
+		this.parseOptions(options);
+		this.init();
+	};
+	$.extend(PNotify.prototype, {
+		// The current version of PNotify.
+		version: "2.0.1",
+
+		// === Options ===
+
+		// Options defaults.
+		options: {
+			// The notice's title.
+			title: false,
+			// Whether to escape the content of the title. (Not allow HTML.)
+			title_escape: false,
+			// The notice's text.
+			text: false,
+			// Whether to escape the content of the text. (Not allow HTML.)
+			text_escape: false,
+			// What styling classes to use. (Can be either jqueryui or bootstrap.)
+			styling: "bootstrap3",
+			// Additional classes to be added to the notice. (For custom styling.)
+			addclass: "",
+			// Class to be added to the notice for corner styling.
+			cornerclass: "",
+			// Display the notice when it is created.
+			auto_display: true,
+			// Width of the notice.
+			width: "300px",
+			// Minimum height of the notice. It will expand to fit content.
+			min_height: "16px",
+			// Type of the notice. "notice", "info", "success", or "error".
+			type: "notice",
+			// Set icon to true to use the default icon for the selected
+			// style/type, false for no icon, or a string for your own icon class.
+			icon: true,
+			// Opacity of the notice.
+			opacity: 1,
+			// The animation to use when displaying and hiding the notice. "none",
+			// "show", "fade", and "slide" are built in to jQuery. Others require jQuery
+			// UI. Use an object with effect_in and effect_out to use different effects.
+			animation: "fade",
+			// Speed at which the notice animates in and out. "slow", "def" or "normal",
+			// "fast" or number of milliseconds.
+			animate_speed: "slow",
+			// Specify a specific duration of position animation
+			position_animate_speed: 500,
+			// Display a drop shadow.
+			shadow: true,
+			// After a delay, remove the notice.
+			hide: true,
+			// Delay in milliseconds before the notice is removed.
+			delay: 8000,
+			// Reset the hide timer if the mouse moves over the notice.
+			mouse_reset: true,
+			// Remove the notice's elements from the DOM after it is removed.
+			remove: true,
+			// Change new lines to br tags.
+			insert_brs: true,
+			// Whether to remove notices from the global array.
+			destroy: true,
+			// The stack on which the notices will be placed. Also controls the
+			// direction the notices stack.
+			stack: default_stack
+		},
+
+		// === Modules ===
+
+		// This object holds all the PNotify modules. They are used to provide
+		// additional functionality.
+		modules: {},
+		// This runs an event on all the modules.
+		runModules: function(event, arg){
+			var curArg;
+			for (var module in this.modules) {
+				curArg = ((typeof arg === "object" && module in arg) ? arg[module] : arg);
+				if (typeof this.modules[module][event] === 'function')
+					this.modules[module][event](this, typeof this.options[module] === 'object' ? this.options[module] : {}, curArg);
+			}
+		},
+
+		// === Class Variables ===
+
+		state: "initializing", // The state can be "initializing", "opening", "open", "closing", and "closed".
+		timer: null, // Auto close timer.
+		styles: null,
+		elem: null,
+		container: null,
+		title_container: null,
+		text_container: null,
+		animating: false, // Stores what is currently being animated (in or out).
+		timerHide: false, // Stores whether the notice was hidden by a timer.
+
+		// === Events ===
+
+		init: function(){
+			var that = this;
+
+			// First and foremost, we don't want our module objects all referencing the prototype.
+			this.modules = {};
+			$.extend(true, this.modules, PNotify.prototype.modules);
+
+			// Get our styling object.
+			if (typeof this.options.styling === "object") {
+				this.styles = this.options.styling;
+			} else {
+				this.styles = PNotify.styling[this.options.styling];
+			}
+
+			// Create our widget.
+			// Stop animation, reset the removal timer when the user mouses over.
+			this.elem = $("<div />", {
+				"class": "ui-pnotify "+this.options.addclass,
+				"css": {"display": "none"},
+				"mouseenter": function(e){
+					if (that.options.mouse_reset && that.animating === "out") {
+						if (!that.timerHide)
+							return;
+						that.cancelRemove();
+					}
+					// Stop the close timer.
+					if (that.options.hide && that.options.mouse_reset) that.cancelRemove();
+				},
+				"mouseleave": function(e){
+					// Start the close timer.
+					if (that.options.hide && that.options.mouse_reset && that.animating !== "out") that.queueRemove();
+					PNotify.positionAll();
+				}
+			});
+			// Create a container for the notice contents.
+			this.container = $("<div />", {"class": this.styles.container+" ui-pnotify-container "+(this.options.type === "error" ? this.styles.error : (this.options.type === "info" ? this.styles.info : (this.options.type === "success" ? this.styles.success : this.styles.notice)))})
+			.appendTo(this.elem);
+			if (this.options.cornerclass !== "")
+				this.container.removeClass("ui-corner-all").addClass(this.options.cornerclass);
+			// Create a drop shadow.
+			if (this.options.shadow)
+				this.container.addClass("ui-pnotify-shadow");
+
+
+			// Add the appropriate icon.
+			if (this.options.icon !== false) {
+				$("<div />", {"class": "ui-pnotify-icon"})
+				.append($("<span />", {"class": this.options.icon === true ? (this.options.type === "error" ? this.styles.error_icon : (this.options.type === "info" ? this.styles.info_icon : (this.options.type === "success" ? this.styles.success_icon : this.styles.notice_icon))) : this.options.icon}))
+				.prependTo(this.container);
+			}
+
+			// Add a title.
+			this.title_container = $("<h4 />", {
+				"class": "ui-pnotify-title"
+			})
+			.appendTo(this.container);
+			if (this.options.title === false)
+				this.title_container.hide();
+			else if (this.options.title_escape)
+				this.title_container.text(this.options.title);
+			else
+				this.title_container.html(this.options.title);
+
+			// Add text.
+			this.text_container = $("<div />", {
+				"class": "ui-pnotify-text"
+			})
+			.appendTo(this.container);
+			if (this.options.text === false)
+				this.text_container.hide();
+			else if (this.options.text_escape)
+				this.text_container.text(this.options.text);
+			else
+				this.text_container.html(this.options.insert_brs ? String(this.options.text).replace(/\n/g, "<br />") : this.options.text);
+
+			// Set width and min height.
+			if (typeof this.options.width === "string")
+				this.elem.css("width", this.options.width);
+			if (typeof this.options.min_height === "string")
+				this.container.css("min-height", this.options.min_height);
+
+
+			// Add the notice to the notice array.
+			if (this.options.stack.push === "top")
+				PNotify.notices = $.merge([this], PNotify.notices);
+			else
+				PNotify.notices = $.merge(PNotify.notices, [this]);
+			// Now position all the notices if they are to push to the top.
+			if (this.options.stack.push === "top")
+				this.queuePosition(false, 1);
+
+
+
+
+			// Mark the stack so it won't animate the new notice.
+			this.options.stack.animation = false;
+
+			// Run the modules.
+			this.runModules('init');
+
+			// Display the notice.
+			if (this.options.auto_display)
+				this.open();
+			return this;
+		},
+
+		// This function is for updating the notice.
+		update: function(options){
+			// Save old options.
+			var oldOpts = this.options;
+			// Then update to the new options.
+			this.parseOptions(oldOpts, options);
+			// Update the corner class.
+			if (this.options.cornerclass !== oldOpts.cornerclass)
+				this.container.removeClass("ui-corner-all "+oldOpts.cornerclass).addClass(this.options.cornerclass);
+			// Update the shadow.
+			if (this.options.shadow !== oldOpts.shadow) {
+				if (this.options.shadow)
+					this.container.addClass("ui-pnotify-shadow");
+				else
+					this.container.removeClass("ui-pnotify-shadow");
+			}
+			// Update the additional classes.
+			if (this.options.addclass === false)
+				this.elem.removeClass(oldOpts.addclass);
+			else if (this.options.addclass !== oldOpts.addclass)
+				this.elem.removeClass(oldOpts.addclass).addClass(this.options.addclass);
+			// Update the title.
+			if (this.options.title === false)
+				this.title_container.slideUp("fast");
+			else if (this.options.title !== oldOpts.title) {
+				if (this.options.title_escape)
+					this.title_container.text(this.options.title);
+				else
+					this.title_container.html(this.options.title);
+				if (oldOpts.title === false)
+					this.title_container.slideDown(200)
+			}
+			// Update the text.
+			if (this.options.text === false) {
+				this.text_container.slideUp("fast");
+			} else if (this.options.text !== oldOpts.text) {
+				if (this.options.text_escape)
+					this.text_container.text(this.options.text);
+				else
+					this.text_container.html(this.options.insert_brs ? String(this.options.text).replace(/\n/g, "<br />") : this.options.text);
+				if (oldOpts.text === false)
+					this.text_container.slideDown(200)
+			}
+			// Change the notice type.
+			if (this.options.type !== oldOpts.type)
+				this.container.removeClass(
+					this.styles.error+" "+this.styles.notice+" "+this.styles.success+" "+this.styles.info
+				).addClass(this.options.type === "error" ?
+					this.styles.error :
+					(this.options.type === "info" ?
+						this.styles.info :
+						(this.options.type === "success" ?
+							this.styles.success :
+							this.styles.notice
+						)
+					)
+				);
+			if (this.options.icon !== oldOpts.icon || (this.options.icon === true && this.options.type !== oldOpts.type)) {
+				// Remove any old icon.
+				this.container.find("div.ui-pnotify-icon").remove();
+				if (this.options.icon !== false) {
+					// Build the new icon.
+					$("<div />", {"class": "ui-pnotify-icon"})
+					.append($("<span />", {"class": this.options.icon === true ? (this.options.type === "error" ? this.styles.error_icon : (this.options.type === "info" ? this.styles.info_icon : (this.options.type === "success" ? this.styles.success_icon : this.styles.notice_icon))) : this.options.icon}))
+					.prependTo(this.container);
+				}
+			}
+			// Update the width.
+			if (this.options.width !== oldOpts.width)
+				this.elem.animate({width: this.options.width});
+			// Update the minimum height.
+			if (this.options.min_height !== oldOpts.min_height)
+				this.container.animate({minHeight: this.options.min_height});
+			// Update the opacity.
+			if (this.options.opacity !== oldOpts.opacity)
+				this.elem.fadeTo(this.options.animate_speed, this.options.opacity);
+			// Update the timed hiding.
+			if (!this.options.hide)
+				this.cancelRemove();
+			else if (!oldOpts.hide)
+				this.queueRemove();
+			this.queuePosition(true);
+
+			// Run the modules.
+			this.runModules('update', oldOpts);
+			return this;
+		},
+
+		// Display the notice.
+		open: function(){
+			this.state = "opening";
+			// Run the modules.
+			this.runModules('beforeOpen');
+
+			var that = this;
+			// If the notice is not in the DOM, append it.
+			if (!this.elem.parent().length)
+				this.elem.appendTo(this.options.stack.context ? this.options.stack.context : body);
+			// Try to put it in the right position.
+			if (this.options.stack.push !== "top")
+				this.position(true);
+			// First show it, then set its opacity, then hide it.
+			if (this.options.animation === "fade" || this.options.animation.effect_in === "fade") {
+				// If it's fading in, it should start at 0.
+				this.elem.show().fadeTo(0, 0).hide();
+			} else {
+				// Or else it should be set to the opacity.
+				if (this.options.opacity !== 1)
+					this.elem.show().fadeTo(0, this.options.opacity).hide();
+			}
+			this.animateIn(function(){
+				that.queuePosition(true);
+
+				// Now set it to hide.
+				if (that.options.hide)
+					that.queueRemove();
+
+				that.state = "open";
+
+				// Run the modules.
+				that.runModules('afterOpen');
+			});
+
+			return this;
+		},
+
+		// Remove the notice.
+		remove: function(timer_hide) {
+			this.state = "closing";
+			this.timerHide = !!timer_hide; // Make sure it's a boolean.
+			// Run the modules.
+			this.runModules('beforeClose');
+
+			var that = this;
+			if (this.timer) {
+				window.clearTimeout(this.timer);
+				this.timer = null;
+			}
+			this.animateOut(function(){
+				that.state = "closed";
+				// Run the modules.
+				that.runModules('afterClose');
+				that.queuePosition(true);
+				// If we're supposed to remove the notice from the DOM, do it.
+				if (that.options.remove)
+					that.elem.detach();
+				// Run the modules.
+				that.runModules('beforeDestroy');
+				// Remove object from PNotify.notices to prevent memory leak (issue #49)
+				// unless destroy is off
+				if (that.options.destroy) {
+					if (PNotify.notices !== null) {
+						var idx = $.inArray(that,PNotify.notices);
+						if (idx !== -1) {
+							PNotify.notices.splice(idx,1);
+						}
+					}
+				}
+				// Run the modules.
+				that.runModules('afterDestroy');
+			});
+
+			return this;
+		},
+
+		// === Class Methods ===
+
+		// Get the DOM element.
+		get: function(){ return this.elem; },
+
+		// Put all the options in the right places.
+		parseOptions: function(options, moreOptions){
+			this.options = $.extend(true, {}, PNotify.prototype.options);
+			// This is the only thing that *should* be copied by reference.
+			this.options.stack = PNotify.prototype.options.stack;
+			var optArray = [options, moreOptions], curOpts;
+			for (var curIndex=0; curIndex < optArray.length; curIndex++) {
+				curOpts = optArray[curIndex];
+				if (typeof curOpts == "undefined")
+					break;
+				if (typeof curOpts !== 'object') {
+					this.options.text = curOpts;
+				} else {
+					for (var option in curOpts) {
+						if (this.modules[option]) {
+							// Avoid overwriting module defaults.
+							$.extend(true, this.options[option], curOpts[option]);
+						} else {
+							this.options[option] = curOpts[option];
+						}
+					}
+				}
+			}
+		},
+
+		// Animate the notice in.
+		animateIn: function(callback){
+			// Declare that the notice is animating in. (Or has completed animating in.)
+			this.animating = "in";
+			var animation;
+			if (typeof this.options.animation.effect_in !== "undefined")
+				animation = this.options.animation.effect_in;
+			else
+				animation = this.options.animation;
+			if (animation === "none") {
+				this.elem.show();
+				callback();
+			} else if (animation === "show")
+				this.elem.show(this.options.animate_speed, callback);
+			else if (animation === "fade")
+				this.elem.show().fadeTo(this.options.animate_speed, this.options.opacity, callback);
+			else if (animation === "slide")
+				this.elem.slideDown(this.options.animate_speed, callback);
+			else if (typeof animation === "function")
+				animation("in", callback, this.elem);
+			else
+				this.elem.show(animation, (typeof this.options.animation.options_in === "object" ? this.options.animation.options_in : {}), this.options.animate_speed, callback);
+			if (this.elem.parent().hasClass('ui-effects-wrapper'))
+				this.elem.parent().css({"position": "fixed", "overflow": "visible"});
+			if (animation !== "slide")
+				this.elem.css("overflow", "visible");
+			this.container.css("overflow", "hidden");
+		},
+
+		// Animate the notice out.
+		animateOut: function(callback){
+			// Declare that the notice is animating out. (Or has completed animating out.)
+			this.animating = "out";
+			var animation;
+			if (typeof this.options.animation.effect_out !== "undefined")
+				animation = this.options.animation.effect_out;
+			else
+				animation = this.options.animation;
+			if (animation === "none") {
+				this.elem.hide();
+				callback();
+			} else if (animation === "show")
+				this.elem.hide(this.options.animate_speed, callback);
+			else if (animation === "fade")
+				this.elem.fadeOut(this.options.animate_speed, callback);
+			else if (animation === "slide")
+				this.elem.slideUp(this.options.animate_speed, callback);
+			else if (typeof animation === "function")
+				animation("out", callback, this.elem);
+			else
+				this.elem.hide(animation, (typeof this.options.animation.options_out === "object" ? this.options.animation.options_out : {}), this.options.animate_speed, callback);
+			if (this.elem.parent().hasClass('ui-effects-wrapper'))
+				this.elem.parent().css({"position": "fixed", "overflow": "visible"});
+			if (animation !== "slide")
+				this.elem.css("overflow", "visible");
+			this.container.css("overflow", "hidden");
+		},
+
+		// Position the notice. dont_skip_hidden causes the notice to
+		// position even if it's not visible.
+		position: function(dontSkipHidden){
+			// Get the notice's stack.
+			var s = this.options.stack,
+				e = this.elem;
+			if (e.parent().hasClass('ui-effects-wrapper'))
+				e = this.elem.css({"left": "0", "top": "0", "right": "0", "bottom": "0"}).parent();
+			if (typeof s.context === "undefined")
+				s.context = body;
+			if (!s) return;
+			if (typeof s.nextpos1 !== "number")
+				s.nextpos1 = s.firstpos1;
+			if (typeof s.nextpos2 !== "number")
+				s.nextpos2 = s.firstpos2;
+			if (typeof s.addpos2 !== "number")
+				s.addpos2 = 0;
+			var hidden = e.css("display") === "none";
+			// Skip this notice if it's not shown.
+			if (!hidden || dontSkipHidden) {
+				var curpos1, curpos2;
+				// Store what will need to be animated.
+				var animate = {};
+				// Calculate the current pos1 value.
+				var csspos1;
+				switch (s.dir1) {
+					case "down":
+						csspos1 = "top";
+						break;
+					case "up":
+						csspos1 = "bottom";
+						break;
+					case "left":
+						csspos1 = "right";
+						break;
+					case "right":
+						csspos1 = "left";
+						break;
+				}
+				curpos1 = parseInt(e.css(csspos1).replace(/(?:\..*|[^0-9.])/g, ''));
+				if (isNaN(curpos1))
+					curpos1 = 0;
+				// Remember the first pos1, so the first visible notice goes there.
+				if (typeof s.firstpos1 === "undefined" && !hidden) {
+					s.firstpos1 = curpos1;
+					s.nextpos1 = s.firstpos1;
+				}
+				// Calculate the current pos2 value.
+				var csspos2;
+				switch (s.dir2) {
+					case "down":
+						csspos2 = "top";
+						break;
+					case "up":
+						csspos2 = "bottom";
+						break;
+					case "left":
+						csspos2 = "right";
+						break;
+					case "right":
+						csspos2 = "left";
+						break;
+				}
+				curpos2 = parseInt(e.css(csspos2).replace(/(?:\..*|[^0-9.])/g, ''));
+				if (isNaN(curpos2))
+					curpos2 = 0;
+				// Remember the first pos2, so the first visible notice goes there.
+				if (typeof s.firstpos2 === "undefined" && !hidden) {
+					s.firstpos2 = curpos2;
+					s.nextpos2 = s.firstpos2;
+				}
+				// Check that it's not beyond the viewport edge.
+				if ((s.dir1 === "down" && s.nextpos1 + e.height() > (s.context.is(body) ? jwindow.height() : s.context.prop('scrollHeight')) ) ||
+					(s.dir1 === "up" && s.nextpos1 + e.height() > (s.context.is(body) ? jwindow.height() : s.context.prop('scrollHeight')) ) ||
+					(s.dir1 === "left" && s.nextpos1 + e.width() > (s.context.is(body) ? jwindow.width() : s.context.prop('scrollWidth')) ) ||
+					(s.dir1 === "right" && s.nextpos1 + e.width() > (s.context.is(body) ? jwindow.width() : s.context.prop('scrollWidth')) ) ) {
+					// If it is, it needs to go back to the first pos1, and over on pos2.
+					s.nextpos1 = s.firstpos1;
+					s.nextpos2 += s.addpos2 + (typeof s.spacing2 === "undefined" ? 25 : s.spacing2);
+					s.addpos2 = 0;
+				}
+				// Animate if we're moving on dir2.
+				if (s.animation && s.nextpos2 < curpos2) {
+					switch (s.dir2) {
+						case "down":
+							animate.top = s.nextpos2+"px";
+							break;
+						case "up":
+							animate.bottom = s.nextpos2+"px";
+							break;
+						case "left":
+							animate.right = s.nextpos2+"px";
+							break;
+						case "right":
+							animate.left = s.nextpos2+"px";
+							break;
+					}
+				} else {
+					if(typeof s.nextpos2 === "number")
+						e.css(csspos2, s.nextpos2+"px");
+				}
+				// Keep track of the widest/tallest notice in the column/row, so we can push the next column/row.
+				switch (s.dir2) {
+					case "down":
+					case "up":
+						if (e.outerHeight(true) > s.addpos2)
+							s.addpos2 = e.height();
+						break;
+					case "left":
+					case "right":
+						if (e.outerWidth(true) > s.addpos2)
+							s.addpos2 = e.width();
+						break;
+				}
+				// Move the notice on dir1.
+				if (typeof s.nextpos1 === "number") {
+					// Animate if we're moving toward the first pos.
+					if (s.animation && (curpos1 > s.nextpos1 || animate.top || animate.bottom || animate.right || animate.left)) {
+						switch (s.dir1) {
+							case "down":
+								animate.top = s.nextpos1+"px";
+								break;
+							case "up":
+								animate.bottom = s.nextpos1+"px";
+								break;
+							case "left":
+								animate.right = s.nextpos1+"px";
+								break;
+							case "right":
+								animate.left = s.nextpos1+"px";
+								break;
+						}
+					} else
+						e.css(csspos1, s.nextpos1+"px");
+				}
+				// Run the animation.
+				if (animate.top || animate.bottom || animate.right || animate.left)
+					e.animate(animate, {duration: this.options.position_animate_speed, queue: false});
+				// Calculate the next dir1 position.
+				switch (s.dir1) {
+					case "down":
+					case "up":
+						s.nextpos1 += e.height() + (typeof s.spacing1 === "undefined" ? 25 : s.spacing1);
+						break;
+					case "left":
+					case "right":
+						s.nextpos1 += e.width() + (typeof s.spacing1 === "undefined" ? 25 : s.spacing1);
+						break;
+				}
+			}
+			return this;
+		},
+		// Queue the position all function so it doesn't run repeatedly and
+		// use up resources.
+		queuePosition: function(animate, milliseconds){
+			if (timer)
+				clearTimeout(timer);
+			if (!milliseconds)
+				milliseconds = 10;
+			timer = setTimeout(function(){ PNotify.positionAll(animate) }, milliseconds);
+			return this;
+		},
+
+
+		// Cancel any pending removal timer.
+		cancelRemove: function(){
+			if (this.timer)
+				window.clearTimeout(this.timer);
+			if (this.state === "closing") {
+				// If it's animating out, animate back in really quickly.
+				this.elem.stop(true);
+				this.state = "open";
+				this.animating = "in";
+				this.elem.css("height", "auto").animate({"width": this.options.width, "opacity": this.options.opacity}, "fast");
+			}
+			return this;
+		},
+		// Queue a removal timer.
+		queueRemove: function(){
+			var that = this;
+			// Cancel any current removal timer.
+			this.cancelRemove();
+			this.timer = window.setTimeout(function(){
+				that.remove(true);
+			}, (isNaN(this.options.delay) ? 0 : this.options.delay));
+			return this;
+		}
+	});
+	// These functions affect all notices.
+	$.extend(PNotify, {
+		// This holds all the notices.
+		notices: [],
+		removeAll: function () {
+			$.each(PNotify.notices, function(){
+				if (this.remove)
+					this.remove(false);
+			});
+		},
+		positionAll: function (animate) {
+			// This timer is used for queueing this function so it doesn't run
+			// repeatedly.
+			if (timer)
+				clearTimeout(timer);
+			timer = null;
+			// Reset the next position data.
+			if (PNotify.notices && PNotify.notices.length) {
+				$.each(PNotify.notices, function(){
+					var s = this.options.stack;
+					if (!s) return;
+					s.nextpos1 = s.firstpos1;
+					s.nextpos2 = s.firstpos2;
+					s.addpos2 = 0;
+					s.animation = animate;
+				});
+				$.each(PNotify.notices, function(){
+					this.position();
+				});
+			} else {
+				var s = PNotify.prototype.options.stack;
+				if (s) {
+					delete s.nextpos1;
+					delete s.nextpos2;
+				}
+			}
+		},
+		styling: {
+			jqueryui: {
+				container: "ui-widget ui-widget-content ui-corner-all",
+				notice: "ui-state-highlight",
+				// (The actual jQUI notice icon looks terrible.)
+				notice_icon: "ui-icon ui-icon-info",
+				info: "",
+				info_icon: "ui-icon ui-icon-info",
+				success: "ui-state-default",
+				success_icon: "ui-icon ui-icon-circle-check",
+				error: "ui-state-error",
+				error_icon: "ui-icon ui-icon-alert"
+			},
+			bootstrap2: {
+				container: "alert",
+				notice: "",
+				notice_icon: "icon-exclamation-sign",
+				info: "alert-info",
+				info_icon: "icon-info-sign",
+				success: "alert-success",
+				success_icon: "icon-ok-sign",
+				error: "alert-error",
+				error_icon: "icon-warning-sign"
+			},
+			bootstrap3: {
+				container: "alert",
+				notice: "alert-warning",
+				notice_icon: "glyphicon glyphicon-exclamation-sign",
+				info: "alert-info",
+				info_icon: "glyphicon glyphicon-info-sign",
+				success: "alert-success",
+				success_icon: "glyphicon glyphicon-ok-sign",
+				error: "alert-danger",
+				error_icon: "glyphicon glyphicon-warning-sign"
+			}
+		}
+	});
+	/*
+	 * uses icons from http://fontawesome.io/
+	 * version 4.0.3
+	 */
+	PNotify.styling.fontawesome = $.extend({}, PNotify.styling.bootstrap3);
+	$.extend(PNotify.styling.fontawesome, {
+		notice_icon: "fa fa-exclamation-circle",
+		info_icon: "fa fa-info",
+		success_icon: "fa fa-check",
+		error_icon: "fa fa-warning"
+	});
+
+	if (document.body)
+		do_when_ready();
+	else
+		$(do_when_ready);
+	return PNotify;
+}));
+
+},{"jquery":64}],70:[function(require,module,exports){
 /*!
 	query-string
 	Parse and stringify URL query strings
@@ -74029,7 +75082,7 @@ function merge_text_nodes( jsonml ) {
 	}
 })();
 
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var trim = require('./trim');
 var decap = require('./decapitalize');
 
@@ -74045,7 +75098,7 @@ module.exports = function camelize(str, decapitalize) {
   }
 };
 
-},{"./decapitalize":77,"./trim":128}],70:[function(require,module,exports){
+},{"./decapitalize":79,"./trim":130}],72:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function capitalize(str) {
@@ -74053,14 +75106,14 @@ module.exports = function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-},{"./helper/makeString":86}],71:[function(require,module,exports){
+},{"./helper/makeString":88}],73:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function chars(str) {
   return makeString(str).split('');
 };
 
-},{"./helper/makeString":86}],72:[function(require,module,exports){
+},{"./helper/makeString":88}],74:[function(require,module,exports){
 module.exports = function chop(str, step) {
   if (str == null) return [];
   str = String(str);
@@ -74068,7 +75121,7 @@ module.exports = function chop(str, step) {
   return step > 0 ? str.match(new RegExp('.{1,' + step + '}', 'g')) : [str];
 };
 
-},{}],73:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 var capitalize = require('./capitalize');
 var camelize = require('./camelize');
 var makeString = require('./helper/makeString');
@@ -74078,14 +75131,14 @@ module.exports = function classify(str) {
   return capitalize(camelize(str.replace(/[\W_]/g, ' ')).replace(/\s/g, ''));
 };
 
-},{"./camelize":69,"./capitalize":70,"./helper/makeString":86}],74:[function(require,module,exports){
+},{"./camelize":71,"./capitalize":72,"./helper/makeString":88}],76:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function clean(str) {
   return trim(str).replace(/\s+/g, ' ');
 };
 
-},{"./trim":128}],75:[function(require,module,exports){
+},{"./trim":130}],77:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function(str, substr) {
@@ -74108,14 +75161,14 @@ module.exports = function(str, substr) {
   return count;
 };
 
-},{"./helper/makeString":86}],76:[function(require,module,exports){
+},{"./helper/makeString":88}],78:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function dasherize(str) {
   return trim(str).replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();
 };
 
-},{"./trim":128}],77:[function(require,module,exports){
+},{"./trim":130}],79:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function decapitalize(str) {
@@ -74123,7 +75176,7 @@ module.exports = function decapitalize(str) {
   return str.charAt(0).toLowerCase() + str.slice(1);
 };
 
-},{"./helper/makeString":86}],78:[function(require,module,exports){
+},{"./helper/makeString":88}],80:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 function getIndent(str) {
@@ -74153,7 +75206,7 @@ module.exports = function dedent(str, pattern) {
   return str.replace(reg, '');
 };
 
-},{"./helper/makeString":86}],79:[function(require,module,exports){
+},{"./helper/makeString":88}],81:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var toPositive = require('./helper/toPositive');
 
@@ -74168,7 +75221,7 @@ module.exports = function endsWith(str, ends, position) {
   return position >= 0 && str.indexOf(ends, position) === position;
 };
 
-},{"./helper/makeString":86,"./helper/toPositive":88}],80:[function(require,module,exports){
+},{"./helper/makeString":88,"./helper/toPositive":90}],82:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var escapeChars = require('./helper/escapeChars');
 var reversedEscapeChars = {};
@@ -74182,7 +75235,7 @@ module.exports = function escapeHTML(str) {
   });
 };
 
-},{"./helper/escapeChars":84,"./helper/makeString":86}],81:[function(require,module,exports){
+},{"./helper/escapeChars":86,"./helper/makeString":88}],83:[function(require,module,exports){
 module.exports = function() {
   var result = {};
 
@@ -74194,7 +75247,7 @@ module.exports = function() {
   return result;
 };
 
-},{}],82:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 var makeString = require('./makeString');
 
 module.exports = function adjacent(str, direction) {
@@ -74205,7 +75258,7 @@ module.exports = function adjacent(str, direction) {
   return str.slice(0, -1) + String.fromCharCode(str.charCodeAt(str.length - 1) + direction);
 };
 
-},{"./makeString":86}],83:[function(require,module,exports){
+},{"./makeString":88}],85:[function(require,module,exports){
 var escapeRegExp = require('./escapeRegExp');
 
 module.exports = function defaultToWhiteSpace(characters) {
@@ -74217,7 +75270,7 @@ module.exports = function defaultToWhiteSpace(characters) {
     return '[' + escapeRegExp(characters) + ']';
 };
 
-},{"./escapeRegExp":85}],84:[function(require,module,exports){
+},{"./escapeRegExp":87}],86:[function(require,module,exports){
 var escapeChars = {
   lt: '<',
   gt: '>',
@@ -74228,14 +75281,14 @@ var escapeChars = {
 
 module.exports = escapeChars;
 
-},{}],85:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 var makeString = require('./makeString');
 
 module.exports = function escapeRegExp(str) {
   return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 };
 
-},{"./makeString":86}],86:[function(require,module,exports){
+},{"./makeString":88}],88:[function(require,module,exports){
 /**
  * Ensure some object is a coerced to a string
  **/
@@ -74244,7 +75297,7 @@ module.exports = function makeString(object) {
   return '' + object;
 };
 
-},{}],87:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 module.exports = function strRepeat(str, qty){
   if (qty < 1) return '';
   var result = '';
@@ -74255,12 +75308,12 @@ module.exports = function strRepeat(str, qty){
   return result;
 };
 
-},{}],88:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 module.exports = function toPositive(number) {
   return number < 0 ? 0 : (+number || 0);
 };
 
-},{}],89:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var capitalize = require('./capitalize');
 var underscored = require('./underscored');
 var trim = require('./trim');
@@ -74269,7 +75322,7 @@ module.exports = function humanize(str) {
   return capitalize(trim(underscored(str).replace(/_id$/, '').replace(/_/g, ' ')));
 };
 
-},{"./capitalize":70,"./trim":128,"./underscored":130}],90:[function(require,module,exports){
+},{"./capitalize":72,"./trim":130,"./underscored":132}],92:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function include(str, needle) {
@@ -74277,7 +75330,7 @@ module.exports = function include(str, needle) {
   return makeString(str).indexOf(needle) !== -1;
 };
 
-},{"./helper/makeString":86}],91:[function(require,module,exports){
+},{"./helper/makeString":88}],93:[function(require,module,exports){
 //  Underscore.string
 //  (c) 2010 Esa-Matti Suuronen <esa-matti aet suuronen dot org>
 //  Underscore.string is freely distributable under the terms of the MIT license.
@@ -74415,21 +75468,21 @@ for (var key in prototypeMethods) prototype2method(prototypeMethods[key]);
 
 module.exports = s;
 
-},{"./camelize":69,"./capitalize":70,"./chars":71,"./chop":72,"./classify":73,"./clean":74,"./count":75,"./dasherize":76,"./decapitalize":77,"./dedent":78,"./endsWith":79,"./escapeHTML":80,"./exports":81,"./helper/escapeRegExp":85,"./humanize":89,"./include":90,"./insert":92,"./isBlank":93,"./join":94,"./levenshtein":95,"./lines":96,"./lpad":97,"./lrpad":98,"./ltrim":99,"./naturalCmp":100,"./numberFormat":101,"./pad":102,"./pred":103,"./prune":104,"./quote":105,"./repeat":106,"./replaceAll":107,"./reverse":108,"./rpad":109,"./rtrim":110,"./slugify":111,"./splice":112,"./sprintf":113,"./startsWith":114,"./strLeft":115,"./strLeftBack":116,"./strRight":117,"./strRightBack":118,"./stripTags":119,"./succ":120,"./surround":121,"./swapCase":122,"./titleize":123,"./toBoolean":124,"./toNumber":125,"./toSentence":126,"./toSentenceSerial":127,"./trim":128,"./truncate":129,"./underscored":130,"./unescapeHTML":131,"./unquote":132,"./vsprintf":133,"./words":134}],92:[function(require,module,exports){
+},{"./camelize":71,"./capitalize":72,"./chars":73,"./chop":74,"./classify":75,"./clean":76,"./count":77,"./dasherize":78,"./decapitalize":79,"./dedent":80,"./endsWith":81,"./escapeHTML":82,"./exports":83,"./helper/escapeRegExp":87,"./humanize":91,"./include":92,"./insert":94,"./isBlank":95,"./join":96,"./levenshtein":97,"./lines":98,"./lpad":99,"./lrpad":100,"./ltrim":101,"./naturalCmp":102,"./numberFormat":103,"./pad":104,"./pred":105,"./prune":106,"./quote":107,"./repeat":108,"./replaceAll":109,"./reverse":110,"./rpad":111,"./rtrim":112,"./slugify":113,"./splice":114,"./sprintf":115,"./startsWith":116,"./strLeft":117,"./strLeftBack":118,"./strRight":119,"./strRightBack":120,"./stripTags":121,"./succ":122,"./surround":123,"./swapCase":124,"./titleize":125,"./toBoolean":126,"./toNumber":127,"./toSentence":128,"./toSentenceSerial":129,"./trim":130,"./truncate":131,"./underscored":132,"./unescapeHTML":133,"./unquote":134,"./vsprintf":135,"./words":136}],94:[function(require,module,exports){
 var splice = require('./splice');
 
 module.exports = function insert(str, i, substr) {
   return splice(str, i, 0, substr);
 };
 
-},{"./splice":112}],93:[function(require,module,exports){
+},{"./splice":114}],95:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function isBlank(str) {
   return (/^\s*$/).test(makeString(str));
 };
 
-},{"./helper/makeString":86}],94:[function(require,module,exports){
+},{"./helper/makeString":88}],96:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var slice = [].slice;
 
@@ -74440,7 +75493,7 @@ module.exports = function join() {
   return args.join(makeString(separator));
 };
 
-},{"./helper/makeString":86}],95:[function(require,module,exports){
+},{"./helper/makeString":88}],97:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function levenshtein(str1, str2) {
@@ -74467,27 +75520,27 @@ module.exports = function levenshtein(str1, str2) {
   return current.pop();
 };
 
-},{"./helper/makeString":86}],96:[function(require,module,exports){
+},{"./helper/makeString":88}],98:[function(require,module,exports){
 module.exports = function lines(str) {
   if (str == null) return [];
   return String(str).split(/\r?\n/);
 };
 
-},{}],97:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 var pad = require('./pad');
 
 module.exports = function lpad(str, length, padStr) {
   return pad(str, length, padStr);
 };
 
-},{"./pad":102}],98:[function(require,module,exports){
+},{"./pad":104}],100:[function(require,module,exports){
 var pad = require('./pad');
 
 module.exports = function lrpad(str, length, padStr) {
   return pad(str, length, padStr, 'both');
 };
 
-},{"./pad":102}],99:[function(require,module,exports){
+},{"./pad":104}],101:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrimLeft = String.prototype.trimLeft;
@@ -74499,7 +75552,7 @@ module.exports = function ltrim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":83,"./helper/makeString":86}],100:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":85,"./helper/makeString":88}],102:[function(require,module,exports){
 module.exports = function naturalCmp(str1, str2) {
   if (str1 == str2) return 0;
   if (!str1) return -1;
@@ -74530,7 +75583,7 @@ module.exports = function naturalCmp(str1, str2) {
   return str1 < str2 ? -1 : 1;
 };
 
-},{}],101:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 module.exports = function numberFormat(number, dec, dsep, tsep) {
   if (isNaN(number) || number == null) return '';
 
@@ -74544,7 +75597,7 @@ module.exports = function numberFormat(number, dec, dsep, tsep) {
   return fnums.replace(/(\d)(?=(?:\d{3})+$)/g, '$1' + tsep) + decimals;
 };
 
-},{}],102:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var strRepeat = require('./helper/strRepeat');
 
@@ -74572,14 +75625,14 @@ module.exports = function pad(str, length, padStr, type) {
   }
 };
 
-},{"./helper/makeString":86,"./helper/strRepeat":87}],103:[function(require,module,exports){
+},{"./helper/makeString":88,"./helper/strRepeat":89}],105:[function(require,module,exports){
 var adjacent = require('./helper/adjacent');
 
 module.exports = function succ(str) {
   return adjacent(str, -1);
 };
 
-},{"./helper/adjacent":82}],104:[function(require,module,exports){
+},{"./helper/adjacent":84}],106:[function(require,module,exports){
 /**
  * _s.prune: a more elegant version of truncate
  * prune extra chars, never leaving a half-chopped word.
@@ -74608,14 +75661,14 @@ module.exports = function prune(str, length, pruneStr) {
   return (template + pruneStr).length > str.length ? str : str.slice(0, template.length) + pruneStr;
 };
 
-},{"./helper/makeString":86,"./rtrim":110}],105:[function(require,module,exports){
+},{"./helper/makeString":88,"./rtrim":112}],107:[function(require,module,exports){
 var surround = require('./surround');
 
 module.exports = function quote(str, quoteChar) {
   return surround(str, quoteChar || '"');
 };
 
-},{"./surround":121}],106:[function(require,module,exports){
+},{"./surround":123}],108:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var strRepeat = require('./helper/strRepeat');
 
@@ -74632,7 +75685,7 @@ module.exports = function repeat(str, qty, separator) {
   return repeat.join(separator);
 };
 
-},{"./helper/makeString":86,"./helper/strRepeat":87}],107:[function(require,module,exports){
+},{"./helper/makeString":88,"./helper/strRepeat":89}],109:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function replaceAll(str, find, replace, ignorecase) {
@@ -74642,21 +75695,21 @@ module.exports = function replaceAll(str, find, replace, ignorecase) {
   return makeString(str).replace(reg, replace);
 };
 
-},{"./helper/makeString":86}],108:[function(require,module,exports){
+},{"./helper/makeString":88}],110:[function(require,module,exports){
 var chars = require('./chars');
 
 module.exports = function reverse(str) {
   return chars(str).reverse().join('');
 };
 
-},{"./chars":71}],109:[function(require,module,exports){
+},{"./chars":73}],111:[function(require,module,exports){
 var pad = require('./pad');
 
 module.exports = function rpad(str, length, padStr) {
   return pad(str, length, padStr, 'right');
 };
 
-},{"./pad":102}],110:[function(require,module,exports){
+},{"./pad":104}],112:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrimRight = String.prototype.trimRight;
@@ -74668,7 +75721,7 @@ module.exports = function rtrim(str, characters) {
   return str.replace(new RegExp(characters + '+$'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":83,"./helper/makeString":86}],111:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":85,"./helper/makeString":88}],113:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var trim = require('./trim');
@@ -74687,7 +75740,7 @@ module.exports = function slugify(str) {
   return trim(dasherize(str.replace(/[^\w\s-]/g, '-')), '-');
 };
 
-},{"./dasherize":76,"./helper/defaultToWhiteSpace":83,"./helper/makeString":86,"./trim":128}],112:[function(require,module,exports){
+},{"./dasherize":78,"./helper/defaultToWhiteSpace":85,"./helper/makeString":88,"./trim":130}],114:[function(require,module,exports){
 var chars = require('./chars');
 
 module.exports = function splice(str, i, howmany, substr) {
@@ -74696,7 +75749,7 @@ module.exports = function splice(str, i, howmany, substr) {
   return arr.join('');
 };
 
-},{"./chars":71}],113:[function(require,module,exports){
+},{"./chars":73}],115:[function(require,module,exports){
 // sprintf() for JavaScript 0.7-beta1
 // http://www.diveintojavascript.com/projects/javascript-sprintf
 //
@@ -74822,7 +75875,7 @@ var sprintf = (function() {
 
 module.exports = sprintf;
 
-},{"./helper/strRepeat":87}],114:[function(require,module,exports){
+},{"./helper/strRepeat":89}],116:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var toPositive = require('./helper/toPositive');
 
@@ -74833,7 +75886,7 @@ module.exports = function startsWith(str, starts, position) {
   return str.lastIndexOf(starts, position) === position;
 };
 
-},{"./helper/makeString":86,"./helper/toPositive":88}],115:[function(require,module,exports){
+},{"./helper/makeString":88,"./helper/toPositive":90}],117:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strLeft(str, sep) {
@@ -74843,7 +75896,7 @@ module.exports = function strLeft(str, sep) {
   return~ pos ? str.slice(0, pos) : str;
 };
 
-},{"./helper/makeString":86}],116:[function(require,module,exports){
+},{"./helper/makeString":88}],118:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strLeftBack(str, sep) {
@@ -74853,7 +75906,7 @@ module.exports = function strLeftBack(str, sep) {
   return~ pos ? str.slice(0, pos) : str;
 };
 
-},{"./helper/makeString":86}],117:[function(require,module,exports){
+},{"./helper/makeString":88}],119:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strRight(str, sep) {
@@ -74863,7 +75916,7 @@ module.exports = function strRight(str, sep) {
   return~ pos ? str.slice(pos + sep.length, str.length) : str;
 };
 
-},{"./helper/makeString":86}],118:[function(require,module,exports){
+},{"./helper/makeString":88}],120:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strRightBack(str, sep) {
@@ -74873,26 +75926,26 @@ module.exports = function strRightBack(str, sep) {
   return~ pos ? str.slice(pos + sep.length, str.length) : str;
 };
 
-},{"./helper/makeString":86}],119:[function(require,module,exports){
+},{"./helper/makeString":88}],121:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function stripTags(str) {
   return makeString(str).replace(/<\/?[^>]+>/g, '');
 };
 
-},{"./helper/makeString":86}],120:[function(require,module,exports){
+},{"./helper/makeString":88}],122:[function(require,module,exports){
 var adjacent = require('./helper/adjacent');
 
 module.exports = function succ(str) {
   return adjacent(str, 1);
 };
 
-},{"./helper/adjacent":82}],121:[function(require,module,exports){
+},{"./helper/adjacent":84}],123:[function(require,module,exports){
 module.exports = function surround(str, wrapper) {
   return [wrapper, str, wrapper].join('');
 };
 
-},{}],122:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function swapCase(str) {
@@ -74901,7 +75954,7 @@ module.exports = function swapCase(str) {
   });
 };
 
-},{"./helper/makeString":86}],123:[function(require,module,exports){
+},{"./helper/makeString":88}],125:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function titleize(str) {
@@ -74910,7 +75963,7 @@ module.exports = function titleize(str) {
   });
 };
 
-},{"./helper/makeString":86}],124:[function(require,module,exports){
+},{"./helper/makeString":88}],126:[function(require,module,exports){
 var trim = require('./trim');
 
 function boolMatch(s, matchers) {
@@ -74932,7 +75985,7 @@ module.exports = function toBoolean(str, trueValues, falseValues) {
   if (boolMatch(str, falseValues || ["false", "0"])) return false;
 };
 
-},{"./trim":128}],125:[function(require,module,exports){
+},{"./trim":130}],127:[function(require,module,exports){
 var trim = require('./trim');
 var parseNumber = function(source) {
   return source * 1 || 0;
@@ -74944,7 +75997,7 @@ module.exports = function toNumber(num, precision) {
   return Math.round(num * factor) / factor;
 };
 
-},{"./trim":128}],126:[function(require,module,exports){
+},{"./trim":130}],128:[function(require,module,exports){
 var rtrim = require('./rtrim');
 
 module.exports = function toSentence(array, separator, lastSeparator, serial) {
@@ -74958,14 +76011,14 @@ module.exports = function toSentence(array, separator, lastSeparator, serial) {
   return a.length ? a.join(separator) + lastSeparator + lastMember : lastMember;
 };
 
-},{"./rtrim":110}],127:[function(require,module,exports){
+},{"./rtrim":112}],129:[function(require,module,exports){
 var toSentence = require('./toSentence');
 
 module.exports = function toSentenceSerial(array, sep, lastSep) {
   return toSentence(array, sep, lastSep, true);
 };
 
-},{"./toSentence":126}],128:[function(require,module,exports){
+},{"./toSentence":128}],130:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrim = String.prototype.trim;
@@ -74977,7 +76030,7 @@ module.exports = function trim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":83,"./helper/makeString":86}],129:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":85,"./helper/makeString":88}],131:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function truncate(str, length, truncateStr) {
@@ -74987,14 +76040,14 @@ module.exports = function truncate(str, length, truncateStr) {
   return str.length > length ? str.slice(0, length) + truncateStr : str;
 };
 
-},{"./helper/makeString":86}],130:[function(require,module,exports){
+},{"./helper/makeString":88}],132:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function underscored(str) {
   return trim(str).replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toLowerCase();
 };
 
-},{"./trim":128}],131:[function(require,module,exports){
+},{"./trim":130}],133:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var escapeChars = require('./helper/escapeChars');
 
@@ -75014,7 +76067,7 @@ module.exports = function unescapeHTML(str) {
   });
 };
 
-},{"./helper/escapeChars":84,"./helper/makeString":86}],132:[function(require,module,exports){
+},{"./helper/escapeChars":86,"./helper/makeString":88}],134:[function(require,module,exports){
 module.exports = function unquote(str, quoteChar) {
   quoteChar = quoteChar || '"';
   if (str[0] === quoteChar && str[str.length - 1] === quoteChar)
@@ -75022,7 +76075,7 @@ module.exports = function unquote(str, quoteChar) {
   else return str;
 };
 
-},{}],133:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 var sprintf = require('./sprintf');
 
 module.exports = function vsprintf(fmt, argv) {
@@ -75030,7 +76083,7 @@ module.exports = function vsprintf(fmt, argv) {
   return sprintf.apply(null, argv);
 };
 
-},{"./sprintf":113}],134:[function(require,module,exports){
+},{"./sprintf":115}],136:[function(require,module,exports){
 var isBlank = require('./isBlank');
 var trim = require('./trim');
 
@@ -75039,7 +76092,7 @@ module.exports = function words(str, delimiter) {
   return trim(str, delimiter).split(delimiter || /\s+/);
 };
 
-},{"./isBlank":93,"./trim":128}],135:[function(require,module,exports){
+},{"./isBlank":95,"./trim":130}],137:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

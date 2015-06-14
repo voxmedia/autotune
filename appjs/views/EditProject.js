@@ -63,7 +63,7 @@ module.exports = FormView.extend({
     }
 
     if(_.isUndefined(form_config)) {
-      this.error('This blueprint does not have a form!');
+      this.app.view.error('This blueprint does not have a form!');
     } else {
       var themes = this.app.themes.filter(function(theme) {
             if ( _.isEqual(config_themes, ['generic']) ) {
@@ -171,7 +171,7 @@ module.exports = FormView.extend({
 
     this.model.updateSnapshot()
       .done(_.bind(function() {
-        this.success('Upgrading the project to use the newest blueprint');
+        this.app.view.success('Upgrading the project to use the newest blueprint');
         this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
@@ -182,7 +182,7 @@ module.exports = FormView.extend({
 
     this.model.build()
       .done(_.bind(function() {
-        this.success('Building project');
+        this.app.view.success('Building project');
         this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
@@ -193,7 +193,7 @@ module.exports = FormView.extend({
 
     this.model.buildAndPublish()
       .done(_.bind(function() {
-        this.success('Publishing project');
+        this.app.view.success('Publishing project');
         this.model.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));

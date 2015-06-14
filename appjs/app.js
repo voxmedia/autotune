@@ -8,65 +8,75 @@
 // Load jQuery and Backbone, make sure Backbone uses jQuery
 var $ = require('jquery'),
     _ = require('underscore'),
-    Backbone = require('backbone');
-
-var bootstrap = require('bootstrap'),
-    Alpaca = require('./vendor/alpaca');
-
-// required to make Backbone work
-Backbone.$ = $;
-
-// Load our components and run the app
-var Router = require('./router'),
+    Backbone = require('backbone'),
+    bootstrap = require('bootstrap'),
+    Alpaca = require('./vendor/alpaca'),
+    // Load our components and run the app
+    Router = require('./router'),
     Listener = require('./listener'),
-    logger = require('./logger');
+    logger = require('./logger'),
+    models = require('./models');
+
+// required to make Backbone work in browserify
+Backbone.$ = $;
 
 /**
  * Autotune admin UI
  * @constructor
  * @param {Object} config - Configure the admin UI
  * @param {string} config.env - Environment (production, staging or development)
- * @param {string[]} config.project_statuses - Possible project statuses
- * @param {string[]} config.project_themes - Possible project themes
- * @param {int[]} config.project_blueprints - Blueprint IDs used by existing projects
- * @param {string[]} config.blueprints_tags - Blueprint tags
  * @param {Object} config.user - Current user info
+ * @param {Object[]} config.themes - Possible project themes
+ * @param {Object[]} config.tags - Blueprint tags
+ * @param {Object[]} config.blueprints - Blueprints
+ * @param {Object[]} config.projects - Projects
  */
 function App(config) {
-  _.extend(this, Backbone.Events);
-
   this.themes = new Backbone.Collection();
   this.themes.reset(config.themes);
   delete config.themes;
 
+  this.tags = new Backbone.Collection();
+  this.tags.reset(config.tags);
+  delete config.tags;
+
+  this.user = new Backbone.Model(config.user);
+  delete config.user;
+
+  this.blueprints = new models.BlueprintCollection();
+  this.projects = new models.ProjectCollection();
+
+  this.listener = new Listener();
+  this.listener.on('change:blueprint', this.handleBlueprintChange, this);
+  this.listener.on('change:project',   this.handleProjectChange, this);
+  this.listener.on('stop',             this.handleListenerStop, this);
+  this.listener.start();
+
   this.config = config;
-  this.router = new Router({app: this});
-  this.msgListener = null;
-  this.has_focus = true;
 
   if ( this.isDev() ) { logger.level = 'debug'; }
 
-  Backbone.history.start({pushState: true});
+  this.router = new Router({ app: this });
+  Backbone.history.start({ pushState: true });
 
-  if ( window.EventSource ) {
+  this.hasFocus = true;
+  if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
-      this.has_focus = true;
-      if(this.sseClosingTimeout){
-        this.debug('Clearing sse closing timeout');
-        clearTimeout(this.sseClosingTimeout);
-      }
+      this.listener
+        .cancelStop()
+        .start();
+      this.view.clearError();
+      this.trigger('focus');
     }, this));
 
     $(window).on('blur', _.bind(function(){
-      this.has_focus = false;
-      this.sseClosingTimeout = setTimeout(_.bind(this.stopListeningForChanges, this), 10000);
+      this.listener.stopAfter(20);
+      this.trigger('blur');
     }, this));
-
-    this.startListeningForChanges();
   }
 }
 
-_.extend(App.prototype, {
+_.extend(App.prototype, Backbone.Events, {
   /**
    * Is the app running in dev mode
    * @return {bool}
@@ -80,7 +90,7 @@ _.extend(App.prototype, {
    * @param {string} type - Event type (pageview)
    */
   analyticsEvent: function() {
-    if ( window && window.ga ) {
+    if ( typeof(window) !== 'undefined' && window.ga ) {
       var ga = window.ga;
       if ( arguments[0] === 'pageview' ) {
         ga('send', 'pageview');
@@ -89,23 +99,49 @@ _.extend(App.prototype, {
   },
 
   /**
-   * Provide references to the models or collections that the event listener should refresh
-   * @param {string} type - Type of data to refresh (blueprint, project)
-   * @param {Object} data - Backbone object to refresh
-   * @param {Object} query - Optional query to use in the refresh
-   */
-  setActiveData: function(type, data, query){    
-    this.dataType = type;
-    this.dataToRefresh = data;
-    this.dataQuery = query;
+   * Handle updating a blueprint
+   **/
+  handleBlueprintChange: function(data) {
+    var inst = this.blueprints.get(data.id);
+    if ( !inst ) { return; }
+    switch (data.status) {
+      case 'new':
+      case 'testing':
+      case 'broken':
+        inst.fetch();
+        break;
+      default:
+        inst.set('status', data.status);
+    }
+  },
+
+  /**
+   * Handle updating a blueprint
+   **/
+  handleProjectChange: function(data) {
+    var inst = this.projects.get(data.id);
+    if ( !inst ) { return; }
+    switch (data.status) {
+      case 'new':
+      case 'built':
+        inst.fetch();
+        break;
+      default:
+        inst.set('status', data.status);
+    }
+  },
+
+  handleListenerStop: function() {
+    this.view.alert('Updates are stopped', 'notice', true);
   }
 });
 
 module.exports = App;
 
-// Make libraries accessible to global scope, for console use and error logging
-if ( _.isObject(window) ) {
+if ( typeof(window) !== 'undefined' ) {
+  // Make App a global so we can initialize from our webpage
   window.App = App;
+  // Make libraries accessible to global scope for console use
   window.Backbone = Backbone;
   window.$ = $;
   window._ = _;

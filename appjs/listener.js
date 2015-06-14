@@ -4,66 +4,107 @@ var _ = require('underscore'),
     Backbone = require('backbone'),
     logger = require('./logger');
 
+/**
+ * Initialize the listener
+ */
 function Listener(opts) {
-  _.extend(this, Backbone.Events);
+  this.config = _.defaults(opts || {}, {
+    url: '/changemessages'
+  });
 }
 
-_.extend(Listener.prototype, {
+_.extend(Listener.prototype, Backbone.Events, {
   /**
-   * Initialize the server-side events listener
+   * Start the server-side events listener
    */
   start: function(){
+    if ( this.paused ) { this.paused = false; }
     if ( this.hasStatus('open', 'connecting') ) { return; }
 
-    logger.debug('Init server event listener');
-    this.conn = new window.EventSource('/changemessages');
+    if ( typeof(window) !== 'undefined' && window.EventSource ) {
+      this.conn = new window.EventSource(this.config.url);
+    } else {
+      return this;
+    }
 
-    this.conn.addEventListener('change', _.bind(function(evt) {
-      logger.debug('Fire change event', evt.data);
-      this.trigger('change', JSON.parse(evt.data));
-    }, this));
+    this.conn.addEventListener('change', _.bind(this.handleChange, this));
+    this.conn.addEventListener('error',  _.bind(this.handleError, this));
+    this.conn.addEventListener('open',   _.bind(this.handleOpen, this));
+    this.conn.addEventListener('close',  _.bind(this.handleClose, this));
 
-    this.conn.onerror = _.bind(function(){
-      if(!this.sseRetryCount){
-        this.sseRetryCount = 0;
-      }
-      this.sseRetryCount++;
-      logger.debug('Could not connect to event stream "changemessages"');
-      if(this.conn){
-        this.conn.close();
-      }
-      if(this.sseRetryCount <= 10){
-        this.sseRetryTimeout = setTimeout(_.bind(this.startListeningForChanges,this), 2000);
-      }
-      if(this.sseRetryCount > 2){
-        this.view.warning("Could not get automatic status updates. Retrying...");
-      }
-      if(this.sseRetryCount >=10){
-        this.view.error("Could not get automatic status updates. Refresh page to see recent changes.");
-      }
-    },this);
-
-    this.conn.onopen = function(){
-      this.sseRetryCount = 0;
-    };
+    return this;
   },
 
   /**
    * Disable the server side event listener
    */
-  stop: function stop() {
+  stop: function() {
     if ( this.hasStatus('open') ) {
       logger.debug('Close event listener');
       this.conn.close();
       this.trigger('stop');
     }
+
+    return this;
   },
 
-  hasStatus: function hasStatus() {
+  stopAfter: function(seconds) {
+    this.cancelStop();
+    this.stopTimeout = setTimeout(_.bind(this.stop, this), seconds*1000);
+    return this;
+  },
+
+  cancelStop: function() {
+    if ( this.stopTimeout ) {
+      clearTimeout(this.stopTimeout);
+    }
+    return this;
+  },
+
+  pause: function() {
+    logger.debug('Pausing event listener');
+    this.paused = true;
+  },
+
+  /**
+   * Check the status of the listener.
+   * @param string status Status of the connection (open, closed, connecting)
+   * @return boolean
+   */
+  hasStatus: function() {
     var iteratee = function(m, i) {
-      return m || this.conn.readyState === i;
+      return m || this.conn.readyState === this.conn[i.toUpperCase()];
     };
     return this.conn && _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  handleChange: function(evt) {
+    if ( !this.paused ) {
+      var data = JSON.parse(evt.data),
+          eventName = 'change:' + data.type,
+          eventData = _.pick(data, 'id', 'status');
+      logger.debug(eventName, eventData);
+      this.trigger(eventName, eventData);
+    }
+  },
+
+  handleError: function(evt) {
+    logger.error('Connection error', evt);
+    this.trigger('error', evt);
+  },
+
+  handleOpen: function(evt){
+    logger.debug('Connection open', evt);
+    this.openTime = evt.timeStamp;
+    this.trigger('open', evt);
+  },
+
+  handleClose: function(evt){
+    var timeConnected = ( evt.timeStamp - this.openTime ) / 1000;
+    logger.debug(
+      'Connection closed by server in ' + timeConnected + ' seconds', evt);
+    this.conn.close();
+    if ( !this.paused ) { this.start(); }
   }
 });
 

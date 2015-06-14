@@ -5,8 +5,9 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    camelize = require('underscore.string/camelize'),
-    alert_template = require('../templates/alert.ejs');
+    camelize = require('underscore.string/camelize');
+
+require('pnotify/pnotify.buttons');
 
 module.exports = Backbone.View.extend({
   events: {
@@ -19,14 +20,18 @@ module.exports = Backbone.View.extend({
     }
 
     if(_.isObject(this.collection)) {
-      this.listenTo(this.collection, 'sync sort', this.render);
+      this.listenTo(this.collection, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
+      this.listenTo(this.collection, 'reset change sort sync', _.debounce(this.render, 300, true));
       this.listenTo(this.collection, 'error', this.handleSyncError);
     }
 
     if(_.isObject(this.model)) {
-      this.listenTo(this.model, 'sync', this.render);
+      this.listenTo(this.model, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
+      this.listenTo(this.model, 'reset change sync', _.debounce(this.render, 300, true));
       this.listenTo(this.model, 'error', this.handleSyncError);
     }
+
+    this.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
 
     this.hook('afterInit', options);
   },
@@ -73,25 +78,16 @@ module.exports = Backbone.View.extend({
     this.app.view.spinStop();
   },
 
-  error: function(message) {
-    this.alert(message, 'danger');
-  },
-
-  warning: function(message) {
-    this.alert(message, 'warning');
-  },
-
-  success: function(message) {
-    this.alert(message, 'success');
-  },
-
-  alert: function(message) {
-    var level = arguments[1] || 'info';
-    $('#flash').html(alert_template({ level: level, message: message }));
+  getObjects: function() {
+    if ( _.size(this.query) > 0 ) {
+      return this.collection.where(this.query);
+    } else {
+      return this.collection.models;
+    }
   },
 
   hasRole: function(role) {
-    return _.contains(this.app.config.user.meta.roles, role);
+    return _.contains(this.app.user.get('meta').roles, role);
   },
 
   hook: function() {

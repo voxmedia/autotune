@@ -13,8 +13,7 @@ module Autotune
       t1 = Time.zone.now.to_f
       logger.info 'Client stream connected'
       response.headers['Content-Type'] = 'text/event-stream'
-      sse = SSE.new(response.stream, retry: 300, event: 'connectionopen')
-      sse.write(msg: 'Channel init')
+      sse = SSE.new(response.stream, :retry => 300, :event => 'ping')
 
       redis_thread = Thread.new do
         Thread.current.abort_on_exception = true
@@ -22,7 +21,7 @@ module Autotune
           on.message do |channel, msg|
             msg_obj = JSON.parse(msg)
             msg_obj['type'] = channel
-            sse.write(msg_obj, event: 'change')
+            sse.write(msg_obj, :event => 'change')
           end
         end
       end
@@ -30,10 +29,10 @@ module Autotune
       loop do
         if Time.zone.now.to_f - t1 > TIMEOUT
           logger.info 'Preemptive stream timeout'
-          sse.write({ msg: 'Channel close' }, event: 'connectionclose')
+          sse.write('timeout', :event => 'close')
           break
         end
-        sse.write({ msg: 'pong' }, event: 'ping')
+        sse.write('pong')
         sleep 2
       end
     rescue ClientDisconnected
