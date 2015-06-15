@@ -31,8 +31,6 @@ module.exports = Backbone.View.extend({
       this.listenTo(this.model, 'error', this.handleSyncError);
     }
 
-    this.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
-
     this.hook('afterInit', options);
   },
 

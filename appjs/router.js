@@ -39,6 +39,7 @@ module.exports = Backbone.Router.extend({
   everyRoute: function(route, params) {
     this.app.view.spinStart();
     this.app.analyticsEvent( 'pageview' );
+    this.app.listener.start();
     if ( params ) {
       logger.debug(route, params);
     } else {

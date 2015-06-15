@@ -621,6 +621,7 @@ module.exports = Backbone.Router.extend({
   everyRoute: function(route, params) {
     this.app.view.spinStart();
     this.app.analyticsEvent( 'pageview' );
+    this.app.listener.start();
     if ( params ) {
       logger.debug(route, params);
     } else {
@@ -29462,6 +29463,11 @@ module.exports = BaseView.extend({
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
   notifications: [],
+  alertDefaults: {
+    addclass: "stack-bottomright",
+    stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
+    buttons: { sticker: false }
+  },
 
   display: function(view) {
     this.$('#main').empty().append(view.$el);
@@ -29499,13 +29505,10 @@ module.exports = BaseView.extend({
   },
 
   alert: function(message, level, permanent) {
-    var opts = {
+    var opts = _.defaults({
       text: message,
-      type: level || 'info',
-      addclass: "stack-bottomright",
-      stack: this.stack,
-      buttons: { sticker: false }
-    };
+      type: level || 'info'
+    }, this.alertDefaults);
 
     if ( permanent ) {
       _.extend(opts, {
@@ -29561,8 +29564,6 @@ module.exports = Backbone.View.extend({
       this.listenTo(this.model, 'reset change sync', _.debounce(this.render, 300, true));
       this.listenTo(this.model, 'error', this.handleSyncError);
     }
-
-    this.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
 
     this.hook('afterInit', options);
   },
