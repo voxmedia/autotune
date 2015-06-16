@@ -650,9 +650,14 @@ module.exports = Backbone.Router.extend({
   },
 
   showBlueprint: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        view = new views.ShowBlueprint({ model: blueprint, app: this.app });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var view = new views.ShowBlueprint({ model: blueprint, app: this.app });
     this.app.view
       .display( view )
       .setTab('blueprints');
@@ -660,9 +665,14 @@ module.exports = Backbone.Router.extend({
   },
 
   editBlueprint: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        view = new views.EditBlueprint({ model: blueprint, app: this.app });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var view = new views.EditBlueprint({ model: blueprint, app: this.app });
     this.app.view
       .display( view )
       .setTab('blueprints');
@@ -682,9 +692,14 @@ module.exports = Backbone.Router.extend({
   },
 
   blueprintBuilder: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
     this.app.view
       .display( view )
       .setTab('blueprints');
@@ -703,9 +718,14 @@ module.exports = Backbone.Router.extend({
   },
 
   newProject: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        project = new models.Project({ blueprint: blueprint }),
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var project = new models.Project({ blueprint: blueprint }),
         view = new views.EditProject({ model: project, app: this.app });
     this.app.view
       .display( view )
@@ -714,9 +734,14 @@ module.exports = Backbone.Router.extend({
   },
 
   editProject: function(slug) {
-    var project = this.app.projects.findWhere({ slug: slug }) ||
-                    new models.Project({ id: slug }),
-        view = new views.EditProject({ model: project, app: this.app });
+    var project = this.app.projects.findWhere({ slug: slug });
+
+    if ( !project ) {
+      project = new models.Project({ id: slug });
+      this.app.projects.add(project);
+    }
+
+    var view = new views.EditProject({ model: project, app: this.app });
     this.app.view
       .display( view )
       .setTab('projects');
@@ -1093,18 +1118,20 @@ __p+=''+
 __p+='</h3>\n\n    ';
  if ( !model.isNew() ) { 
 __p+='\n    <p class="text-muted">\n      Status:\n      ';
- if ( model.hasUnpublishedUpdates() ) { 
-__p+='\n      <a data-tooltip="Your Published Version Has Updates" target="_blank" href="'+
+ if ( model.hasStatus('broken') ) { 
+__p+='\n      <span class="text-danger"><i class="icon-alert"></i>Broken</span>\n      ';
+ } else if ( !model.hasStatus('built') ) { 
+__p+='\n      <span class="text-warning">Building...</span>\n      ';
+ } else if ( model.hasUnpublishedUpdates() ) { 
+__p+='\n        <a data-tooltip="Your Published Version Has Updates"\n           target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
 '">Published</a> (has updates)\n      ';
  } else if ( model.isPublished() ) { 
-__p+='\n      <a data-tooltip="View Published Preview" target="_blank" href="'+
+__p+='\n        <a data-tooltip="View Published Preview"\n           target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
 '">Published</a>\n      ';
- } else if ( model.hasStatus('broken') ) { 
-__p+='\n      <span class="m-status status-alert"><i class="icon-alert"></i>Broken</span>\n      ';
  } else { 
-__p+='\n      <a data-tooltip="View Draft Preview" target="_blank" href="'+
+__p+='\n        <a data-tooltip="View Draft Preview"\n           target="_blank" href="'+
 ((__t=(model.get('preview_url') ))==null?'':__t)+
 '">Draft</a>\n      ';
  } 
@@ -1175,15 +1202,15 @@ var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<p class="margin-top">\n<button type="submit" class="btn btn-default"\n        ';
+__p+='<p class="margin-top">\n  <button type="submit" class="btn btn-default" id="saveBtn"\n          ';
  if ( model.hasStatus('building') ) { 
 __p+='disabled="true"';
  } 
-__p+='\n        data-loading-text="Saving...">Save</button>\n\n';
+__p+='\n          data-loading-text="Saving...">Save</button>\n\n';
  if ( ! model.isNew() ) { 
 __p+='\n  ';
  if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
-__p+='\n  <a class="btn btn-default" target="_blank"\n     ';
+__p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     ';
  if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
@@ -1191,7 +1218,7 @@ __p+='\n     href="'+
 ((__t=(model.getPreviewUrl('http') ))==null?'':__t)+
 '">Preview</a>\n  ';
  } else { 
-__p+='\n  <a class="btn btn-default" target="_blank"\n     ';
+__p+='\n  <a class="btn btn-default" target="_blank" id="viewBtn"\n     ';
  if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
@@ -1199,13 +1226,13 @@ __p+='\n     href="'+
 ((__t=(model.getPublishUrl('http') ))==null?'':__t)+
 '">View</a>\n  ';
  } 
-__p+='\n\n  <button type="button" class="btn btn-success"\n          ';
+__p+='\n\n  <button type="button" class="btn btn-success" id="publishBtn"\n          ';
  if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
 __p+='\n          data-action="build-and-publish" data-model="Project"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Publish</button>\n\n  <button type="button" class="btn btn-danger"\n          ';
+'">Publish</button>\n\n  <button type="button" class="btn btn-danger" id="deleteBtn"\n          ';
  if ( model.hasStatus('building') ) { 
 __p+='disabled="true"';
  } 

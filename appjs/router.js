@@ -68,9 +68,14 @@ module.exports = Backbone.Router.extend({
   },
 
   showBlueprint: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        view = new views.ShowBlueprint({ model: blueprint, app: this.app });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var view = new views.ShowBlueprint({ model: blueprint, app: this.app });
     this.app.view
       .display( view )
       .setTab('blueprints');
@@ -78,9 +83,14 @@ module.exports = Backbone.Router.extend({
   },
 
   editBlueprint: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        view = new views.EditBlueprint({ model: blueprint, app: this.app });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var view = new views.EditBlueprint({ model: blueprint, app: this.app });
     this.app.view
       .display( view )
       .setTab('blueprints');
@@ -100,9 +110,14 @@ module.exports = Backbone.Router.extend({
   },
 
   blueprintBuilder: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
     this.app.view
       .display( view )
       .setTab('blueprints');
@@ -121,9 +136,14 @@ module.exports = Backbone.Router.extend({
   },
 
   newProject: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }) ||
-                      new models.Blueprint({ id: slug }),
-        project = new models.Project({ blueprint: blueprint }),
+    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+
+    if ( !blueprint ) {
+      blueprint = new models.Blueprint({ id: slug });
+      this.app.blueprints.add(blueprint);
+    }
+
+    var project = new models.Project({ blueprint: blueprint }),
         view = new views.EditProject({ model: project, app: this.app });
     this.app.view
       .display( view )
@@ -132,9 +152,14 @@ module.exports = Backbone.Router.extend({
   },
 
   editProject: function(slug) {
-    var project = this.app.projects.findWhere({ slug: slug }) ||
-                    new models.Project({ id: slug }),
-        view = new views.EditProject({ model: project, app: this.app });
+    var project = this.app.projects.findWhere({ slug: slug });
+
+    if ( !project ) {
+      project = new models.Project({ id: slug });
+      this.app.projects.add(project);
+    }
+
+    var view = new views.EditProject({ model: project, app: this.app });
     this.app.view
       .display( view )
       .setTab('projects');
