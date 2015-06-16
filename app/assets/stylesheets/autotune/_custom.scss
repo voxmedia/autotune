@@ -12,7 +12,7 @@
   color: $darkgrey;
   font-size: 20px;
   margin: 0 5px;
-  &:hover {
+  &:not([disabled]):hover {
     color: $primary;
     text-decoration: none;
   }
@@ -49,19 +49,19 @@
   margin: 0 3px 0 0;
 }
 .icon-ok {
-  &:after { 
+  &:after {
     content: "\e013";
     color: $green;
   }
 }
 .icon-alert {
-  &:after { 
+  &:after {
     content: "\e209";
     color: $red;
   }
 }
 .icon-info {
-  &:after { 
+  &:after {
     content: "\e086";
     color: $orange;
   }

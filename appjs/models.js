@@ -84,7 +84,13 @@ exports.Project = Backbone.Model.extend({
    * @returns {boolean}
    **/
   hasInstructions: function() {
-    return this.blueprint && this.blueprint.get('config')['instructions'];
+    if ( this.get('blueprint_config') && this.get('blueprint_config').instructions ) {
+      return true;
+    } else if ( this.blueprint && this.blueprint.get('config') &&
+                this.blueprint.get('config').instructions ) {
+      return true;
+    }
+    return false;
   },
 
   /**
@@ -93,7 +99,13 @@ exports.Project = Backbone.Model.extend({
    **/
   instructions: function() {
     if(this.hasInstructions()) {
-      return markdown.toHTML(this.blueprint.get('config')['instructions']);
+      var instructions;
+      if ( this.get('blueprint_config') ) {
+        instructions = this.get('blueprint_config').instructions;
+      } else {
+        instructions = this.blueprint.get('config')['instructions'];
+      }
+      return markdown.toHTML(instructions);
     }
   },
 

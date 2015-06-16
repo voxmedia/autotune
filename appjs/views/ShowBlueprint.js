@@ -16,7 +16,7 @@ module.exports = FormView.extend({
 
     inst.updateRepo()
       .done(_.bind(function() {
-        this.success('Updating blueprint repo');
+        this.app.view.success('Updating blueprint repo');
         inst.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));

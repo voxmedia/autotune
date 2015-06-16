@@ -102,8 +102,14 @@ module WorkDir
 
     # Copy a path from the working directory to another location
     def cp(path, dest)
-      FileUtils.mkdir_p(expand dest)
-      FileUtils.cp_r(expand(path), expand(dest))
+      FileUtils.rm_rf(expand dest)
+      if File.directory?(expand path)
+        FileUtils.mkdir_p(expand dest)
+        FileUtils.cp_r(expand(path), expand(dest))
+      else
+        FileUtils.mkdir_p(File.dirname(expand dest))
+        FileUtils.cp(expand(path), expand(dest))
+      end
     end
 
     # Return an array of filenames
