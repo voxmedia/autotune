@@ -31,8 +31,14 @@ module Autotune
       # Upload build
       deploy_dir = project.blueprint_config['deploy_dir'] || 'build'
       ws = WorkDir.website(repo.expand(deploy_dir))
+      phantom = WorkDir.phantom(repo.expand(deploy_dir))
       if mode == 'publish'
         ws.deploy(File.join(
+          Rails.configuration.autotune.publish[:connect], project.slug))
+
+        # capture screenshot and save it
+        phantom.capture_screenshot(get_full_url(project.publish_url))
+        ws.deploy_file('screenshots', File.join(
           Rails.configuration.autotune.publish[:connect], project.slug))
 
         # Save the results
@@ -40,6 +46,11 @@ module Autotune
           :output => out, :status => 'built', :published_at => DateTime.current)
       else
         ws.deploy(File.join(
+          Rails.configuration.autotune.preview[:connect], project.slug))
+
+        # capture screenshot and save it
+        phantom.capture_screenshot(get_full_url(project.preview_url))
+        ws.deploy_file('screenshots', File.join(
           Rails.configuration.autotune.preview[:connect], project.slug))
 
         # Save the results
@@ -51,6 +62,13 @@ module Autotune
       out ||= "#{exc.message}\n#{exc.backtrace.join("\n")}"
       project.update!(:output => out, :status => 'broken')
       raise
+    end
+
+    private
+
+    def get_full_url(url)
+      return url if url.start_with?('http')
+      url.start_with?('//') ? 'http:' + url : 'http://localhost:3000' + url
     end
   end
 end
