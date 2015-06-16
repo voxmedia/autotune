@@ -1249,23 +1249,23 @@ __p+='>\n        ';
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
 __p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="5">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
- if(query.theme_id || query.blueprint_type || query.status) { 
+ if(query.theme || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
 __p+='\n          &nbsp;\n          ';
  if ( app.themes.length > 1 ) { 
-__p+='\n          <div class="select">\n            <select name="theme_id" id="theme_id" class="form-control" data-auto-submit="true">\n              <option disabled ';
- if(!query.theme_id) { 
+__p+='\n          <div class="select">\n            <select name="theme" id="theme" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.theme) { 
 __p+='selected';
  } 
 __p+='>Theme</option>\n            ';
  app.themes.each(function(theme) { 
 __p+='\n              <option ';
- if(theme.id == query.theme_id) { 
+ if(theme.get('value') == query.theme) { 
 __p+='selected';
  } 
 __p+='\n                    value="'+
-((__t=(theme.id ))==null?'':__t)+
+((__t=(theme.get('value') ))==null?'':__t)+
 '">'+
 ((__t=(theme.get('label') ))==null?'':__t)+
 '</option>\n            ';
@@ -29612,6 +29612,7 @@ module.exports = Backbone.View.extend({
 
   getObjects: function() {
     if ( _.size(this.query) > 0 ) {
+      logger.debug(this.query);
       return this.collection.where(this.query);
     } else {
       return this.collection.models;

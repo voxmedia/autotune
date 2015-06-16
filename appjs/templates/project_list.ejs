@@ -28,17 +28,17 @@
       <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
           Filters
-          <% if(query.theme_id || query.blueprint_type || query.status) { %>
+          <% if(query.theme || query.blueprint_type || query.status) { %>
             (<a href="/projects">clear</a>)
           <% } %>
           &nbsp;
           <% if ( app.themes.length > 1 ) { %>
           <div class="select">
-            <select name="theme_id" id="theme_id" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.theme_id) { %>selected<% } %>>Theme</option>
+            <select name="theme" id="theme" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
             <% app.themes.each(function(theme) { %>
-              <option <% if(theme.id == query.theme_id) { %>selected<% } %>
-                    value="<%=theme.id %>"><%=theme.get('label') %></option>
+              <option <% if(theme.get('value') == query.theme) { %>selected<% } %>
+                    value="<%=theme.get('value') %>"><%=theme.get('label') %></option>
             <% }) %>
             </select>
           </div>

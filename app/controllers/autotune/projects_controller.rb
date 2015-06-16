@@ -27,8 +27,13 @@ module Autotune
       @projects = Project
 
       # Filter and search query
-      query = select_from_get :status, :theme_id, :blueprint_id
+      query = select_from_get :status
       @projects = @projects.search(params[:search]) if params.key? :search
+
+      if params.key? :theme
+        theme = Theme.find_by_value(params[:theme])
+        query[:theme_id] = theme.id
+      end
 
       unless current_user.role? :superuser
         if current_user.role? :editor
