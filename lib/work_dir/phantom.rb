@@ -5,7 +5,7 @@ module WorkDir
   class Phantom < Base
     def capture_screenshot(url)
       working_dir do
-        cp '../../../../autotune/lib/work_dir/screenshot.js', '.'
+        cp '../../../../autotune/lib/work_dir/screenshot.js', 'screenshot.js'
         phantomjs 'screenshot.js', url
         rm 'screenshot.js'
       end
