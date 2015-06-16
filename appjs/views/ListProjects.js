@@ -17,7 +17,7 @@ module.exports = FormView.extend({
 
     inst.updateSnapshot()
       .done(_.bind(function() {
-        this.success('Upgrading the project to use the newest blueprint');
+        this.app.view.success('Upgrading the project to use the newest blueprint');
         inst.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
@@ -31,7 +31,7 @@ module.exports = FormView.extend({
 
     inst.build()
       .done(_.bind(function() {
-        this.success('Building project');
+        this.app.view.success('Building project');
         inst.fetch();
       }, this))
       .fail(_.bind(this.handleRequestError, this));
