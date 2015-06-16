@@ -119,12 +119,12 @@
 
       <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
     <% if ( !item.hasStatus( 'built' ) ) { %>
-      <a data-tooltip="preview" disabled="true"><span class="icon-preview"></span></a>
+      <span class="icon-preview" disabled></span>
     <% } else if ( item.published ) { %>
-      <a data-tooltip="preview" target="_blank" disabled="true"
+      <a data-tooltip="preview" target="_blank"
          href="<%=item.getPublishUrl('http') %>"><span class="icon-preview"></span></a>
     <% } else { %>
-      <a data-tooltip="preview" target="_blank" disabled="true"
+      <a data-tooltip="preview" target="_blank"
          href="<%=item.getPreviewUrl('http') %>"><span class="icon-preview"></span></a>
     <% } %>
       <a data-tooltip="delete" data-loading-text=""

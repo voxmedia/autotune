@@ -1396,13 +1396,13 @@ __p+='\n    </td>\n    <td>'+
 ((__t=(item.url() ))==null?'':__t)+
 '/edit"><span class="icon-edit"></span></a>\n    ';
  if ( !item.hasStatus( 'built' ) ) { 
-__p+='\n      <a data-tooltip="preview" disabled="true"><span class="icon-preview"></span></a>\n    ';
+__p+='\n      <span class="icon-preview" disabled></span>\n    ';
  } else if ( item.published ) { 
-__p+='\n      <a data-tooltip="preview" target="_blank" disabled="true"\n         href="'+
+__p+='\n      <a data-tooltip="preview" target="_blank"\n         href="'+
 ((__t=(item.getPublishUrl('http') ))==null?'':__t)+
 '"><span class="icon-preview"></span></a>\n    ';
  } else { 
-__p+='\n      <a data-tooltip="preview" target="_blank" disabled="true"\n         href="'+
+__p+='\n      <a data-tooltip="preview" target="_blank"\n         href="'+
 ((__t=(item.getPreviewUrl('http') ))==null?'':__t)+
 '"><span class="icon-preview"></span></a>\n    ';
  } 
