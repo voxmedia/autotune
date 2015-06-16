@@ -15,7 +15,7 @@ module.exports = BaseView.extend({
     'submit form': 'handleForm',
     'click button[data-action],a[data-action]': 'handleAction',
     'change select[data-auto-submit=true]': 'submitForm',
-    'change :input': 'pauseListener'
+    'change :input': 'handleFormChange'
   },
 
   initialize: function(options) {
@@ -149,8 +149,9 @@ module.exports = BaseView.extend({
     $(eve.currentTarget).parents('form').submit();
   },
 
-  pauseListener: function(evt) {
+  handleFormChange: function(evt) {
     this.app.listener.pause();
+    $('#viewBtn, #previewBtn, #deleteBtn, #publishBtn').attr('disabled', 'disabled');
   },
 
   _modelOrCollection: function() {
