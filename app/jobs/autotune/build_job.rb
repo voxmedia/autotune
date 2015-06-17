@@ -37,9 +37,11 @@ module Autotune
           Rails.configuration.autotune.publish[:connect], project.slug))
 
         # capture screenshot and save it
-        phantom.capture_screenshot(get_full_url(project.publish_url))
-        ws.deploy_file('screenshots', File.join(
-          Rails.configuration.autotune.publish[:connect], project.slug))
+        if phantom.phantomJS?
+          phantom.capture_screenshot(get_full_url(project.publish_url))
+          ws.deploy_file('screenshots', File.join(
+            Rails.configuration.autotune.publish[:connect], project.slug))
+        end
 
         # Save the results
         project.update!(
@@ -49,9 +51,11 @@ module Autotune
           Rails.configuration.autotune.preview[:connect], project.slug))
 
         # capture screenshot and save it
-        phantom.capture_screenshot(get_full_url(project.preview_url))
-        ws.deploy_file('screenshots', File.join(
-          Rails.configuration.autotune.preview[:connect], project.slug))
+        if phantom.phantomJS?
+          phantom.capture_screenshot(get_full_url(project.preview_url))
+          ws.deploy_file('screenshots', File.join(
+            Rails.configuration.autotune.preview[:connect], project.slug)) 
+        end
 
         # Save the results
         project.update!(:output => out, :status => 'built')
