@@ -32,6 +32,16 @@ module WorkDir
       dir? '.git'
     end
 
+    # Is phantomJS installed?
+    def phantomJS?
+      begin
+        cmd 'which phantomJS'
+      rescue CommandError
+        return false
+      end
+      return true
+    end
+
     def exist?(path = '.')
       File.exist?(expand path)
     end
