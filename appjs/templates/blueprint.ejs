@@ -1,45 +1,113 @@
 <div class="row m-page-heading">
   <div class="col-xs-12">
-    <h3><%=model.get('title') %></h3>
-    <% if(model.get('status') == 'ready') { %>
-    <span class="m-status status-ok"><i class="icon-ok"></i><%=model.get('status') %></span>
-    <% } else if(model.get('status') == 'broken') { %>
-    <span class="m-status status-alert"><i class="icon-alert"></i><%=model.get('status') %></span>
-    <% } else { %>
-    <span class="m-status status-info"><i class="icon-info"></i><%=model.get('status') %></span>
+    <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+
+    <% if ( !model.isNew() ) { %>
+    <p class="text-muted">
+      Status:
+      <% if(model.get('status') == 'ready') { %>
+      <span class="text-success"><i class="icon-ok"></i><%=s.capitalize(model.get('status')) %></span>
+      <% } else if(model.get('status') == 'broken') { %>
+      <span class="text-danger"><i class="icon-alert"></i><%=s.capitalize(model.get('status')) %></span>
+      <% } else { %>
+      <span class="text-warning"><i class="icon-info"></i><%=s.capitalize(model.get('status')) %></span>
+      <% } %>
+    </p>
     <% } %>
   </div>
 </div>
 
 <div class="row">
   <div class="col-xs-12">
-    <ul class="m-sub-nav">
-      <li><a href="<%=model.url() %>/new_project">New Project</a></li>
-      <li><a href="<%=model.url() %>/builder">Form Builder</a></li>
-      <li><button type="button" data-action="update" data-model="Blueprint"
-              data-loading-text="Updating..."
-              data-model-id="<%=model.get('slug') %>">Update</button></li>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active"><a
+          href="#edit" aria-controls="edit"
+          role="tab" data-toggle="tab">Blueprint Info</a></li>
+      <% if ( model.isNew() ) { %>
+      <li role="presentation" class="disabled"><a>Form Builder</a></li>
+      <% } else { %>
+      <li role="presentation"><a
+          href="#builder" aria-controls="builder"
+          role="tab" data-toggle="tab">Form Builder</a></li>
+      <% } %>
     </ul>
-  </div>
-</div>
 
-<div class="row">
-  <div class="col-md-6">
-    <% if(model.has('config')) { %>
-    <p class="margin-bottom"><%=model.get('config').description %></p>
-    <% } %>
-    <p><strong>Type:</strong> <%=model.get('type') %></p>
-    <p><strong>Repo:</strong> <input disabled="disabled" value="<%=model.get('repo_url') %>"></input></p>
-    <div class="btn-group margin-top" role="group" aria-label="blueprint actions">
-      <a class="btn btn-default" href="<%=model.url() %>/edit">Edit</a>
-      <button type="button" class="btn btn-danger"
-            data-action="delete" data-model="Blueprint"
-            data-next="/blueprints"
-            data-loading-text="Deleting..."
-            data-model-id="<%=model.get('slug') %>">Delete</button>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="edit">
+        <div class="row">
+          <div class="col-md-6">
+            <form id="new-blueprint" role="form"
+                  data-next="show" data-model="Blueprint"
+                  <% if(model.isNew()) { %>
+                  data-action="new"
+                  <% } else { %>
+                  data-action="edit" data-model-id="<%=model.get('id') %>"
+                  <% } %> >
+              <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" required class="form-control"
+                       <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
+                       id="title" name="title" placeholder="Enter title">
+              </div>
+              <div class="form-group">
+                <label for="repo_url">Repo url</label>
+                <input type="text" required class="form-control"
+                       <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
+                       id="repo_url" name="repo_url" placeholder="Enter repo url">
+              </div>
+              <% if(!model.isNew()) { %>
+              <div class="form-group">
+                <label for="status" class="block">Status</label>
+                <div class="select">
+                  <select id="status" name="status" class="form-control"
+                    <% if ( model.hasStatus('new', 'updating') ) { %>disabled<% } %>>
+                    <option value="testing"
+                      <% if ( model.hasStatus('testing') ) { %>selected<% } %>
+                      >Testing</option>
+                    <option value="broken"
+                      <% if ( model.hasStatus('broken') ) { %>selected<% } %>
+                      >Broken</option>
+                    <option value="ready"
+                      <% if ( model.hasStatus('ready') ) { %>selected<% } %>
+                      >Ready</option>
+                  </select>
+                </div>
+              </div>
+              <% } %>
+              <button type="submit" class="btn btn-primary"
+                      data-loading-text="Saving...">Save changes</button>
+
+              <button type="button" class="btn btn-default"
+                      data-action="update" data-model="Blueprint"
+                      data-loading-text="Upgrading..."
+                      data-model-id="<%=model.get('slug') %>">Upgrade</button>
+              <button type="button" class="btn btn-danger"
+                      data-action="delete" data-model="Blueprint"
+                      data-next="/blueprints"
+                      data-loading-text="Deleting..."
+                      data-model-id="<%=model.get('slug') %>">Delete</button>
+            </form>
+          </div>
+          <div class="col-md-6">
+            <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
+            <p><strong>Type:</strong> <%=model.get('type') %></p>
+            <% if(model.has('config')) { %>
+            <p class="margin-bottom"><%=model.get('config').description %></p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="builder">
+        <div id="schema"></div>
+        <div id="previewWrap">
+          <div class="message"></div>
+          <div id="previewDiv"></div>
+        </div>
+      </div>
+
     </div>
-  </div>
-  <div class="col-md-6">
-    <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
   </div>
 </div>
