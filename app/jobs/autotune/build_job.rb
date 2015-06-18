@@ -31,31 +31,22 @@ module Autotune
       # Upload build
       deploy_dir = project.blueprint_config['deploy_dir'] || 'build'
       ws = WorkDir.website(repo.expand(deploy_dir))
-      phantom = WorkDir.phantom(repo.expand(deploy_dir))
       if mode == 'publish'
-        ws.deploy(File.join(
-          Rails.configuration.autotune.publish[:connect], project.slug))
+        ws_location = File.join(Rails.configuration.autotune.publish[:connect], project.slug)
+        ws.deploy(ws_location)
 
         # capture screenshot and save it
-        if phantom.phantomJS?
-          phantom.capture_screenshot(get_full_url(project.publish_url))
-          ws.deploy_file('screenshots', File.join(
-            Rails.configuration.autotune.publish[:connect], project.slug))
-        end
+        save_screenshots(repo.expand(deploy_dir), project.publish_url, ws_location)
 
         # Save the results
         project.update!(
           :output => out, :status => 'built', :published_at => DateTime.current)
       else
-        ws.deploy(File.join(
-          Rails.configuration.autotune.preview[:connect], project.slug))
+        ws_location = File.join(Rails.configuration.autotune.preview[:connect], project.slug)
+        ws.deploy(ws_location)
 
         # capture screenshot and save it
-        if phantom.phantomJS?
-          phantom.capture_screenshot(get_full_url(project.preview_url))
-          ws.deploy_file('screenshots', File.join(
-            Rails.configuration.autotune.preview[:connect], project.slug)) 
-        end
+        save_screenshots(repo.expand(deploy_dir), project.preview_url, ws_location)
 
         # Save the results
         project.update!(:output => out, :status => 'built')
@@ -73,6 +64,15 @@ module Autotune
     def get_full_url(url)
       return url if url.start_with?('http')
       url.start_with?('//') ? 'http:' + url : 'http://localhost:3000' + url
+    end
+
+    def save_screenshots(build_dir, url, deploy_dir)
+      phantom = WorkDir.phantom(build_dir)
+      if phantom.phantomJS?
+        phantom.capture_screenshot(get_full_url(url))
+        screenshots_dir = WorkDir.website(File.join(build_dir, 'screenshots'))
+        screenshots_dir.deploy(File.join(deploy_dir, 'screenshots'))
+      end
     end
   end
 end
