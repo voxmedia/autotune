@@ -23,27 +23,30 @@ module WorkDir
           ];
 
           var capturescreen = function(){
-            var page = WebPage.create();
-            page.viewportSize = {
-              width: screenshots[index].dimensions[0],
-              height: screenshots[index].dimensions[1]
-            };
-            page.open(address);
+          var processed = false;
+          var page = WebPage.create();
+          page.viewportSize = {
+            width: screenshots[index].dimensions[0],
+            height: screenshots[index].dimensions[1]
+          };
+          page.open(address);
 
-            page.onError = function(){
-              page.close();
-              setTimeout(nextPage, 1000);
-            }
-
-            page.onLoadFinished = setTimeout(function() {
-                page.render(screenshots[index].filename);
-                page.close();
-                index++;
-                // Give it a second before calling next. 
-                // Phantom runs into some sort of race condition without this
-                setTimeout(nextPage, 1000); 
-            }, 3000);
+          page.onError = function(){
+            page.close();
+            phantom.exit();
           }
+
+          page.onLoadFinished = setTimeout(function() {
+              if(processed) { return; }
+              processed = true;
+              page.render(screenshots[index].filename);
+              page.close();
+              index++;
+              // Give it a second before calling next. 
+              // Phantom runs into some sort of race condition without this
+              setTimeout(nextPage, 1000); 
+          }, 3000);
+        }
 
           var nextPage = function(){
             if(!screenshots[index]){
@@ -52,8 +55,10 @@ module WorkDir
             capturescreen();
           }
 
-          nextPage();" > screenshot.js'
-          
+          nextPage();
+          //exit if not done after 20 seconds
+          setTimeout(function(){ phantom.exit();}, 20000);" > screenshot.js'
+
         phantomjs 'screenshot.js', url
         rm 'screenshot.js'
       end
