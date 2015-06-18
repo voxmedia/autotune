@@ -25,7 +25,7 @@ module.exports = Backbone.Router.extend({
     "": "listProjects",
     "blueprints": "listBlueprints",
     "blueprints/new": "newBlueprint",
-    "blueprints/:slug": "showBlueprint",
+    "blueprints/:slug": "editBlueprint",
     "blueprints/:slug/new_project": "newProject",
     "blueprints/:slug/builder": "blueprintBuilder",
     "blueprints/:slug/edit": "editBlueprint",
@@ -65,21 +65,6 @@ module.exports = Backbone.Router.extend({
       .display( view )
       .setTab('blueprints');
     view.render();
-  },
-
-  showBlueprint: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug });
-
-    if ( !blueprint ) {
-      blueprint = new models.Blueprint({ id: slug });
-      this.app.blueprints.add(blueprint);
-    }
-
-    var view = new views.ShowBlueprint({ model: blueprint, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('blueprints');
-    blueprint.fetch();
   },
 
   editBlueprint: function(slug) {
