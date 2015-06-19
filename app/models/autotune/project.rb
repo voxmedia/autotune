@@ -38,11 +38,14 @@ module Autotune
     end
 
     def update_snapshot
-      return if blueprint_version == blueprint.version
-      update!(
-        :status => 'building',
-        :blueprint_version => blueprint.version,
-        :blueprint_config => blueprint.config)
+      if blueprint_version == blueprint.version
+        update!(:status => 'building')
+      else
+        update!(
+          :status => 'building',
+          :blueprint_version => blueprint.version,
+          :blueprint_config => blueprint.config)
+      end
       BuildJob.perform_later(self, 'preview', true)
     rescue
       update!(:status => 'broken')
