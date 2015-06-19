@@ -34,11 +34,11 @@ module WorkDir
 
     # Is phantomJS installed?
     def phantomJS?
-      # begin
-      #   cmd 'which phantomJS'
-      # rescue CommandError
-      #   return false
-      # end
+      begin
+        cmd 'which phantomJS'
+      rescue CommandError
+        return false
+      end
       return true
     end
 
