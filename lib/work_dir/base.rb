@@ -34,12 +34,7 @@ module WorkDir
 
     # Is phantomJS installed?
     def phantomJS?
-      begin
-        cmd 'which phantomJS'
-      rescue CommandError
-        return false
-      end
-      return true
+      exist? '/usr/local/bin/phantomjs'
     end
 
     def exist?(path = '.')
