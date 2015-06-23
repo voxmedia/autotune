@@ -112,7 +112,7 @@ module.exports = FormView.extend({
       }
 
       _.extend(schema_properties, form_config['schema']['properties'] || {});
-      if(form_config['options']) {
+      if( form_config['options'] ) {
         _.extend(options_form, form_config['options']['form'] || {});
         _.extend(options_fields, form_config['options']['fields'] || {});
       }
@@ -132,6 +132,11 @@ module.exports = FormView.extend({
           control.form.form.append( button_tmpl(this) );
         }, this)
       };
+
+      if( form_config['view'] ) {
+        opts.view = form_config.view;
+      }
+
       if(!this.model.isNew()) {
         opts.data = this.model.formData();
         if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
