@@ -1,24 +1,30 @@
-# ![Autotune Log](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
+# ![Autotune Logo](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
 
 
 **Current project status**: Alpha
 
 ---
 
-Autotune is a platform and UI for creating new websites and html snippets from templates stored in git repos.
-Basically a fancy thing for turning templates into web pages.
+Autotune is a centralized management system for your charts, graphics, quizzes and other tools,
+brought to you by the Editorial Products team at Vox Media.
 
 ## Documentation
 
 See project [wiki](https://github.com/voxmedia/autotune/wiki) for documentation on getting started.
 
-## Examples
+- [Getting started](https://github.com/voxmedia/autotune/wiki/setup)
+- [How to create a blueprint](https://github.com/voxmedia/autotune/wiki/How-to-create-a-blueprint)
+- [Example blueprints](https://github.com/voxmedia/autotune/wiki/Example-blueprints)
+- [Troubleshooting](https://github.com/voxmedia/autotune/wiki/Troubleshooting)
+- [Reporting bugs](https://github.com/voxmedia/autotune/wiki/Reporting-bugs)
+- [Contribution guidelines](https://github.com/voxmedia/autotune/wiki/Contribution-guidelines)
 
-TK
+## Credits
 
-## Authors
-
-TK
+Architecture and development: Ryan Mark
+UI design: Josh Laincz and Jason Santa Maria
+Contributions from Kavya Sukumar, Casey Miller, Skip Baney
+And lots of help from Vox Media's product team
 
 ## License
 
