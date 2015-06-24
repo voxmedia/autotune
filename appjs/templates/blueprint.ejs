@@ -1,6 +1,6 @@
 <div class="row m-page-heading">
   <div class="col-xs-12">
-    <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+    <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-default" href="<%=model.url() %>/new_project">New project</a><% } %></h3>
 
     <% if ( !model.isNew() ) { %>
     <p class="text-muted">
@@ -79,6 +79,7 @@
               <button type="submit" class="btn btn-primary"
                       data-loading-text="Saving...">Save changes</button>
 
+              <% if(!model.isNew()) { %>
               <button type="button" class="btn btn-default"
                       data-action="update" data-model="Blueprint"
                       data-loading-text="Upgrading..."
@@ -88,13 +89,16 @@
                       data-next="/blueprints"
                       data-loading-text="Deleting..."
                       data-model-id="<%=model.get('slug') %>">Delete</button>
+              <% } %>
             </form>
           </div>
           <div class="col-md-6">
+            <% if(!model.isNew()) { %>
             <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
             <p><strong>Type:</strong> <%=model.get('type') %></p>
             <% if(model.has('config')) { %>
             <p class="margin-bottom"><%=model.get('config').description %></p>
+            <% } %>
             <% } %>
           </div>
         </div>

@@ -18,6 +18,9 @@ module.exports = BaseView.extend({
   },
 
   display: function(view) {
+    if ( this.currentView ) { this.currentView.unload(this); }
+    this.currentView = view;
+    this.currentView.load(this);
     this.$('#main').empty().append(view.$el);
     return this;
   },

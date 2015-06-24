@@ -65,7 +65,6 @@ function App(config) {
       this.listener
         .cancelStop()
         .start();
-      this.view.clearError();
       this.trigger('focus');
     }, this));
 

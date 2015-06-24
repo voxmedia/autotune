@@ -31,7 +31,7 @@ module.exports = FormView.extend({
     }
 
     if( ! this.model.blueprint.has('config') ) {
-      this.app.view.spinStart();
+      this.app.trigger('loadingStart');
       this.model.blueprint.fetch();
     } else {
       this.renderForm();

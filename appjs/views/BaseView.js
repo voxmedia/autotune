@@ -15,19 +15,21 @@ module.exports = Backbone.View.extend({
   },
 
   initialize: function(options) {
+    this.loaded = true;
+
     if (_.isObject(options)) {
       _.extend(this, options);
     }
 
     if(_.isObject(this.collection)) {
       this.listenTo(this.collection, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
-      this.listenTo(this.collection, 'reset change sort sync', _.debounce(this.render, 300, true));
+      this.listenTo(this.collection, 'reset change sort sync', _.debounce(this.render, 300));
       this.listenTo(this.collection, 'error', this.handleSyncError);
     }
 
     if(_.isObject(this.model)) {
       this.listenTo(this.model, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
-      this.listenTo(this.model, 'reset change sync', _.debounce(this.render, 300, true));
+      this.listenTo(this.model, 'reset change sync', _.debounce(this.render, 300));
       this.listenTo(this.model, 'error', this.handleSyncError);
     }
 
@@ -48,14 +50,15 @@ module.exports = Backbone.View.extend({
   },
 
   render: function() {
-    this.hook('beforeRender');
+    if ( this.loaded ) {
+      this.hook('beforeRender');
 
-    this.$el.html(this.template(this));
+      this.$el.html(this.template(this));
 
-    this.app.view.spinStop();
+      this.app.trigger('loadingStop');
 
-    this.hook('afterRender');
-
+      this.hook('afterRender');
+    }
     return this;
   },
 
@@ -73,7 +76,7 @@ module.exports = Backbone.View.extend({
     }
     logger.debug(tmplObj);
     this.$el.html(tmpl(tmplObj));
-    this.app.view.spinStop();
+    this.app.trigger('loadingStop');
   },
 
   getObjects: function() {
@@ -83,6 +86,18 @@ module.exports = Backbone.View.extend({
     } else {
       return this.collection.models;
     }
+  },
+
+  load: function(parentView) {
+    this.loaded = true;
+    this.parentView = parentView;
+    return this;
+  },
+
+  unload: function(parentView) {
+    this.loaded = false;
+    if ( this.parentView ) { this.parentView = null; }
+    return this;
   },
 
   hasRole: function(role) {

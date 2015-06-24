@@ -26,7 +26,7 @@ module.exports = BaseView.extend({
     eve.preventDefault();
     eve.stopPropagation();
 
-    this.app.view.spinStart();
+    this.app.trigger('loadingStart');
     logger.debug('handleForm');
 
     var inst, Model,
@@ -104,7 +104,7 @@ module.exports = BaseView.extend({
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
-    this.app.view.spinStart();
+    this.app.trigger('loadingStart');
     var $btn = $(eve.currentTarget),
         action = $btn.data('action');
     $btn.button('loading');

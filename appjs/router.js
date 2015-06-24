@@ -16,9 +16,13 @@ module.exports = Backbone.Router.extend({
 
     this.on("route", this.everyRoute);
 
-    this.app.view = this.app.view = new views.Application({ app: this.app });
+    this.app.view = new views.Application({ app: this.app });
     this.app.view.render();
     $('body').prepend(this.app.view.$el);
+
+    this.app.on('focus', function() { this.app.view.clearError(); }, this);
+    this.app.on('loadingStart', function() { this.app.view.spinStart(); }, this);
+    this.app.on('loadingStop', function() { this.app.view.spinStop(); }, this);
   },
 
   routes: {
@@ -27,7 +31,6 @@ module.exports = Backbone.Router.extend({
     "blueprints/new": "newBlueprint",
     "blueprints/:slug": "editBlueprint",
     "blueprints/:slug/new_project": "newProject",
-    "blueprints/:slug/builder": "blueprintBuilder",
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
@@ -37,7 +40,7 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
-    this.app.view.spinStart();
+    this.app.trigger('loadingStart');
     this.app.analyticsEvent( 'pageview' );
     this.app.listener.start();
     if ( params ) {
@@ -92,21 +95,6 @@ module.exports = Backbone.Router.extend({
       .display( view )
       .setTab('projects');
     blueprints.fetch();
-  },
-
-  blueprintBuilder: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug });
-
-    if ( !blueprint ) {
-      blueprint = new models.Blueprint({ id: slug });
-      this.app.blueprints.add(blueprint);
-    }
-
-    var view = new views.BlueprintBuilder({ model: blueprint, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('blueprints');
-    blueprint.fetch();
   },
 
   listProjects: function(params) {
