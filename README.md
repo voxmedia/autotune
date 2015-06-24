@@ -21,9 +21,12 @@ See project [wiki](https://github.com/voxmedia/autotune/wiki) for documentation 
 
 ## Credits
 
-Architecture and development: Ryan Mark
-UI design: Josh Laincz and Jason Santa Maria
+_Architecture and development:_ Ryan Mark
+
+_UI design:_ Josh Laincz and Jason Santa Maria
+
 Contributions from Kavya Sukumar, Casey Miller, Skip Baney
+
 And lots of help from Vox Media's product team
 
 ## License
