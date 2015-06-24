@@ -25,7 +25,7 @@ _Architecture and development:_ Ryan Mark
 
 _UI design:_ Josh Laincz and Jason Santa Maria
 
-Contributions from Kavya Sukumar, Casey Miller, Skip Baney
+_Contributions:_ Kavya Sukumar, Casey Miller, Skip Baney
 
 And lots of help from Vox Media's product team
 
