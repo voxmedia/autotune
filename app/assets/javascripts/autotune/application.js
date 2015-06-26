@@ -871,11 +871,9 @@ module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<div class="row m-page-heading">\n  <div class="col-xs-12">\n    <h3>Choose a blueprint</h3>\n  </div>\n</div>\n';
- if(collection.models.length == 0) { 
-__p+='\n  <div class="well text-center">\n    <h4>There are no blueprints ready for use.</h4>\n    <p>You must change the status of a blueprint to\n      <span class="m-status status-ok"><i class="icon-ok"></i>Ready</span> for it to appear here.</p>\n  </div>\n';
- }
-   var index = 0;
-   _.each(collection.models, function(blueprint) { 
+ if( hasObjects() ) { 
+__p+='\n  ';
+ _.each(getObjects(), function(blueprint, index) { 
 __p+='\n  ';
  if(index % 3 == 0) { 
 __p+='\n  ';
@@ -886,13 +884,17 @@ __p+='\n<div class="row m-blueprint-chooser">\n  ';
  } 
 __p+='\n  <div class="col-md-4">\n    <div class="thumbnail" style="background-image:url(\''+
 ((__t=(blueprint.get('thumb_url') ))==null?'':__t)+
-'\');"> \n      <h4>'+
+'\');">\n      <h4>'+
 ((__t=(blueprint.get('title') ))==null?'':__t)+
 '</h4>\n      <a href="'+
 ((__t=(blueprint.url() ))==null?'':__t)+
-'/new_project"></a>\n    </div>\n  </div>\n';
- index++; }); 
+'/new_project"></a>\n    </div>\n  </div>\n  ';
+ }) 
 __p+='\n</div>\n';
+ } else { 
+__p+='\n<div class="well text-center">\n  <h4>There are no blueprints ready for use.</h4>\n  <p>You must change the status of a blueprint to\n    <span class="m-status status-ok"><i class="icon-ok"></i>Ready</span> for it to appear here.</p>\n</div>\n';
+ } 
+__p+='\n';
 }
 return __p;
 };
@@ -29592,10 +29594,17 @@ module.exports = Backbone.View.extend({
 
   getObjects: function() {
     if ( _.size(this.query) > 0 ) {
-      logger.debug(this.query);
       return this.collection.where(this.query);
     } else {
       return this.collection.models;
+    }
+  },
+
+  hasObjects: function() {
+    if ( _.size(this.query) > 0 ) {
+      return this.collection.where(this.query).length > 0;
+    } else {
+      return this.collection.models.length > 0;
     }
   },
 

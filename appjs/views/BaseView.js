@@ -81,10 +81,17 @@ module.exports = Backbone.View.extend({
 
   getObjects: function() {
     if ( _.size(this.query) > 0 ) {
-      logger.debug(this.query);
       return this.collection.where(this.query);
     } else {
       return this.collection.models;
+    }
+  },
+
+  hasObjects: function() {
+    if ( _.size(this.query) > 0 ) {
+      return this.collection.where(this.query).length > 0;
+    } else {
+      return this.collection.models.length > 0;
     }
   },
 
