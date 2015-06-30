@@ -29520,7 +29520,7 @@ var $ = require('jquery'),
     logger = require('../logger'),
     camelize = require('underscore.string/camelize');
 
-require('pnotify/pnotify.buttons');
+require('pnotify/src/pnotify.buttons');
 
 module.exports = Backbone.View.extend({
   events: {
@@ -29634,7 +29634,7 @@ module.exports = Backbone.View.extend({
 });
 
 
-},{"../logger":3,"../models":4,"../templates/error.ejs":11,"../templates/not_allowed.ejs":12,"../templates/not_found.ejs":13,"backbone":27,"jquery":54,"pnotify/pnotify.buttons":58,"underscore":127,"underscore.string/camelize":61}],21:[function(require,module,exports){
+},{"../logger":3,"../models":4,"../templates/error.ejs":11,"../templates/not_allowed.ejs":12,"../templates/not_found.ejs":13,"backbone":27,"jquery":54,"pnotify/src/pnotify.buttons":58,"underscore":127,"underscore.string/camelize":61}],21:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -71050,7 +71050,7 @@ function merge_text_nodes( jsonml ) {
 // Buttons
 // Uses AMD or browser globals for jQuery.
 (function (factory) {
-    if (typeof(exports) === 'object' && typeof(module) !== 'undefined') {
+    if (typeof exports === 'object' && typeof module !== 'undefined') {
         // CommonJS
         module.exports = factory(require('jquery'), require('pnotify'));
     } else if (typeof define === 'function' && define.amd) {
@@ -71202,9 +71202,8 @@ license GPL/LGPL/MPL
  * 	http://mozilla.org/MPL/MPL-1.1.html
  */
 
-// Uses AMD or browser globals for jQuery.
 (function (factory) {
-    if (typeof(exports) === 'object' && typeof(module) !== 'undefined') {
+    if (typeof exports === 'object' && typeof module !== 'undefined') {
         // CommonJS
         module.exports = factory(require('jquery'));
     } else if (typeof define === 'function' && define.amd) {
@@ -71353,6 +71352,7 @@ license GPL/LGPL/MPL
 			this.elem = $("<div />", {
 				"class": "ui-pnotify "+this.options.addclass,
 				"css": {"display": "none"},
+				"aria-live": "assertive",
 				"mouseenter": function(e){
 					if (that.options.mouse_reset && that.animating === "out") {
 						if (!that.timerHide)
@@ -71369,8 +71369,10 @@ license GPL/LGPL/MPL
 				}
 			});
 			// Create a container for the notice contents.
-			this.container = $("<div />", {"class": this.styles.container+" ui-pnotify-container "+(this.options.type === "error" ? this.styles.error : (this.options.type === "info" ? this.styles.info : (this.options.type === "success" ? this.styles.success : this.styles.notice)))})
-			.appendTo(this.elem);
+			this.container = $("<div />", {
+				"class": this.styles.container+" ui-pnotify-container "+(this.options.type === "error" ? this.styles.error : (this.options.type === "info" ? this.styles.info : (this.options.type === "success" ? this.styles.success : this.styles.notice))),
+				"role": "alert"
+			}).appendTo(this.elem);
 			if (this.options.cornerclass !== "")
 				this.container.removeClass("ui-corner-all").addClass(this.options.cornerclass);
 			// Create a drop shadow.

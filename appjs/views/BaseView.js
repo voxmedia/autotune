@@ -7,7 +7,7 @@ var $ = require('jquery'),
     logger = require('../logger'),
     camelize = require('underscore.string/camelize');
 
-require('pnotify/pnotify.buttons');
+require('pnotify/src/pnotify.buttons');
 
 module.exports = Backbone.View.extend({
   events: {
