@@ -32,11 +32,6 @@ module WorkDir
       dir? '.git'
     end
 
-    # Is phantomJS installed?
-    def phantomJS?
-      exist? '/usr/local/bin/phantomjs'
-    end
-
     def exist?(path = '.')
       File.exist?(expand path)
     end
