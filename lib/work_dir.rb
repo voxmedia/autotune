@@ -2,6 +2,7 @@ require 'logger'
 require 'work_dir/base'
 require 'work_dir/repo'
 require 'work_dir/website'
+require 'work_dir/phantom'
 
 # Top-level module for work dir
 module WorkDir
@@ -35,6 +36,10 @@ module WorkDir
 
     def website(*args)
       Website.new(*args)
+    end
+
+    def phantom(*args)
+      Phantom.new(*args)
     end
   end
 end

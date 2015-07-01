@@ -31,5 +31,6 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
 
     assert snapshot.exist?, 'Snapshot should exist'
     assert snapshot.git?, 'Snapshot should be a git repo'
+    assert snapshot.exist?('build/screenshots/screenshot_l.png'), 'Snapshot should have screenies'
   end
 end
