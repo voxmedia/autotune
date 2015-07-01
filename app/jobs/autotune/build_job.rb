@@ -68,7 +68,7 @@ module Autotune
 
     def save_screenshots(build_dir, url, deploy_dir)
       phantom = WorkDir.phantom(build_dir)
-      if phantom.phantomJS?
+      if phantom.phantomjs?
         phantom.capture_screenshot(get_full_url(url))
         screenshots_dir = WorkDir.website(File.join(build_dir, 'screenshots'))
         screenshots_dir.deploy(File.join(deploy_dir, 'screenshots'))
