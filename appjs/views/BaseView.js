@@ -5,9 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    camelize = require('underscore.string/camelize');
-
-require('pnotify/src/pnotify.buttons');
+    helpers = require('../helpers');
 
 module.exports = Backbone.View.extend({
   events: {
@@ -15,7 +13,7 @@ module.exports = Backbone.View.extend({
   },
 
   initialize: function(options) {
-    this.loaded = true;
+    this.loaded = this.firstRender = true;
 
     if (_.isObject(options)) {
       _.extend(this, options);
@@ -50,16 +48,39 @@ module.exports = Backbone.View.extend({
   },
 
   render: function() {
+    var scrollPos = $(window).scrollTop(),
+        activeTab = this.$('.nav-tabs .active a').attr('href'),
+        view = this;
+
     if ( this.loaded ) {
-      this.hook('beforeRender');
+      return this.hook('beforeRender').then(function() {
+        view.$el.html( helpers.render( view.template, view.getTemplateObj() ) );
 
-      this.$el.html(this.template(this));
+        return view.hook( 'afterRender' );
+      }).then(function() {
+        if ( view.firstRender ) {
+          logger.debug( 'first render' );
+          view.firstRender = false;
+        } else {
+          logger.debug('re-render; fix scroll and tabs', scrollPos, activeTab, $(document).height());
+          view.$('.nav-tabs a[href='+activeTab+']').tab('show');
+          $(window).scrollTop(scrollPos);
+        }
 
-      this.app.trigger('loadingStop');
-
-      this.hook('afterRender');
+        view.app.trigger( 'loadingStop' );
+      });
+    } else {
+      return Promise.resolve();
     }
-    return this;
+  },
+
+  getTemplateObj: function() {
+    return {
+      model: this.model,
+      collection: this.collection,
+      app: this.app,
+      query: this.query
+    };
   },
 
   handleSyncError: function(model_or_collection, resp, options) {
@@ -74,49 +95,35 @@ module.exports = Backbone.View.extend({
     } else {
       tmpl = require('../templates/error.ejs');
     }
-    logger.debug(tmplObj);
-    this.$el.html(tmpl(tmplObj));
+    this.$el.html(helpers.render(tmpl, tmplObj));
     this.app.trigger('loadingStop');
   },
 
-  getObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query);
-    } else {
-      return this.collection.models;
-    }
-  },
-
-  hasObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query).length > 0;
-    } else {
-      return this.collection.models.length > 0;
-    }
-  },
-
   load: function(parentView) {
-    this.loaded = true;
+    this.loaded = this.firstRender = true;
     this.parentView = parentView;
     return this;
   },
 
-  unload: function(parentView) {
+  unload: function() {
     this.loaded = false;
     if ( this.parentView ) { this.parentView = null; }
     return this;
   },
 
-  hasRole: function(role) {
-    return _.contains(this.app.user.get('meta').roles, role);
-  },
-
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
+
     logger.debug('hook ' + name);
+
     this.trigger(name, args);
-    if(_.isFunction(this[name])) { return this[name].apply(this, args); }
+
+    if( _.isFunction(this[name]) ) {
+      return Promise.resolve( this[name].apply(this, args) );
+    } else {
+      return Promise.resolve( this );
+    }
   }
 });
 

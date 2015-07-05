@@ -6,7 +6,6 @@ var $ = require('jquery'),
     models = require('../models'),
     logger = require('../logger'),
     camelize = require('underscore.string/camelize'),
-    alert_template = require('../templates/alert.ejs'),
     BaseView = require('./BaseView');
 
 module.exports = BaseView.extend({
@@ -29,7 +28,7 @@ module.exports = BaseView.extend({
     this.app.trigger('loadingStart');
     logger.debug('handleForm');
 
-    var inst, Model,
+    var inst, Model, view = this,
         $form = $(eve.currentTarget),
         values = this.formValues($form),
         model_class = $form.data('model'),
@@ -40,11 +39,8 @@ module.exports = BaseView.extend({
     $form.find('[type=submit]').button('loading');
 
     if(model_class && action === 'new') {
-      Model = models[model_class];
-      this.hook('beforeSubmit', $form, values, action, Model);
-      inst = new Model();
+      inst = new models[model_class]();
     } else if(_.isObject(this.model) && action === 'edit') {
-      this.hook('beforeSubmit', $form, values, action, this.model);
       inst = this.model;
     } else if ($form.attr('method').toLowerCase() === 'get') {
       // if the method attr is `get` then we can navigate to that new
@@ -56,37 +52,37 @@ module.exports = BaseView.extend({
       return;
     } else { throw "Don't know how to handle this form"; }
 
-    inst.set(values);
-    if(!this.formValidate(inst, $form)) {
-      $form.find('[type=submit]').button('reset');
-      logger.debug('form is not valid');
-      return false;
-    }
+    return this.hook('beforeSubmit', $form, values, action, inst)
+      .then(function() {
+        inst.set(values);
+        if(!view.formValidate(inst, $form)) {
+          $form.find('[type=submit]').button('reset');
+          logger.debug('form is not valid');
+          throw 'Form is not valid';
+        }
 
-    logger.debug('form is valid, saving...');
+        logger.debug('form is valid, saving...');
 
-    inst.save()
-      .done(_.bind(function() {
-        $form.find('[type=submit]').button('reset');
+        return Promise.resolve( inst.save() );
+      }).then(function(data) {
         logger.debug('form finished saving');
-        if(action === 'new') {
-          this.app.view.success('New '+model_class+' saved');
+
+        if ( action === 'new' ) {
+          view.app.view.success('New '+model_class+' saved');
         } else {
-          this.app.view.success(model_class+' updates saved');
+          view.app.view.success(model_class+' updates saved');
         }
-        if(next === 'show') {
-          Backbone.history.navigate(this.model.url(), {trigger: true});
-        } else if(next){
+
+        if ( next === 'show' ) {
+          Backbone.history.navigate(view.model.url(), {trigger: true});
+        } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
-        } else {
-          if(_.isObject(this.collection)) {
-            this.collection.fetch();
-          } else if(_.isObject(this.model)) {
-            this.model.fetch();
-          }
         }
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+      }).catch(function(error) {
+        view.handleRequestError(error);
+      }).then(function() {
+        $form.find('[type=submit]').button('reset');
+      });
   },
 
   formValues: function($form) {
@@ -104,45 +100,54 @@ module.exports = BaseView.extend({
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+
     this.app.trigger('loadingStart');
     var $btn = $(eve.currentTarget),
         action = $btn.data('action');
     $btn.button('loading');
-    this.hook(camelize('handle-' + action + '-action'), eve);
+    this.hook(camelize('handle-' + action + '-action'), eve)
+      .then(function() {
+        $btn.button('reset');
+      });
   },
 
   handleDeleteAction: function(eve) {
-    var inst,
+    var inst, view = this,
         $btn = $(eve.currentTarget),
         model_class = $btn.data('model'),
-        model_id = $btn.data('model-id'),
-        next = $btn.data('next');
+        model_id = $btn.data('model-id');
+
+    if ( model_class && model_id ) {
+      inst = new models[model_class]({id: model_id});
+    } else {
+      inst = this.model;
+    }
 
     if(window.confirm('Are you sure you want to delete this?')) {
-      inst = new models[model_class]({id: model_id});
-      inst.destroy()
-        .done(_.bind(function() {
-          this.app.view.success('Deleted '+model_class);
-          if(_.isObject(this.model)) {
-            Backbone.history.navigate(this.model.urlRoot, {trigger: true});
-          } else {
-            this.collection.fetch();
-          }
-        }, this))
-        .fail(_.bind(this.handleRequestError, this));
-    } else {
-      $btn.button('reset');
+      return Promise.resolve( inst.destroy() )
+        .then(function(response) {
+            view.app.view.success( 'Deleted ' + model_class );
+            if( _.isObject(view.model) ) {
+              Backbone.history.navigate(
+                view.model.urlRoot, {trigger: true} );
+            } else {
+              view.collection.remove( inst );
+              return Promise.resolve( view.collection.fetch() );
+            }
+        }).catch(function(error) {
+          view.handleRequestError(error);
+        });
     }
   },
 
-  handleRequestError: function(xhr, status, error){
-    if(error === 'Bad Request') {
-      var data = $.parseJSON(xhr.responseText);
-      this.app.view.error(data.error);
+  handleRequestError: function(xhr){
+    if ( xhr.statusText === 'Bad Request' ) {
+      var data = $.parseJSON( xhr.responseText );
+      this.app.view.error( data.error );
     } else {
-      this.app.view.error('Something bad happened... Please reload and try again');
+      this.app.view.error( 'Something bad happened... Please reload and try again' );
     }
-    logger.error("REQUEST FAILED!!", xhr, status, error);
+    logger.error("REQUEST FAILED!!", xhr);
   },
 
   submitForm: function(eve) {

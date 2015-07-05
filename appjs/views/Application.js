@@ -5,7 +5,10 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     PNotify = require('pnotify'),
     models = require('../models'),
+    logger = require('../logger'),
     BaseView = require('./BaseView');
+
+require('pnotify/src/pnotify.buttons');
 
 module.exports = BaseView.extend({
   className: 'container-fluid',
@@ -21,6 +24,7 @@ module.exports = BaseView.extend({
     if ( this.currentView ) { this.currentView.unload(this); }
     this.currentView = view;
     this.currentView.load(this);
+    logger.debug('displaying view', view, this.$('#main'));
     this.$('#main').empty().append(view.$el);
     return this;
   },

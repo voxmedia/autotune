@@ -15,14 +15,6 @@ module.exports = Backbone.Router.extend({
     logger.debug("Init router");
 
     this.on("route", this.everyRoute);
-
-    this.app.view = new views.Application({ app: this.app });
-    this.app.view.render();
-    $('body').prepend(this.app.view.$el);
-
-    this.app.on('focus', function() { this.app.view.clearError(); }, this);
-    this.app.on('loadingStart', function() { this.app.view.spinStart(); }, this);
-    this.app.on('loadingStop', function() { this.app.view.spinStop(); }, this);
   },
 
   routes: {
@@ -40,7 +32,7 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
-    this.app.trigger('loadingStart');
+    this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.listener.start();
     if ( params ) {
@@ -121,7 +113,8 @@ module.exports = Backbone.Router.extend({
     this.app.view
       .display( view )
       .setTab('projects');
-    blueprint.fetch();
+    blueprint.fetch()
+      .then(function() { view.render(); });
   },
 
   editProject: function(slug) {

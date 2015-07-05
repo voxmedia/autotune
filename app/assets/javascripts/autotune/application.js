@@ -19,6 +19,7 @@ var $ = require('jquery'),
     Router = require('./router'),
     Listener = require('./listener'),
     logger = require('./logger'),
+    views = require('./views'),
     models = require('./models');
 
 // required to make Backbone work in browserify
@@ -60,20 +61,43 @@ function App(config) {
 
   if ( this.isDev() ) { logger.level = 'debug'; }
 
-  this.router = new Router({ app: this });
-  Backbone.history.start({ pushState: true });
+  // Initialize top-level view
+  this.view = new views.Application({ app: this });
 
+  // Clear error messages when window is focused
+  this.on('focus', function() { this.view.clearError(); }, this);
+
+  // Show or hide spinner on loading events
+  this.on('loadingStart', function() { this.view.spinStart(); }, this);
+  this.on('loadingStop', function() { this.view.spinStop(); }, this);
+
+  // Initialize routing
+  this.router = new Router({ app: this });
+
+  // Start the app once the top-level view is rendered
+  var view = this.view;
+  this.view.render().then(function() {
+    $('body').prepend(view.$el);
+    view.app.trigger( 'loadingStart' );
+    Backbone.history.start({ pushState: true });
+  });
+
+  // Handle application focus
   this.hasFocus = true;
   if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
+      // Tell the listener to cancel the timeout, and make sure it's started
       this.listener
         .cancelStop()
         .start();
+      // Proxy the event on the app object
       this.trigger('focus');
     }, this));
 
     $(window).on('blur', _.bind(function(){
+      // Tell the listener to time out in 20 seconds
       this.listener.stopAfter(20);
+      // Proxy the event on the app object
       this.trigger('blur');
     }, this));
   }
@@ -150,7 +174,44 @@ if ( typeof(window) !== 'undefined' ) {
   window._ = _;
 }
 
-},{"./listener":2,"./logger":3,"./models":4,"./router":5,"./vendor/alpaca":17,"backbone":27,"bootstrap":28,"jquery":54,"underscore":127}],2:[function(require,module,exports){
+},{"./listener":3,"./logger":4,"./models":5,"./router":6,"./vendor/alpaca":17,"./views":18,"backbone":27,"bootstrap":28,"jquery":54,"underscore":127}],2:[function(require,module,exports){
+"use strict";
+
+var $ = require('jquery'),
+    _ = require('underscore');
+
+module.exports = {
+  render: function(template, templateObj) {
+    if ( _.isString(template) ) {
+      template = require('./templates/' + template + '.ejs');
+    }
+    templateObj = _.extend(templateObj || {}, this, require('underscore.string'));
+
+    return template(templateObj);
+  },
+
+  getObjects: function() {
+    if ( _.size(this.query) > 0 ) {
+      return this.collection.where(this.query);
+    } else {
+      return this.collection.models;
+    }
+  },
+
+  hasObjects: function() {
+    if ( _.size(this.query) > 0 ) {
+      return this.collection.where(this.query).length > 0;
+    } else {
+      return this.collection.models.length > 0;
+    }
+  },
+
+  hasRole: function(role) {
+    return _.contains(this.app.user.get('meta').roles, role);
+  }
+};
+
+},{"jquery":54,"underscore":127,"underscore.string":83}],3:[function(require,module,exports){
 "use strict";
 
 var _ = require('underscore'),
@@ -263,7 +324,7 @@ _.extend(Listener.prototype, Backbone.Events, {
 
 module.exports = Listener;
 
-},{"./logger":3,"backbone":27,"underscore":127}],3:[function(require,module,exports){
+},{"./logger":4,"backbone":27,"underscore":127}],4:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -294,7 +355,7 @@ module.exports = {
   }
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 var Backbone = require('backbone'),
@@ -578,7 +639,7 @@ exports.BlueprintCollection = Backbone.Collection.extend({
   url: '/blueprints'
 });
 
-},{"backbone":27,"markdown":55,"moment":57,"underscore":127}],5:[function(require,module,exports){
+},{"backbone":27,"markdown":55,"moment":57,"underscore":127}],6:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -596,14 +657,6 @@ module.exports = Backbone.Router.extend({
     logger.debug("Init router");
 
     this.on("route", this.everyRoute);
-
-    this.app.view = new views.Application({ app: this.app });
-    this.app.view.render();
-    $('body').prepend(this.app.view.$el);
-
-    this.app.on('focus', function() { this.app.view.clearError(); }, this);
-    this.app.on('loadingStart', function() { this.app.view.spinStart(); }, this);
-    this.app.on('loadingStop', function() { this.app.view.spinStop(); }, this);
   },
 
   routes: {
@@ -621,7 +674,7 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
-    this.app.trigger('loadingStart');
+    this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.listener.start();
     if ( params ) {
@@ -702,7 +755,8 @@ module.exports = Backbone.Router.extend({
     this.app.view
       .display( view )
       .setTab('projects');
-    blueprint.fetch();
+    blueprint.fetch()
+      .then(function() { view.render(); });
   },
 
   editProject: function(slug) {
@@ -721,24 +775,8 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"./logger":3,"./models":4,"./views":18,"backbone":27,"jquery":54,"query-string":60,"underscore":127}],6:[function(require,module,exports){
+},{"./logger":4,"./models":5,"./views":18,"backbone":27,"jquery":54,"query-string":60,"underscore":127}],7:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
-module.exports = function(obj){
-var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
-with(obj||{}){
-__p+='<div class="alert alert-'+
-((__t=(level ))==null?'':__t)+
-'" role="alert">\n  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
-((__t=(message ))==null?'':__t)+
-'\n</div>\n';
-}
-return __p;
-};
-
-},{"underscore":127,"underscore.string":83}],7:[function(require,module,exports){
-var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -755,9 +793,8 @@ __p+='\n          <li data-tab="faq"><a href="'+
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],8:[function(require,module,exports){
+},{"underscore":127}],8:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -776,15 +813,15 @@ __p+='</h3>\n\n    ';
 __p+='\n    <p class="text-muted">\n      Status:\n      ';
  if(model.get('status') == 'ready') { 
 __p+='\n      <span class="text-success"><i class="icon-ok"></i>'+
-((__t=(s.capitalize(model.get('status')) ))==null?'':__t)+
+((__t=(capitalize(model.get('status')) ))==null?'':__t)+
 '</span>\n      ';
  } else if(model.get('status') == 'broken') { 
 __p+='\n      <span class="text-danger"><i class="icon-alert"></i>'+
-((__t=(s.capitalize(model.get('status')) ))==null?'':__t)+
+((__t=(capitalize(model.get('status')) ))==null?'':__t)+
 '</span>\n      ';
  } else { 
 __p+='\n      <span class="text-warning"><i class="icon-info"></i>'+
-((__t=(s.capitalize(model.get('status')) ))==null?'':__t)+
+((__t=(capitalize(model.get('status')) ))==null?'':__t)+
 '</span>\n      ';
  } 
 __p+='\n    </p>\n    ';
@@ -836,15 +873,23 @@ __p+='selected';
 __p+='\n                      >Ready</option>\n                  </select>\n                </div>\n              </div>\n              ';
  } 
 __p+='\n              <button type="submit" class="btn btn-primary"\n                      data-loading-text="Saving...">Save changes</button>\n\n              ';
- if(!model.isNew()) { 
-__p+='\n              <button type="button" class="btn btn-default"\n                      data-action="update" data-model="Blueprint"\n                      data-loading-text="Upgrading..."\n                      data-model-id="'+
+ if ( !model.isNew() ) { 
+__p+='\n              <button type="button" class="btn btn-default"\n                      ';
+ if ( model.hasStatus('updating') ) { 
+__p+='disabled="true"';
+ } 
+__p+='\n                      data-action="update" data-model="Blueprint"\n                      data-loading-text="Upgrading..."\n                      data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Upgrade</button>\n              <button type="button" class="btn btn-danger"\n                      data-action="delete" data-model="Blueprint"\n                      data-next="/blueprints"\n                      data-loading-text="Deleting..."\n                      data-model-id="'+
+'">Upgrade</button>\n              <button type="button" class="btn btn-danger"\n                      ';
+ if ( model.hasStatus('updating') ) { 
+__p+='disabled="true"';
+ } 
+__p+='\n                      data-action="delete" data-model="Blueprint"\n                      data-next="/blueprints"\n                      data-loading-text="Deleting..."\n                      data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n              ';
  } 
 __p+='\n            </form>\n          </div>\n          <div class="col-md-6">\n            ';
- if(!model.isNew()) { 
+ if ( !model.isNew() ) { 
 __p+='\n            <img src="'+
 ((__t=(model.get('thumb_url') ))==null?'':__t)+
 '" alt="'+
@@ -852,7 +897,7 @@ __p+='\n            <img src="'+
 '" width="100%">\n            <p><strong>Type:</strong> '+
 ((__t=(model.get('type') ))==null?'':__t)+
 '</p>\n            ';
- if(model.has('config')) { 
+ if ( model.has('config') ) { 
 __p+='\n            <p class="margin-bottom">'+
 ((__t=(model.get('config').description ))==null?'':__t)+
 '</p>\n            ';
@@ -864,9 +909,8 @@ __p+='\n          </div>\n        </div>\n      </div>\n\n      <div role="tabpa
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],9:[function(require,module,exports){
+},{"underscore":127}],9:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -899,9 +943,8 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],10:[function(require,module,exports){
+},{"underscore":127}],10:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -1011,9 +1054,8 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],11:[function(require,module,exports){
+},{"underscore":127}],11:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -1030,9 +1072,8 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],12:[function(require,module,exports){
+},{"underscore":127}],12:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -1041,9 +1082,8 @@ __p+='<h3>Not allowed</h3>\n<p>You need a higher access level.</p>\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],13:[function(require,module,exports){
+},{"underscore":127}],13:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -1052,9 +1092,8 @@ __p+='<h3>Not found</h3>\n<p>I dinna ken what ye want</p>\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],14:[function(require,module,exports){
+},{"underscore":127}],14:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -1129,7 +1168,7 @@ __p+='<span class="text-danger">Broken</span>\n        ';
 __p+='<span class="text-success">Built</span>\n        ';
  } else { 
 __p+='<span class="text-warning">'+
-((__t=(s.capitalize(model.get('status')) ))==null?'':__t)+
+((__t=(capitalize(model.get('status')) ))==null?'':__t)+
 '</span>';
  } 
 __p+='\n      </p>\n\n      <p>\n        <button type="button" class="btn btn-default"\n                data-action="build" data-model="Project"\n                data-model-id="'+
@@ -1147,9 +1186,8 @@ __p+='\n  </div>\n\n</div>\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],15:[function(require,module,exports){
+},{"underscore":127}],15:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -1210,9 +1248,8 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],16:[function(require,module,exports){
+},{"underscore":127}],16:[function(require,module,exports){
 var _ = require("underscore");
-var s = require("underscore.string");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -1366,7 +1403,7 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"underscore":127,"underscore.string":83}],17:[function(require,module,exports){
+},{"underscore":127}],17:[function(require,module,exports){
 (function (process){
 
 (function(root, factory)
@@ -29433,7 +29470,10 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     PNotify = require('pnotify'),
     models = require('../models'),
+    logger = require('../logger'),
     BaseView = require('./BaseView');
+
+require('pnotify/src/pnotify.buttons');
 
 module.exports = BaseView.extend({
   className: 'container-fluid',
@@ -29449,6 +29489,7 @@ module.exports = BaseView.extend({
     if ( this.currentView ) { this.currentView.unload(this); }
     this.currentView = view;
     this.currentView.load(this);
+    logger.debug('displaying view', view, this.$('#main'));
     this.$('#main').empty().append(view.$el);
     return this;
   },
@@ -29510,7 +29551,7 @@ module.exports = BaseView.extend({
   }
 });
 
-},{"../models":4,"../templates/application.ejs":7,"./BaseView":20,"backbone":27,"jquery":54,"pnotify":59,"underscore":127}],20:[function(require,module,exports){
+},{"../logger":4,"../models":5,"../templates/application.ejs":7,"./BaseView":20,"backbone":27,"jquery":54,"pnotify":59,"pnotify/src/pnotify.buttons":58,"underscore":127}],20:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29518,9 +29559,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    camelize = require('underscore.string/camelize');
-
-require('pnotify/src/pnotify.buttons');
+    helpers = require('../helpers');
 
 module.exports = Backbone.View.extend({
   events: {
@@ -29528,7 +29567,7 @@ module.exports = Backbone.View.extend({
   },
 
   initialize: function(options) {
-    this.loaded = true;
+    this.loaded = this.firstRender = true;
 
     if (_.isObject(options)) {
       _.extend(this, options);
@@ -29563,16 +29602,39 @@ module.exports = Backbone.View.extend({
   },
 
   render: function() {
+    var scrollPos = $(window).scrollTop(),
+        activeTab = this.$('.nav-tabs .active a').attr('href'),
+        view = this;
+
     if ( this.loaded ) {
-      this.hook('beforeRender');
+      return this.hook('beforeRender').then(function() {
+        view.$el.html( helpers.render( view.template, view.getTemplateObj() ) );
 
-      this.$el.html(this.template(this));
+        return view.hook( 'afterRender' );
+      }).then(function() {
+        if ( view.firstRender ) {
+          logger.debug( 'first render' );
+          view.firstRender = false;
+        } else {
+          logger.debug('re-render; fix scroll and tabs', scrollPos, activeTab, $(document).height());
+          view.$('.nav-tabs a[href='+activeTab+']').tab('show');
+          $(window).scrollTop(scrollPos);
+        }
 
-      this.app.trigger('loadingStop');
-
-      this.hook('afterRender');
+        view.app.trigger( 'loadingStop' );
+      });
+    } else {
+      return Promise.resolve();
     }
-    return this;
+  },
+
+  getTemplateObj: function() {
+    return {
+      model: this.model,
+      collection: this.collection,
+      app: this.app,
+      query: this.query
+    };
   },
 
   handleSyncError: function(model_or_collection, resp, options) {
@@ -29587,54 +29649,40 @@ module.exports = Backbone.View.extend({
     } else {
       tmpl = require('../templates/error.ejs');
     }
-    logger.debug(tmplObj);
-    this.$el.html(tmpl(tmplObj));
+    this.$el.html(helpers.render(tmpl, tmplObj));
     this.app.trigger('loadingStop');
   },
 
-  getObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query);
-    } else {
-      return this.collection.models;
-    }
-  },
-
-  hasObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query).length > 0;
-    } else {
-      return this.collection.models.length > 0;
-    }
-  },
-
   load: function(parentView) {
-    this.loaded = true;
+    this.loaded = this.firstRender = true;
     this.parentView = parentView;
     return this;
   },
 
-  unload: function(parentView) {
+  unload: function() {
     this.loaded = false;
     if ( this.parentView ) { this.parentView = null; }
     return this;
   },
 
-  hasRole: function(role) {
-    return _.contains(this.app.user.get('meta').roles, role);
-  },
-
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
+
     logger.debug('hook ' + name);
+
     this.trigger(name, args);
-    if(_.isFunction(this[name])) { return this[name].apply(this, args); }
+
+    if( _.isFunction(this[name]) ) {
+      return Promise.resolve( this[name].apply(this, args) );
+    } else {
+      return Promise.resolve( this );
+    }
   }
 });
 
 
-},{"../logger":3,"../models":4,"../templates/error.ejs":11,"../templates/not_allowed.ejs":12,"../templates/not_found.ejs":13,"backbone":27,"jquery":54,"pnotify/src/pnotify.buttons":58,"underscore":127,"underscore.string/camelize":61}],21:[function(require,module,exports){
+},{"../helpers":2,"../logger":4,"../models":5,"../templates/error.ejs":11,"../templates/not_allowed.ejs":12,"../templates/not_found.ejs":13,"backbone":27,"jquery":54,"underscore":127}],21:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29647,7 +29695,7 @@ module.exports = FormView.extend({
   template: require('../templates/blueprint_chooser.ejs')
 });
 
-},{"../models":4,"../templates/blueprint_chooser.ejs":9,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],22:[function(require,module,exports){
+},{"../models":5,"../templates/blueprint_chooser.ejs":9,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],22:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29815,19 +29863,23 @@ var setup = function(formData) {
 
 module.exports = FormView.extend({
   template: require('../templates/blueprint.ejs'),
+
   handleUpdateAction: function(eve) {
-    var $btn = $(eve.currentTarget),
+    var view = this,
+        $btn = $(eve.currentTarget),
         model_class = $btn.data('model'),
         model_id = $btn.data('model-id'),
         inst = new models[model_class]({id: model_id});
 
-    inst.updateRepo()
-      .done(_.bind(function() {
-        this.app.view.success('Updating blueprint repo');
-        inst.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+    return Promise.resolve( inst.updateRepo() )
+      .then(function() {
+        view.app.view.success('Updating blueprint repo');
+      })
+      .catch(function(error) {
+        view.handleRequestError( error );
+      });
   },
+
   afterRender: function() {
     if ( !this.model.isNew() ) {
       setup(this.model.get('config').form);
@@ -29835,13 +29887,14 @@ module.exports = FormView.extend({
   }
 });
 
-},{"../logger":3,"../models":4,"../templates/blueprint.ejs":8,"../vendor/alpaca":17,"./FormView":24,"backbone":27,"brace":29,"brace/mode/javascript":30,"brace/theme/textmate":32,"jquery":54,"underscore":127}],23:[function(require,module,exports){
+},{"../logger":4,"../models":5,"../templates/blueprint.ejs":8,"../vendor/alpaca":17,"./FormView":24,"backbone":27,"brace":29,"brace/mode/javascript":30,"brace/theme/textmate":32,"jquery":54,"underscore":127}],23:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
+    helpers = require('../helpers'),
     FormView = require('./FormView');
 
 function pluckAttr(models, attribute) {
@@ -29851,43 +29904,43 @@ function pluckAttr(models, attribute) {
 module.exports = FormView.extend({
   template: require('../templates/project.ejs'),
 
-  afterInit: function() {
-    this.setupBlueprint();
+  afterInit: function() {},
+
+  beforeRender: function() {
+    if ( _.isUndefined(this.model.blueprint) && this.model.has( 'blueprint_id' ) ) {
+      this.model.blueprint = new models.Blueprint(
+        { id: this.model.get( 'blueprint_id' ) });
+    }
+
+    if( ! this.model.blueprint.has( 'config' ) ) {
+      this.app.trigger( 'loadingStart' );
+      return Promise.resolve( this.model.blueprint.fetch() );
+    }
   },
 
   afterRender: function() {
-    if ( _.isUndefined( this.model.blueprint ) ) {
-      this.setupBlueprint();
-    }
-
+    var view = this, promises = [];
     if ( this.model.isPublished() ) {
-      $.get(this.model.getPublishUrl(window.location.protocol.replace(':', '')) + 'embed.txt',
-            function(data, status) {
-              data = data.replace(/(?:\r\n|\r|\n)/gm, '');
-              $('#embed textarea').text( data );
-            });
+      var proto = window.location.protocol.replace( ':', '' ),
+          embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
+
+      promises.push( Promise
+        .resolve( $.get( embedUrl ) )
+        .then( function(data) {
+          console.log('loaded embed');
+          data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
+          view.$( '#embed textarea' ).text( data );
+        }) );
     }
 
-    if( ! this.model.blueprint.has('config') ) {
-      this.app.trigger('loadingStart');
-      this.model.blueprint.fetch();
-    } else {
-      this.renderForm();
-    }
+    promises.push( new Promise( function(resolve, reject) {
+      view.renderForm(resolve, reject);
+    } ) );
+
+    return Promise.all(promises);
   },
 
-  setupBlueprint: function() {
-    if ( _.isUndefined(this.model.blueprint) && this.model.has('blueprint_id') ) {
-      this.model.blueprint = new models.Blueprint({ id: this.model.get('blueprint_id') });
-    }
-
-    if ( _.isObject( this.model.blueprint ) ) {
-      this.listenTo(this.model.blueprint, 'sync', this.render);
-      this.listenTo(this.model.blueprint, 'error', this.handleSyncError);
-    }
-  },
-
-  renderForm: function() {
+  renderForm: function(resolve, reject) {
     var $form = this.$el.find('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes;
@@ -29902,6 +29955,7 @@ module.exports = FormView.extend({
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
+      reject('This blueprint does not have a form!');
     } else {
       var themes = this.app.themes.filter(function(theme) {
             if ( _.isEqual(config_themes, ['generic']) ) {
@@ -29964,10 +30018,13 @@ module.exports = FormView.extend({
         },
         "options": {
           "form": options_form,
-          "fields": options_fields
+          "fields": options_fields,
+          "focus": this.firstRender
         },
         "postRender": _.bind(function(control) {
-          control.form.form.append( button_tmpl(this) );
+          this.alpaca = control;
+          control.form.form.append( helpers.render(button_tmpl, this.getTemplateObj()) );
+          resolve();
         }, this)
       };
 
@@ -30003,47 +30060,50 @@ module.exports = FormView.extend({
       control.form.refreshValidationState(true);
       $form.find('#validation-error').removeClass('hidden');
     } else {
-      $form.find('#success-message').removeClass('hidden');
+      $form.find('#resolve-message').removeClass('hidden');
       $form.find('#validation-error').addClass('hidden');
     }
     return valid;
   },
 
   handleUpdateAction: function(eve) {
-    var $btn = $(eve.currentTarget);
+    var view = this,
+        $btn = $(eve.currentTarget);
 
-    this.model.updateSnapshot()
-      .done(_.bind(function() {
-        this.app.view.success('Upgrading the project to use the newest blueprint');
-        this.model.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+    return Promise.resolve( this.model.updateSnapshot() )
+      .then( function(response) {
+        view.app.view.success('Upgrading the project to use the newest blueprint');
+      }).catch( function(error) {
+        view.handleRequestError(error);
+      });
   },
 
   handleBuildAction: function(eve) {
-    var $btn = $(eve.currentTarget);
+    var view = this,
+        $btn = $(eve.currentTarget);
 
-    this.model.build()
-      .done(_.bind(function() {
-        this.app.view.success('Building project');
-        this.model.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+    return Promise.resolve( this.model.build() )
+      .then(function() {
+        view.app.view.success('Building project');
+      }).catch(function(error) {
+        view.handleRequestError( error );
+      });
   },
 
   handleBuildAndPublishAction: function(eve) {
-    var $btn = $(eve.currentTarget);
+    var view = this,
+        $btn = $(eve.currentTarget);
 
-    this.model.buildAndPublish()
-      .done(_.bind(function() {
-        this.app.view.success('Publishing project');
-        this.model.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+    return Promise.resolve( this.model.buildAndPublish() )
+      .then(function() {
+        view.app.view.success('Publishing project');
+      }).catch(function(error) {
+        view.handleRequestError(error);
+      });
   }
 });
 
-},{"../models":4,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],24:[function(require,module,exports){
+},{"../helpers":2,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],24:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30052,7 +30112,6 @@ var $ = require('jquery'),
     models = require('../models'),
     logger = require('../logger'),
     camelize = require('underscore.string/camelize'),
-    alert_template = require('../templates/alert.ejs'),
     BaseView = require('./BaseView');
 
 module.exports = BaseView.extend({
@@ -30075,7 +30134,7 @@ module.exports = BaseView.extend({
     this.app.trigger('loadingStart');
     logger.debug('handleForm');
 
-    var inst, Model,
+    var inst, Model, view = this,
         $form = $(eve.currentTarget),
         values = this.formValues($form),
         model_class = $form.data('model'),
@@ -30086,11 +30145,8 @@ module.exports = BaseView.extend({
     $form.find('[type=submit]').button('loading');
 
     if(model_class && action === 'new') {
-      Model = models[model_class];
-      this.hook('beforeSubmit', $form, values, action, Model);
-      inst = new Model();
+      inst = new models[model_class]();
     } else if(_.isObject(this.model) && action === 'edit') {
-      this.hook('beforeSubmit', $form, values, action, this.model);
       inst = this.model;
     } else if ($form.attr('method').toLowerCase() === 'get') {
       // if the method attr is `get` then we can navigate to that new
@@ -30102,37 +30158,37 @@ module.exports = BaseView.extend({
       return;
     } else { throw "Don't know how to handle this form"; }
 
-    inst.set(values);
-    if(!this.formValidate(inst, $form)) {
-      $form.find('[type=submit]').button('reset');
-      logger.debug('form is not valid');
-      return false;
-    }
+    return this.hook('beforeSubmit', $form, values, action, inst)
+      .then(function() {
+        inst.set(values);
+        if(!view.formValidate(inst, $form)) {
+          $form.find('[type=submit]').button('reset');
+          logger.debug('form is not valid');
+          throw 'Form is not valid';
+        }
 
-    logger.debug('form is valid, saving...');
+        logger.debug('form is valid, saving...');
 
-    inst.save()
-      .done(_.bind(function() {
-        $form.find('[type=submit]').button('reset');
+        return Promise.resolve( inst.save() );
+      }).then(function(data) {
         logger.debug('form finished saving');
-        if(action === 'new') {
-          this.app.view.success('New '+model_class+' saved');
+
+        if ( action === 'new' ) {
+          view.app.view.success('New '+model_class+' saved');
         } else {
-          this.app.view.success(model_class+' updates saved');
+          view.app.view.success(model_class+' updates saved');
         }
-        if(next === 'show') {
-          Backbone.history.navigate(this.model.url(), {trigger: true});
-        } else if(next){
+
+        if ( next === 'show' ) {
+          Backbone.history.navigate(view.model.url(), {trigger: true});
+        } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
-        } else {
-          if(_.isObject(this.collection)) {
-            this.collection.fetch();
-          } else if(_.isObject(this.model)) {
-            this.model.fetch();
-          }
         }
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+      }).catch(function(error) {
+        view.handleRequestError(error);
+      }).then(function() {
+        $form.find('[type=submit]').button('reset');
+      });
   },
 
   formValues: function($form) {
@@ -30150,45 +30206,54 @@ module.exports = BaseView.extend({
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+
     this.app.trigger('loadingStart');
     var $btn = $(eve.currentTarget),
         action = $btn.data('action');
     $btn.button('loading');
-    this.hook(camelize('handle-' + action + '-action'), eve);
+    this.hook(camelize('handle-' + action + '-action'), eve)
+      .then(function() {
+        $btn.button('reset');
+      });
   },
 
   handleDeleteAction: function(eve) {
-    var inst,
+    var inst, view = this,
         $btn = $(eve.currentTarget),
         model_class = $btn.data('model'),
-        model_id = $btn.data('model-id'),
-        next = $btn.data('next');
+        model_id = $btn.data('model-id');
+
+    if ( model_class && model_id ) {
+      inst = new models[model_class]({id: model_id});
+    } else {
+      inst = this.model;
+    }
 
     if(window.confirm('Are you sure you want to delete this?')) {
-      inst = new models[model_class]({id: model_id});
-      inst.destroy()
-        .done(_.bind(function() {
-          this.app.view.success('Deleted '+model_class);
-          if(_.isObject(this.model)) {
-            Backbone.history.navigate(this.model.urlRoot, {trigger: true});
-          } else {
-            this.collection.fetch();
-          }
-        }, this))
-        .fail(_.bind(this.handleRequestError, this));
-    } else {
-      $btn.button('reset');
+      return Promise.resolve( inst.destroy() )
+        .then(function(response) {
+            view.app.view.success( 'Deleted ' + model_class );
+            if( _.isObject(view.model) ) {
+              Backbone.history.navigate(
+                view.model.urlRoot, {trigger: true} );
+            } else {
+              view.collection.remove( inst );
+              return Promise.resolve( view.collection.fetch() );
+            }
+        }).catch(function(error) {
+          view.handleRequestError(error);
+        });
     }
   },
 
-  handleRequestError: function(xhr, status, error){
-    if(error === 'Bad Request') {
-      var data = $.parseJSON(xhr.responseText);
-      this.app.view.error(data.error);
+  handleRequestError: function(xhr){
+    if ( xhr.statusText === 'Bad Request' ) {
+      var data = $.parseJSON( xhr.responseText );
+      this.app.view.error( data.error );
     } else {
-      this.app.view.error('Something bad happened... Please reload and try again');
+      this.app.view.error( 'Something bad happened... Please reload and try again' );
     }
-    logger.error("REQUEST FAILED!!", xhr, status, error);
+    logger.error("REQUEST FAILED!!", xhr);
   },
 
   submitForm: function(eve) {
@@ -30207,7 +30272,7 @@ module.exports = BaseView.extend({
 });
 
 
-},{"../logger":3,"../models":4,"../templates/alert.ejs":6,"./BaseView":20,"backbone":27,"jquery":54,"underscore":127,"underscore.string/camelize":61}],25:[function(require,module,exports){
+},{"../logger":4,"../models":5,"./BaseView":20,"backbone":27,"jquery":54,"underscore":127,"underscore.string/camelize":61}],25:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30233,7 +30298,7 @@ module.exports = FormView.extend({
   }
 });
 
-},{"../models":4,"../templates/blueprint_list.ejs":10,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],26:[function(require,module,exports){
+},{"../models":5,"../templates/blueprint_list.ejs":10,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],26:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30247,9 +30312,9 @@ module.exports = FormView.extend({
 
   handleUpdateAction: function(eve) {
     var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+        model_class = $btn.data('model'),
+        model_id = $btn.data('model-id'),
+        inst = new models[model_class]({id: model_id});
 
     inst.updateSnapshot()
       .done(_.bind(function() {
@@ -30261,9 +30326,9 @@ module.exports = FormView.extend({
 
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+        model_class = $btn.data('model'),
+        model_id = $btn.data('model-id'),
+        inst = new models[model_class]({id: model_id});
 
     inst.build()
       .done(_.bind(function() {
@@ -30274,7 +30339,7 @@ module.exports = FormView.extend({
   }
 });
 
-},{"../models":4,"../templates/project_list.ejs":16,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],27:[function(require,module,exports){
+},{"../models":5,"../templates/project_list.ejs":16,"./FormView":24,"backbone":27,"jquery":54,"underscore":127}],27:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

@@ -6,11 +6,11 @@
     <p class="text-muted">
       Status:
       <% if(model.get('status') == 'ready') { %>
-      <span class="text-success"><i class="icon-ok"></i><%=s.capitalize(model.get('status')) %></span>
+      <span class="text-success"><i class="icon-ok"></i><%=capitalize(model.get('status')) %></span>
       <% } else if(model.get('status') == 'broken') { %>
-      <span class="text-danger"><i class="icon-alert"></i><%=s.capitalize(model.get('status')) %></span>
+      <span class="text-danger"><i class="icon-alert"></i><%=capitalize(model.get('status')) %></span>
       <% } else { %>
-      <span class="text-warning"><i class="icon-info"></i><%=s.capitalize(model.get('status')) %></span>
+      <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
       <% } %>
     </p>
     <% } %>
@@ -79,12 +79,14 @@
               <button type="submit" class="btn btn-primary"
                       data-loading-text="Saving...">Save changes</button>
 
-              <% if(!model.isNew()) { %>
+              <% if ( !model.isNew() ) { %>
               <button type="button" class="btn btn-default"
+                      <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
                       data-action="update" data-model="Blueprint"
                       data-loading-text="Upgrading..."
                       data-model-id="<%=model.get('slug') %>">Upgrade</button>
               <button type="button" class="btn btn-danger"
+                      <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
                       data-action="delete" data-model="Blueprint"
                       data-next="/blueprints"
                       data-loading-text="Deleting..."
@@ -93,10 +95,10 @@
             </form>
           </div>
           <div class="col-md-6">
-            <% if(!model.isNew()) { %>
+            <% if ( !model.isNew() ) { %>
             <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
             <p><strong>Type:</strong> <%=model.get('type') %></p>
-            <% if(model.has('config')) { %>
+            <% if ( model.has('config') ) { %>
             <p class="margin-bottom"><%=model.get('config').description %></p>
             <% } %>
             <% } %>

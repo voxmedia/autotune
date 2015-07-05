@@ -11,9 +11,9 @@ module.exports = FormView.extend({
 
   handleUpdateAction: function(eve) {
     var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+        model_class = $btn.data('model'),
+        model_id = $btn.data('model-id'),
+        inst = new models[model_class]({id: model_id});
 
     inst.updateSnapshot()
       .done(_.bind(function() {
@@ -25,9 +25,9 @@ module.exports = FormView.extend({
 
   handleBuildAction: function(eve) {
     var $btn = $(eve.currentTarget),
-    model_class = $btn.data('model'),
-    model_id = $btn.data('model-id'),
-    inst = new models[model_class]({id: model_id});
+        model_class = $btn.data('model'),
+        model_id = $btn.data('model-id'),
+        inst = new models[model_class]({id: model_id});
 
     inst.build()
       .done(_.bind(function() {

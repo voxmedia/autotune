@@ -4,6 +4,7 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
+    helpers = require('../helpers'),
     FormView = require('./FormView');
 
 function pluckAttr(models, attribute) {
@@ -13,43 +14,43 @@ function pluckAttr(models, attribute) {
 module.exports = FormView.extend({
   template: require('../templates/project.ejs'),
 
-  afterInit: function() {
-    this.setupBlueprint();
+  afterInit: function() {},
+
+  beforeRender: function() {
+    if ( _.isUndefined(this.model.blueprint) && this.model.has( 'blueprint_id' ) ) {
+      this.model.blueprint = new models.Blueprint(
+        { id: this.model.get( 'blueprint_id' ) });
+    }
+
+    if( ! this.model.blueprint.has( 'config' ) ) {
+      this.app.trigger( 'loadingStart' );
+      return Promise.resolve( this.model.blueprint.fetch() );
+    }
   },
 
   afterRender: function() {
-    if ( _.isUndefined( this.model.blueprint ) ) {
-      this.setupBlueprint();
-    }
-
+    var view = this, promises = [];
     if ( this.model.isPublished() ) {
-      $.get(this.model.getPublishUrl(window.location.protocol.replace(':', '')) + 'embed.txt',
-            function(data, status) {
-              data = data.replace(/(?:\r\n|\r|\n)/gm, '');
-              $('#embed textarea').text( data );
-            });
+      var proto = window.location.protocol.replace( ':', '' ),
+          embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
+
+      promises.push( Promise
+        .resolve( $.get( embedUrl ) )
+        .then( function(data) {
+          console.log('loaded embed');
+          data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
+          view.$( '#embed textarea' ).text( data );
+        }) );
     }
 
-    if( ! this.model.blueprint.has('config') ) {
-      this.app.trigger('loadingStart');
-      this.model.blueprint.fetch();
-    } else {
-      this.renderForm();
-    }
+    promises.push( new Promise( function(resolve, reject) {
+      view.renderForm(resolve, reject);
+    } ) );
+
+    return Promise.all(promises);
   },
 
-  setupBlueprint: function() {
-    if ( _.isUndefined(this.model.blueprint) && this.model.has('blueprint_id') ) {
-      this.model.blueprint = new models.Blueprint({ id: this.model.get('blueprint_id') });
-    }
-
-    if ( _.isObject( this.model.blueprint ) ) {
-      this.listenTo(this.model.blueprint, 'sync', this.render);
-      this.listenTo(this.model.blueprint, 'error', this.handleSyncError);
-    }
-  },
-
-  renderForm: function() {
+  renderForm: function(resolve, reject) {
     var $form = this.$el.find('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes;
@@ -64,6 +65,7 @@ module.exports = FormView.extend({
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
+      reject('This blueprint does not have a form!');
     } else {
       var themes = this.app.themes.filter(function(theme) {
             if ( _.isEqual(config_themes, ['generic']) ) {
@@ -126,10 +128,13 @@ module.exports = FormView.extend({
         },
         "options": {
           "form": options_form,
-          "fields": options_fields
+          "fields": options_fields,
+          "focus": this.firstRender
         },
         "postRender": _.bind(function(control) {
-          control.form.form.append( button_tmpl(this) );
+          this.alpaca = control;
+          control.form.form.append( helpers.render(button_tmpl, this.getTemplateObj()) );
+          resolve();
         }, this)
       };
 
@@ -165,42 +170,45 @@ module.exports = FormView.extend({
       control.form.refreshValidationState(true);
       $form.find('#validation-error').removeClass('hidden');
     } else {
-      $form.find('#success-message').removeClass('hidden');
+      $form.find('#resolve-message').removeClass('hidden');
       $form.find('#validation-error').addClass('hidden');
     }
     return valid;
   },
 
   handleUpdateAction: function(eve) {
-    var $btn = $(eve.currentTarget);
+    var view = this,
+        $btn = $(eve.currentTarget);
 
-    this.model.updateSnapshot()
-      .done(_.bind(function() {
-        this.app.view.success('Upgrading the project to use the newest blueprint');
-        this.model.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+    return Promise.resolve( this.model.updateSnapshot() )
+      .then( function(response) {
+        view.app.view.success('Upgrading the project to use the newest blueprint');
+      }).catch( function(error) {
+        view.handleRequestError(error);
+      });
   },
 
   handleBuildAction: function(eve) {
-    var $btn = $(eve.currentTarget);
+    var view = this,
+        $btn = $(eve.currentTarget);
 
-    this.model.build()
-      .done(_.bind(function() {
-        this.app.view.success('Building project');
-        this.model.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+    return Promise.resolve( this.model.build() )
+      .then(function() {
+        view.app.view.success('Building project');
+      }).catch(function(error) {
+        view.handleRequestError( error );
+      });
   },
 
   handleBuildAndPublishAction: function(eve) {
-    var $btn = $(eve.currentTarget);
+    var view = this,
+        $btn = $(eve.currentTarget);
 
-    this.model.buildAndPublish()
-      .done(_.bind(function() {
-        this.app.view.success('Publishing project');
-        this.model.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+    return Promise.resolve( this.model.buildAndPublish() )
+      .then(function() {
+        view.app.view.success('Publishing project');
+      }).catch(function(error) {
+        view.handleRequestError(error);
+      });
   }
 });

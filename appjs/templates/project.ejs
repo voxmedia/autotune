@@ -71,7 +71,7 @@
       <p>Status:
         <% if ( model.hasStatus('broken') ) { %><span class="text-danger">Broken</span>
         <% } else if ( model.hasStatus('built') ) { %><span class="text-success">Built</span>
-        <% } else { %><span class="text-warning"><%=s.capitalize(model.get('status')) %></span><% } %>
+        <% } else { %><span class="text-warning"><%=capitalize(model.get('status')) %></span><% } %>
       </p>
 
       <p>
