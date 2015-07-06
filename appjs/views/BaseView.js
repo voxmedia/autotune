@@ -111,6 +111,12 @@ module.exports = Backbone.View.extend({
     return this;
   },
 
+  extend: function(child) {
+    var view = Backbone.View.extend.apply(this, arguments);
+    view.prototype.events = _.extend({}, this.prototype.events, child.events);
+    return view;
+  },
+
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
