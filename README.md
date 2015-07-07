@@ -12,9 +12,13 @@ brought to you by the Editorial Products team at Vox Media.
 
 See project [wiki](https://github.com/voxmedia/autotune/wiki) for documentation on getting started.
 
-- [Getting started](https://github.com/voxmedia/autotune/wiki/setup)
-- [How to create a blueprint](https://github.com/voxmedia/autotune/wiki/How-to-create-a-blueprint)
-- [Example blueprints](https://github.com/voxmedia/autotune/wiki/Example-blueprints)
+- [Getting started](https://github.com/voxmedia/autotune/wiki/getting-started)
+- [Setup](https://github.com/voxmedia/autotune/wiki/setup)
+- [How does it work?](https://github.com/voxmedia/autotune/wiki/How-does-it-work?)
+- [Blueprints](https://github.com/voxmedia/autotune/wiki/Getting-started#blueprints)
+  - [Using an existing blueprint](https://github.com/voxmedia/autotune/wiki/Using-a-blueprint)
+  - [Creating a new blueprint](https://github.com/voxmedia/autotune/wiki/How-to-create-a-blueprint)
+  - [Example blueprints](https://github.com/voxmedia/autotune/wiki/Example-blueprints)
 - [Troubleshooting](https://github.com/voxmedia/autotune/wiki/Troubleshooting)
 - [Reporting bugs](https://github.com/voxmedia/autotune/wiki/Reporting-bugs)
 - [Contribution guidelines](https://github.com/voxmedia/autotune/wiki/Contribution-guidelines)
