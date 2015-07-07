@@ -1,7 +1,7 @@
 # ![Autotune Logo](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
 
 
-**Current project status**: V1
+**Current project status**: v1.0
 
 ---
 
