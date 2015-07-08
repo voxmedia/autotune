@@ -1227,7 +1227,7 @@ __p+='>\n        ';
  if(query.search) { 
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
-__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project lol</a>\n      </td>\n      <td class="text-right" colspan="5">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
+__p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="5">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
  if(query.theme || query.blueprint_type || query.status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 

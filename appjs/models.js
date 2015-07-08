@@ -229,7 +229,17 @@ exports.Project = Backbone.Model.extend({
 
 exports.ProjectCollection = PageableCollection.extend({
   model: exports.Project,
-  url: '/projects'
+  url: '/projects',
+
+  state: {
+    firstPage: 0,
+    currentPage: 2
+  },
+
+  queryParams: {
+    currentPage: 'current_page',
+    pageSize: 'page_size'
+  }
 });
 
 exports.Blueprint = Backbone.Model.extend({
