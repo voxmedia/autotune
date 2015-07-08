@@ -24,7 +24,7 @@ module Autotune
     def edit; end
 
     def index
-      @projects = Project.all.paginate(page: params[:page], per_page: 20)
+      @projects = Project
 
       # Filter and search query
       query = select_from_get :status
@@ -46,9 +46,9 @@ module Autotune
       end
 
       if query.empty?
-        @projects = @projects.all
+        @projects = @projects.all.paginate(:page => params[:page], :per_page => 20)
       else
-        @projects = @projects.where(query)
+        @projects = @projects.where(query).paginate(:page => params[:page], :per_page => 20)
       end
     end
 
