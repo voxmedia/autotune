@@ -29,7 +29,7 @@
             (<a href="/blueprints">clear</a>)
           <% } %>
           &nbsp;
-          <div class="select">  
+          <div class="select">
             <select name="type" id="type" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
             <% _.each(app.config.blueprint_types, function(type) { %>
@@ -38,7 +38,7 @@
             <% }) %>
             </select>
           </div>
-          <div class="select">  
+          <div class="select">
             <select name="tag" id="tag" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
             <% _.each(app.config.blueprint_tags, function(tag) { %>
@@ -47,7 +47,7 @@
             <% }) %>
             </select>
           </div>
-          <div class="select">  
+          <div class="select">
             <select name="status" id="status" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
             <% _.each(app.config.blueprint_statuses, function(status) { %>
@@ -89,10 +89,15 @@
     </td>
     <td class="text-right" colspan="2">
       <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
-      <a data-tooltip="update" href="#" data-action="update" data-model="Blueprint"
-                data-model-id="<%= item.attributes.slug %>"><span class="icon-refresh"></span></a>
-      <a data-tooltip="delete" href="#" data-action="delete" data-model="Blueprint"
-                data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
+      <a data-tooltip="update" href="#"
+         data-action-message="Updating the blueprint..."
+         data-action="update" data-model="Blueprint" data-action-next="reload"
+         data-model-id="<%= item.attributes.slug %>"><span class="icon-refresh"></span></a>
+      <a data-tooltip="delete" href="#"
+         data-action-message="Blueprint deleted"
+         data-action-confirm="Are you sure you wish to delete this?"
+         data-action="destroy" data-model="Blueprint" data-action-next="reload"
+         data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
     </td>
   </tr>
 <% }); %>

@@ -4,7 +4,7 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="/">Autotune</a>
         <div class="navbar-text" id="spinner">
-            <img src="<%=app.config.spinner %>">
+          <%=render(require('./spinner.ejs'), {color:'white'})%>
         </div>
         <ul class="nav navbar-nav">
           <li data-tab="projects"><a href="/projects">Projects</a></li>
@@ -20,5 +20,9 @@
 </div>
 <div class="row">
   <div id="flash"></div>
-  <div class="col-lg-8 col-lg-offset-2" id="main"></div>
+  <div class="col-lg-8 col-lg-offset-2" id="main">
+    <div style="max-width:10em;margin:5em auto;">
+    <%=render(require('./spinner.ejs'))%>
+    </div>
+  </div>
 </div>

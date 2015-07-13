@@ -60,6 +60,7 @@ exports.Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   build: function() {
+    this.set({'status': 'building'});
     return getEmptyJSON(this.url() + '/build');
   },
 
@@ -68,6 +69,7 @@ exports.Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   buildAndPublish: function() {
+    this.set({'status': 'building'});
     return getEmptyJSON(this.url() + '/build_and_publish');
   },
 
@@ -76,6 +78,7 @@ exports.Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   updateSnapshot: function() {
+    this.set({'status': 'updating'});
     return getEmptyJSON(this.url() + '/update_snapshot');
   },
 
@@ -272,6 +275,7 @@ exports.Blueprint = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   updateRepo: function() {
+    this.set({'status': 'updating'});
     return getEmptyJSON(this.url() + '/update_repo');
   }
 });

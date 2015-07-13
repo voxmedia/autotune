@@ -82,14 +82,18 @@
               <% if ( !model.isNew() ) { %>
               <button type="button" class="btn btn-default"
                       <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
-                      data-action="update" data-model="Blueprint"
+                      data-action-message="Upgrade started"
                       data-loading-text="Upgrading..."
+                      data-action="update" data-model="Blueprint"
+                      data-action-next="reload"
                       data-model-id="<%=model.get('slug') %>">Upgrade</button>
               <button type="button" class="btn btn-danger"
                       <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
-                      data-action="delete" data-model="Blueprint"
-                      data-next="/blueprints"
+                      data-action-message="Project deleted"
+                      data-action-confirm="Are you sure you wish to delete this?"
                       data-loading-text="Deleting..."
+                      data-action="destroy"
+                      data-action-next="/blueprints" data-model="Blueprint"
                       data-model-id="<%=model.get('slug') %>">Delete</button>
               <% } %>
             </form>

@@ -166,22 +166,6 @@ var setup = function(formData) {
 module.exports = FormView.extend({
   template: require('../templates/blueprint.ejs'),
 
-  handleUpdateAction: function(eve) {
-    var view = this,
-        $btn = $(eve.currentTarget),
-        model_class = $btn.data('model'),
-        model_id = $btn.data('model-id'),
-        inst = new models[model_class]({id: model_id});
-
-    return Promise.resolve( inst.updateRepo() )
-      .then(function() {
-        view.app.view.success('Updating blueprint repo');
-      })
-      .catch(function(error) {
-        view.handleRequestError( error );
-      });
-  },
-
   afterRender: function() {
     if ( !this.model.isNew() ) {
       setup(this.model.get('config').form);

@@ -4,9 +4,9 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     camelize = require('underscore.string/camelize'),
-    models = require('../models'),
-    logger = require('../logger'),
-    helpers = require('../helpers');
+    models = require('../../models'),
+    logger = require('../../logger'),
+    helpers = require('../../helpers');
 
 module.exports = {
   events: {
@@ -57,7 +57,7 @@ module.exports = {
 
         logger.debug('form is valid, saving...');
 
-        return Promise.resolve( inst.save() );
+        return inst.save();
       }).then(function(data) {
         logger.debug('form finished saving');
 

@@ -7,44 +7,15 @@ var $ = require('jquery'),
     logger = require('../logger'),
     helpers = require('../helpers');
 
-module.exports = Backbone.View.extend({
-  events: {
-    'click a[href]': 'handleLink'
-  },
-
+var BaseView = Backbone.View.extend({
+  loaded: true,
+  firstRender: true,
   initialize: function(options) {
-    this.loaded = this.firstRender = true;
-
     if (_.isObject(options)) {
-      _.extend(this, options);
-    }
-
-    if(_.isObject(this.collection)) {
-      this.listenTo(this.collection, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
-      this.listenTo(this.collection, 'reset change sort sync', _.debounce(this.render, 300));
-      this.listenTo(this.collection, 'error', this.handleSyncError);
-    }
-
-    if(_.isObject(this.model)) {
-      this.listenTo(this.model, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
-      this.listenTo(this.model, 'reset change sync', _.debounce(this.render, 300));
-      this.listenTo(this.model, 'error', this.handleSyncError);
+      _.extend(this, _.pick(options, 'app', 'query'));
     }
 
     this.hook('afterInit', options);
-  },
-
-  handleLink: function(eve) {
-    var href = $(eve.currentTarget).attr('href'),
-        target = $(eve.currentTarget).attr('target');
-    if (href && !target && !/^(https?:\/\/|#)/.test(href) && !eve.metaKey && !eve.ctrlKey) {
-      // only handle this link if it's a fragment and you didn't hold down a modifer key
-      eve.preventDefault();
-      eve.stopPropagation();
-      Backbone.history.navigate(
-        $(eve.currentTarget).attr('href'),
-        {trigger: true});
-    }
   },
 
   render: function() {
@@ -52,51 +23,39 @@ module.exports = Backbone.View.extend({
         activeTab = this.$('.nav-tabs .active a').attr('href'),
         view = this;
 
-    if ( this.loaded ) {
-      return this.hook('beforeRender').then(function() {
-        view.$el.html( helpers.render( view.template, view.getTemplateObj() ) );
+    // Only render if this view is loaded
+    if ( !this.loaded ) { return Promise.resolve(); }
 
-        return view.hook( 'afterRender' );
-      }).then(function() {
-        if ( view.firstRender ) {
-          logger.debug( 'first render' );
-          view.firstRender = false;
-        } else {
-          logger.debug('re-render; fix scroll and tabs', scrollPos, activeTab, $(document).height());
-          view.$('.nav-tabs a[href='+activeTab+']').tab('show');
-          $(window).scrollTop(scrollPos);
-        }
+    // Do some renderin'. First up: beforeRender()
+    return view.hook( 'beforeRender' ).then(function() {
+      // Generate the element using template and templateData()
+      view.$el.html(
+        helpers.render(
+          view.template, view.templateData() ) );
 
-        view.app.trigger( 'loadingStop' );
-      });
-    } else {
-      return Promise.resolve();
-    }
+      return view.hook( 'afterRender' );
+    }).then(function() {
+      if ( view.firstRender ) {
+        logger.debug( 'first render' );
+        view.firstRender = false;
+      } else {
+        logger.debug('re-render; fix scroll and tabs',
+                     scrollPos, activeTab, $(document).height());
+        view.$('.nav-tabs a[href='+activeTab+']').tab('show');
+        $(window).scrollTop(scrollPos);
+      }
+
+      view.app.trigger( 'loadingStop' );
+    });
   },
 
-  getTemplateObj: function() {
+  templateData: function() {
     return {
       model: this.model,
       collection: this.collection,
       app: this.app,
       query: this.query
     };
-  },
-
-  handleSyncError: function(model_or_collection, resp, options) {
-    var tmpl,
-        tmplObj = {
-          app: this.app, resp: resp, options: options,
-          model_or_collection: model_or_collection };
-    if (resp.status === 404) {
-      tmpl = require('../templates/not_found.ejs');
-    } else if (resp.status === 403) {
-      tmpl = require('../templates/not_allowed.ejs');
-    } else {
-      tmpl = require('../templates/error.ejs');
-    }
-    this.$el.html(helpers.render(tmpl, tmplObj));
-    this.app.trigger('loadingStop');
   },
 
   load: function(parentView) {
@@ -109,12 +68,6 @@ module.exports = Backbone.View.extend({
     this.loaded = false;
     if ( this.parentView ) { this.parentView = null; }
     return this;
-  },
-
-  extend: function(child) {
-    var view = Backbone.View.extend.apply(this, arguments);
-    view.prototype.events = _.extend({}, this.prototype.events, child.events);
-    return view;
   },
 
   hook: function() {
@@ -133,3 +86,24 @@ module.exports = Backbone.View.extend({
   }
 });
 
+/*
+ * Improved extend function that takes multiple objects. Also merges all event objects instead
+ * of overridding.
+ *
+ * http://stackoverflow.com/questions/9403675/backbone-view-inherit-and-extend-events-from-parent
+ */
+BaseView.extend = function() {
+  var obj = _.extend.apply(_, arguments);
+
+  obj.events = _.extend(
+    _.reduce(
+      _.pluck(arguments, 'events'),
+      function(m, o) { return _.extend(m, o); },
+      {} ),
+    this.prototype.events
+  );
+
+  return Backbone.View.extend.call(this, obj);
+};
+
+module.exports = BaseView;

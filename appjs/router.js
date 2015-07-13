@@ -44,13 +44,18 @@ module.exports = Backbone.Router.extend({
 
   listBlueprints: function(params) {
     var blueprints = this.app.blueprints,
-        query = {}, view;
+        app = this.app, query = {}, view;
     if(params) { query = queryString.parse(params); }
-    view = new views.ListBlueprints({ collection: blueprints, query: query, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('blueprints');
-    blueprints.fetch();
+
+    blueprints.fetch().then(function() {
+      view = new views.ListBlueprints({ collection: blueprints, query: query, app: app });
+      view.render();
+      app.view
+        .display( view )
+        .setTab('blueprints');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   },
 
   newBlueprint: function() {
@@ -59,76 +64,118 @@ module.exports = Backbone.Router.extend({
     this.app.view
       .display( view )
       .setTab('blueprints');
+
     view.render();
   },
 
   editBlueprint: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug }),
+        maybeFetch = Promise.resolve(),
+        app = this.app, view;
 
     if ( !blueprint ) {
       blueprint = new models.Blueprint({ id: slug });
       this.app.blueprints.add(blueprint);
+      maybeFetch = blueprint.fetch();
     }
 
-    var view = new views.EditBlueprint({ model: blueprint, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('blueprints');
-    blueprint.fetch();
+    maybeFetch.then(function() {
+      var view = new views.EditBlueprint({ model: blueprint, app: app });
+      view.render();
+      app.view
+        .display( view )
+        .setTab('blueprints');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   },
 
   chooseBlueprint: function(params) {
     var blueprints = this.app.blueprints,
-        query = {}, view;
+        app = this.app, query = {}, view;
+
     if(params) { query = queryString.parse(params); }
     query['status'] = 'ready';
-    view = new views.ChooseBlueprint({ collection: blueprints, query: query, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('projects');
-    blueprints.fetch();
+
+    blueprints.fetch().then(function() {
+      view = new views.ChooseBlueprint({ collection: blueprints, query: query, app: app });
+      view.render();
+      app.view
+        .display( view )
+        .setTab('projects');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   },
 
   listProjects: function(params) {
     var projects = this.app.projects,
-        query = {}, view;
+        app = this.app, query = {}, view;
+
     if(params) { query = queryString.parse(params); }
-    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('projects');
-    projects.fetch();
+
+    projects.fetch().then(function() {
+      view = new views.ListProjects({ collection: projects, query: query, app: app });
+      view.render();
+      app.view
+        .display( view )
+        .setTab('projects');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   },
 
   newProject: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug });
+    var blueprint = this.app.blueprints.findWhere({ slug: slug }),
+        maybeFetch = Promise.resolve(),
+        app = this.app, view, project;
 
     if ( !blueprint ) {
       blueprint = new models.Blueprint({ id: slug });
       this.app.blueprints.add(blueprint);
+      maybeFetch = blueprint.fetch();
     }
 
-    var project = new models.Project({ blueprint: blueprint }),
-        view = new views.EditProject({ model: project, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('projects');
-    blueprint.fetch()
-      .then(function() { view.render(); });
+    maybeFetch.then(function() {
+      project = new models.Project({ blueprint: blueprint });
+      view = new views.EditProject({ model: project, app: app });
+      view.render();
+      app.view
+        .display( view )
+        .setTab('projects');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   },
 
   editProject: function(slug) {
-    var project = this.app.projects.findWhere({ slug: slug });
+    var project = this.app.projects.findWhere({ slug: slug }),
+        maybeFetch = Promise.resolve('some value'),
+        app = this.app, view, blueprint;
 
     if ( !project ) {
       project = new models.Project({ id: slug });
       this.app.projects.add(project);
+      maybeFetch = project.fetch();
     }
 
-    var view = new views.EditProject({ model: project, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('projects');
-    project.fetch();
+    maybeFetch.then(function() {
+      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
+
+      if ( !blueprint ) {
+        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
+        app.blueprints.add(blueprint);
+        return blueprint.fetch();
+      }
+    }).then(function() {
+      project.blueprint = blueprint;
+      view = new views.EditProject({ model: project, app: app });
+      view.render();
+      app.view
+        .display( view )
+        .setTab('projects');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   }
 });

@@ -58,7 +58,7 @@
       <div class="row">
         <div class="col-md-8">
       <% } %>
-          <div id="projectForm"></div>
+        <div id="projectForm"></div>
       <% if ( model.hasInstructions() ) { %>
         </div>
         <div class="col-md-4"><%=model.instructions() %></div>
@@ -76,10 +76,14 @@
 
       <p>
         <button type="button" class="btn btn-default"
-                data-action="build" data-model="Project"
+                <% if ( model.hasStatus('building', 'updating') ) { %>disabled="disabled"<% } %>
+                data-action-message="Build started" data-loading-text="Starting build..."
+                data-action="build" data-model="Project" data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>">Rebuild</button>
         <button type="button" class="btn btn-warning"
-                data-action="update" data-model="Project"
+                <% if ( model.hasStatus('building', 'updating') ) { %>disabled="disabled"<% } %>
+                data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
+                data-action="update-snapshot" data-model="Project" data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>">Upgrade</button>
       </p>
 

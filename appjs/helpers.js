@@ -5,9 +5,6 @@ var $ = require('jquery'),
 
 module.exports = {
   render: function(template, templateObj) {
-    if ( _.isString(template) ) {
-      template = require('./templates/' + template + '.ejs');
-    }
     templateObj = _.extend(templateObj || {}, this, require('underscore.string'));
 
     return template(templateObj);

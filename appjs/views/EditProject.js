@@ -5,6 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     helpers = require('../helpers'),
+    logger = require('../logger'),
     FormView = require('./FormView');
 
 function pluckAttr(models, attribute) {
@@ -13,20 +14,6 @@ function pluckAttr(models, attribute) {
 
 module.exports = FormView.extend({
   template: require('../templates/project.ejs'),
-
-  afterInit: function() {},
-
-  beforeRender: function() {
-    if ( _.isUndefined(this.model.blueprint) && this.model.has( 'blueprint_id' ) ) {
-      this.model.blueprint = new models.Blueprint(
-        { id: this.model.get( 'blueprint_id' ) });
-    }
-
-    if( ! this.model.blueprint.has( 'config' ) ) {
-      this.app.trigger( 'loadingStart' );
-      return Promise.resolve( this.model.blueprint.fetch() );
-    }
-  },
 
   afterRender: function() {
     var view = this, promises = [];
@@ -37,9 +24,10 @@ module.exports = FormView.extend({
       promises.push( Promise
         .resolve( $.get( embedUrl ) )
         .then( function(data) {
-          console.log('loaded embed');
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
+        }).catch(function(error) {
+          logger.error(error);
         }) );
     }
 
@@ -133,7 +121,7 @@ module.exports = FormView.extend({
         },
         "postRender": _.bind(function(control) {
           this.alpaca = control;
-          control.form.form.append( helpers.render(button_tmpl, this.getTemplateObj()) );
+          control.form.form.append( helpers.render(button_tmpl, this.templateData()) );
           resolve();
         }, this)
       };
@@ -174,41 +162,5 @@ module.exports = FormView.extend({
       $form.find('#validation-error').addClass('hidden');
     }
     return valid;
-  },
-
-  handleUpdateAction: function(eve) {
-    var view = this,
-        $btn = $(eve.currentTarget);
-
-    return Promise.resolve( this.model.updateSnapshot() )
-      .then( function(response) {
-        view.app.view.success('Upgrading the project to use the newest blueprint');
-      }).catch( function(error) {
-        view.handleRequestError(error);
-      });
-  },
-
-  handleBuildAction: function(eve) {
-    var view = this,
-        $btn = $(eve.currentTarget);
-
-    return Promise.resolve( this.model.build() )
-      .then(function() {
-        view.app.view.success('Building project');
-      }).catch(function(error) {
-        view.handleRequestError( error );
-      });
-  },
-
-  handleBuildAndPublishAction: function(eve) {
-    var view = this,
-        $btn = $(eve.currentTarget);
-
-    return Promise.resolve( this.model.buildAndPublish() )
-      .then(function() {
-        view.app.view.success('Publishing project');
-      }).catch(function(error) {
-        view.handleRequestError(error);
-      });
   }
 });
