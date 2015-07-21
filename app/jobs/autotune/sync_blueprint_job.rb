@@ -6,7 +6,7 @@ module Autotune
     queue_as :default
 
     # do the deed
-    def perform(blueprint)
+    def perform(blueprint, status = 'testing')
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
@@ -44,7 +44,7 @@ module Autotune
       end
 
       # Blueprint is now ready for testing
-      blueprint.status = 'testing'
+      blueprint.status = status
       blueprint.save!
     rescue => exc
       # If the command failed, raise a red flag
