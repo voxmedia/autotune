@@ -46,9 +46,21 @@ module Autotune
       end
 
       if query.empty?
-        @projects = @projects.all.paginate(:page => params[:page], :per_page => 20)
+        @projects = @projects.all
       else
-        @projects = @projects.where(query).paginate(:page => params[:page], :per_page => 20)
+        @projects = @projects.where(query)
+      end
+
+      @projects = @projects.all.paginate(:page => params[:page], :per_page => 20)
+      current_page = @projects.current_page
+      prev_page = "#{posts_path(@projects)}?page=#{@projects.current_page-1}"
+      next_page = @projects.next_page
+      if prev_page && next_page
+        headers['Link'] = "<#{prev_page}>; rel=\"prev\", <#{next_page}>; rel=\"next\";"
+      elsif !prev_page
+        headers['Link'] = "<#{next_page}>; rel=\"next\";"
+      elsif !next_page
+        headers['Link'] = "<#{prev_page}>; rel=\"prev\";"
       end
     end
 
