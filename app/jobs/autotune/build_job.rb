@@ -6,7 +6,7 @@ module Autotune
   class BuildJob < ActiveJob::Base
     queue_as :default
 
-    def perform(project, mode = 'preview', force_sync = false)
+    def perform(project, target = :preview, force_sync = false)
       out = nil
       # Create a new repo object based on the projects working dir
       repo = WorkDir.repo(project.working_dir,
@@ -20,37 +20,39 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme.value,
-        'base_url' => (mode == :publish) ? project.publish_url : project.preview_url)
+        'theme' => project.theme.value)
+
+      # Get the deployer object
+      deployer = Autotune.find_deployment(target, project)
+
+      # Run the before build deployer hook
+      deployer.before_build(build_data, project)
 
       # Run the build
       repo.working_dir do
-        out = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
+        project.output = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
       end
+
+      # Find the dir of the built files
+      deploy_dir = repo.expand(project.deploy_dir)
 
       # Upload build
-      deploy_dir = project.blueprint_config['deploy_dir'] || 'build'
-      ws = WorkDir.website(repo.expand(deploy_dir))
-      if mode == 'publish'
-        ws_location = File.join(Rails.configuration.autotune.publish[:connect], project.slug)
-        ws.deploy(ws_location)
+      deployer.deploy(deploy_dir, project.slug)
 
-        # capture screenshot and save it
-        save_screenshots(repo.expand(deploy_dir), project.publish_url, ws_location)
+      # Create screenshots (has to happen after upload)
+      url = deployer.url_for(project.slug)
+      phantom = WorkDir.phantom(deploy_dir)
+      phantom.capture_screenshot(get_full_url(url)) if phantom.phantomjs?
 
-        # Save the results
-        project.update!(
-          :output => out, :status => 'built', :published_at => DateTime.current)
-      else
-        ws_location = File.join(Rails.configuration.autotune.preview[:connect], project.slug)
-        ws.deploy(ws_location)
-
-        # capture screenshot and save it
-        save_screenshots(repo.expand(deploy_dir), project.preview_url, ws_location)
-
-        # Save the results
-        project.update!(:output => out, :status => 'built')
+      # Upload screens
+      phantom.screenshots.each do |filename|
+        deployer.deploy_file(deploy_dir, project.slug, filename)
       end
+
+      # Set status and save project
+      project.status = 'built'
+      project.published_at = DateTime.current if target == :publish
+      project.save!
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
@@ -64,15 +66,6 @@ module Autotune
     def get_full_url(url)
       return url if url.start_with?('http')
       url.start_with?('//') ? 'http:' + url : 'http://localhost:3000' + url
-    end
-
-    def save_screenshots(build_dir, url, deploy_dir)
-      phantom = WorkDir.phantom(build_dir)
-      if phantom.phantomjs?
-        phantom.capture_screenshot(get_full_url(url))
-        screenshots_dir = WorkDir.website(File.join(build_dir, 'screenshots'))
-        screenshots_dir.deploy(File.join(deploy_dir, 'screenshots'))
-      end
     end
   end
 end

@@ -9,8 +9,6 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
     assert_equal autotune_blueprints(:example), b.blueprint
     assert_equal autotune_users(:developer), b.user
 
-    assert_not_nil Rails.configuration.autotune.preview
-
     assert_performed_jobs 0
 
     perform_enqueued_jobs do

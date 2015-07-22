@@ -40,6 +40,12 @@ module WorkDir
       Dir.exist?(expand path)
     end
 
+    def glob(pattern)
+      working_dir do
+        Dir.glob(pattern)
+      end
+    end
+
     # Get the path for or chdir into this repo
     def working_dir(&block)
       return Dir.chdir(@working_dir, &block) if block_given?

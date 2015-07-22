@@ -38,9 +38,11 @@ module Autotune
 
       # Stash the thumbnail
       if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
-        WorkDir.website(blueprint.working_dir).deploy_file(
-          blueprint.config['thumbnail'],
-          File.join(Rails.configuration.autotune.media[:connect], blueprint.slug))
+        deployer = Autotune.find_deployment(:media)
+        deployer.deploy_file(
+          blueprint.working_dir,
+          blueprint.slug,
+          blueprint.config['thumbnail'])
       end
 
       # Blueprint is now ready for testing
