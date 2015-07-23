@@ -11,6 +11,7 @@ module Autotune
 
     initializer 'autotune.init', :before => :load_config_initializers do |app|
       app.config.autotune = Config.new
+      Autotune.redis = Redis.new(:host => ENV['REDIS_SERVER'])
       # Figure out where we project our blueprints
       app.config.autotune.working_dir = File.expand_path(
         ENV['WORKING_DIR'] || './working', Rails.root)
