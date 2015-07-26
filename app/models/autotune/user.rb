@@ -5,11 +5,9 @@ module Autotune
     has_many :projects
     serialize :meta, JSON
 
-    validates :email, :api_key, :presence => true
-    validates :api_key, :email, :uniqueness => true
+    validates :api_key, :presence => true, :uniqueness => true
     validates :email,
-              :uniqueness => { :case_sensitive => false },
-              :format => { :with => /\A.+@.+\..+\z/ }
+              :uniqueness => { :case_sensitive => false }
     after_initialize :defaults
 
     def self.generate_api_key
@@ -29,9 +27,15 @@ module Autotune
       return if roles.nil?
       a = Authorization.new(
         auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
-      a.user = User
-        .create_with(:name => auth_hash['info']['name'], :meta => { 'roles' => roles })
-        .find_or_create_by!(:email => auth_hash['info']['email'])
+      if auth_hash['info']['email'].empty?
+        a.user = User.new
+      else
+        a.user = User.find_or_initialize_by(:email => auth_hash['info']['email'])
+      end
+      a.user.attributes = {
+        :name => auth_hash['info']['name'],
+        :meta => { 'roles' => roles }
+      }
       a.save!
       a.user
     end
