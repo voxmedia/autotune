@@ -5,7 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    FormView = require('./FormView'),
+    BaseView = require('./BaseView'),
     Alpaca = require('../vendor/alpaca'),
     ace = require('brace');
 
@@ -163,12 +163,16 @@ var setup = function(formData) {
   doRefresh($("#previewDiv"));
 };
 
-module.exports = FormView.extend({
+module.exports = BaseView.extend({
   template: require('../templates/blueprint.ejs'),
+
+  afterInit: function() {
+    this.listenTo(this.model, 'change', this.render);
+  },
 
   afterRender: function() {
     if ( !this.model.isNew() ) {
       setup(this.model.get('config').form);
     }
   }
-});
+}, require('./mixins/actions'), require('./mixins/form') );

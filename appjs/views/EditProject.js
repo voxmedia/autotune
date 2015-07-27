@@ -6,14 +6,18 @@ var $ = require('jquery'),
     models = require('../models'),
     helpers = require('../helpers'),
     logger = require('../logger'),
-    FormView = require('./FormView');
+    BaseView = require('./BaseView');
 
 function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
 
-module.exports = FormView.extend({
+module.exports = BaseView.extend({
   template: require('../templates/project.ejs'),
+
+  afterInit: function() {
+    this.listenTo(this.model, 'change', this.render);
+  },
 
   afterRender: function() {
     var view = this, promises = [];
@@ -163,4 +167,4 @@ module.exports = FormView.extend({
     }
     return valid;
   }
-});
+}, require('./mixins/actions'), require('./mixins/form') );
