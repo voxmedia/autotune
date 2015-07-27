@@ -73,10 +73,12 @@ module Autotune
         end
       end
 
-      # make sure data doesn't contain title, slug or theme
-      @project.data.delete('title')
-      @project.data.delete('slug')
-      @project.data.delete('theme')
+      unless @project.data.nil?
+        # make sure data doesn't contain title, slug or theme
+        @project.data.delete('title')
+        @project.data.delete('slug')
+        @project.data.delete('theme')
+      end
 
       if @project.valid?
         @project.save
