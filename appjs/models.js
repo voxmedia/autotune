@@ -233,7 +233,8 @@ exports.ProjectCollection = PageableCollection.extend({
 
   state: {
     firstPage: 0,
-    currentPage: 2
+    currentPage: 1,
+    pageSize: 20
   },
 
   queryParams: {

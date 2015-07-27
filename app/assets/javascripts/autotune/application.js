@@ -526,7 +526,18 @@ exports.Project = Backbone.Model.extend({
 
 exports.ProjectCollection = PageableCollection.extend({
   model: exports.Project,
-  url: '/projects'
+  url: '/projects',
+
+  state: {
+    firstPage: 0,
+    currentPage: 1,
+    pageSize: 20
+  },
+
+  queryParams: {
+    currentPage: 'current_page',
+    pageSize: 'page_size'
+  }
 });
 
 exports.Blueprint = Backbone.Model.extend({
@@ -616,6 +627,10 @@ module.exports = Backbone.Router.extend({
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
+    "projects/next": "nextProjects",
+    "projects/previous": "previousProjects",
+    "projects/last": "lastProjects",
+    "projects/first": "firstProjects",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject"
   },
@@ -719,6 +734,28 @@ module.exports = Backbone.Router.extend({
       .display( view )
       .setTab('projects');
     project.fetch();
+  },
+
+  nextProjects: function(params) {
+    var projects = this.app.projects,
+        query = {}, view;
+    if(params) { query = queryString.parse(params); }
+    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+    this.app.view
+      .display( view )
+      .setTab('projects');
+    projects.getNextPage();
+  },
+
+  previousProjects: function(params) {
+    var projects = this.app.projects,
+        query = {}, view;
+    if(params) { query = queryString.parse(params); }
+    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+    this.app.view
+      .display( view )
+      .setTab('projects');
+    projects.getPreviousPage();
   }
 });
 
@@ -1283,7 +1320,7 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n    <tr>\n    <a href="projects/previous"> previous </a>\n    <a href="projects/next"> next </a>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">z\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(getObjects().length == 0) { 
 __p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }

@@ -51,16 +51,16 @@ module Autotune
         @projects = @projects.where(query)
       end
 
-      @projects = @projects.all.paginate(:page => params[:page], :per_page => 20)
+      @projects = @projects.all.paginate(:page => params[:current_page], :per_page => params[:page_size])
       current_page = @projects.current_page
-      prev_page = "#{posts_path(@projects)}?page=#{@projects.current_page-1}"
-      next_page = @projects.next_page
+      prev_page = @projects.current_page-1
+      next_page = @projects.current_page+1
       if prev_page && next_page
-        headers['Link'] = "<#{prev_page}>; rel=\"prev\", <#{next_page}>; rel=\"next\";"
+        headers['Link'] = "<#{prev_page}>; rel=\"prev\", <#{current_page}>; rel=\"page\", <#{next_page}>; rel=\"next\";"
       elsif !prev_page
-        headers['Link'] = "<#{next_page}>; rel=\"next\";"
+        headers['Link'] = "<#{current_page}>; rel=\"page\", <#{next_page}>; rel=\"next\";"
       elsif !next_page
-        headers['Link'] = "<#{prev_page}>; rel=\"prev\";"
+        headers['Link'] = "<#{prev_page}>; rel=\"prev\", <#{current_page}>; rel=\"page\";"
       end
     end
 

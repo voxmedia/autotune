@@ -34,6 +34,10 @@ module.exports = Backbone.Router.extend({
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
+    "projects/next": "nextProjects",
+    "projects/previous": "previousProjects",
+    "projects/last": "lastProjects",
+    "projects/first": "firstProjects",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject"
   },
@@ -137,5 +141,27 @@ module.exports = Backbone.Router.extend({
       .display( view )
       .setTab('projects');
     project.fetch();
+  },
+
+  nextProjects: function(params) {
+    var projects = this.app.projects,
+        query = {}, view;
+    if(params) { query = queryString.parse(params); }
+    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+    this.app.view
+      .display( view )
+      .setTab('projects');
+    projects.getNextPage();
+  },
+
+  previousProjects: function(params) {
+    var projects = this.app.projects,
+        query = {}, view;
+    if(params) { query = queryString.parse(params); }
+    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+    this.app.view
+      .display( view )
+      .setTab('projects');
+    projects.getPreviousPage();
   }
 });
