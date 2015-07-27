@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'LICENSE', 'Rakefile', 'README.md']
   s.test_files = Dir['test/**/*']
 
-  s.add_dependency 'rails', '~> 4.2.0'
+  s.add_dependency 'rails', '~> 4.2.3'
   s.add_dependency 'omniauth', '~> 1.2.2'
   s.add_dependency 'resque', '~> 1.25.2'
   s.add_dependency 'jbuilder', '~> 2.0'
