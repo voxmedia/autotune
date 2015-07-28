@@ -30334,7 +30334,11 @@ module.exports = {
           Backbone.history.navigate(next, {trigger: true});
         }
       }).catch(function(error) {
-        view.handleRequestError(error);
+        if ( _.isString( error ) ) {
+          view.app.view.error( error );
+        } else {
+          view.handleRequestError(error);
+        }
       }).then(function() {
         $form.find('[type=submit]').button('reset');
       });
