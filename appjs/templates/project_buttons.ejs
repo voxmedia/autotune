@@ -45,7 +45,7 @@
     </p>
   <% } else if ( model.hasStatus('building') ) { %>
   <p class="text-warning">
-    <span class="m-status status-info"><i class="icon-info"></i>Building the project, gimmie a sec.</span>
+    <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10})%></span>
   </p>
   <% } else if ( model.isDraft() ) { %>
   <p class="text-warning">

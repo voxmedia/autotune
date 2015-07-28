@@ -1166,9 +1166,9 @@ __p+='\n    <p class="text-muted">\n      Status:\n      ';
  if ( model.hasStatus('broken') ) { 
 __p+='\n      <span class="text-danger"><i class="icon-alert"></i>Broken</span>\n      ';
  } else if ( !model.hasStatus('built') ) { 
-__p+='\n      <span class="text-warning">\n        '+
-((__t=(render(require('./spinner.ejs'))))==null?'':__t)+
-'\n        Building...</span>\n      ';
+__p+='\n      <span class="text-warning">'+
+((__t=(render(require('./spinner.ejs'), {size:10})))==null?'':__t)+
+'Building...</span>\n      ';
  } else if ( model.hasUnpublishedUpdates() ) { 
 __p+='\n        <a data-tooltip="Your Published Version Has Updates"\n           target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
@@ -1300,7 +1300,9 @@ __p+='\n  ';
  if ( model.hasStatus('broken') ) { 
 __p+='\n  <p class="text-danger">\n     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>\n    </p>\n  ';
  } else if ( model.hasStatus('building') ) { 
-__p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>Building the project, gimmie a sec.</span>\n  </p>\n  ';
+__p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? '+
+((__t=(render(require('./spinner.ejs'), {size:10})))==null?'':__t)+
+'</span>\n  </p>\n  ';
  } else if ( model.isDraft() ) { 
 __p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You are currently editing a draft.</span>\n  </p>\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>\n  </p>\n  ';
  } else if ( model.hasUnpublishedUpdates() ) { 
@@ -1313,7 +1315,7 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":130}],16:[function(require,module,exports){
+},{"./spinner.ejs":17,"underscore":130}],16:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1473,9 +1475,21 @@ var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div style="position:relative;height:0;padding:0 0 100% 0;overflow:hidden;">\n<div style="position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;">\n<svg xmlns="http://www.w3.org/2000/svg"\n     viewBox="0 0 32 32"\n     width="100%" height="100%"\n     fill="'+
+__p+='';
+ if ( typeof(size) === 'undefined' ) { 
+__p+='\n<div style="position:relative;height:0;padding:0 0 100% 0;overflow:hidden;">\n<div style="position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;">\n';
+ } 
+__p+='\n<svg xmlns="http://www.w3.org/2000/svg"\n     viewBox="0 0 32 32"\n     width="'+
+((__t=((typeof(size) === 'undefined') ? '100%' : size ))==null?'':__t)+
+'"\n     height="'+
+((__t=((typeof(size) === 'undefined') ? '100%' : size ))==null?'':__t)+
+'"\n     fill="'+
 ((__t=((typeof(color) === 'undefined') ? 'black' : color ))==null?'':__t)+
-'">\n  <path opacity=".25"\n        d="M16 0 A16 16 0 0 0 16 32 A16 16 0 0 0 16 0 M16 4 A12 12 0 0 1 16 28 A12 12 0 0 1 16 4"/>\n  <path d="M16 0 A16 16 0 0 1 32 16 L28 16 A12 12 0 0 0 16 4z">\n  <animateTransform attributeName="transform" type="rotate"\n                    from="0 16 16" to="360 16 16" dur="0.8s"\n                    repeatCount="indefinite" />\n  </path>\n</svg>\n</div>\n</div>\n';
+'">\n  <path opacity=".25"\n        d="M16 0 A16 16 0 0 0 16 32 A16 16 0 0 0 16 0 M16 4 A12 12 0 0 1 16 28 A12 12 0 0 1 16 4"/>\n  <path d="M16 0 A16 16 0 0 1 32 16 L28 16 A12 12 0 0 0 16 4z">\n    <animateTransform attributeName="transform" type="rotate"\n                      from="0 16 16" to="360 16 16" dur="0.8s"\n                      repeatCount="indefinite" />\n  </path>\n</svg>\n';
+ if ( typeof(size) === 'undefined' ) { 
+__p+='</div></div>';
+ } 
+__p+='\n';
 }
 return __p;
 };

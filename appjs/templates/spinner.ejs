@@ -1,16 +1,18 @@
+<% if ( typeof(size) === 'undefined' ) { %>
 <div style="position:relative;height:0;padding:0 0 100% 0;overflow:hidden;">
 <div style="position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;">
+<% } %>
 <svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 32 32"
-     width="100%" height="100%"
+     width="<%=(typeof(size) === 'undefined') ? '100%' : size %>"
+     height="<%=(typeof(size) === 'undefined') ? '100%' : size %>"
      fill="<%=(typeof(color) === 'undefined') ? 'black' : color %>">
   <path opacity=".25"
         d="M16 0 A16 16 0 0 0 16 32 A16 16 0 0 0 16 0 M16 4 A12 12 0 0 1 16 28 A12 12 0 0 1 16 4"/>
   <path d="M16 0 A16 16 0 0 1 32 16 L28 16 A12 12 0 0 0 16 4z">
-  <animateTransform attributeName="transform" type="rotate"
-                    from="0 16 16" to="360 16 16" dur="0.8s"
-                    repeatCount="indefinite" />
+    <animateTransform attributeName="transform" type="rotate"
+                      from="0 16 16" to="360 16 16" dur="0.8s"
+                      repeatCount="indefinite" />
   </path>
 </svg>
-</div>
-</div>
+<% if ( typeof(size) === 'undefined' ) { %></div></div><% } %>
