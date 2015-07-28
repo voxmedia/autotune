@@ -529,14 +529,11 @@ exports.ProjectCollection = PageableCollection.extend({
   url: '/projects',
 
   state: {
-    firstPage: 0,
+    totalRecords: null,
+    totalPages: null,
+    firstPage: 1,
     currentPage: 1,
-    pageSize: 20
-  },
-
-  queryParams: {
-    currentPage: 'current_page',
-    pageSize: 'page_size'
+    pageSize: 15
   }
 });
 
@@ -627,10 +624,7 @@ module.exports = Backbone.Router.extend({
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
-    "projects/next": "nextProjects",
-    "projects/previous": "previousProjects",
-    "projects/last": "lastProjects",
-    "projects/first": "firstProjects",
+    "projects/p:page": "getProjectPage",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject"
   },
@@ -702,7 +696,13 @@ module.exports = Backbone.Router.extend({
     this.app.view
       .display( view )
       .setTab('projects');
-    projects.fetch();
+    console.log(query.page);
+    if (query.page) {
+      console.log(parseInt(query.page));
+      projects.getPage(parseInt(query.page));
+    } else {
+      projects.getFirstPage();
+    }
   },
 
   newProject: function(slug) {
@@ -736,9 +736,20 @@ module.exports = Backbone.Router.extend({
     project.fetch();
   },
 
-  nextProjects: function(params) {
+  // getProjectPage: function(page, params) {
+  //   var projects = this.app.projects,
+  //   query = {}, view;
+  //   if(params) { query = queryString.parse(params); }
+  //   view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+  //   this.app.view
+  //     .display( view )
+  //     .setTab('projects');
+  //   projects.getPage(parseInt(page));
+  // },
+
+  getNextProjectPage: function(params) {
     var projects = this.app.projects,
-        query = {}, view;
+    query = {}, view;
     if(params) { query = queryString.parse(params); }
     view = new views.ListProjects({ collection: projects, query: query, app: this.app });
     this.app.view
@@ -747,16 +758,16 @@ module.exports = Backbone.Router.extend({
     projects.getNextPage();
   },
 
-  previousProjects: function(params) {
-    var projects = this.app.projects,
-        query = {}, view;
-    if(params) { query = queryString.parse(params); }
-    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('projects');
-    projects.getPreviousPage();
-  }
+  // previousProjects: function(params) {
+  //   var projects = this.app.projects,
+  //       query = {}, view;
+  //   if(params) { query = queryString.parse(params); }
+  //   view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+  //   this.app.view
+  //     .display( view )
+  //     .setTab('projects');
+  //   projects.getPreviousPage();
+  // }
 });
 
 },{"./logger":3,"./models":4,"./views":18,"backbone":28,"jquery":55,"query-string":61,"underscore":128}],6:[function(require,module,exports){
@@ -1320,7 +1331,7 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n    <tr>\n    <a href="projects/previous"> previous </a>\n    <a href="projects/next"> next </a>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">z\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n    <tr>\n      <div id="paginator"></div>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(getObjects().length == 0) { 
 __p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }

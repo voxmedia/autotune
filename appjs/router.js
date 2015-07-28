@@ -34,10 +34,7 @@ module.exports = Backbone.Router.extend({
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
-    "projects/next": "nextProjects",
-    "projects/previous": "previousProjects",
-    "projects/last": "lastProjects",
-    "projects/first": "firstProjects",
+    "projects/p:page": "getProjectPage",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject"
   },
@@ -109,7 +106,13 @@ module.exports = Backbone.Router.extend({
     this.app.view
       .display( view )
       .setTab('projects');
-    projects.fetch();
+    console.log(query.page);
+    if (query.page) {
+      console.log(parseInt(query.page));
+      projects.getPage(parseInt(query.page));
+    } else {
+      projects.getFirstPage();
+    }
   },
 
   newProject: function(slug) {
@@ -143,9 +146,20 @@ module.exports = Backbone.Router.extend({
     project.fetch();
   },
 
-  nextProjects: function(params) {
+  // getProjectPage: function(page, params) {
+  //   var projects = this.app.projects,
+  //   query = {}, view;
+  //   if(params) { query = queryString.parse(params); }
+  //   view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+  //   this.app.view
+  //     .display( view )
+  //     .setTab('projects');
+  //   projects.getPage(parseInt(page));
+  // },
+
+  getNextProjectPage: function(params) {
     var projects = this.app.projects,
-        query = {}, view;
+    query = {}, view;
     if(params) { query = queryString.parse(params); }
     view = new views.ListProjects({ collection: projects, query: query, app: this.app });
     this.app.view
@@ -154,14 +168,14 @@ module.exports = Backbone.Router.extend({
     projects.getNextPage();
   },
 
-  previousProjects: function(params) {
-    var projects = this.app.projects,
-        query = {}, view;
-    if(params) { query = queryString.parse(params); }
-    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('projects');
-    projects.getPreviousPage();
-  }
+  // previousProjects: function(params) {
+  //   var projects = this.app.projects,
+  //       query = {}, view;
+  //   if(params) { query = queryString.parse(params); }
+  //   view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+  //   this.app.view
+  //     .display( view )
+  //     .setTab('projects');
+  //   projects.getPreviousPage();
+  // }
 });

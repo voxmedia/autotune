@@ -232,14 +232,11 @@ exports.ProjectCollection = PageableCollection.extend({
   url: '/projects',
 
   state: {
-    firstPage: 0,
+    totalRecords: null,
+    totalPages: null,
+    firstPage: 1,
     currentPage: 1,
-    pageSize: 20
-  },
-
-  queryParams: {
-    currentPage: 'current_page',
-    pageSize: 'page_size'
+    pageSize: 15
   }
 });
 
