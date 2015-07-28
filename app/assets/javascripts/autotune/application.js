@@ -1168,7 +1168,7 @@ __p+='\n      <span class="text-danger"><i class="icon-alert"></i>Broken</span>\
  } else if ( !model.hasStatus('built') ) { 
 __p+='\n      <span class="text-warning">'+
 ((__t=(render(require('./spinner.ejs'), {size:10, color:'#FFA039'})))==null?'':__t)+
-'Building...</span>\n      ';
+'Building</span>\n      ';
  } else if ( model.hasUnpublishedUpdates() ) { 
 __p+='\n        <a data-tooltip="Your Published Version Has Updates"\n           target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+

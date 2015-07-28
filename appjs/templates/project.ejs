@@ -8,7 +8,7 @@
       <% if ( model.hasStatus('broken') ) { %>
       <span class="text-danger"><i class="icon-alert"></i>Broken</span>
       <% } else if ( !model.hasStatus('built') ) { %>
-      <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building...</span>
+      <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
       <% } else if ( model.hasUnpublishedUpdates() ) { %>
         <a data-tooltip="Your Published Version Has Updates"
            target="_blank" href="<%=model.get('publish_url') %>">Published</a> (has updates)
