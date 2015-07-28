@@ -1167,7 +1167,7 @@ __p+='\n    <p class="text-muted">\n      Status:\n      ';
 __p+='\n      <span class="text-danger"><i class="icon-alert"></i>Broken</span>\n      ';
  } else if ( !model.hasStatus('built') ) { 
 __p+='\n      <span class="text-warning">'+
-((__t=(render(require('./spinner.ejs'), {size:10})))==null?'':__t)+
+((__t=(render(require('./spinner.ejs'), {size:10, color:'#FFA039'})))==null?'':__t)+
 'Building...</span>\n      ';
  } else if ( model.hasUnpublishedUpdates() ) { 
 __p+='\n        <a data-tooltip="Your Published Version Has Updates"\n           target="_blank" href="'+
@@ -1301,7 +1301,7 @@ __p+='\n  ';
 __p+='\n  <p class="text-danger">\n     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>\n    </p>\n  ';
  } else if ( model.hasStatus('building') ) { 
 __p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? '+
-((__t=(render(require('./spinner.ejs'), {size:10})))==null?'':__t)+
+((__t=(render(require('./spinner.ejs'), {size:10, color:'#FFA039'})))==null?'':__t)+
 '</span>\n  </p>\n  ';
  } else if ( model.isDraft() ) { 
 __p+='\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You are currently editing a draft.</span>\n  </p>\n  <p class="text-warning">\n    <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>\n  </p>\n  ';
