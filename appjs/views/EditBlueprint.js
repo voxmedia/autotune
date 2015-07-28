@@ -163,7 +163,7 @@ var setup = function(formData) {
   doRefresh($("#previewDiv"));
 };
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint.ejs'),
 
   afterInit: function() {
@@ -175,4 +175,4 @@ module.exports = BaseView.extend({
       setup(this.model.get('config').form);
     }
   }
-}, require('./mixins/actions'), require('./mixins/form') );
+} );

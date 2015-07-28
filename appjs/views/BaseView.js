@@ -86,23 +86,28 @@ var BaseView = Backbone.View.extend({
   }
 });
 
-/*
- * Improved extend function that takes multiple objects. Also merges all event objects instead
- * of overridding.
+/* Take an array of mixins and objects and return a new Backbone view class.
+ * Merges objects in the event attributes instead of overridding.
  *
  * http://stackoverflow.com/questions/9403675/backbone-view-inherit-and-extend-events-from-parent
  */
 BaseView.extend = function() {
-  var obj = _.extend.apply(_, arguments);
+  // make a new array, starting with an empty object and add all the arguments
+  var args = [ { } ].concat( Array.prototype.slice.call(arguments) );
+  // < [{}, arg1, arg2, arg3...]
+  // merge all the objects together...
+  var obj = _.extend.apply(_, args);
 
+  // Go through all the arguments and merge together their event attributes
   obj.events = _.extend(
     _.reduce(
       _.pluck(arguments, 'events'),
       function(m, o) { return _.extend(m, o); },
       {} ),
-    this.prototype.events
+    this.prototype.event
   );
 
+  // Make a view
   return Backbone.View.extend.call(this, obj);
 };
 

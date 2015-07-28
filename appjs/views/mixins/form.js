@@ -48,6 +48,7 @@ module.exports = {
 
     return this.hook('beforeSubmit', $form, values, action, inst)
       .then(function() {
+        logger.debug('saving values', values);
         inst.set(values);
         if(!view.formValidate(inst, $form)) {
           $form.find('[type=submit]').button('reset');

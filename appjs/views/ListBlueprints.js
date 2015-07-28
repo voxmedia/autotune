@@ -6,7 +6,7 @@ var $ = require('jquery'),
     models = require('../models'),
     BaseView = require('./BaseView');
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint_list.ejs'),
 
   afterInit: function() {
@@ -26,4 +26,4 @@ module.exports = BaseView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
-}, require('./mixins/actions'), require('./mixins/form') );
+} );

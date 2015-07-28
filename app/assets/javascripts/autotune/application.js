@@ -1166,7 +1166,9 @@ __p+='\n    <p class="text-muted">\n      Status:\n      ';
  if ( model.hasStatus('broken') ) { 
 __p+='\n      <span class="text-danger"><i class="icon-alert"></i>Broken</span>\n      ';
  } else if ( !model.hasStatus('built') ) { 
-__p+='\n      <span class="text-warning">Building...</span>\n      ';
+__p+='\n      <span class="text-warning">\n        '+
+((__t=(render(require('./spinner.ejs'))))==null?'':__t)+
+'\n        Building...</span>\n      ';
  } else if ( model.hasUnpublishedUpdates() ) { 
 __p+='\n        <a data-tooltip="Your Published Version Has Updates"\n           target="_blank" href="'+
 ((__t=(model.get('publish_url') ))==null?'':__t)+
@@ -1249,7 +1251,7 @@ __p+='\n  </div>\n\n</div>\n';
 return __p;
 };
 
-},{"underscore":130}],15:[function(require,module,exports){
+},{"./spinner.ejs":17,"underscore":130}],15:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -29554,7 +29556,7 @@ PNotify.prototype.options.styling = "bootstrap3";
 // Load PNotify buttons component
 require('pnotify/src/pnotify.buttons');
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/links.js'), {
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
   notifications: [],
@@ -29650,7 +29652,7 @@ module.exports = BaseView.extend({
     this.notifications = [];
     return this;
   }
-}, require('./mixins/links.js'));
+});
 
 },{"../helpers":2,"../logger":4,"../models":5,"../templates/application.ejs":7,"../templates/error.ejs":11,"../templates/not_allowed.ejs":12,"../templates/not_found.ejs":13,"./BaseView":21,"./mixins/links.js":29,"backbone":30,"jquery":57,"pnotify":62,"pnotify/src/pnotify.buttons":61,"underscore":130}],21:[function(require,module,exports){
 "use strict";
@@ -29741,23 +29743,28 @@ var BaseView = Backbone.View.extend({
   }
 });
 
-/*
- * Improved extend function that takes multiple objects. Also merges all event objects instead
- * of overridding.
+/* Take an array of mixins and objects and return a new Backbone view class.
+ * Merges objects in the event attributes instead of overridding.
  *
  * http://stackoverflow.com/questions/9403675/backbone-view-inherit-and-extend-events-from-parent
  */
 BaseView.extend = function() {
-  var obj = _.extend.apply(_, arguments);
+  // make a new array, starting with an empty object and add all the arguments
+  var args = [ { } ].concat( Array.prototype.slice.call(arguments) );
+  // < [{}, arg1, arg2, arg3...]
+  // merge all the objects together...
+  var obj = _.extend.apply(_, args);
 
+  // Go through all the arguments and merge together their event attributes
   obj.events = _.extend(
     _.reduce(
       _.pluck(arguments, 'events'),
       function(m, o) { return _.extend(m, o); },
       {} ),
-    this.prototype.events
+    this.prototype.event
   );
 
+  // Make a view
   return Backbone.View.extend.call(this, obj);
 };
 
@@ -29772,9 +29779,9 @@ var $ = require('jquery'),
     models = require('../models'),
     BaseView = require('./BaseView');
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint_chooser.ejs')
-}, require('./mixins/actions'), require('./mixins/form') );
+} );
 
 },{"../models":5,"../templates/blueprint_chooser.ejs":9,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":30,"jquery":57,"underscore":130}],23:[function(require,module,exports){
 "use strict";
@@ -29942,7 +29949,7 @@ var setup = function(formData) {
   doRefresh($("#previewDiv"));
 };
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint.ejs'),
 
   afterInit: function() {
@@ -29954,7 +29961,7 @@ module.exports = BaseView.extend({
       setup(this.model.get('config').form);
     }
   }
-}, require('./mixins/actions'), require('./mixins/form') );
+} );
 
 },{"../logger":4,"../models":5,"../templates/blueprint.ejs":8,"../vendor/alpaca":18,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":30,"brace":32,"brace/mode/javascript":33,"brace/theme/textmate":35,"jquery":57,"underscore":130}],24:[function(require,module,exports){
 "use strict";
@@ -29971,7 +29978,7 @@ function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
 
   afterInit: function() {
@@ -30126,7 +30133,7 @@ module.exports = BaseView.extend({
     }
     return valid;
   }
-}, require('./mixins/actions'), require('./mixins/form') );
+} );
 
 },{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":30,"jquery":57,"underscore":130}],25:[function(require,module,exports){
 "use strict";
@@ -30137,7 +30144,7 @@ var $ = require('jquery'),
     models = require('../models'),
     BaseView = require('./BaseView');
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint_list.ejs'),
 
   afterInit: function() {
@@ -30157,7 +30164,7 @@ module.exports = BaseView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
-}, require('./mixins/actions'), require('./mixins/form') );
+} );
 
 },{"../models":5,"../templates/blueprint_list.ejs":10,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":30,"jquery":57,"underscore":130}],26:[function(require,module,exports){
 "use strict";
@@ -30168,13 +30175,13 @@ var $ = require('jquery'),
     models = require('../models'),
     BaseView = require('./BaseView');
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project_list.ejs'),
 
   afterInit: function() {
     this.listenTo(this.collection, 'update', this.render);
   }
-}, require('./mixins/actions'), require('./mixins/form') );
+} );
 
 },{"../models":5,"../templates/project_list.ejs":16,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":30,"jquery":57,"underscore":130}],27:[function(require,module,exports){
 "use strict";
@@ -30301,6 +30308,7 @@ module.exports = {
 
     return this.hook('beforeSubmit', $form, values, action, inst)
       .then(function() {
+        logger.debug('saving values', values);
         inst.set(values);
         if(!view.formValidate(inst, $form)) {
           $form.find('[type=submit]').button('reset');

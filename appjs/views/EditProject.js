@@ -12,7 +12,7 @@ function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
 
   afterInit: function() {
@@ -167,4 +167,4 @@ module.exports = BaseView.extend({
     }
     return valid;
   }
-}, require('./mixins/actions'), require('./mixins/form') );
+} );

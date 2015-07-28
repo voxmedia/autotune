@@ -14,7 +14,7 @@ PNotify.prototype.options.styling = "bootstrap3";
 // Load PNotify buttons component
 require('pnotify/src/pnotify.buttons');
 
-module.exports = BaseView.extend({
+module.exports = BaseView.extend(require('./mixins/links.js'), {
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
   notifications: [],
@@ -110,4 +110,4 @@ module.exports = BaseView.extend({
     this.notifications = [];
     return this;
   }
-}, require('./mixins/links.js'));
+});
