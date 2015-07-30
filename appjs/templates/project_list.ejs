@@ -77,7 +77,7 @@
     <td>Blueprint</td>
     <td class="text-right">Bold Actions</td>
   </tr>
-  <% if(getObjects().length == 0) { %>
+  <% if(!hasObjects()) { %>
   <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>
   <% }
    _.each(getObjects(), function(item) { %>

@@ -624,7 +624,6 @@ module.exports = Backbone.Router.extend({
     "blueprints/:slug/edit": "editBlueprint",
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
-    "projects/p:page": "getProjectPage",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject"
   },
@@ -692,13 +691,17 @@ module.exports = Backbone.Router.extend({
     var projects = this.app.projects,
         query = {}, view;
     if(params) { query = queryString.parse(params); }
-    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
+
+    view = new views.ListProjects({
+      collection: projects,
+      query: _.pick(query, 'status', 'blueprint_type', 'theme', 'search'),
+      app: this.app
+    });
+
     this.app.view
       .display( view )
       .setTab('projects');
-    console.log(query.page);
     if (query.page) {
-      console.log(parseInt(query.page));
       projects.getPage(parseInt(query.page));
     } else {
       projects.getFirstPage();
@@ -734,40 +737,7 @@ module.exports = Backbone.Router.extend({
       .display( view )
       .setTab('projects');
     project.fetch();
-  },
-
-  // getProjectPage: function(page, params) {
-  //   var projects = this.app.projects,
-  //   query = {}, view;
-  //   if(params) { query = queryString.parse(params); }
-  //   view = new views.ListProjects({ collection: projects, query: query, app: this.app });
-  //   this.app.view
-  //     .display( view )
-  //     .setTab('projects');
-  //   projects.getPage(parseInt(page));
-  // },
-
-  getNextProjectPage: function(params) {
-    var projects = this.app.projects,
-    query = {}, view;
-    if(params) { query = queryString.parse(params); }
-    view = new views.ListProjects({ collection: projects, query: query, app: this.app });
-    this.app.view
-      .display( view )
-      .setTab('projects');
-    projects.getNextPage();
-  },
-
-  // previousProjects: function(params) {
-  //   var projects = this.app.projects,
-  //       query = {}, view;
-  //   if(params) { query = queryString.parse(params); }
-  //   view = new views.ListProjects({ collection: projects, query: query, app: this.app });
-  //   this.app.view
-  //     .display( view )
-  //     .setTab('projects');
-  //   projects.getPreviousPage();
-  // }
+  }
 });
 
 },{"./logger":3,"./models":4,"./views":18,"backbone":28,"jquery":55,"query-string":61,"underscore":128}],6:[function(require,module,exports){
@@ -1332,7 +1302,7 @@ __p+='\n                    value="'+
 '</option>\n            ';
  }) 
 __p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n    <tr>\n      <div id="paginator"></div>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
- if(getObjects().length == 0) { 
+ if(!hasObjects()) { 
 __p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }
    _.each(getObjects(), function(item) { 
