@@ -57,7 +57,11 @@ module Autotune
       link_str = '<%s>; rel="%s"'
       links = [
         link_str % [
-          projects_url(:page => @projects.current_page, :per_page => per_page), 'page']
+          projects_url(:page => @projects.current_page, :per_page => per_page), 'page'],
+        link_str % [
+          projects_url(:page => 1, :per_page => per_page), 'first'],
+        link_str % [
+          projects_url(:page => @projects.total_pages, :per_page => per_page), 'last']
       ]
       if @projects.next_page
         links << link_str % [
