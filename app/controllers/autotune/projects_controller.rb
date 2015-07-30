@@ -51,17 +51,23 @@ module Autotune
         @projects = @projects.where(query)
       end
 
-      @projects = @projects.all.paginate(:page => params[:current_page], :per_page => params[:page_size])
-      current_page = @projects.current_page
-      prev_page = @projects.current_page-1
-      next_page = @projects.current_page+1
-      if prev_page && next_page
-        headers['Link'] = "<#{prev_page}>; rel=\"prev\", <#{current_page}>; rel=\"page\", <#{next_page}>; rel=\"next\";"
-      elsif !prev_page
-        headers['Link'] = "<#{current_page}>; rel=\"page\", <#{next_page}>; rel=\"next\";"
-      elsif !next_page
-        headers['Link'] = "<#{prev_page}>; rel=\"prev\", <#{current_page}>; rel=\"page\";"
+      page = params[:page] || 1
+      per_page = params[:per_page] || 15
+      @projects = @projects.paginate(:page => page, :per_page => per_page)
+      link_str = '<%s>; rel="%s"'
+      links = [
+        link_str % [
+          projects_url(:page => @projects.current_page, :per_page => per_page), 'page']
+      ]
+      if @projects.next_page
+        links << link_str % [
+          projects_url(:page => @projects.next_page, :per_page => per_page), 'next']
       end
+      if @projects.previous_page
+        links << link_str % [
+          projects_url(:page => @projects.previous_page, :per_page => per_page), 'prev']
+      end
+      headers['Link'] = links.join(', ')
     end
 
     def show
