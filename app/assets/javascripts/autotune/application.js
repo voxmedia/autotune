@@ -1305,7 +1305,35 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n    <tr>\n      <div id="paginator"></div>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n    <tr>\n      <ul class="pagination">\n          ';
+ if ( app.projects.state.currentPage != app.projects.state.firstPage ) { 
+__p+='\n            <li><a href="/?page='+
+((__t=( app.projects.state.firstPage ))==null?'':__t)+
+'">First</a></li>\n          ';
+ } 
+__p+='\n          ';
+ if ( app.projects.hasPreviousPage && (app.projects.state.currentPage - 1 != app.projects.state.firstPage) ) { 
+__p+='\n            <li><a href="/?page='+
+((__t=( app.projects.state.currentPage - 1 ))==null?'':__t)+
+'">Previous</a></li>\n          ';
+ } 
+__p+='\n          <li class="active"><a href="/?page='+
+((__t=( app.projects.state.currentPage ))==null?'':__t)+
+'">'+
+((__t=( app.projects.state.currentPage ))==null?'':__t)+
+'</a></li>\n          ';
+ if ( app.projects.hasNextPage && (app.projects.state.currentPage + 1 != app.projects.state.lastPage) ) { 
+__p+='\n            <li><a href="/?page='+
+((__t=( app.projects.state.currentPage + 1 ))==null?'':__t)+
+'">Next</a></li>\n          ';
+ } 
+__p+='\n          ';
+ if ( app.projects.state.currentPage != app.projects.state.lastPage ) { 
+__p+='\n            <li><a href="/?page='+
+((__t=( app.projects.state.lastPage ))==null?'':__t)+
+'">Last</a></li>\n          ';
+ } 
+__p+='\n      </ul>\n      </div>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(!hasObjects()) { 
 __p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }

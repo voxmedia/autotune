@@ -65,7 +65,22 @@
       </td>
     </tr>
     <tr>
-      <div id="paginator"></div>
+      <ul class="pagination">
+          <% if ( app.projects.state.currentPage != app.projects.state.firstPage ) { %>
+            <li><a href="/?page=<%= app.projects.state.firstPage %>">First</a></li>
+          <% } %>
+          <% if ( app.projects.hasPreviousPage && (app.projects.state.currentPage - 1 != app.projects.state.firstPage) ) { %>
+            <li><a href="/?page=<%= app.projects.state.currentPage - 1 %>">Previous</a></li>
+          <% } %>
+          <li class="active"><a href="/?page=<%= app.projects.state.currentPage %>"><%= app.projects.state.currentPage %></a></li>
+          <% if ( app.projects.hasNextPage && (app.projects.state.currentPage + 1 != app.projects.state.lastPage) ) { %>
+            <li><a href="/?page=<%= app.projects.state.currentPage + 1 %>">Next</a></li>
+          <% } %>
+          <% if ( app.projects.state.currentPage != app.projects.state.lastPage ) { %>
+            <li><a href="/?page=<%= app.projects.state.lastPage %>">Last</a></li>
+          <% } %>
+      </ul>
+      </div>
     </tr>
   </thead>
   <tbody>
