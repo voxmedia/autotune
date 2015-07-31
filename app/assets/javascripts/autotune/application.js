@@ -534,6 +534,10 @@ exports.ProjectCollection = PageableCollection.extend({
     firstPage: 1,
     currentPage: 1,
     pageSize: 15
+  },
+
+  parseState: function (response, queryParams, state, options) {
+    return {totalRecords: parseInt(options.xhr.getResponseHeader("X-Total"))};
   }
 });
 
