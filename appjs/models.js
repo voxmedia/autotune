@@ -3,7 +3,8 @@
 var Backbone = require('backbone'),
     _ = require('underscore'),
     moment = require('moment'),
-    markdown = require('markdown').markdown;
+    markdown = require('markdown').markdown,
+    PageableCollection = require('backbone.paginator');
 
 /**
  * Wrapper around Backbone.ajax where a simple `Accepted` status response with an empty
@@ -229,9 +230,21 @@ exports.Project = Backbone.Model.extend({
   }
 });
 
-exports.ProjectCollection = Backbone.Collection.extend({
+exports.ProjectCollection = PageableCollection.extend({
   model: exports.Project,
-  url: '/projects'
+  url: '/projects',
+
+  state: {
+    totalRecords: null,
+    totalPages: null,
+    firstPage: 1,
+    currentPage: 1,
+    pageSize: 15
+  },
+
+  parseState: function (response, queryParams, state, options) {
+    return {totalRecords: parseInt(options.xhr.getResponseHeader("X-Total"))};
+  }
 });
 
 exports.Blueprint = Backbone.Model.extend({

@@ -110,12 +110,22 @@ module.exports = Backbone.Router.extend({
 
   listProjects: function(params) {
     var projects = this.app.projects,
-        app = this.app, query = {}, view;
+        app = this.app, query = {}, view, promise;
 
     if(params) { query = queryString.parse(params); }
 
-    projects.fetch().then(function() {
-      view = new views.ListProjects({ collection: projects, query: query, app: app });
+    if (query.page) {
+      promise = projects.getPage(parseInt(query.page));
+    } else {
+      promise = projects.getFirstPage();
+    }
+
+    promise.then(function() {
+      view = new views.ListProjects({
+        collection: projects,
+        query: _.pick(query, 'status', 'blueprint_type', 'theme', 'search'),
+        app: app
+      });
       view.render();
       app.view
         .display( view )
