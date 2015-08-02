@@ -127,8 +127,10 @@
       <a data-tooltip="preview" target="_blank"
          href="<%=item.getPreviewUrl('http') %>"><span class="icon-preview"></span></a>
     <% } %>
-      <a data-tooltip="delete" data-loading-text=""
-         data-action="delete" data-model="Project"
+      <a data-tooltip="delete"
+         data-action-message="Project deleted"
+         data-action-confirm="Are you sure you wish to delete this?"
+         data-action="destroy" data-model="Project" data-action-next="reload"
          data-model-id="<%= item.get('slug') %>"><span class="icon-delete"></span></a>
     </td>
   </tr>

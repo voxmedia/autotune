@@ -15,10 +15,16 @@ var $ = require('jquery'),
     Router = require('./router'),
     Listener = require('./listener'),
     logger = require('./logger'),
+    views = require('./views'),
     models = require('./models');
 
 // required to make Backbone work in browserify
 Backbone.$ = $;
+
+// make backbone return full promises
+Backbone.ajax = function() {
+  return Promise.resolve( Backbone.$.ajax.apply(Backbone.$, arguments) );
+};
 
 /**
  * Autotune admin UI
@@ -56,20 +62,43 @@ function App(config) {
 
   if ( this.isDev() ) { logger.level = 'debug'; }
 
-  this.router = new Router({ app: this });
-  Backbone.history.start({ pushState: true });
+  // Initialize top-level view
+  this.view = new views.Application({ app: this });
 
+  // Clear error messages when window is focused
+  this.on('focus', function() { this.view.clearError(); }, this);
+
+  // Show or hide spinner on loading events
+  this.on('loadingStart', function() { this.view.spinStart(); }, this);
+  this.on('loadingStop', function() { this.view.spinStop(); }, this);
+
+  // Initialize routing
+  this.router = new Router({ app: this });
+
+  // Start the app once the top-level view is rendered
+  var view = this.view;
+  this.view.render().then(function() {
+    $('body').prepend(view.$el);
+    view.app.trigger( 'loadingStart' );
+    Backbone.history.start({ pushState: true });
+  });
+
+  // Handle application focus
   this.hasFocus = true;
   if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
+      // Tell the listener to cancel the timeout, and make sure it's started
       this.listener
         .cancelStop()
         .start();
+      // Proxy the event on the app object
       this.trigger('focus');
     }, this));
 
     $(window).on('blur', _.bind(function(){
+      // Tell the listener to time out in 20 seconds
       this.listener.stopAfter(20);
+      // Proxy the event on the app object
       this.trigger('blur');
     }, this));
   }

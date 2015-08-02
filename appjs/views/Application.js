@@ -5,9 +5,16 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     PNotify = require('pnotify'),
     models = require('../models'),
+    logger = require('../logger'),
+    helpers = require('../helpers'),
     BaseView = require('./BaseView');
 
-module.exports = BaseView.extend({
+// Set PNotify to use bootstrap
+PNotify.prototype.options.styling = "bootstrap3";
+// Load PNotify buttons component
+require('pnotify/src/pnotify.buttons');
+
+module.exports = BaseView.extend(require('./mixins/links.js'), {
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
   notifications: [],
@@ -21,8 +28,31 @@ module.exports = BaseView.extend({
     if ( this.currentView ) { this.currentView.unload(this); }
     this.currentView = view;
     this.currentView.load(this);
+    logger.debug('displaying view', view, this.$('#main'));
     this.$('#main').empty().append(view.$el);
     return this;
+  },
+
+  display404: function() {
+    this.$('#main').empty().append(
+      helpers.render( require('../templates/not_found.ejs') ));
+  },
+  display403: function() {
+    this.$('#main').empty().append(
+      helpers.render( require('../templates/not_allowed.ejs') ));
+  },
+  display500: function(status, message) {
+    this.$('#main').empty().append(
+      helpers.render( require('../templates/error.ejs'), {status: status, message: message} ));
+  },
+  displayError: function(code, status, message) {
+    if (code === 404) {
+      this.display404();
+    } else if (code === 403) {
+      this.display403();
+    } else {
+      this.display500(status, message);
+    }
   },
 
   spinStart: function() {

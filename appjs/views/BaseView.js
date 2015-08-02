@@ -5,118 +5,110 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    camelize = require('underscore.string/camelize');
+    helpers = require('../helpers');
 
-require('pnotify/src/pnotify.buttons');
-
-module.exports = Backbone.View.extend({
-  events: {
-    'click a[href]': 'handleLink'
-  },
-
+var BaseView = Backbone.View.extend({
+  loaded: true,
+  firstRender: true,
   initialize: function(options) {
-    this.loaded = true;
-
     if (_.isObject(options)) {
-      _.extend(this, options);
-    }
-
-    if(_.isObject(this.collection)) {
-      this.listenTo(this.collection, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
-      this.listenTo(this.collection, 'reset change sort sync', _.debounce(this.render, 300));
-      this.listenTo(this.collection, 'error', this.handleSyncError);
-    }
-
-    if(_.isObject(this.model)) {
-      this.listenTo(this.model, 'all', function(name, inst, data, xhr) { logger.debug(name, arguments); });
-      this.listenTo(this.model, 'reset change sync', _.debounce(this.render, 300));
-      this.listenTo(this.model, 'error', this.handleSyncError);
+      _.extend(this, _.pick(options, 'app', 'query'));
     }
 
     this.hook('afterInit', options);
   },
 
-  handleLink: function(eve) {
-    var href = $(eve.currentTarget).attr('href'),
-        target = $(eve.currentTarget).attr('target');
-    if (href && !target && !/^(https?:\/\/|#)/.test(href) && !eve.metaKey && !eve.ctrlKey) {
-      // only handle this link if it's a fragment and you didn't hold down a modifer key
-      eve.preventDefault();
-      eve.stopPropagation();
-      Backbone.history.navigate(
-        $(eve.currentTarget).attr('href'),
-        {trigger: true});
-    }
-  },
-
   render: function() {
-    if ( this.loaded ) {
-      this.hook('beforeRender');
+    var scrollPos = $(window).scrollTop(),
+        activeTab = this.$('.nav-tabs .active a').attr('href'),
+        view = this;
 
-      this.$el.html(this.template(this));
+    // Only render if this view is loaded
+    if ( !this.loaded ) { return Promise.resolve(); }
 
-      this.app.trigger('loadingStop');
+    // Do some renderin'. First up: beforeRender()
+    return view.hook( 'beforeRender' ).then(function() {
+      // Generate the element using template and templateData()
+      view.$el.html(
+        helpers.render(
+          view.template, view.templateData() ) );
 
-      this.hook('afterRender');
-    }
-    return this;
+      return view.hook( 'afterRender' );
+    }).then(function() {
+      if ( view.firstRender ) {
+        logger.debug( 'first render' );
+        view.firstRender = false;
+      } else {
+        logger.debug('re-render; fix scroll and tabs',
+                     scrollPos, activeTab, $(document).height());
+        view.$('.nav-tabs a[href='+activeTab+']').tab('show');
+        $(window).scrollTop(scrollPos);
+      }
+
+      view.app.trigger( 'loadingStop' );
+    });
   },
 
-  handleSyncError: function(model_or_collection, resp, options) {
-    var tmpl,
-        tmplObj = {
-          app: this.app, resp: resp, options: options,
-          model_or_collection: model_or_collection };
-    if (resp.status === 404) {
-      tmpl = require('../templates/not_found.ejs');
-    } else if (resp.status === 403) {
-      tmpl = require('../templates/not_allowed.ejs');
-    } else {
-      tmpl = require('../templates/error.ejs');
-    }
-    logger.debug(tmplObj);
-    this.$el.html(tmpl(tmplObj));
-    this.app.trigger('loadingStop');
-  },
-
-  getObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query);
-    } else {
-      return this.collection.models;
-    }
-  },
-
-  hasObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query).length > 0;
-    } else {
-      return this.collection.models.length > 0;
-    }
+  templateData: function() {
+    return {
+      model: this.model,
+      collection: this.collection,
+      app: this.app,
+      query: this.query
+    };
   },
 
   load: function(parentView) {
-    this.loaded = true;
+    this.loaded = this.firstRender = true;
     this.parentView = parentView;
     return this;
   },
 
-  unload: function(parentView) {
+  unload: function() {
     this.loaded = false;
     if ( this.parentView ) { this.parentView = null; }
     return this;
   },
 
-  hasRole: function(role) {
-    return _.contains(this.app.user.get('meta').roles, role);
-  },
-
   hook: function() {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
+
     logger.debug('hook ' + name);
+
     this.trigger(name, args);
-    if(_.isFunction(this[name])) { return this[name].apply(this, args); }
+
+    if( _.isFunction(this[name]) ) {
+      return Promise.resolve( this[name].apply(this, args) );
+    } else {
+      return Promise.resolve( this );
+    }
   }
 });
 
+/* Take an array of mixins and objects and return a new Backbone view class.
+ * Merges objects in the event attributes instead of overridding.
+ *
+ * http://stackoverflow.com/questions/9403675/backbone-view-inherit-and-extend-events-from-parent
+ */
+BaseView.extend = function() {
+  // make a new array, starting with an empty object and add all the arguments
+  var args = [ { } ].concat( Array.prototype.slice.call(arguments) );
+  // < [{}, arg1, arg2, arg3...]
+  // merge all the objects together...
+  var obj = _.extend.apply(_, args);
+
+  // Go through all the arguments and merge together their event attributes
+  obj.events = _.extend(
+    _.reduce(
+      _.pluck(arguments, 'events'),
+      function(m, o) { return _.extend(m, o); },
+      {} ),
+    this.prototype.event
+  );
+
+  // Make a view
+  return Backbone.View.extend.call(this, obj);
+};
+
+module.exports = BaseView;
