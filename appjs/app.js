@@ -21,11 +21,6 @@ var $ = require('jquery'),
 // required to make Backbone work in browserify
 Backbone.$ = $;
 
-// make backbone return full promises
-Backbone.ajax = function() {
-  return Promise.resolve( Backbone.$.ajax.apply(Backbone.$, arguments) );
-};
-
 /**
  * Autotune admin UI
  * @constructor

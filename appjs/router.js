@@ -47,7 +47,7 @@ module.exports = Backbone.Router.extend({
         app = this.app, query = {}, view;
     if(params) { query = queryString.parse(params); }
 
-    blueprints.fetch().then(function() {
+    Promise.resolve( blueprints.fetch() ).then(function() {
       view = new views.ListBlueprints({ collection: blueprints, query: query, app: app });
       view.render();
       app.view
@@ -76,7 +76,7 @@ module.exports = Backbone.Router.extend({
     if ( !blueprint ) {
       blueprint = new models.Blueprint({ id: slug });
       this.app.blueprints.add(blueprint);
-      maybeFetch = blueprint.fetch();
+      maybeFetch = Promise.resolve( blueprint.fetch() );
     }
 
     maybeFetch.then(function() {
@@ -97,7 +97,7 @@ module.exports = Backbone.Router.extend({
     if(params) { query = queryString.parse(params); }
     query['status'] = 'ready';
 
-    blueprints.fetch().then(function() {
+    Promise.resolve( blueprints.fetch() ).then(function() {
       view = new views.ChooseBlueprint({ collection: blueprints, query: query, app: app });
       view.render();
       app.view
@@ -110,17 +110,17 @@ module.exports = Backbone.Router.extend({
 
   listProjects: function(params) {
     var projects = this.app.projects,
-        app = this.app, query = {}, view, promise;
+        app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = queryString.parse(params); }
 
     if (query.page) {
-      promise = projects.getPage(parseInt(query.page));
+      jqxhr = projects.getPage(parseInt(query.page));
     } else {
-      promise = projects.getFirstPage();
+      jqxhr = projects.getFirstPage();
     }
 
-    promise.then(function() {
+    Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
         query: _.pick(query, 'status', 'blueprint_type', 'theme', 'search'),
@@ -143,7 +143,7 @@ module.exports = Backbone.Router.extend({
     if ( !blueprint ) {
       blueprint = new models.Blueprint({ id: slug });
       this.app.blueprints.add(blueprint);
-      maybeFetch = blueprint.fetch();
+      maybeFetch = Promise.resolve( blueprint.fetch() );
     }
 
     maybeFetch.then(function() {
@@ -166,7 +166,7 @@ module.exports = Backbone.Router.extend({
     if ( !project ) {
       project = new models.Project({ id: slug });
       this.app.projects.add(project);
-      maybeFetch = project.fetch();
+      maybeFetch = Promise.resolve( project.fetch() );
     }
 
     maybeFetch.then(function() {
