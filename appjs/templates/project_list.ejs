@@ -64,24 +64,6 @@
         </form>
       </td>
     </tr>
-    <tr>
-      <ul class="pagination">
-          <% if ( app.projects.state.currentPage != app.projects.state.firstPage ) { %>
-            <li><a href="/?page=<%= app.projects.state.firstPage %>">First</a></li>
-          <% } %>
-          <% if ( app.projects.hasPreviousPage && (app.projects.state.currentPage - 1 != app.projects.state.firstPage) ) { %>
-            <li><a href="/?page=<%= app.projects.state.currentPage - 1 %>">Previous</a></li>
-          <% } %>
-          <li class="active"><a href="/?page=<%= app.projects.state.currentPage %>"><%= app.projects.state.currentPage %></a></li>
-          <% if ( app.projects.hasNextPage && (app.projects.state.currentPage + 1 != app.projects.state.lastPage) ) { %>
-            <li><a href="/?page=<%= app.projects.state.currentPage + 1 %>">Next</a></li>
-          <% } %>
-          <% if ( app.projects.state.currentPage != app.projects.state.lastPage ) { %>
-            <li><a href="/?page=<%= app.projects.state.lastPage %>">Last</a></li>
-          <% } %>
-      </ul>
-      </div>
-    </tr>
   </thead>
   <tbody>
   <tr class="m-table-heading">
@@ -155,3 +137,10 @@
 <% }); %>
   </tbody>
 </table>
+<nav>
+  <ul class="pager">
+    <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
+    <li>Page <%=collection.state.currentPage %></li>
+    <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
+  </ul>
+</nav>

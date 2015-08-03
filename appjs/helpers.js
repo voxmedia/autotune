@@ -1,7 +1,8 @@
 "use strict";
 
 var $ = require('jquery'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    queryString = require('query-string');
 
 module.exports = {
   render: function(template, templateObj) {
@@ -28,5 +29,31 @@ module.exports = {
 
   hasRole: function(role) {
     return _.contains(this.app.user.get('meta').roles, role);
+  },
+
+  /***********
+   * Pagination helpers
+   */
+
+  hasNextPage: function() {
+    return this.collection.hasNextPage();
+  },
+
+  hasPreviousPage: function() {
+    return this.collection.hasPreviousPage();
+  },
+
+  getPageUrl: function(page) {
+    var base = _.result(this.collection, 'url'),
+        qs = _.extend({page: page}, this.query);
+    return base + '?' + queryString.stringify( qs );
+  },
+
+  getNextPageUrl: function() {
+    return this.getPageUrl( this.collection.state.currentPage + 1 );
+  },
+
+  getPreviousPageUrl: function() {
+    return this.getPageUrl( this.collection.state.currentPage - 1 );
   }
 };

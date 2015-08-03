@@ -178,7 +178,8 @@ if ( typeof(window) !== 'undefined' ) {
 "use strict";
 
 var $ = require('jquery'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    queryString = require('query-string');
 
 module.exports = {
   render: function(template, templateObj) {
@@ -205,10 +206,36 @@ module.exports = {
 
   hasRole: function(role) {
     return _.contains(this.app.user.get('meta').roles, role);
+  },
+
+  /***********
+   * Pagination helpers
+   */
+
+  hasNextPage: function() {
+    return this.collection.hasNextPage();
+  },
+
+  hasPreviousPage: function() {
+    return this.collection.hasPreviousPage();
+  },
+
+  getPageUrl: function(page) {
+    var base = _.result(this.collection, 'url'),
+        qs = _.extend({page: page}, this.query);
+    return base + '?' + queryString.stringify( qs );
+  },
+
+  getNextPageUrl: function() {
+    return this.getPageUrl( this.collection.state.currentPage + 1 );
+  },
+
+  getPreviousPageUrl: function() {
+    return this.getPageUrl( this.collection.state.currentPage - 1 );
   }
 };
 
-},{"jquery":58,"underscore":131,"underscore.string":87}],3:[function(require,module,exports){
+},{"jquery":58,"query-string":64,"underscore":131,"underscore.string":87}],3:[function(require,module,exports){
 "use strict";
 
 var _ = require('underscore'),
@@ -1404,35 +1431,7 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n    <tr>\n      <ul class="pagination">\n          ';
- if ( app.projects.state.currentPage != app.projects.state.firstPage ) { 
-__p+='\n            <li><a href="/?page='+
-((__t=( app.projects.state.firstPage ))==null?'':__t)+
-'">First</a></li>\n          ';
- } 
-__p+='\n          ';
- if ( app.projects.hasPreviousPage && (app.projects.state.currentPage - 1 != app.projects.state.firstPage) ) { 
-__p+='\n            <li><a href="/?page='+
-((__t=( app.projects.state.currentPage - 1 ))==null?'':__t)+
-'">Previous</a></li>\n          ';
- } 
-__p+='\n          <li class="active"><a href="/?page='+
-((__t=( app.projects.state.currentPage ))==null?'':__t)+
-'">'+
-((__t=( app.projects.state.currentPage ))==null?'':__t)+
-'</a></li>\n          ';
- if ( app.projects.hasNextPage && (app.projects.state.currentPage + 1 != app.projects.state.lastPage) ) { 
-__p+='\n            <li><a href="/?page='+
-((__t=( app.projects.state.currentPage + 1 ))==null?'':__t)+
-'">Next</a></li>\n          ';
- } 
-__p+='\n          ';
- if ( app.projects.state.currentPage != app.projects.state.lastPage ) { 
-__p+='\n            <li><a href="/?page='+
-((__t=( app.projects.state.lastPage ))==null?'':__t)+
-'">Last</a></li>\n          ';
- } 
-__p+='\n      </ul>\n      </div>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(!hasObjects()) { 
 __p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }
@@ -1511,7 +1510,17 @@ __p+='\n      <a data-tooltip="delete"\n         data-action-message="Project de
 ((__t=( item.get('slug') ))==null?'':__t)+
 '"><span class="icon-delete"></span></a>\n    </td>\n  </tr>\n';
  }); 
-__p+='\n  </tbody>\n</table>\n';
+__p+='\n  </tbody>\n</table>\n<nav>\n  <ul class="pager">\n    <li class="previous'+
+((__t=(hasPreviousPage() ? '' : ' disabled' ))==null?'':__t)+
+'"><a href="'+
+((__t=(getPreviousPageUrl()))==null?'':__t)+
+'">Previous</a></li>\n    <li>Page '+
+((__t=(collection.state.currentPage ))==null?'':__t)+
+'</li>\n    <li class="next'+
+((__t=(hasNextPage() ? '' : ' disabled' ))==null?'':__t)+
+'"><a href="'+
+((__t=(getNextPageUrl()))==null?'':__t)+
+'">Next</a></li>\n  </ul>\n</nav>\n';
 }
 return __p;
 };
