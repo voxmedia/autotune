@@ -33,20 +33,17 @@ module Autotune
         project.output = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
       end
 
-      # Find the dir of the built files
-      deploy_dir = repo.expand(project.deploy_dir)
-
       # Upload build
-      deployer.deploy(deploy_dir, project.slug)
+      deployer.deploy(project.deploy_dir, project.slug)
 
       # Create screenshots (has to happen after upload)
-      url = deployer.url_for(project.slug)
-      phantom = WorkDir.phantom(deploy_dir)
+      url = deployer.url_for(project, project.slug)
+      phantom = WorkDir.phantom(project.deploy_dir)
       phantom.capture_screenshot(get_full_url(url)) if phantom.phantomjs?
 
       # Upload screens
       phantom.screenshots.each do |filename|
-        deployer.deploy_file(deploy_dir, project.slug, filename)
+        deployer.deploy_file(project.deploy_dir, project.slug, filename)
       end
 
       # Set status and save project

@@ -7,6 +7,7 @@ module Autotune
     include Searchable
     include WorkingDir
     serialize :data, JSON
+    serialize :meta, JSON
     serialize :blueprint_config, JSON
     belongs_to :blueprint
     belongs_to :user
@@ -24,6 +25,11 @@ module Autotune
     before_save :check_for_updated_data
 
     after_save :pub_to_redis
+
+    after_initialize do
+      self.status ||= 'new'
+      self.meta   ||= {}
+    end
 
     def draft?
       published_at.nil?
@@ -69,21 +75,20 @@ module Autotune
     end
 
     def deploy_dir
-      blueprint_config['deploy_dir'] || 'build'
+      File.join(working_dir, blueprint_config['deploy_dir'] || 'build')
     end
 
     def preview_url
-      Autotune.find_deployment(:preview).url_for(slug)
+      Autotune.find_deployment(:preview).url_for(self, slug)
     end
 
     def publish_url
-      Autotune.find_deployment(:preview).url_for(slug)
+      Autotune.find_deployment(:preview).url_for(self, slug)
     end
 
     private
 
     def defaults
-      self.status ||= 'new'
       # self.data ||= {}  # seems to mess up check_for_updated_data
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
       self.blueprint_config ||= blueprint.config unless blueprint.nil?

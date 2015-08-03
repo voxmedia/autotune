@@ -31,6 +31,15 @@ module Autotune
       assert_equal 'new', b.status
     end
 
+    test 'project meta' do
+      project = Project.new
+      assert_equal({}, project.meta)
+
+      project = autotune_projects(:example_one)
+      project.meta['thinga'] = 'foo'
+      assert project.save
+    end
+
     test 'updating a project' do
       project = autotune_projects(:example_one)
       project.update!(:title => 'new project')
