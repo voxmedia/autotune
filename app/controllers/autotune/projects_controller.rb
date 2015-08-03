@@ -50,6 +50,29 @@ module Autotune
       else
         @projects = @projects.where(query)
       end
+
+      page = params[:page] || 1
+      per_page = params[:per_page] || 15
+      @projects = @projects.paginate(:page => page, :per_page => per_page)
+      link_str = '<%s>; rel="%s"'
+      links = [
+        link_str % [
+          projects_url(:page => @projects.current_page, :per_page => per_page), 'page'],
+        link_str % [
+          projects_url(:page => 1, :per_page => per_page), 'first'],
+        link_str % [
+          projects_url(:page => @projects.total_pages, :per_page => per_page), 'last']
+      ]
+      if @projects.next_page
+        links << link_str % [
+          projects_url(:page => @projects.next_page, :per_page => per_page), 'next']
+      end
+      if @projects.previous_page
+        links << link_str % [
+          projects_url(:page => @projects.previous_page, :per_page => per_page), 'prev']
+      end
+      headers['Link'] = links.join(', ')
+      headers['X-Total'] = @projects.count
     end
 
     def show
@@ -73,10 +96,12 @@ module Autotune
         end
       end
 
-      # make sure data doesn't contain title, slug or theme
-      @project.data.delete('title')
-      @project.data.delete('slug')
-      @project.data.delete('theme')
+      unless @project.data.nil?
+        # make sure data doesn't contain title, slug or theme
+        @project.data.delete('title')
+        @project.data.delete('slug')
+        @project.data.delete('theme')
+      end
 
       if @project.valid?
         @project.save

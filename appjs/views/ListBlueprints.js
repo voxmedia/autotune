@@ -4,10 +4,15 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
-    FormView = require('./FormView');
+    BaseView = require('./BaseView');
 
-module.exports = FormView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint_list.ejs'),
+
+  afterInit: function() {
+    this.listenTo(this.collection, 'update', this.render);
+  },
+
   handleUpdateAction: function(eve) {
     var $btn = $(eve.currentTarget),
     model_class = $btn.data('model'),
@@ -21,4 +26,4 @@ module.exports = FormView.extend({
       }, this))
       .fail(_.bind(this.handleRequestError, this));
   }
-});
+} );

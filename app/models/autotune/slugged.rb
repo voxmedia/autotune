@@ -14,8 +14,9 @@ module Autotune
     private
 
     def ensure_unique_slug
+      return self.slug unless self.slug.nil? || self.slug.strip.empty?
       return if text_for_slug.nil? || text_for_slug.empty?
-      self.slug ||= text_for_slug.gsub('&nbsp;', ' ').parameterize
+      self.slug = text_for_slug.gsub('&nbsp;', ' ').parameterize
       return if similar_slugs.empty? || !similar_slugs.include?(self.slug)
       i = 0
       self.slug = loop do
@@ -25,11 +26,11 @@ module Autotune
     end
 
     def similar_slugs
-      @_similar_slugs ||= begin
+      @similar_slugs ||= begin
         if id
-          q = ["slug LIKE ? AND id != ?", "#{self.slug}%", id]
+          q = ['slug LIKE ? AND id != ?', "#{self.slug}%", id]
         else
-          q = ["slug LIKE ?", "#{self.slug}%"]
+          q = ['slug LIKE ?', "#{self.slug}%"]
         end
         self.class.where(q).map { |e| e.slug }
       end

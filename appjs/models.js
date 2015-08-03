@@ -3,7 +3,8 @@
 var Backbone = require('backbone'),
     _ = require('underscore'),
     moment = require('moment'),
-    markdown = require('markdown').markdown;
+    markdown = require('markdown').markdown,
+    PageableCollection = require('backbone.paginator');
 
 /**
  * Wrapper around Backbone.ajax where a simple `Accepted` status response with an empty
@@ -60,6 +61,7 @@ exports.Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   build: function() {
+    this.set({'status': 'building'});
     return getEmptyJSON(this.url() + '/build');
   },
 
@@ -68,6 +70,7 @@ exports.Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   buildAndPublish: function() {
+    this.set({'status': 'building'});
     return getEmptyJSON(this.url() + '/build_and_publish');
   },
 
@@ -76,6 +79,7 @@ exports.Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   updateSnapshot: function() {
+    this.set({'status': 'updating'});
     return getEmptyJSON(this.url() + '/update_snapshot');
   },
 
@@ -226,9 +230,21 @@ exports.Project = Backbone.Model.extend({
   }
 });
 
-exports.ProjectCollection = Backbone.Collection.extend({
+exports.ProjectCollection = PageableCollection.extend({
   model: exports.Project,
-  url: '/projects'
+  url: '/projects',
+
+  state: {
+    totalRecords: null,
+    totalPages: null,
+    firstPage: 1,
+    currentPage: 1,
+    pageSize: 15
+  },
+
+  parseState: function (response, queryParams, state, options) {
+    return {totalRecords: parseInt(options.xhr.getResponseHeader("X-Total"))};
+  }
 });
 
 exports.Blueprint = Backbone.Model.extend({
@@ -272,6 +288,7 @@ exports.Blueprint = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   updateRepo: function() {
+    this.set({'status': 'updating'});
     return getEmptyJSON(this.url() + '/update_repo');
   }
 });

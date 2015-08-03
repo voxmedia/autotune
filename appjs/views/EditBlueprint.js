@@ -5,7 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    FormView = require('./FormView'),
+    BaseView = require('./BaseView'),
     Alpaca = require('../vendor/alpaca'),
     ace = require('brace');
 
@@ -163,24 +163,16 @@ var setup = function(formData) {
   doRefresh($("#previewDiv"));
 };
 
-module.exports = FormView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint.ejs'),
-  handleUpdateAction: function(eve) {
-    var $btn = $(eve.currentTarget),
-        model_class = $btn.data('model'),
-        model_id = $btn.data('model-id'),
-        inst = new models[model_class]({id: model_id});
 
-    inst.updateRepo()
-      .done(_.bind(function() {
-        this.app.view.success('Updating blueprint repo');
-        inst.fetch();
-      }, this))
-      .fail(_.bind(this.handleRequestError, this));
+  afterInit: function() {
+    this.listenTo(this.model, 'change', this.render);
   },
+
   afterRender: function() {
     if ( !this.model.isNew() ) {
       setup(this.model.get('config').form);
     }
   }
-});
+} );

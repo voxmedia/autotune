@@ -10,5 +10,5 @@
   "boss": true,
   "eqnull": true,
   "node": true,
-  "predef": ["document", "window"]
+  "predef": ["document", "window", "Promise"]
 }

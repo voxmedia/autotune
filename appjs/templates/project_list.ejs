@@ -74,7 +74,7 @@
     <td>Blueprint</td>
     <td class="text-right">Bold Actions</td>
   </tr>
-  <% if(getObjects().length == 0) { %>
+  <% if(!hasObjects()) { %>
   <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>
   <% }
    _.each(getObjects(), function(item) { %>
@@ -127,11 +127,20 @@
       <a data-tooltip="preview" target="_blank"
          href="<%=item.getPreviewUrl('http') %>"><span class="icon-preview"></span></a>
     <% } %>
-      <a data-tooltip="delete" data-loading-text=""
-         data-action="delete" data-model="Project"
+      <a data-tooltip="delete"
+         data-action-message="Project deleted"
+         data-action-confirm="Are you sure you wish to delete this?"
+         data-action="destroy" data-model="Project" data-action-next="reload"
          data-model-id="<%= item.get('slug') %>"><span class="icon-delete"></span></a>
     </td>
   </tr>
 <% }); %>
   </tbody>
 </table>
+<nav>
+  <ul class="pager">
+    <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
+    <li>Page <%=collection.state.currentPage %></li>
+    <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
+  </ul>
+</nav>

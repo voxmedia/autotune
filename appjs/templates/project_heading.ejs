@@ -1,0 +1,22 @@
+  <h3><% if ( model.isNew() ) { %>New Project<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+
+  <% if ( !model.isNew() ) { %>
+  <p class="text-muted">
+    Status:
+    <% if ( model.hasStatus('broken') ) { %>
+    <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+    <% } else if ( !model.hasStatus('built') ) { %>
+    <span class="text-warning">Building...</span>
+    <% } else if ( model.hasUnpublishedUpdates() ) { %>
+      <a data-tooltip="Your Published Version Has Updates"
+         target="_blank" href="<%=model.get('publish_url') %>">Published</a> (has updates)
+    <% } else if ( model.isPublished() ) { %>
+      <a data-tooltip="View Published Preview"
+         target="_blank" href="<%=model.get('publish_url') %>">Published</a>
+    <% } else { %>
+      <a data-tooltip="View Draft Preview"
+         target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
+    <% } %>
+    <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
+  </p>
+  <% } %>

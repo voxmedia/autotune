@@ -16,13 +16,17 @@
 
   <button type="button" class="btn btn-success" id="publishBtn"
           <% if ( !model.hasStatus('built') ) { %>disabled="true"<% } %>
+          data-action-message="Publishing..."
           data-action="build-and-publish" data-model="Project"
+          data-action-next="reload"
           data-model-id="<%=model.get('slug') %>">Publish</button>
 
   <button type="button" class="btn btn-danger" id="deleteBtn"
           <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>
-          data-action="delete" data-model="Project"
-          data-next="/projects"
+          data-action-message="Project deleted"
+          data-action-confirm="Are you sure you wish to delete this?"
+          data-action="destroy"
+          data-action-next="/projects" data-model="Project"
           data-model-id="<%=model.get('slug') %>">Delete</button>
 <% } %>
 </p>
@@ -41,7 +45,7 @@
     </p>
   <% } else if ( model.hasStatus('building') ) { %>
   <p class="text-warning">
-    <span class="m-status status-info"><i class="icon-info"></i>Building the project, gimmie a sec.</span>
+    <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span>
   </p>
   <% } else if ( model.isDraft() ) { %>
   <p class="text-warning">

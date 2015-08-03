@@ -4,8 +4,8 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
-    FormView = require('./FormView');
+    BaseView = require('./BaseView');
 
-module.exports = FormView.extend({
+module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint_chooser.ejs')
-});
+} );
