@@ -46,7 +46,7 @@ function App(config) {
 
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
-
+  
   this.listener = new Listener();
   this.listener.on('change:blueprint', this.handleBlueprintChange, this);
   this.listener.on('change:project',   this.handleProjectChange, this);
