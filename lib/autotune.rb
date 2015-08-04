@@ -11,6 +11,7 @@ module Autotune
   REPO_URL_RE = %r{(\w+://)?(.+@)?([\w\.]+)(:[\d]+)?/?(.*)}
   PROJECT_STATUSES = %w(new building updated built broken)
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
+  BLUEPRINT_TYPES = %w(graphic app)
   ROLES = %w(author editor superuser)
 
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
