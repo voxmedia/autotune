@@ -50,7 +50,7 @@ function App(config) {
 
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
-
+  
   this.listener = new Listener();
   this.listener.on('change:blueprint', this.handleBlueprintChange, this);
   this.listener.on('change:project',   this.handleProjectChange, this);
@@ -806,7 +806,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'blueprint_type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'type', 'theme', 'search'),
         app: app
       });
       view.render();
@@ -1399,14 +1399,14 @@ __p+='\n                    value="'+
  }) 
 __p+='\n            </select>\n          </div>\n          ';
  } 
-__p+='\n          <div class="select">\n            <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n              <option disabled ';
- if(!query.blueprint_type) { 
+__p+='\n          <div class="select">\n            <select name="type" id="type" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.type) { 
 __p+='selected';
  } 
-__p+='>Type</option>\n            ';
+__p+='>Type!</option>\n            ';
  _.each(app.config.blueprint_types, function(type) { 
 __p+='\n              <option ';
- if(type === query.blueprint_type) { 
+ if(type === query.type) { 
 __p+='selected';
  } 
 __p+='\n                    value="'+
