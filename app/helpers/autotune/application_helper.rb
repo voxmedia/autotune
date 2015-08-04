@@ -9,6 +9,7 @@ module Autotune
         :tags => Tag.all.as_json(:only => [:title, :slug]),
         :project_statuses => Autotune::PROJECT_STATUSES,
         :blueprint_statuses => Autotune::BLUEPRINT_STATUSES,
+        :blueprint_types => Autotune::BLUEPRINT_TYPES,
         :spinner => ActionController::Base.helpers.asset_path('autotune/spinner.gif'),
         :faq_url => Rails.configuration.autotune.faq_url
       }
