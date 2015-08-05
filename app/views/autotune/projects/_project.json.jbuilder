@@ -4,6 +4,7 @@ json.extract!(
   :preview_url, :publish_url, :user_id, :published_at, :data_updated_at,
   :blueprint_version, :blueprint_config)
 
+json.type project.blueprint.type
 json.blueprint_title project.blueprint.title
 json.theme project.theme.value
 json.created_by project.user.name
