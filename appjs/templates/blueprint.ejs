@@ -84,7 +84,7 @@
                       <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
                       data-action-message="Upgrade started"
                       data-loading-text="Upgrading..."
-                      data-action="update" data-model="Blueprint"
+                      data-action="update-repo" data-model="Blueprint"
                       data-action-next="reload"
                       data-model-id="<%=model.get('slug') %>">Upgrade</button>
               <button type="button" class="btn btn-danger"
