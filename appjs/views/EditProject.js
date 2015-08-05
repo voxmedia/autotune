@@ -47,6 +47,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes;
 
+    $($form).keypress(function(event){
+      if (event.keyCode === 10 || event.keyCode === 13){
+        event.preventDefault();
+      }
+    });
+
     if ( this.model.isNew() ) {
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
