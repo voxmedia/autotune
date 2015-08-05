@@ -20,8 +20,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     assert bp.installed?, 'Blueprint should be installed'
     assert_equal 'testing', bp.status
-    # only `generic` theme is enabled for the test suite
+    # only `generic` and `vox` themes are enabled for the test suite
     # the sync should have reset all the themes to just the one available
-    assert_equal 1, bp.themes.count
+    assert_equal 2, bp.themes.count
   end
 end
