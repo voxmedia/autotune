@@ -44,6 +44,7 @@ module.exports = {
   },
 
   getPageUrl: function(page) {
+    $(window).scrollTop();
     var base = _.result(this.collection, 'url'),
         qs = _.extend({page: page}, this.query);
     return base + '?' + querystring.stringify( qs );
