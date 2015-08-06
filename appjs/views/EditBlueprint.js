@@ -22,6 +22,7 @@ var setup = function(formData) {
   };
 
   var sourceRefresh = function(form) {
+    console.log("form", form);
     var config,
         cursor = editor1.getCursorPosition();
     try {
@@ -88,6 +89,7 @@ var setup = function(formData) {
       if (!config.options) { config.options = {}; }
 
       config.options.focus = false;
+
       if ( cb ) {
         config.postRender = function(form) { cb(null, form); };
       }
@@ -171,6 +173,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   },
 
   afterRender: function() {
+    var $form = this.$el.find('#new-blueprint');
+    $($form).keypress(function(event){
+      if (event.keyCode === 10 || event.keyCode === 13){
+        event.preventDefault();
+      }
+    });
     if ( !this.model.isNew() ) {
       setup(this.model.get('config').form);
     }
