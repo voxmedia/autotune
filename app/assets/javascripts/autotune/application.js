@@ -1242,9 +1242,9 @@ __p+='\n    </p>\n    ';
  } 
 __p+='\n  </div>\n\n</div>\n\n<div role="tabpanel">\n\n  <!-- Nav tabs -->\n  <ul class="nav nav-tabs" role="tablist">\n    <li role="presentation" class="active"><a\n        href="#edit" aria-controls="edit"\n        role="tab" data-toggle="tab">Project info</a></li>\n    ';
  if ( model.isPublished() ) { 
-__p+='\n    <li role="presentation"><a\n        href="#embed" aria-controls="embed"\n        role="tab" data-toggle="tab">Embed</a></li>\n    ';
+__p+='\n    <li role="presentation"><a\n        href="#embed" aria-controls="embed"\n        role="tab" data-toggle="tab">Embed</a></li>\n    <li role="presentation"><a\n        href="#screenshots" aria-controls="screenshots"\n        role="tab" data-toggle="tab">Screenshots</a></li>\n    ';
  } else { 
-__p+='\n    <li role="presentation" class="disabled"><a>Embed</a></li>\n    ';
+__p+='\n    <li role="presentation" class="disabled"><a>Embed</a></li>\n    <li role="presentation" class="disabled"><a>Screenshots</a></li>\n    ';
  } 
 __p+='\n    ';
  if ( hasRole('superuser') ) { 
@@ -1266,7 +1266,7 @@ __p+='\n        </div>\n        <div class="col-md-4">'+
 ((__t=(model.instructions() ))==null?'':__t)+
 '</div>\n      </div>\n      ';
  } 
-__p+='\n    </div>\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    ';
+__p+='\n    </div>\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    <div role="tabpanel" class="tab-pane" id="screenshots">\n\n      <ul class="nav nav-pills">\n        <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>\n        <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>\n        <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>\n      </ul>\n\n      <div class="tab-content">\n        <div id="large-ss" class="row tab-pane active">\n          <img path="screenshots/screenshot_l.png" />\n        </div>\n        <div id="medium-ss" class="row tab-pane">\n          <img path="screenshots/screenshot_m.png" />\n        </div>\n        <div id="small-ss" class="row tab-pane">\n          <img path="screenshots/screenshot_s.png" />\n        </div>\n      </div>\n\n    </div>\n    ';
  if ( hasRole('superuser') ) { 
 __p+='\n    <div role="tabpanel" class="tab-pane" id="developer">\n      <p>Status:\n        ';
  if ( model.hasStatus('broken') ) { 
@@ -30071,6 +30071,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var view = this, promises = [];
     if ( this.model.isPublished() ) {
       var proto = window.location.protocol.replace( ':', '' ),
+          prefix = this.model.getPublishUrl(proto),
           embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
 
       promises.push( Promise
@@ -30078,6 +30079,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         .then( function(data) {
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
+          $.each(view.$( '#screenshots img' ), function(){
+            $(this).attr( 'src', prefix+$(this).attr('path') );
+            $(this).removeAttr( 'path' );
+          });
         }).catch(function(error) {
           logger.error(error);
         }) );

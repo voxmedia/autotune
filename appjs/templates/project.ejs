@@ -37,8 +37,12 @@
     <li role="presentation"><a
         href="#embed" aria-controls="embed"
         role="tab" data-toggle="tab">Embed</a></li>
+    <li role="presentation"><a
+        href="#screenshots" aria-controls="screenshots"
+        role="tab" data-toggle="tab">Screenshots</a></li>
     <% } else { %>
     <li role="presentation" class="disabled"><a>Embed</a></li>
+    <li role="presentation" class="disabled"><a>Screenshots</a></li>
     <% } %>
     <% if ( hasRole('superuser') ) { %>
       <% if ( model.isNew() ) { %>
@@ -66,6 +70,27 @@
       <% } %>
     </div>
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
+    <div role="tabpanel" class="tab-pane" id="screenshots">
+
+      <ul class="nav nav-pills">
+        <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>
+        <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>
+        <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="large-ss" class="row tab-pane active">
+          <img path="screenshots/screenshot_l.png" />
+        </div>
+        <div id="medium-ss" class="row tab-pane">
+          <img path="screenshots/screenshot_m.png" />
+        </div>
+        <div id="small-ss" class="row tab-pane">
+          <img path="screenshots/screenshot_s.png" />
+        </div>
+      </div>
+
+    </div>
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">
       <p>Status:
