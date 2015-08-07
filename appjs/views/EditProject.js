@@ -23,6 +23,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var view = this, promises = [];
     if ( this.model.isPublished() ) {
       var proto = window.location.protocol.replace( ':', '' ),
+          prefix = this.model.getPublishUrl(proto),
           embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
 
       promises.push( Promise
@@ -30,6 +31,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         .then( function(data) {
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
+          $.each(view.$( '#screenshots img' ), function(){
+            $(this).attr( 'src', prefix+$(this).attr('path') );
+            $(this).removeAttr( 'path' );
+          });
         }).catch(function(error) {
           logger.error(error);
         }) );
