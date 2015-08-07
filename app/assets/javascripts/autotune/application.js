@@ -715,6 +715,7 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
+    $(window).scrollTop(0);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.listener.start();
