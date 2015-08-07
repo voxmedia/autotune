@@ -45,7 +45,7 @@
           <% } %>
           <div class="select">
             <select name="type" id="type" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.type) { %>selected<% } %>>Type!</option>
+              <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
             <% _.each(app.config.blueprint_types, function(type) { %>
               <option <% if(type === query.type) { %>selected<% } %>
                     value="<%=type %>"><%=type %></option>
