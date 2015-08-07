@@ -27,7 +27,10 @@ module Autotune
       @projects = Project
 
       # Filter and search query
-      query = select_from_get :status
+      type = false
+      query = {}
+      query[:status] = params[:status] if params.key? :status
+      type = true if params.key? :type
       @projects = @projects.search(params[:search]) if params.key? :search
 
       if params.key? :theme
@@ -43,6 +46,17 @@ module Autotune
         else
           query[:user_id] = current_user.id
         end
+      end
+
+      if query || type
+        @projects = @projects.where(query)
+        if params.key? :type
+          @blueprints = Blueprint
+          @blueprint_ids = @blueprints.where({:type => params[:type]}).pluck(:id)
+          @projects = @projects.where( :blueprint_id => @blueprint_ids )
+        end
+      else
+        @projects = @projects.all
       end
 
       page = params[:page] || 1
