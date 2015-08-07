@@ -189,16 +189,12 @@ module.exports = {
   },
 
   getObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query);
-    } else {
-      return this.collection.models;
-    }
+    return this.collection.models;
   },
 
   hasObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query).length > 0;
+    if (this.collection.models.length > 0) {
+      return this.collection.models.length > 0;
     } else {
       return this.collection.models.length > 0;
     }
