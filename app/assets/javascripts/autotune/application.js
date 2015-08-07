@@ -221,7 +221,6 @@ module.exports = {
   },
 
   getPageUrl: function(page) {
-    $(window).scrollTop();
     var base = _.result(this.collection, 'url'),
         qs = _.extend({page: page}, this.query);
     return base + '?' + querystring.stringify( qs );
@@ -801,6 +800,12 @@ module.exports = Backbone.Router.extend({
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }
+
+    if (query.page) {
+      jqxhr = projects.getPage(parseInt(query.page));
+    } else {
+      jqxhr = projects.getFirstPage();
+    }
 
     Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
@@ -1402,7 +1407,7 @@ __p+='\n          <div class="select">\n            <select name="type" id="type
  if(!query.type) { 
 __p+='selected';
  } 
-__p+='>Type!</option>\n            ';
+__p+='>Type</option>\n            ';
  _.each(app.config.blueprint_types, function(type) { 
 __p+='\n              <option ';
  if(type === query.type) { 
