@@ -22,6 +22,7 @@ module Autotune
       query[:tag] = params[:tag] if params.key? :theme
       query[:type] = params[:type] if params.key? :type
       @blueprints = @blueprints.search(params[:search]) if params.key? :search
+
       if query.empty?
         @blueprints = @blueprints.all
       else
