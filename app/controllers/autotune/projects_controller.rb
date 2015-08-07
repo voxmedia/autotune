@@ -45,11 +45,12 @@ module Autotune
         end
       end
 
-      if query.empty?
-        @projects = @projects.all
-      else
-        @projects = @projects.where(query)
-      end
+      # if query.empty?
+      #   @projects = @projects.all
+      #   puts @projects
+      # else
+      #   @projects = @projects.where(query)
+      # end
 
       page = params[:page] || 1
       per_page = params[:per_page] || 15
