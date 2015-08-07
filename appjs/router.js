@@ -50,7 +50,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( blueprints.fetch({data: query}) ).then(function() {
       view = new views.ListBlueprints({
         collection: blueprints,
-        query: _.pick(query, 'type', 'tag', 'status'), 
+        query: _.pick(query, 'type', 'tag', 'status'),
         app: app
       });
       view.render();
@@ -117,12 +117,6 @@ module.exports = Backbone.Router.extend({
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }
-
-    if (query.page) {
-      jqxhr = projects.getPage(parseInt(query.page));
-    } else {
-      jqxhr = projects.getFirstPage();
-    }
 
     Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
