@@ -5,16 +5,16 @@ module Autotune
     # Deploy to the local filesystem
     class File < Autotune::Deployer
       # Deploy an entire directory
-      def deploy(source, slug)
+      def deploy(source)
         dir = WorkDir.new(source)
-        dir.rm(parts.path) if ::File.exist?(parts.path)
-        dir.copy_to(::File.join(parts.path, slug))
+        dir.rm(deploy_path) if ::File.exist?(deploy_path)
+        dir.copy_to(deploy_path)
       end
 
       # Deploy a single file
-      def deploy_file(source, slug, path)
+      def deploy_file(source, path)
         dir = WorkDir.new(source)
-        dir.cp(path, ::File.join(parts.path, slug, path))
+        dir.cp(path, [deploy_path, path].join('/'))
       end
     end
   end

@@ -5,6 +5,8 @@ require 'open3'
 module WorkDir
   # Thin API for doing shell stuff
   class Base
+    attr_writer :logger
+
     # Create a new shell object with a working directory and environment vars
     def initialize(path, env = {})
       @working_dir = path.to_s
@@ -90,7 +92,7 @@ module WorkDir
     # Wrapper around Open3.capture2e
     def cmd(*args, **opts, &block)
       opts[:unsetenv_others] = true unless opts.keys.include? :unsetenv_others
-      WorkDir.logger.debug((@env.map { |k, v| "#{k}=#{v}" } + args).join(' '))
+      logger.debug((@env.map { |k, v| "#{k}=#{v}" } + args).join(' '))
       out, status = Open3.capture2e(@env, *args, **opts, &block)
       return out if status.success?
       raise CommandError, "#{args.join(' ')}\n#{out}"
@@ -180,6 +182,10 @@ module WorkDir
       else
         nil
       end
+    end
+
+    def logger
+      @logger ||= WorkDir.logger
     end
 
     def to_s

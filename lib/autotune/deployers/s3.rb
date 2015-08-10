@@ -6,20 +6,18 @@ module Autotune
     # Deploy to s3
     class S3 < Autotune::Deployer
       # Deploy an entire directory
-      def deploy(source, project)
-        app_path = [parts.path, project.slug].join('/')
+      def deploy(source)
         deployer = S3deploy::Deployer.new(
           :dist_dir => source, :bucket => parts.host,
-          :app_path => app_path, :logger => Rails.logger)
+          :app_path => deploy_path, :logger => logger)
         deployer.deploy!
       end
 
       # Deploy a single file
-      def deploy_file(source, project, path)
-        app_path = [parts.path, project.slug].join('/')
+      def deploy_file(source, path)
         deployer = S3deploy::Deployer.new(
           :dist_dir => source, :bucket => parts.host,
-          :app_path => app_path, :logger => Rails.logger)
+          :app_path => deploy_path, :logger => logger)
         deployer.deploy_file!(path)
       end
     end

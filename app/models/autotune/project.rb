@@ -52,7 +52,7 @@ module Autotune
           :blueprint_version => blueprint.version,
           :blueprint_config => blueprint.config)
       end
-      BuildJob.perform_later(self, :preview, true)
+      BuildJob.perform_later(self, 'preview', true)
     rescue
       update!(:status => 'broken')
       raise
@@ -68,7 +68,7 @@ module Autotune
 
     def build_and_publish
       update(:status => 'building')
-      BuildJob.perform_later(self, :publish)
+      BuildJob.perform_later(self, 'publish')
     rescue
       update!(:status => 'broken')
       raise
@@ -79,11 +79,11 @@ module Autotune
     end
 
     def preview_url
-      Autotune.find_deployment(:preview).url_for(self, slug)
+      Autotune.new_deployer(:preview, self).project_url
     end
 
     def publish_url
-      Autotune.find_deployment(:preview).url_for(self, slug)
+      Autotune.new_deployer(:publish, self).project_url
     end
 
     private

@@ -9,6 +9,8 @@ module Autotune
     # Bootstrap for css
     require 'bootstrap-sass'
 
+    require 'will_paginate'
+
     initializer 'autotune.init', :before => :load_config_initializers do |app|
       app.config.autotune = Config.new
 

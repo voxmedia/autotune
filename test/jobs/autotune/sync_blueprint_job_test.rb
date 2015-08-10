@@ -23,5 +23,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     # only `generic` and `vox` themes are enabled for the test suite
     # the sync should have reset all the themes to just the one available
     assert_equal 2, bp.themes.count
+
+    assert_equal '/media/example-blueprint/thumbnail.jpg', bp.thumb_url
   end
 end

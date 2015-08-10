@@ -90,5 +90,11 @@ module Autotune
 
       assert b.destroy, 'can delete blueprints'
     end
+
+    test 'thumb url' do
+      assert_equal(
+        '/assets/autotune/at_placeholder.png',
+        autotune_blueprints(:example).thumb_url)
+    end
   end
 end

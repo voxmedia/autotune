@@ -45,19 +45,22 @@ module Autotune
       end
     end
 
-    def find_deployment(target, project = nil)
+    def new_deployer(target, project = nil, **opts)
       dep = @deployments[target.to_sym]
-      if dep.is_a? Proc
-        dep.call(project)
-      elsif dep.is_a? Hash
-        parts = URI.parse(dep['connect'] || dep[:connect])
+      dep = dep.call(project, opts) if dep.is_a? Proc
+      if dep.is_a? Hash
+        parts = URI.parse(dep[:connect])
         unless @deployers.key? parts.scheme.to_sym
           raise "No deployer registered for #{parts.scheme}://"
         end
-        @deployers[parts.scheme.to_sym].new(dep)
+        @deployers[parts.scheme.to_sym].new(
+          dep.dup.update(:project => project).update(opts))
       else
         dep
       end
+    rescue => exc
+      Rails.logger.error exc.message + "\n" + exc.backtrace.join("\n")
+      raise
     end
 
     def configure

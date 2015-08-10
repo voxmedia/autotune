@@ -26,9 +26,7 @@ module Autotune
 
     def thumb_url
       if config['thumbnail'] && !config['thumbnail'].empty?
-        File.join(
-          Rails.configuration.autotune.media[:base_url],
-          slug, config['thumbnail']).to_s
+        Autotune.new_deployer(:media, self).url_for(config['thumbnail'])
       else
         ActionController::Base.helpers.asset_path('autotune/at_placeholder.png')
       end

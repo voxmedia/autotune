@@ -38,10 +38,9 @@ module Autotune
 
       # Stash the thumbnail
       if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
-        deployer = Autotune.find_deployment(:media)
+        deployer = Autotune.new_deployer(:media, blueprint)
         deployer.deploy_file(
           blueprint.working_dir,
-          blueprint.slug,
           blueprint.config['thumbnail'])
       end
 

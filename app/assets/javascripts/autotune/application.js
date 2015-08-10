@@ -151,6 +151,7 @@ _.extend(App.prototype, Backbone.Events, {
     switch (data.status) {
       case 'new':
       case 'built':
+      case 'broken':
         inst.fetch();
         break;
       default:

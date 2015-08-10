@@ -43,9 +43,9 @@ module Autotune
     def self.find_by_auth_hash(auth_hash)
       roles = verify_auth_hash(auth_hash)
       return if roles.nil?
-      a = Authorization.where(
+      a = Authorization.find_by(
         :provider => auth_hash['provider'],
-        :uid => auth_hash['uid']).first
+        :uid => auth_hash['uid'])
       return if a.nil?
 
       a.update(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)

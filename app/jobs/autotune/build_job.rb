@@ -1,13 +1,19 @@
 require 'work_dir'
 require 'date'
+require 'logger'
+require 'stringio'
 
 module Autotune
   # project a blueprint
   class BuildJob < ActiveJob::Base
     queue_as :default
 
-    def perform(project, target = :preview, force_sync = false)
-      out = nil
+    def perform(project, target = 'preview', force_sync = false)
+      out = StringIO.new
+      outlogger = Logger.new out
+      outlogger.formatter = proc do |severity, datetime, _progname, msg|
+        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
+      end
       # Create a new repo object based on the projects working dir
       repo = WorkDir.repo(project.working_dir,
                           Rails.configuration.autotune.build_environment)
@@ -16,46 +22,51 @@ module Autotune
       SyncProjectJob.perform_now(project) if !repo.exist? || force_sync
 
       # Add a few extras to the build data
-      build_data = project.data.dup
+      build_data = project.data.deep_dup
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
         'theme' => project.theme.value)
 
       # Get the deployer object
-      deployer = Autotune.find_deployment(target, project)
+      deployer = Autotune.new_deployer(target.to_sym, project, :logger => outlogger)
 
       # Run the before build deployer hook
-      deployer.before_build(build_data, project)
+      deployer.before_build(build_data)
 
       # Run the build
       repo.working_dir do
-        project.output = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
+        outlogger.info repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
       end
 
       # Upload build
-      deployer.deploy(project.deploy_dir, project.slug)
+      deployer.deploy(project.deploy_dir)
 
       # Create screenshots (has to happen after upload)
-      url = deployer.url_for(project, project.slug)
+      url = deployer.base_url
       phantom = WorkDir.phantom(project.deploy_dir)
       phantom.capture_screenshot(get_full_url(url)) if phantom.phantomjs?
 
       # Upload screens
       phantom.screenshots.each do |filename|
-        deployer.deploy_file(project.deploy_dir, project.slug, filename)
+        deployer.deploy_file(project.deploy_dir, filename)
       end
 
       # Set status and save project
+      project.published_at = DateTime.current if target.to_sym == :publish
       project.status = 'built'
-      project.published_at = DateTime.current if target == :publish
-      project.save!
     rescue => exc
       # If the command failed, raise a red flag
-      logger.error(exc)
-      out ||= "#{exc.message}\n#{exc.backtrace.join("\n")}"
-      project.update!(:output => out, :status => 'broken')
+      msg = exc.message + "\n" + exc.backtrace.join("\n")
+      logger.error(msg)
+      outlogger.error(msg)
+      project.status = 'broken'
       raise
+    ensure
+      out.rewind
+      project.output = out.read
+      project.save!
+      outlogger.close
     end
 
     private
