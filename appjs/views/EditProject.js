@@ -88,10 +88,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             },
             "slug": {
               "title": "Slug",
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 60,
-              "pattern": "^[0-9a-z\-_]{1,60}$"
+              "type": "string"
             },
             "theme": {
               "title": "Theme",
@@ -113,6 +110,23 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             "theme": {
               "type": "select",
               "optionLabels": pluckAttr(themes, 'label')
+            },
+            "slug": {
+              "label": "Slug", 
+              "validator": function(callback){
+                var slugPattern = /^[0-9a-z\-_]{0,59}$/;
+                var slug = this.getValue();
+                if ( slugPattern.test(slug) ){
+                  callback({
+                    "status": true
+                  });
+                } else {
+                  callback({
+                    "status": false,
+                    "message": "Must contain fewer than 60 numbers, letters, hyphens, and underscores."
+                  });
+                }
+              }
             }
           };
 
