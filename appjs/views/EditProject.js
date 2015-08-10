@@ -89,7 +89,9 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             "slug": {
               "title": "Slug",
               "type": "string",
-              "pattern": "^[0-9a-z\-_]+$"
+              "minLength": 1,
+              "maxLength": 60,
+              "pattern": "^[0-9a-z\-_]{1,60}$"
             },
             "theme": {
               "title": "Theme",
