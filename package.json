@@ -44,7 +44,6 @@
     "pnotify": "git://github.com/sciactive/pnotify",
     "promise": "^7.0.3",
     "pym.js": "0.4.1",
-    "query-string": "1.0.0",
     "underscore": "1.7.0",
     "underscore.string": "3.0.3"
   },

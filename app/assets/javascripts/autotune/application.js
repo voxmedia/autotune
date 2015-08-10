@@ -175,12 +175,12 @@ if ( typeof(window) !== 'undefined' ) {
   window._ = _;
 }
 
-},{"./listener":3,"./logger":4,"./models":5,"./router":6,"./vendor/alpaca":18,"./views":19,"backbone":31,"bootstrap":32,"jquery":58,"underscore":131}],2:[function(require,module,exports){
+},{"./listener":3,"./logger":4,"./models":5,"./router":6,"./vendor/alpaca":18,"./views":19,"backbone":31,"bootstrap":32,"jquery":61,"underscore":133}],2:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
     _ = require('underscore'),
-    queryString = require('query-string');
+    querystring = require('querystring');
 
 module.exports = {
   render: function(template, templateObj) {
@@ -224,7 +224,7 @@ module.exports = {
   getPageUrl: function(page) {
     var base = _.result(this.collection, 'url'),
         qs = _.extend({page: page}, this.query);
-    return base + '?' + queryString.stringify( qs );
+    return base + '?' + querystring.stringify( qs );
   },
 
   getNextPageUrl: function() {
@@ -236,7 +236,7 @@ module.exports = {
   }
 };
 
-},{"jquery":58,"query-string":64,"underscore":131,"underscore.string":87}],3:[function(require,module,exports){
+},{"jquery":61,"querystring":43,"underscore":133,"underscore.string":89}],3:[function(require,module,exports){
 "use strict";
 
 var _ = require('underscore'),
@@ -349,7 +349,7 @@ _.extend(Listener.prototype, Backbone.Events, {
 
 module.exports = Listener;
 
-},{"./logger":4,"backbone":31,"underscore":131}],4:[function(require,module,exports){
+},{"./logger":4,"backbone":31,"underscore":133}],4:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -681,7 +681,7 @@ exports.BlueprintCollection = Backbone.Collection.extend({
   url: '/blueprints'
 });
 
-},{"backbone":31,"backbone.paginator":30,"markdown":59,"moment":61,"underscore":131}],6:[function(require,module,exports){
+},{"backbone":31,"backbone.paginator":30,"markdown":62,"moment":64,"underscore":133}],6:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -690,7 +690,7 @@ var $ = require('jquery'),
     models = require('./models'),
     views = require('./views'),
     logger = require('./logger'),
-    queryString = require('query-string');
+    querystring = require('querystring');
 
 module.exports = Backbone.Router.extend({
 
@@ -729,7 +729,7 @@ module.exports = Backbone.Router.extend({
   listBlueprints: function(params) {
     var blueprints = this.app.blueprints,
         app = this.app, query = {}, view;
-    if(params) { query = queryString.parse(params); }
+    if(params) { query = querystring.parse(params); }
 
     Promise.resolve( blueprints.fetch() ).then(function() {
       view = new views.ListBlueprints({ collection: blueprints, query: query, app: app });
@@ -778,7 +778,7 @@ module.exports = Backbone.Router.extend({
     var blueprints = this.app.blueprints,
         app = this.app, query = {}, view;
 
-    if(params) { query = queryString.parse(params); }
+    if(params) { query = querystring.parse(params); }
     query['status'] = 'ready';
 
     Promise.resolve( blueprints.fetch() ).then(function() {
@@ -796,7 +796,7 @@ module.exports = Backbone.Router.extend({
     var projects = this.app.projects,
         app = this.app, query = {}, view, jqxhr;
 
-    if(params) { query = queryString.parse(params); }
+    if(params) { query = querystring.parse(params); }
 
     if (query.page) {
       jqxhr = projects.getPage(parseInt(query.page));
@@ -874,7 +874,7 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"./logger":4,"./models":5,"./views":19,"backbone":31,"jquery":58,"query-string":64,"underscore":131}],7:[function(require,module,exports){
+},{"./logger":4,"./models":5,"./views":19,"backbone":31,"jquery":61,"querystring":43,"underscore":133}],7:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -894,7 +894,7 @@ __p+='\n          <li data-tab="faq"><a href="'+
 return __p;
 };
 
-},{"./spinner.ejs":17,"underscore":131}],8:[function(require,module,exports){
+},{"./spinner.ejs":17,"underscore":133}],8:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -979,7 +979,7 @@ __p+='\n              <button type="button" class="btn btn-default"\n           
  if ( model.hasStatus('updating') ) { 
 __p+='disabled="true"';
  } 
-__p+='\n                      data-action-message="Upgrade started"\n                      data-loading-text="Upgrading..."\n                      data-action="update" data-model="Blueprint"\n                      data-action-next="reload"\n                      data-model-id="'+
+__p+='\n                      data-action-message="Upgrade started"\n                      data-loading-text="Upgrading..."\n                      data-action="update-repo" data-model="Blueprint"\n                      data-action-next="reload"\n                      data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n              <button type="button" class="btn btn-danger"\n                      ';
  if ( model.hasStatus('updating') ) { 
@@ -1010,7 +1010,7 @@ __p+='\n          </div>\n        </div>\n      </div>\n\n      <div role="tabpa
 return __p;
 };
 
-},{"underscore":131}],9:[function(require,module,exports){
+},{"underscore":133}],9:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1044,7 +1044,7 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":131}],10:[function(require,module,exports){
+},{"underscore":133}],10:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1155,7 +1155,7 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"underscore":131}],11:[function(require,module,exports){
+},{"underscore":133}],11:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1173,7 +1173,7 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":131}],12:[function(require,module,exports){
+},{"underscore":133}],12:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1183,7 +1183,7 @@ __p+='<h3>Not allowed</h3>\n<p>You need a higher access level.</p>\n';
 return __p;
 };
 
-},{"underscore":131}],13:[function(require,module,exports){
+},{"underscore":133}],13:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1193,7 +1193,7 @@ __p+='<h3>Not found</h3>\n<p>I dinna ken what ye want</p>\n';
 return __p;
 };
 
-},{"underscore":131}],14:[function(require,module,exports){
+},{"underscore":133}],14:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1297,7 +1297,7 @@ __p+='\n  </div>\n\n</div>\n';
 return __p;
 };
 
-},{"./spinner.ejs":17,"underscore":131}],15:[function(require,module,exports){
+},{"./spinner.ejs":17,"underscore":133}],15:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1361,7 +1361,7 @@ __p+='\n';
 return __p;
 };
 
-},{"./spinner.ejs":17,"underscore":131}],16:[function(require,module,exports){
+},{"./spinner.ejs":17,"underscore":133}],16:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1526,7 +1526,7 @@ __p+='\n  </tbody>\n</table>\n<nav>\n  <ul class="pager">\n    <li class="previo
 return __p;
 };
 
-},{"underscore":131}],17:[function(require,module,exports){
+},{"underscore":133}],17:[function(require,module,exports){
 var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -1550,7 +1550,7 @@ __p+='\n';
 return __p;
 };
 
-},{"underscore":131}],18:[function(require,module,exports){
+},{"underscore":133}],18:[function(require,module,exports){
 (function (process){
 
 (function(root, factory)
@@ -29597,7 +29597,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }));
 
 }).call(this,require('_process'))
-},{"_process":40,"bootstrap":32,"handlebars":57,"jquery":58}],19:[function(require,module,exports){
+},{"_process":40,"bootstrap":32,"handlebars":60,"jquery":61}],19:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -29724,7 +29724,7 @@ module.exports = BaseView.extend(require('./mixins/links.js'), {
   }
 });
 
-},{"../helpers":2,"../logger":4,"../models":5,"../templates/application.ejs":7,"../templates/error.ejs":11,"../templates/not_allowed.ejs":12,"../templates/not_found.ejs":13,"./BaseView":21,"./mixins/links.js":29,"backbone":31,"jquery":58,"pnotify":63,"pnotify/src/pnotify.buttons":62,"underscore":131}],21:[function(require,module,exports){
+},{"../helpers":2,"../logger":4,"../models":5,"../templates/application.ejs":7,"../templates/error.ejs":11,"../templates/not_allowed.ejs":12,"../templates/not_found.ejs":13,"./BaseView":21,"./mixins/links.js":29,"backbone":31,"jquery":61,"pnotify":66,"pnotify/src/pnotify.buttons":65,"underscore":133}],21:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29840,7 +29840,7 @@ BaseView.extend = function() {
 
 module.exports = BaseView;
 
-},{"../helpers":2,"../logger":4,"../models":5,"backbone":31,"jquery":58,"underscore":131}],22:[function(require,module,exports){
+},{"../helpers":2,"../logger":4,"../models":5,"backbone":31,"jquery":61,"underscore":133}],22:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -29853,7 +29853,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   template: require('../templates/blueprint_chooser.ejs')
 } );
 
-},{"../models":5,"../templates/blueprint_chooser.ejs":9,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":58,"underscore":131}],23:[function(require,module,exports){
+},{"../models":5,"../templates/blueprint_chooser.ejs":9,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133}],23:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30033,7 +30033,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   }
 } );
 
-},{"../logger":4,"../models":5,"../templates/blueprint.ejs":8,"../vendor/alpaca":18,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"brace":33,"brace/mode/javascript":34,"brace/theme/textmate":36,"jquery":58,"underscore":131}],24:[function(require,module,exports){
+},{"../logger":4,"../models":5,"../templates/blueprint.ejs":8,"../vendor/alpaca":18,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"brace":33,"brace/mode/javascript":34,"brace/theme/textmate":36,"jquery":61,"underscore":133}],24:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30205,7 +30205,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   }
 } );
 
-},{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":58,"underscore":131}],25:[function(require,module,exports){
+},{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133}],25:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30236,7 +30236,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   }
 } );
 
-},{"../models":5,"../templates/blueprint_list.ejs":10,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":58,"underscore":131}],26:[function(require,module,exports){
+},{"../models":5,"../templates/blueprint_list.ejs":10,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133}],26:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30253,7 +30253,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   }
 } );
 
-},{"../models":5,"../templates/project_list.ejs":16,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":58,"underscore":131}],27:[function(require,module,exports){
+},{"../models":5,"../templates/project_list.ejs":16,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133}],27:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30327,7 +30327,7 @@ module.exports = {
 
 };
 
-},{"../../helpers":2,"../../logger":4,"../../models":5,"backbone":31,"jquery":58,"underscore":131,"underscore.string/camelize":65}],28:[function(require,module,exports){
+},{"../../helpers":2,"../../logger":4,"../../models":5,"backbone":31,"jquery":61,"underscore":133,"underscore.string/camelize":67}],28:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30436,7 +30436,7 @@ module.exports = {
   }
 };
 
-},{"../../helpers":2,"../../logger":4,"../../models":5,"backbone":31,"jquery":58,"underscore":131,"underscore.string/camelize":65}],29:[function(require,module,exports){
+},{"../../helpers":2,"../../logger":4,"../../models":5,"backbone":31,"jquery":61,"underscore":133,"underscore.string/camelize":67}],29:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30462,7 +30462,7 @@ module.exports = {
   }
 };
 
-},{"backbone":31,"jquery":58,"underscore":131}],30:[function(require,module,exports){
+},{"backbone":31,"jquery":61,"underscore":133}],30:[function(require,module,exports){
 /*
   backbone.paginator 2.0.0
   http://github.com/backbone-paginator/backbone.paginator
@@ -31789,7 +31789,7 @@ module.exports = {
 
 }));
 
-},{"backbone":31,"underscore":131}],31:[function(require,module,exports){
+},{"backbone":31,"underscore":133}],31:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -33399,7 +33399,7 @@ module.exports = {
 
 }));
 
-},{"underscore":131}],32:[function(require,module,exports){
+},{"underscore":133}],32:[function(require,module,exports){
 (function (global){
 
 ; jQuery = global.jQuery = require("jquery");
@@ -35522,7 +35522,7 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
 }).call(global, module, undefined, undefined);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":58}],33:[function(require,module,exports){
+},{"jquery":61}],33:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
  * Distributed under the BSD license:
  *
@@ -55094,13 +55094,192 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],41:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+// If obj.hasOwnProperty has been overridden, then calling
+// obj.hasOwnProperty(prop) will break.
+// See: https://github.com/joyent/node/issues/1707
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+module.exports = function(qs, sep, eq, options) {
+  sep = sep || '&';
+  eq = eq || '=';
+  var obj = {};
+
+  if (typeof qs !== 'string' || qs.length === 0) {
+    return obj;
+  }
+
+  var regexp = /\+/g;
+  qs = qs.split(sep);
+
+  var maxKeys = 1000;
+  if (options && typeof options.maxKeys === 'number') {
+    maxKeys = options.maxKeys;
+  }
+
+  var len = qs.length;
+  // maxKeys <= 0 means that we should not limit keys count
+  if (maxKeys > 0 && len > maxKeys) {
+    len = maxKeys;
+  }
+
+  for (var i = 0; i < len; ++i) {
+    var x = qs[i].replace(regexp, '%20'),
+        idx = x.indexOf(eq),
+        kstr, vstr, k, v;
+
+    if (idx >= 0) {
+      kstr = x.substr(0, idx);
+      vstr = x.substr(idx + 1);
+    } else {
+      kstr = x;
+      vstr = '';
+    }
+
+    k = decodeURIComponent(kstr);
+    v = decodeURIComponent(vstr);
+
+    if (!hasOwnProperty(obj, k)) {
+      obj[k] = v;
+    } else if (isArray(obj[k])) {
+      obj[k].push(v);
+    } else {
+      obj[k] = [obj[k], v];
+    }
+  }
+
+  return obj;
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+},{}],42:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+var stringifyPrimitive = function(v) {
+  switch (typeof v) {
+    case 'string':
+      return v;
+
+    case 'boolean':
+      return v ? 'true' : 'false';
+
+    case 'number':
+      return isFinite(v) ? v : '';
+
+    default:
+      return '';
+  }
+};
+
+module.exports = function(obj, sep, eq, name) {
+  sep = sep || '&';
+  eq = eq || '=';
+  if (obj === null) {
+    obj = undefined;
+  }
+
+  if (typeof obj === 'object') {
+    return map(objectKeys(obj), function(k) {
+      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+      if (isArray(obj[k])) {
+        return map(obj[k], function(v) {
+          return ks + encodeURIComponent(stringifyPrimitive(v));
+        }).join(sep);
+      } else {
+        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+      }
+    }).join(sep);
+
+  }
+
+  if (!name) return '';
+  return encodeURIComponent(stringifyPrimitive(name)) + eq +
+         encodeURIComponent(stringifyPrimitive(obj));
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+function map (xs, f) {
+  if (xs.map) return xs.map(f);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    res.push(f(xs[i], i));
+  }
+  return res;
+}
+
+var objectKeys = Object.keys || function (obj) {
+  var res = [];
+  for (var key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
+  }
+  return res;
+};
+
+},{}],43:[function(require,module,exports){
+'use strict';
+
+exports.decode = exports.parse = require('./decode');
+exports.encode = exports.stringify = require('./encode');
+
+},{"./decode":41,"./encode":42}],44:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],42:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -55690,7 +55869,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":41,"_process":40,"inherits":39}],43:[function(require,module,exports){
+},{"./support/isBuffer":44,"_process":40,"inherits":39}],46:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var Handlebars = require("./handlebars.runtime")["default"];
@@ -55728,7 +55907,7 @@ Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars.runtime":44,"./handlebars/compiler/ast":46,"./handlebars/compiler/base":47,"./handlebars/compiler/compiler":48,"./handlebars/compiler/javascript-compiler":49}],44:[function(require,module,exports){
+},{"./handlebars.runtime":47,"./handlebars/compiler/ast":49,"./handlebars/compiler/base":50,"./handlebars/compiler/compiler":51,"./handlebars/compiler/javascript-compiler":52}],47:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -55761,7 +55940,7 @@ var Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars/base":45,"./handlebars/exception":53,"./handlebars/runtime":54,"./handlebars/safe-string":55,"./handlebars/utils":56}],45:[function(require,module,exports){
+},{"./handlebars/base":48,"./handlebars/exception":56,"./handlebars/runtime":57,"./handlebars/safe-string":58,"./handlebars/utils":59}],48:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -55942,7 +56121,7 @@ exports.log = log;var createFrame = function(object) {
   return obj;
 };
 exports.createFrame = createFrame;
-},{"./exception":53,"./utils":56}],46:[function(require,module,exports){
+},{"./exception":56,"./utils":59}],49:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -56170,7 +56349,7 @@ var AST = {
 // Must be exported as an object rather than the root of the module as the jison lexer
 // most modify the object to operate properly.
 exports["default"] = AST;
-},{"../exception":53}],47:[function(require,module,exports){
+},{"../exception":56}],50:[function(require,module,exports){
 "use strict";
 var parser = require("./parser")["default"];
 var AST = require("./ast")["default"];
@@ -56186,7 +56365,7 @@ function parse(input) {
 }
 
 exports.parse = parse;
-},{"./ast":46,"./parser":50}],48:[function(require,module,exports){
+},{"./ast":49,"./parser":53}],51:[function(require,module,exports){
 "use strict";
 var Exception = require("../exception")["default"];
 
@@ -56656,7 +56835,7 @@ exports.precompile = precompile;function compile(input, options, env) {
 }
 
 exports.compile = compile;
-},{"../exception":53}],49:[function(require,module,exports){
+},{"../exception":56}],52:[function(require,module,exports){
 "use strict";
 var COMPILER_REVISION = require("../base").COMPILER_REVISION;
 var REVISION_CHANGES = require("../base").REVISION_CHANGES;
@@ -57599,7 +57778,7 @@ JavaScriptCompiler.isValidJavaScriptVariableName = function(name) {
 };
 
 exports["default"] = JavaScriptCompiler;
-},{"../base":45,"../exception":53}],50:[function(require,module,exports){
+},{"../base":48,"../exception":56}],53:[function(require,module,exports){
 "use strict";
 /* jshint ignore:start */
 /* Jison generated parser */
@@ -58090,7 +58269,7 @@ function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Pa
 return new Parser;
 })();exports["default"] = handlebars;
 /* jshint ignore:end */
-},{}],51:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 var Visitor = require("./visitor")["default"];
 
@@ -58229,7 +58408,7 @@ PrintVisitor.prototype.content = function(content) {
 PrintVisitor.prototype.comment = function(comment) {
   return this.pad("{{! '" + comment.comment + "' }}");
 };
-},{"./visitor":52}],52:[function(require,module,exports){
+},{"./visitor":55}],55:[function(require,module,exports){
 "use strict";
 function Visitor() {}
 
@@ -58242,7 +58421,7 @@ Visitor.prototype = {
 };
 
 exports["default"] = Visitor;
-},{}],53:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
@@ -58271,7 +58450,7 @@ function Exception(message, node) {
 Exception.prototype = new Error();
 
 exports["default"] = Exception;
-},{}],54:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -58409,7 +58588,7 @@ exports.program = program;function invokePartial(partial, name, context, helpers
 exports.invokePartial = invokePartial;function noop() { return ""; }
 
 exports.noop = noop;
-},{"./base":45,"./exception":53,"./utils":56}],55:[function(require,module,exports){
+},{"./base":48,"./exception":56,"./utils":59}],58:[function(require,module,exports){
 "use strict";
 // Build out our basic SafeString type
 function SafeString(string) {
@@ -58421,7 +58600,7 @@ SafeString.prototype.toString = function() {
 };
 
 exports["default"] = SafeString;
-},{}],56:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 /*jshint -W004 */
 var SafeString = require("./safe-string")["default"];
@@ -58498,7 +58677,7 @@ exports.escapeExpression = escapeExpression;function isEmpty(value) {
 }
 
 exports.isEmpty = isEmpty;
-},{"./safe-string":55}],57:[function(require,module,exports){
+},{"./safe-string":58}],60:[function(require,module,exports){
 // USAGE:
 // var handlebars = require('handlebars');
 
@@ -58525,7 +58704,7 @@ if (typeof require !== 'undefined' && require.extensions) {
   require.extensions[".hbs"] = extension;
 }
 
-},{"../dist/cjs/handlebars":43,"../dist/cjs/handlebars/compiler/printer":51,"../dist/cjs/handlebars/compiler/visitor":52,"fs":38}],58:[function(require,module,exports){
+},{"../dist/cjs/handlebars":46,"../dist/cjs/handlebars/compiler/printer":54,"../dist/cjs/handlebars/compiler/visitor":55,"fs":38}],61:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.1
  * http://jquery.com/
@@ -67717,12 +67896,12 @@ return jQuery;
 
 }));
 
-},{}],59:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // super simple module for the most common nodejs use case.
 exports.markdown = require("./markdown");
 exports.parse = exports.markdown.toHTML;
 
-},{"./markdown":60}],60:[function(require,module,exports){
+},{"./markdown":63}],63:[function(require,module,exports){
 // Released under MIT license
 // Copyright (c) 2009-2010 Dominic Baggott
 // Copyright (c) 2009-2010 Ash Berlin
@@ -69449,7 +69628,7 @@ function merge_text_nodes( jsonml ) {
   }
 } )() );
 
-},{"util":42}],61:[function(require,module,exports){
+},{"util":45}],64:[function(require,module,exports){
 //! moment.js
 //! version : 2.10.3
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -72561,7 +72740,7 @@ function merge_text_nodes( jsonml ) {
     return _moment;
 
 }));
-},{}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 // Buttons
 // Uses AMD or browser globals for jQuery.
 (function (factory) {
@@ -72721,7 +72900,7 @@ function merge_text_nodes( jsonml ) {
 	});
 }));
 
-},{"jquery":58,"pnotify":63}],63:[function(require,module,exports){
+},{"jquery":61,"pnotify":66}],66:[function(require,module,exports){
 /*
 PNotify 2.0.1 sciactive.com/pnotify/
 (C) 2014 Hunter Perrin
@@ -73611,75 +73790,7 @@ license GPL/LGPL/MPL
 	return PNotify;
 }));
 
-},{"jquery":58}],64:[function(require,module,exports){
-/*!
-	query-string
-	Parse and stringify URL query strings
-	https://github.com/sindresorhus/query-string
-	by Sindre Sorhus
-	MIT License
-*/
-(function () {
-	'use strict';
-	var queryString = {};
-
-	queryString.parse = function (str) {
-		if (typeof str !== 'string') {
-			return {};
-		}
-
-		str = str.trim().replace(/^(\?|#)/, '');
-
-		if (!str) {
-			return {};
-		}
-
-		return str.trim().split('&').reduce(function (ret, param) {
-			var parts = param.replace(/\+/g, ' ').split('=');
-			var key = parts[0];
-			var val = parts[1];
-
-			key = decodeURIComponent(key);
-			// missing `=` should be `null`:
-			// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-			val = val === undefined ? null : decodeURIComponent(val);
-
-			if (!ret.hasOwnProperty(key)) {
-				ret[key] = val;
-			} else if (Array.isArray(ret[key])) {
-				ret[key].push(val);
-			} else {
-				ret[key] = [ret[key], val];
-			}
-
-			return ret;
-		}, {});
-	};
-
-	queryString.stringify = function (obj) {
-		return obj ? Object.keys(obj).map(function (key) {
-			var val = obj[key];
-
-			if (Array.isArray(val)) {
-				return val.map(function (val2) {
-					return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
-				}).join('&');
-			}
-
-			return encodeURIComponent(key) + '=' + encodeURIComponent(val);
-		}).join('&') : '';
-	};
-
-	if (typeof define === 'function' && define.amd) {
-		define(function() { return queryString; });
-	} else if (typeof module !== 'undefined' && module.exports) {
-		module.exports = queryString;
-	} else {
-		window.queryString = queryString;
-	}
-})();
-
-},{}],65:[function(require,module,exports){
+},{"jquery":61}],67:[function(require,module,exports){
 var trim = require('./trim');
 var decap = require('./decapitalize');
 
@@ -73695,7 +73806,7 @@ module.exports = function camelize(str, decapitalize) {
   }
 };
 
-},{"./decapitalize":73,"./trim":124}],66:[function(require,module,exports){
+},{"./decapitalize":75,"./trim":126}],68:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function capitalize(str) {
@@ -73703,14 +73814,14 @@ module.exports = function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-},{"./helper/makeString":82}],67:[function(require,module,exports){
+},{"./helper/makeString":84}],69:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function chars(str) {
   return makeString(str).split('');
 };
 
-},{"./helper/makeString":82}],68:[function(require,module,exports){
+},{"./helper/makeString":84}],70:[function(require,module,exports){
 module.exports = function chop(str, step) {
   if (str == null) return [];
   str = String(str);
@@ -73718,7 +73829,7 @@ module.exports = function chop(str, step) {
   return step > 0 ? str.match(new RegExp('.{1,' + step + '}', 'g')) : [str];
 };
 
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var capitalize = require('./capitalize');
 var camelize = require('./camelize');
 var makeString = require('./helper/makeString');
@@ -73728,14 +73839,14 @@ module.exports = function classify(str) {
   return capitalize(camelize(str.replace(/[\W_]/g, ' ')).replace(/\s/g, ''));
 };
 
-},{"./camelize":65,"./capitalize":66,"./helper/makeString":82}],70:[function(require,module,exports){
+},{"./camelize":67,"./capitalize":68,"./helper/makeString":84}],72:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function clean(str) {
   return trim(str).replace(/\s+/g, ' ');
 };
 
-},{"./trim":124}],71:[function(require,module,exports){
+},{"./trim":126}],73:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function(str, substr) {
@@ -73758,14 +73869,14 @@ module.exports = function(str, substr) {
   return count;
 };
 
-},{"./helper/makeString":82}],72:[function(require,module,exports){
+},{"./helper/makeString":84}],74:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function dasherize(str) {
   return trim(str).replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();
 };
 
-},{"./trim":124}],73:[function(require,module,exports){
+},{"./trim":126}],75:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function decapitalize(str) {
@@ -73773,7 +73884,7 @@ module.exports = function decapitalize(str) {
   return str.charAt(0).toLowerCase() + str.slice(1);
 };
 
-},{"./helper/makeString":82}],74:[function(require,module,exports){
+},{"./helper/makeString":84}],76:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 function getIndent(str) {
@@ -73803,7 +73914,7 @@ module.exports = function dedent(str, pattern) {
   return str.replace(reg, '');
 };
 
-},{"./helper/makeString":82}],75:[function(require,module,exports){
+},{"./helper/makeString":84}],77:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var toPositive = require('./helper/toPositive');
 
@@ -73818,7 +73929,7 @@ module.exports = function endsWith(str, ends, position) {
   return position >= 0 && str.indexOf(ends, position) === position;
 };
 
-},{"./helper/makeString":82,"./helper/toPositive":84}],76:[function(require,module,exports){
+},{"./helper/makeString":84,"./helper/toPositive":86}],78:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var escapeChars = require('./helper/escapeChars');
 var reversedEscapeChars = {};
@@ -73832,7 +73943,7 @@ module.exports = function escapeHTML(str) {
   });
 };
 
-},{"./helper/escapeChars":80,"./helper/makeString":82}],77:[function(require,module,exports){
+},{"./helper/escapeChars":82,"./helper/makeString":84}],79:[function(require,module,exports){
 module.exports = function() {
   var result = {};
 
@@ -73844,7 +73955,7 @@ module.exports = function() {
   return result;
 };
 
-},{}],78:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 var makeString = require('./makeString');
 
 module.exports = function adjacent(str, direction) {
@@ -73855,7 +73966,7 @@ module.exports = function adjacent(str, direction) {
   return str.slice(0, -1) + String.fromCharCode(str.charCodeAt(str.length - 1) + direction);
 };
 
-},{"./makeString":82}],79:[function(require,module,exports){
+},{"./makeString":84}],81:[function(require,module,exports){
 var escapeRegExp = require('./escapeRegExp');
 
 module.exports = function defaultToWhiteSpace(characters) {
@@ -73867,7 +73978,7 @@ module.exports = function defaultToWhiteSpace(characters) {
     return '[' + escapeRegExp(characters) + ']';
 };
 
-},{"./escapeRegExp":81}],80:[function(require,module,exports){
+},{"./escapeRegExp":83}],82:[function(require,module,exports){
 var escapeChars = {
   lt: '<',
   gt: '>',
@@ -73878,14 +73989,14 @@ var escapeChars = {
 
 module.exports = escapeChars;
 
-},{}],81:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 var makeString = require('./makeString');
 
 module.exports = function escapeRegExp(str) {
   return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 };
 
-},{"./makeString":82}],82:[function(require,module,exports){
+},{"./makeString":84}],84:[function(require,module,exports){
 /**
  * Ensure some object is a coerced to a string
  **/
@@ -73894,7 +74005,7 @@ module.exports = function makeString(object) {
   return '' + object;
 };
 
-},{}],83:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 module.exports = function strRepeat(str, qty){
   if (qty < 1) return '';
   var result = '';
@@ -73905,12 +74016,12 @@ module.exports = function strRepeat(str, qty){
   return result;
 };
 
-},{}],84:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 module.exports = function toPositive(number) {
   return number < 0 ? 0 : (+number || 0);
 };
 
-},{}],85:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 var capitalize = require('./capitalize');
 var underscored = require('./underscored');
 var trim = require('./trim');
@@ -73919,7 +74030,7 @@ module.exports = function humanize(str) {
   return capitalize(trim(underscored(str).replace(/_id$/, '').replace(/_/g, ' ')));
 };
 
-},{"./capitalize":66,"./trim":124,"./underscored":126}],86:[function(require,module,exports){
+},{"./capitalize":68,"./trim":126,"./underscored":128}],88:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function include(str, needle) {
@@ -73927,7 +74038,7 @@ module.exports = function include(str, needle) {
   return makeString(str).indexOf(needle) !== -1;
 };
 
-},{"./helper/makeString":82}],87:[function(require,module,exports){
+},{"./helper/makeString":84}],89:[function(require,module,exports){
 //  Underscore.string
 //  (c) 2010 Esa-Matti Suuronen <esa-matti aet suuronen dot org>
 //  Underscore.string is freely distributable under the terms of the MIT license.
@@ -74065,21 +74176,21 @@ for (var key in prototypeMethods) prototype2method(prototypeMethods[key]);
 
 module.exports = s;
 
-},{"./camelize":65,"./capitalize":66,"./chars":67,"./chop":68,"./classify":69,"./clean":70,"./count":71,"./dasherize":72,"./decapitalize":73,"./dedent":74,"./endsWith":75,"./escapeHTML":76,"./exports":77,"./helper/escapeRegExp":81,"./humanize":85,"./include":86,"./insert":88,"./isBlank":89,"./join":90,"./levenshtein":91,"./lines":92,"./lpad":93,"./lrpad":94,"./ltrim":95,"./naturalCmp":96,"./numberFormat":97,"./pad":98,"./pred":99,"./prune":100,"./quote":101,"./repeat":102,"./replaceAll":103,"./reverse":104,"./rpad":105,"./rtrim":106,"./slugify":107,"./splice":108,"./sprintf":109,"./startsWith":110,"./strLeft":111,"./strLeftBack":112,"./strRight":113,"./strRightBack":114,"./stripTags":115,"./succ":116,"./surround":117,"./swapCase":118,"./titleize":119,"./toBoolean":120,"./toNumber":121,"./toSentence":122,"./toSentenceSerial":123,"./trim":124,"./truncate":125,"./underscored":126,"./unescapeHTML":127,"./unquote":128,"./vsprintf":129,"./words":130}],88:[function(require,module,exports){
+},{"./camelize":67,"./capitalize":68,"./chars":69,"./chop":70,"./classify":71,"./clean":72,"./count":73,"./dasherize":74,"./decapitalize":75,"./dedent":76,"./endsWith":77,"./escapeHTML":78,"./exports":79,"./helper/escapeRegExp":83,"./humanize":87,"./include":88,"./insert":90,"./isBlank":91,"./join":92,"./levenshtein":93,"./lines":94,"./lpad":95,"./lrpad":96,"./ltrim":97,"./naturalCmp":98,"./numberFormat":99,"./pad":100,"./pred":101,"./prune":102,"./quote":103,"./repeat":104,"./replaceAll":105,"./reverse":106,"./rpad":107,"./rtrim":108,"./slugify":109,"./splice":110,"./sprintf":111,"./startsWith":112,"./strLeft":113,"./strLeftBack":114,"./strRight":115,"./strRightBack":116,"./stripTags":117,"./succ":118,"./surround":119,"./swapCase":120,"./titleize":121,"./toBoolean":122,"./toNumber":123,"./toSentence":124,"./toSentenceSerial":125,"./trim":126,"./truncate":127,"./underscored":128,"./unescapeHTML":129,"./unquote":130,"./vsprintf":131,"./words":132}],90:[function(require,module,exports){
 var splice = require('./splice');
 
 module.exports = function insert(str, i, substr) {
   return splice(str, i, 0, substr);
 };
 
-},{"./splice":108}],89:[function(require,module,exports){
+},{"./splice":110}],91:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function isBlank(str) {
   return (/^\s*$/).test(makeString(str));
 };
 
-},{"./helper/makeString":82}],90:[function(require,module,exports){
+},{"./helper/makeString":84}],92:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var slice = [].slice;
 
@@ -74090,7 +74201,7 @@ module.exports = function join() {
   return args.join(makeString(separator));
 };
 
-},{"./helper/makeString":82}],91:[function(require,module,exports){
+},{"./helper/makeString":84}],93:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function levenshtein(str1, str2) {
@@ -74117,27 +74228,27 @@ module.exports = function levenshtein(str1, str2) {
   return current.pop();
 };
 
-},{"./helper/makeString":82}],92:[function(require,module,exports){
+},{"./helper/makeString":84}],94:[function(require,module,exports){
 module.exports = function lines(str) {
   if (str == null) return [];
   return String(str).split(/\r?\n/);
 };
 
-},{}],93:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 var pad = require('./pad');
 
 module.exports = function lpad(str, length, padStr) {
   return pad(str, length, padStr);
 };
 
-},{"./pad":98}],94:[function(require,module,exports){
+},{"./pad":100}],96:[function(require,module,exports){
 var pad = require('./pad');
 
 module.exports = function lrpad(str, length, padStr) {
   return pad(str, length, padStr, 'both');
 };
 
-},{"./pad":98}],95:[function(require,module,exports){
+},{"./pad":100}],97:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrimLeft = String.prototype.trimLeft;
@@ -74149,7 +74260,7 @@ module.exports = function ltrim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":79,"./helper/makeString":82}],96:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":81,"./helper/makeString":84}],98:[function(require,module,exports){
 module.exports = function naturalCmp(str1, str2) {
   if (str1 == str2) return 0;
   if (!str1) return -1;
@@ -74180,7 +74291,7 @@ module.exports = function naturalCmp(str1, str2) {
   return str1 < str2 ? -1 : 1;
 };
 
-},{}],97:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 module.exports = function numberFormat(number, dec, dsep, tsep) {
   if (isNaN(number) || number == null) return '';
 
@@ -74194,7 +74305,7 @@ module.exports = function numberFormat(number, dec, dsep, tsep) {
   return fnums.replace(/(\d)(?=(?:\d{3})+$)/g, '$1' + tsep) + decimals;
 };
 
-},{}],98:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var strRepeat = require('./helper/strRepeat');
 
@@ -74222,14 +74333,14 @@ module.exports = function pad(str, length, padStr, type) {
   }
 };
 
-},{"./helper/makeString":82,"./helper/strRepeat":83}],99:[function(require,module,exports){
+},{"./helper/makeString":84,"./helper/strRepeat":85}],101:[function(require,module,exports){
 var adjacent = require('./helper/adjacent');
 
 module.exports = function succ(str) {
   return adjacent(str, -1);
 };
 
-},{"./helper/adjacent":78}],100:[function(require,module,exports){
+},{"./helper/adjacent":80}],102:[function(require,module,exports){
 /**
  * _s.prune: a more elegant version of truncate
  * prune extra chars, never leaving a half-chopped word.
@@ -74258,14 +74369,14 @@ module.exports = function prune(str, length, pruneStr) {
   return (template + pruneStr).length > str.length ? str : str.slice(0, template.length) + pruneStr;
 };
 
-},{"./helper/makeString":82,"./rtrim":106}],101:[function(require,module,exports){
+},{"./helper/makeString":84,"./rtrim":108}],103:[function(require,module,exports){
 var surround = require('./surround');
 
 module.exports = function quote(str, quoteChar) {
   return surround(str, quoteChar || '"');
 };
 
-},{"./surround":117}],102:[function(require,module,exports){
+},{"./surround":119}],104:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var strRepeat = require('./helper/strRepeat');
 
@@ -74282,7 +74393,7 @@ module.exports = function repeat(str, qty, separator) {
   return repeat.join(separator);
 };
 
-},{"./helper/makeString":82,"./helper/strRepeat":83}],103:[function(require,module,exports){
+},{"./helper/makeString":84,"./helper/strRepeat":85}],105:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function replaceAll(str, find, replace, ignorecase) {
@@ -74292,21 +74403,21 @@ module.exports = function replaceAll(str, find, replace, ignorecase) {
   return makeString(str).replace(reg, replace);
 };
 
-},{"./helper/makeString":82}],104:[function(require,module,exports){
+},{"./helper/makeString":84}],106:[function(require,module,exports){
 var chars = require('./chars');
 
 module.exports = function reverse(str) {
   return chars(str).reverse().join('');
 };
 
-},{"./chars":67}],105:[function(require,module,exports){
+},{"./chars":69}],107:[function(require,module,exports){
 var pad = require('./pad');
 
 module.exports = function rpad(str, length, padStr) {
   return pad(str, length, padStr, 'right');
 };
 
-},{"./pad":98}],106:[function(require,module,exports){
+},{"./pad":100}],108:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrimRight = String.prototype.trimRight;
@@ -74318,7 +74429,7 @@ module.exports = function rtrim(str, characters) {
   return str.replace(new RegExp(characters + '+$'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":79,"./helper/makeString":82}],107:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":81,"./helper/makeString":84}],109:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var trim = require('./trim');
@@ -74337,7 +74448,7 @@ module.exports = function slugify(str) {
   return trim(dasherize(str.replace(/[^\w\s-]/g, '-')), '-');
 };
 
-},{"./dasherize":72,"./helper/defaultToWhiteSpace":79,"./helper/makeString":82,"./trim":124}],108:[function(require,module,exports){
+},{"./dasherize":74,"./helper/defaultToWhiteSpace":81,"./helper/makeString":84,"./trim":126}],110:[function(require,module,exports){
 var chars = require('./chars');
 
 module.exports = function splice(str, i, howmany, substr) {
@@ -74346,7 +74457,7 @@ module.exports = function splice(str, i, howmany, substr) {
   return arr.join('');
 };
 
-},{"./chars":67}],109:[function(require,module,exports){
+},{"./chars":69}],111:[function(require,module,exports){
 // sprintf() for JavaScript 0.7-beta1
 // http://www.diveintojavascript.com/projects/javascript-sprintf
 //
@@ -74472,7 +74583,7 @@ var sprintf = (function() {
 
 module.exports = sprintf;
 
-},{"./helper/strRepeat":83}],110:[function(require,module,exports){
+},{"./helper/strRepeat":85}],112:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var toPositive = require('./helper/toPositive');
 
@@ -74483,7 +74594,7 @@ module.exports = function startsWith(str, starts, position) {
   return str.lastIndexOf(starts, position) === position;
 };
 
-},{"./helper/makeString":82,"./helper/toPositive":84}],111:[function(require,module,exports){
+},{"./helper/makeString":84,"./helper/toPositive":86}],113:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strLeft(str, sep) {
@@ -74493,7 +74604,7 @@ module.exports = function strLeft(str, sep) {
   return~ pos ? str.slice(0, pos) : str;
 };
 
-},{"./helper/makeString":82}],112:[function(require,module,exports){
+},{"./helper/makeString":84}],114:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strLeftBack(str, sep) {
@@ -74503,7 +74614,7 @@ module.exports = function strLeftBack(str, sep) {
   return~ pos ? str.slice(0, pos) : str;
 };
 
-},{"./helper/makeString":82}],113:[function(require,module,exports){
+},{"./helper/makeString":84}],115:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strRight(str, sep) {
@@ -74513,7 +74624,7 @@ module.exports = function strRight(str, sep) {
   return~ pos ? str.slice(pos + sep.length, str.length) : str;
 };
 
-},{"./helper/makeString":82}],114:[function(require,module,exports){
+},{"./helper/makeString":84}],116:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function strRightBack(str, sep) {
@@ -74523,26 +74634,26 @@ module.exports = function strRightBack(str, sep) {
   return~ pos ? str.slice(pos + sep.length, str.length) : str;
 };
 
-},{"./helper/makeString":82}],115:[function(require,module,exports){
+},{"./helper/makeString":84}],117:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function stripTags(str) {
   return makeString(str).replace(/<\/?[^>]+>/g, '');
 };
 
-},{"./helper/makeString":82}],116:[function(require,module,exports){
+},{"./helper/makeString":84}],118:[function(require,module,exports){
 var adjacent = require('./helper/adjacent');
 
 module.exports = function succ(str) {
   return adjacent(str, 1);
 };
 
-},{"./helper/adjacent":78}],117:[function(require,module,exports){
+},{"./helper/adjacent":80}],119:[function(require,module,exports){
 module.exports = function surround(str, wrapper) {
   return [wrapper, str, wrapper].join('');
 };
 
-},{}],118:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function swapCase(str) {
@@ -74551,7 +74662,7 @@ module.exports = function swapCase(str) {
   });
 };
 
-},{"./helper/makeString":82}],119:[function(require,module,exports){
+},{"./helper/makeString":84}],121:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function titleize(str) {
@@ -74560,7 +74671,7 @@ module.exports = function titleize(str) {
   });
 };
 
-},{"./helper/makeString":82}],120:[function(require,module,exports){
+},{"./helper/makeString":84}],122:[function(require,module,exports){
 var trim = require('./trim');
 
 function boolMatch(s, matchers) {
@@ -74582,7 +74693,7 @@ module.exports = function toBoolean(str, trueValues, falseValues) {
   if (boolMatch(str, falseValues || ["false", "0"])) return false;
 };
 
-},{"./trim":124}],121:[function(require,module,exports){
+},{"./trim":126}],123:[function(require,module,exports){
 var trim = require('./trim');
 var parseNumber = function(source) {
   return source * 1 || 0;
@@ -74594,7 +74705,7 @@ module.exports = function toNumber(num, precision) {
   return Math.round(num * factor) / factor;
 };
 
-},{"./trim":124}],122:[function(require,module,exports){
+},{"./trim":126}],124:[function(require,module,exports){
 var rtrim = require('./rtrim');
 
 module.exports = function toSentence(array, separator, lastSeparator, serial) {
@@ -74608,14 +74719,14 @@ module.exports = function toSentence(array, separator, lastSeparator, serial) {
   return a.length ? a.join(separator) + lastSeparator + lastMember : lastMember;
 };
 
-},{"./rtrim":106}],123:[function(require,module,exports){
+},{"./rtrim":108}],125:[function(require,module,exports){
 var toSentence = require('./toSentence');
 
 module.exports = function toSentenceSerial(array, sep, lastSep) {
   return toSentence(array, sep, lastSep, true);
 };
 
-},{"./toSentence":122}],124:[function(require,module,exports){
+},{"./toSentence":124}],126:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrim = String.prototype.trim;
@@ -74627,7 +74738,7 @@ module.exports = function trim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":79,"./helper/makeString":82}],125:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":81,"./helper/makeString":84}],127:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function truncate(str, length, truncateStr) {
@@ -74637,14 +74748,14 @@ module.exports = function truncate(str, length, truncateStr) {
   return str.length > length ? str.slice(0, length) + truncateStr : str;
 };
 
-},{"./helper/makeString":82}],126:[function(require,module,exports){
+},{"./helper/makeString":84}],128:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function underscored(str) {
   return trim(str).replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toLowerCase();
 };
 
-},{"./trim":124}],127:[function(require,module,exports){
+},{"./trim":126}],129:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var escapeChars = require('./helper/escapeChars');
 
@@ -74664,7 +74775,7 @@ module.exports = function unescapeHTML(str) {
   });
 };
 
-},{"./helper/escapeChars":80,"./helper/makeString":82}],128:[function(require,module,exports){
+},{"./helper/escapeChars":82,"./helper/makeString":84}],130:[function(require,module,exports){
 module.exports = function unquote(str, quoteChar) {
   quoteChar = quoteChar || '"';
   if (str[0] === quoteChar && str[str.length - 1] === quoteChar)
@@ -74672,7 +74783,7 @@ module.exports = function unquote(str, quoteChar) {
   else return str;
 };
 
-},{}],129:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 var sprintf = require('./sprintf');
 
 module.exports = function vsprintf(fmt, argv) {
@@ -74680,7 +74791,7 @@ module.exports = function vsprintf(fmt, argv) {
   return sprintf.apply(null, argv);
 };
 
-},{"./sprintf":109}],130:[function(require,module,exports){
+},{"./sprintf":111}],132:[function(require,module,exports){
 var isBlank = require('./isBlank');
 var trim = require('./trim');
 
@@ -74689,7 +74800,7 @@ module.exports = function words(str, delimiter) {
   return trim(str, delimiter).split(delimiter || /\s+/);
 };
 
-},{"./isBlank":89,"./trim":124}],131:[function(require,module,exports){
+},{"./isBlank":91,"./trim":126}],133:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

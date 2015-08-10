@@ -6,7 +6,7 @@ var $ = require('jquery'),
     models = require('./models'),
     views = require('./views'),
     logger = require('./logger'),
-    queryString = require('query-string');
+    querystring = require('querystring');
 
 module.exports = Backbone.Router.extend({
 
@@ -45,7 +45,7 @@ module.exports = Backbone.Router.extend({
   listBlueprints: function(params) {
     var blueprints = this.app.blueprints,
         app = this.app, query = {}, view;
-    if(params) { query = queryString.parse(params); }
+    if(params) { query = querystring.parse(params); }
 
     Promise.resolve( blueprints.fetch() ).then(function() {
       view = new views.ListBlueprints({ collection: blueprints, query: query, app: app });
@@ -94,7 +94,7 @@ module.exports = Backbone.Router.extend({
     var blueprints = this.app.blueprints,
         app = this.app, query = {}, view;
 
-    if(params) { query = queryString.parse(params); }
+    if(params) { query = querystring.parse(params); }
     query['status'] = 'ready';
 
     Promise.resolve( blueprints.fetch() ).then(function() {
@@ -112,7 +112,7 @@ module.exports = Backbone.Router.extend({
     var projects = this.app.projects,
         app = this.app, query = {}, view, jqxhr;
 
-    if(params) { query = queryString.parse(params); }
+    if(params) { query = querystring.parse(params); }
 
     if (query.page) {
       jqxhr = projects.getPage(parseInt(query.page));

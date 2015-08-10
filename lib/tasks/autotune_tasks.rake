@@ -36,4 +36,12 @@ namespace :autotune do
     require 'fileutils'
     FileUtils.rm_rf(Rails.configuration.autotune.working_dir)
   end
+
+  desc 'Remove all project files'
+  task :clean_projects => :environment do
+    puts 'Deleting project folders'
+    require 'fileutils'
+    FileUtils.rm_rf(
+      File.join(Rails.configuration.autotune.working_dir, 'projects'))
+  end
 end

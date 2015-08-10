@@ -2,7 +2,7 @@
 
 var $ = require('jquery'),
     _ = require('underscore'),
-    queryString = require('query-string');
+    querystring = require('querystring');
 
 module.exports = {
   render: function(template, templateObj) {
@@ -46,7 +46,7 @@ module.exports = {
   getPageUrl: function(page) {
     var base = _.result(this.collection, 'url'),
         qs = _.extend({page: page}, this.query);
-    return base + '?' + queryString.stringify( qs );
+    return base + '?' + querystring.stringify( qs );
   },
 
   getNextPageUrl: function() {
