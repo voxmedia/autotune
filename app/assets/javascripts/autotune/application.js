@@ -30050,7 +30050,8 @@ var $ = require('jquery'),
     models = require('../models'),
     helpers = require('../helpers'),
     logger = require('../logger'),
-    BaseView = require('./BaseView');
+    BaseView = require('./BaseView'),
+    slugify = require("underscore.string/slugify");
 
 function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
@@ -30275,7 +30276,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   }
 } );
 
-},{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133}],25:[function(require,module,exports){
+},{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133,"underscore.string/slugify":109}],25:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),

@@ -6,7 +6,8 @@ var $ = require('jquery'),
     models = require('../models'),
     helpers = require('../helpers'),
     logger = require('../logger'),
-    BaseView = require('./BaseView');
+    BaseView = require('./BaseView'),
+    slugify = require("underscore.string/slugify");
 
 function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
@@ -72,12 +73,6 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-      var slugify = function(text){
-        return text.toLowerCase()
-                   .replace(/[^\w\s]+/g,'')
-                   .replace(/\s+/g,'-');
-      };
-
       var renderSlug = function(field){
         var title = field.getParent().childrenByPropertyId["title"];
         var theme = field.getParent().childrenByPropertyId["theme"];
