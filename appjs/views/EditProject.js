@@ -50,7 +50,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   renderForm: function(resolve, reject) {
     var $form = this.$el.find('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
-        form_config, config_themes;
+        form_config, config_themes, newProject;
 
     $($form).keypress(function(event){
       if (event.keyCode === 10 || event.keyCode === 13){
@@ -59,9 +59,11 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     });
 
     if ( this.model.isNew() ) {
+      newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
     } else {
+      newProject = false;
       form_config = this.model.get('blueprint_config').form;
       config_themes = this.model.get('blueprint_config').themes || ['generic'];
     }
@@ -70,6 +72,21 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
+      var slugify = function(text){
+        return text.toLowerCase()
+                   .replace(/[^\w\s]+/g,'')
+                   .replace(/\s+/g,'-');
+      };
+
+      var renderSlug = function(field){
+        var title = field.getParent().childrenByPropertyId["title"];
+        var theme = field.getParent().childrenByPropertyId["theme"];
+        var slug = field.getParent().childrenByPropertyId["slug"];
+        if (title.getValue() !== '' && theme.getValue() !== '') {
+          slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,60) );
+        }
+      };
+
       var themes = this.app.themes.filter(function(theme) {
             if ( _.isEqual(config_themes, ['generic']) ) {
               return true;
@@ -83,16 +100,16 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
               "type": "string",
               "required": true
             },
-            "slug": {
-              "title": "Slug",
-              "type": "string"
-            },
             "theme": {
               "title": "Theme",
               "type": "string",
               "required": true,
               "default": pluckAttr(themes, 'value')[0],
               "enum": pluckAttr(themes, 'value')
+            },
+            "slug": {
+              "title": "Slug",
+              "type": "string"
             }
           },
           options_form = {
@@ -104,9 +121,22 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             }
           },
           options_fields = {
+            "title": {
+              "label": "Title",
+              "validator": function(callback){
+                if (newProject){
+                  renderSlug(this);
+                }
+              }
+            },
             "theme": {
               "type": "select",
-              "optionLabels": pluckAttr(themes, 'label')
+              "optionLabels": pluckAttr(themes, 'label'),
+              "validator": function(callback){
+                if (newProject){
+                  renderSlug(this);
+                }
+              }
             },
             "slug": {
               "label": "Slug", 
@@ -117,10 +147,15 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
                   callback({
                     "status": true
                   });
+                } else if (slugPattern.test(slug.substring(0,60))){
+                  this.setValue(slug.substr(0,60));
+                  callback({
+                    "status": true
+                  });
                 } else {
                   callback({
                     "status": false,
-                    "message": "Must contain fewer than 60 numbers, letters, hyphens, and underscores."
+                    "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
                   });
                 }
               }
