@@ -383,7 +383,7 @@ var Backbone = require('backbone'),
     moment = require('moment'),
     markdown = require('markdown').markdown,
     PageableCollection = require('backbone.paginator');
-
+    
 /**
  * Wrapper around Backbone.ajax where a simple `Accepted` status response with an empty
  * body is expected.
@@ -1330,7 +1330,7 @@ __p+='\n\n  <button type="button" class="btn btn-success" id="publishBtn"\n     
  if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
-__p+='\n          data-action-message="Publishing..."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
+__p+='\n          data-action-message="Publishing! This might take a moment."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Publish</button>\n\n  <button type="button" class="btn btn-danger" id="deleteBtn"\n          ';
  if ( model.hasStatus('building') ) { 
@@ -29697,10 +29697,11 @@ module.exports = BaseView.extend(require('./mixins/links.js'), {
     return this.alert(message, 'success');
   },
 
-  alert: function(message, level, permanent) {
+  alert: function(message, level, permanent, wait) {
     var opts = _.defaults({
       text: message,
-      type: level || 'info'
+      type: level || 'info',
+      delay: wait || 8000
     }, this.alertDefaults);
 
     if ( permanent ) {
@@ -30452,15 +30453,19 @@ module.exports = {
         logger.debug('form finished saving');
 
         if ( action === 'new' ) {
-          view.app.view.success('New '+model_class+' saved');
+          view.app.view.alert('New '+model_class+' saved', 'success', false, 4000);
         } else {
-          view.app.view.success(model_class+' updates saved');
+          view.app.view.alert(model_class+' updates saved', 'success', false, 4000);
         }
 
         if ( next === 'show' ) {
           Backbone.history.navigate(view.model.url(), {trigger: true});
         } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
+        }
+        
+        if (view.model.hasStatus('building')){
+          view.app.view.alert('Building! This might take a moment.', 'notice', false, 12000);
         }
       }).catch(function(error) {
         if ( _.isString( error ) ) {

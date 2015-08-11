@@ -63,15 +63,19 @@ module.exports = {
         logger.debug('form finished saving');
 
         if ( action === 'new' ) {
-          view.app.view.success('New '+model_class+' saved');
+          view.app.view.alert('New '+model_class+' saved', 'success', false, 4000);
         } else {
-          view.app.view.success(model_class+' updates saved');
+          view.app.view.alert(model_class+' updates saved', 'success', false, 4000);
         }
 
         if ( next === 'show' ) {
           Backbone.history.navigate(view.model.url(), {trigger: true});
         } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
+        }
+        
+        if (view.model.hasStatus('building')){
+          view.app.view.alert('Building! This might take a moment.', 'notice', false, 12000);
         }
       }).catch(function(error) {
         if ( _.isString( error ) ) {
