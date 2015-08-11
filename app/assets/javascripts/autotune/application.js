@@ -30167,7 +30167,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           options_fields = {
             "title": {
               "label": "Title",
-              "validator": function(callback){
+              "validator": function(){
                 if (newProject){
                   renderSlug(this);
                 }
@@ -30176,7 +30176,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             "theme": {
               "type": "select",
               "optionLabels": pluckAttr(themes, 'label'),
-              "validator": function(callback){
+              "validator": function(){
                 if (newProject){
                   renderSlug(this);
                 }
