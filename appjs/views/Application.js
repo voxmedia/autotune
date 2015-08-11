@@ -85,10 +85,11 @@ module.exports = BaseView.extend(require('./mixins/links.js'), {
     return this.alert(message, 'success');
   },
 
-  alert: function(message, level, permanent) {
+  alert: function(message, level, permanent, wait) {
     var opts = _.defaults({
       text: message,
-      type: level || 'info'
+      type: level || 'info',
+      delay: wait || 8000
     }, this.alertDefaults);
 
     if ( permanent ) {
