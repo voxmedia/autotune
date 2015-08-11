@@ -76,15 +76,6 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-      var renderSlug = function(field){
-        var title = field.getParent().childrenByPropertyId["title"];
-        var theme = field.getParent().childrenByPropertyId["theme"];
-        var slug = field.getParent().childrenByPropertyId["slug"];
-        if (title.getValue() !== '' && theme.getValue() !== '') {
-          slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,60) );
-        }
-      };
-
       var themes = this.app.themes.filter(function(theme) {
             if ( _.isEqual(config_themes, ['generic']) ) {
               return true;
@@ -119,27 +110,14 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             }
           },
           options_fields = {
-            "title": {
-              "label": "Title",
-              "validator": function(){
-                if (newProject){
-                  renderSlug(this);
-                }
-              }
-            },
             "theme": {
               "type": "select",
               "optionLabels": pluckAttr(themes, 'label'),
-              "validator": function(){
-                if (newProject){
-                  renderSlug(this);
-                }
-              }
             },
             "slug": {
               "label": "Slug", 
               "validator": function(callback){
-                var slugPattern = /^[0-9a-z\-_]{0,59}$/;
+                var slugPattern = /^[0-9a-z\-_]{0,60}$/;
                 var slug = this.getValue();
                 if ( slugPattern.test(slug) ){
                   callback({
@@ -185,6 +163,19 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         },
         "postRender": _.bind(function(control) {
           this.alpaca = control;
+
+          var title = control.childrenByPropertyId["title"],
+              theme = control.childrenByPropertyId["theme"],
+               slug = control.childrenByPropertyId["slug"];
+
+          $([title, theme]).each(function(){
+            this.on('change', function(){
+              if (newProject && (title.getValue() !== '' && theme.getValue() !== '')) {
+                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,60) );
+              }
+            });
+          });
+
           control.form.form.append( helpers.render(button_tmpl, this.templateData()) );
           resolve();
         }, this)
