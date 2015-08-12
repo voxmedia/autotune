@@ -23,6 +23,10 @@ module Autotune
 
       # Load the blueprint config file into the DB
       blueprint.config = repo.read BLUEPRINT_CONFIG_FILENAME
+      if blueprint.config.nil?
+        raise "Can't read '%s' in blueprint '%s'" % [
+          BLUEPRINT_CONFIG_FILENAME, blueprint.slug]
+      end
 
       # look in the config for stuff like descriptions, sample images, tags
       blueprint.initialize_tags_from_config
