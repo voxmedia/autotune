@@ -73,9 +73,9 @@ module.exports = {
         } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
         }
-        
+
         if (view.model.hasStatus('building')){
-          view.app.view.alert('Building! This might take a moment.', 'notice', false, 12000);
+          view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
         }
       }).catch(function(error) {
         if ( _.isString( error ) ) {

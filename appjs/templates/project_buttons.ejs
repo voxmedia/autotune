@@ -16,7 +16,7 @@
 
   <button type="button" class="btn btn-success" id="publishBtn"
           <% if ( !model.hasStatus('built') ) { %>disabled="true"<% } %>
-          data-action-message="Publishing! This might take a moment."
+          data-action-message="Publishing..."
           data-action="build-and-publish" data-model="Project"
           data-action-next="reload"
           data-model-id="<%=model.get('slug') %>">Publish</button>
