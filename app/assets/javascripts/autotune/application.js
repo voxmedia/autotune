@@ -383,7 +383,7 @@ var Backbone = require('backbone'),
     moment = require('moment'),
     markdown = require('markdown').markdown,
     PageableCollection = require('backbone.paginator');
-    
+
 /**
  * Wrapper around Backbone.ajax where a simple `Accepted` status response with an empty
  * body is expected.
@@ -30457,13 +30457,19 @@ module.exports = {
         } else {
           view.app.view.alert(model_class+' updates saved', 'success', false, 4000);
         }
+        logger.debug('FORM.js!!!');
+        logger.debug(view.model.url(), view.model, values);
 
         if ( next === 'show' ) {
-          Backbone.history.navigate(view.model.url(), {trigger: true});
+          var redirectURL = view.model.url();
+          if ( redirectURL === '/projects' ){
+            redirectURL += '/'+values.slug;
+          }
+          Backbone.history.navigate(redirectURL, {trigger: true});
         } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
         }
-        
+
         if (view.model.hasStatus('building')){
           view.app.view.alert('Building! This might take a moment.', 'notice', false, 12000);
         }
