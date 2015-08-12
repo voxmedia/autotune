@@ -86,6 +86,7 @@ function App(config) {
   this.hasFocus = true;
   if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
+      this.hasFocus = true;
       // Tell the listener to cancel the timeout, and make sure it's started
       this.listener
         .cancelStop()
@@ -95,8 +96,9 @@ function App(config) {
     }, this));
 
     $(window).on('blur', _.bind(function(){
+      this.hasFocus = false;
       // Tell the listener to time out in 20 seconds
-      this.listener.stopAfter(20);
+      this.listener.stopAfter(200);
       // Proxy the event on the app object
       this.trigger('blur');
     }, this));
@@ -1144,7 +1146,7 @@ __p+='\n        <span class="m-status status-info"><i class="icon-info"></i>'+
  } 
 __p+='\n    </td>\n    <td class="text-right" colspan="2">\n      <a data-tooltip="edit" href="'+
 ((__t=(item.url() ))==null?'':__t)+
-'/edit"><span class="icon-edit"></span></a>\n      <a data-tooltip="update" href="#"\n         data-action-message="Updating the blueprint..."\n         data-action="update" data-model="Blueprint" data-action-next="reload"\n         data-model-id="'+
+'/edit"><span class="icon-edit"></span></a>\n      <a data-tooltip="update" href="#"\n         data-action-message="Updating the blueprint..."\n         data-action="updateRepo" data-model="Blueprint" data-action-next="reload"\n         data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
 '"><span class="icon-refresh"></span></a>\n      <a data-tooltip="delete" href="#"\n         data-action-message="Blueprint deleted"\n         data-action-confirm="Are you sure you wish to delete this?"\n         data-action="destroy" data-model="Blueprint" data-action-next="reload"\n         data-model-id="'+
 ((__t=( item.attributes.slug ))==null?'':__t)+
