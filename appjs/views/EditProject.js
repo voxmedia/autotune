@@ -171,7 +171,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           $([title, theme]).each(function(){
             this.on('change', function(){
               if (newProject && (title.getValue() !== '' && theme.getValue() !== '')) {
-                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,60) );
+                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,57) );
               }
             });
           });
