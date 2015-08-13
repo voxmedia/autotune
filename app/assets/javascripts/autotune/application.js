@@ -1330,7 +1330,7 @@ __p+='\n\n  <button type="button" class="btn btn-success" id="publishBtn"\n     
  if ( !model.hasStatus('built') ) { 
 __p+='disabled="true"';
  } 
-__p+='\n          data-action-message="Publishing! This might take a moment."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
+__p+='\n          data-action-message="Publishing..."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Publish</button>\n\n  <button type="button" class="btn btn-danger" id="deleteBtn"\n          ';
  if ( model.hasStatus('building') ) { 
@@ -30213,7 +30213,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           $([title, theme]).each(function(){
             this.on('change', function(){
               if (newProject && (title.getValue() !== '' && theme.getValue() !== '')) {
-                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,60) );
+                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,57) );
               }
             });
           });
@@ -30354,7 +30354,11 @@ module.exports = {
 
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
-        view.app.view.success( action_message );
+        view.app.view.alert(action_message, 'success', false, 4000);
+
+        if (action.indexOf('build') > -1){
+          view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
+        }
 
         if ( next === 'show' ) {
           Backbone.history.navigate( view.model.url(), {trigger: true} );
@@ -30466,7 +30470,7 @@ module.exports = {
         }
 
         if (view.model.hasStatus('building')){
-          view.app.view.alert('Building! This might take a moment.', 'notice', false, 12000);
+          view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
         }
       }).catch(function(error) {
         if ( _.isString( error ) ) {

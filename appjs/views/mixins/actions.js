@@ -41,7 +41,11 @@ module.exports = {
 
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
-        view.app.view.success( action_message );
+        view.app.view.alert(action_message, 'success', false, 4000);
+
+        if (action.indexOf('build') > -1){
+          view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
+        }
 
         if ( next === 'show' ) {
           Backbone.history.navigate( view.model.url(), {trigger: true} );
