@@ -67,8 +67,6 @@ module.exports = {
         } else {
           view.app.view.alert(model_class+' updates saved', 'success', false, 4000);
         }
-        logger.debug('FORM.js!!!');
-        logger.debug(view.model.url(), view.model, values);
 
         if ( next === 'show' ) {
           var redirectURL = view.model.url();
