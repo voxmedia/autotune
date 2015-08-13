@@ -30128,6 +30128,15 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
               return _.contains(config_themes, theme.get('value'));
             }
           }),
+          social_chars = {
+            "sbnation": 8,
+            "theverge": 5,
+            "polygon": 7,
+            "racked": 6,
+            "eater": 5,
+            "vox": 9,
+            "custom": 0
+          },
           schema_properties = {
             "title": {
               "title": "Title",
@@ -30144,6 +30153,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             "slug": {
               "title": "Slug",
               "type": "string"
+            },
+            "tweet_text":{
+              "type": "string",
+              "minLength": 0
             }
           },
           options_form = {
@@ -30160,7 +30173,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
               "optionLabels": pluckAttr(themes, 'label'),
             },
             "slug": {
-              "label": "Slug", 
+              "label": "Slug",
               "validator": function(callback){
                 var slugPattern = /^[0-9a-z\-_]{0,60}$/;
                 var slug = this.getValue();
@@ -30180,6 +30193,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
                   });
                 }
               }
+            },
+            "tweet_text":{
+              "label": "Social share text",
+              "constrainMaxLength": true,
+              "constrainMinLength": true,
+              "showMaxLengthIndicator": true
             }
           };
 
@@ -30211,13 +30230,19 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
 
           var title = control.childrenByPropertyId["title"],
               theme = control.childrenByPropertyId["theme"],
-               slug = control.childrenByPropertyId["slug"];
+               slug = control.childrenByPropertyId["slug"],
+             social = control.childrenByPropertyId["tweet_text"];
+
+          social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+          social.updateMaxLengthIndicator();
 
           $([title, theme]).each(function(){
             this.on('change', function(){
               if (newProject && (title.getValue() !== '' && theme.getValue() !== '')) {
                 slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,57) );
               }
+              social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+              social.updateMaxLengthIndicator();
             });
           });
 
