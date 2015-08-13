@@ -50,7 +50,7 @@ function App(config) {
 
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
-
+  
   this.listener = new Listener();
   this.listener.on('change:blueprint', this.handleBlueprintChange, this);
   this.listener.on('change:project',   this.handleProjectChange, this);
@@ -192,16 +192,12 @@ module.exports = {
   },
 
   getObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query);
-    } else {
-      return this.collection.models;
-    }
+    return this.collection.models;
   },
 
   hasObjects: function() {
-    if ( _.size(this.query) > 0 ) {
-      return this.collection.where(this.query).length > 0;
+    if (this.collection.models.length > 0) {
+      return this.collection.models.length > 0;
     } else {
       return this.collection.models.length > 0;
     }
@@ -718,6 +714,7 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
+    $(window).scrollTop(0);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.listener.start();
@@ -733,8 +730,12 @@ module.exports = Backbone.Router.extend({
         app = this.app, query = {}, view;
     if(params) { query = querystring.parse(params); }
 
-    Promise.resolve( blueprints.fetch() ).then(function() {
-      view = new views.ListBlueprints({ collection: blueprints, query: query, app: app });
+    Promise.resolve( blueprints.fetch({data: query}) ).then(function() {
+      view = new views.ListBlueprints({
+        collection: blueprints,
+        query: _.pick(query, 'type', 'tag', 'status', 'search'),
+        app: app
+      });
       view.render();
       app.view
         .display( view )
@@ -806,10 +807,10 @@ module.exports = Backbone.Router.extend({
       jqxhr = projects.getFirstPage();
     }
 
-    Promise.resolve( jqxhr ).then(function() {
+    Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'blueprint_type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'type', 'theme', 'search'),
         app: app
       });
       view.render();
@@ -1240,9 +1241,9 @@ __p+='\n    </p>\n    ';
  } 
 __p+='\n  </div>\n\n</div>\n\n<div role="tabpanel">\n\n  <!-- Nav tabs -->\n  <ul class="nav nav-tabs" role="tablist">\n    <li role="presentation" class="active"><a\n        href="#edit" aria-controls="edit"\n        role="tab" data-toggle="tab">Project info</a></li>\n    ';
  if ( model.isPublished() ) { 
-__p+='\n    <li role="presentation"><a\n        href="#embed" aria-controls="embed"\n        role="tab" data-toggle="tab">Embed</a></li>\n    ';
+__p+='\n    <li role="presentation"><a\n        href="#embed" aria-controls="embed"\n        role="tab" data-toggle="tab">Embed</a></li>\n    <li role="presentation"><a\n        href="#screenshots" aria-controls="screenshots"\n        role="tab" data-toggle="tab">Screenshots</a></li>\n    ';
  } else { 
-__p+='\n    <li role="presentation" class="disabled"><a>Embed</a></li>\n    ';
+__p+='\n    <li role="presentation" class="disabled"><a>Embed</a></li>\n    <li role="presentation" class="disabled"><a>Screenshots</a></li>\n    ';
  } 
 __p+='\n    ';
  if ( hasRole('superuser') ) { 
@@ -1264,7 +1265,7 @@ __p+='\n        </div>\n        <div class="col-md-4">'+
 ((__t=(model.instructions() ))==null?'':__t)+
 '</div>\n      </div>\n      ';
  } 
-__p+='\n    </div>\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    ';
+__p+='\n    </div>\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    <div role="tabpanel" class="tab-pane" id="screenshots">\n\n      <ul class="nav nav-pills">\n        <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>\n        <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>\n        <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>\n      </ul>\n\n      <div class="tab-content">\n        <div id="large-ss" class="row tab-pane active">\n          <img path="screenshots/screenshot_l.png" />\n        </div>\n        <div id="medium-ss" class="row tab-pane">\n          <img path="screenshots/screenshot_m.png" />\n        </div>\n        <div id="small-ss" class="row tab-pane">\n          <img path="screenshots/screenshot_s.png" />\n        </div>\n      </div>\n\n    </div>\n    ';
  if ( hasRole('superuser') ) { 
 __p+='\n    <div role="tabpanel" class="tab-pane" id="developer">\n      <p>Status:\n        ';
  if ( model.hasStatus('broken') ) { 
@@ -1402,14 +1403,14 @@ __p+='\n                    value="'+
  }) 
 __p+='\n            </select>\n          </div>\n          ';
  } 
-__p+='\n          <div class="select">\n            <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">\n              <option disabled ';
- if(!query.blueprint_type) { 
+__p+='\n          <div class="select">\n            <select name="type" id="type" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.type) { 
 __p+='selected';
  } 
 __p+='>Type</option>\n            ';
  _.each(app.config.blueprint_types, function(type) { 
 __p+='\n              <option ';
- if(type === query.blueprint_type) { 
+ if(type === query.type) { 
 __p+='selected';
  } 
 __p+='\n                    value="'+
@@ -29880,6 +29881,7 @@ var setup = function(formData) {
   };
 
   var sourceRefresh = function(form) {
+    console.log("form", form);
     var config,
         cursor = editor1.getCursorPosition();
     try {
@@ -29946,6 +29948,7 @@ var setup = function(formData) {
       if (!config.options) { config.options = {}; }
 
       config.options.focus = false;
+
       if ( cb ) {
         config.postRender = function(form) { cb(null, form); };
       }
@@ -30029,6 +30032,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   },
 
   afterRender: function() {
+    var $form = this.$el.find('#new-blueprint');
+    $($form).keypress(function(event){
+      if (event.keyCode === 10 || event.keyCode === 13){
+        event.preventDefault();
+      }
+    });
     if ( !this.model.isNew() ) {
       setup(this.model.get('config').form);
     }
@@ -30061,6 +30070,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var view = this, promises = [];
     if ( this.model.isPublished() ) {
       var proto = window.location.protocol.replace( ':', '' ),
+          prefix = this.model.getPublishUrl(proto),
           embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
 
       promises.push( Promise
@@ -30068,6 +30078,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         .then( function(data) {
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
+          $.each(view.$( '#screenshots img' ), function(){
+            $(this).attr( 'src', prefix+$(this).attr('path') );
+            $(this).removeAttr( 'path' );
+          });
         }).catch(function(error) {
           logger.error(error);
         }) );
@@ -30084,6 +30098,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var $form = this.$el.find('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes;
+
+    $($form).keypress(function(event){
+      if (event.keyCode === 10 || event.keyCode === 13){
+        event.preventDefault();
+      }
+    });
 
     if ( this.model.isNew() ) {
       form_config = this.model.blueprint.get('config').form;

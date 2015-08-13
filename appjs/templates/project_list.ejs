@@ -44,10 +44,10 @@
           </div>
           <% } %>
           <div class="select">
-            <select name="blueprint_type" id="blueprint_type" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.blueprint_type) { %>selected<% } %>>Type</option>
+            <select name="type" id="type" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
             <% _.each(app.config.blueprint_types, function(type) { %>
-              <option <% if(type === query.blueprint_type) { %>selected<% } %>
+              <option <% if(type === query.type) { %>selected<% } %>
                     value="<%=type %>"><%=type %></option>
             <% }) %>
             </select>

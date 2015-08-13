@@ -23,6 +23,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var view = this, promises = [];
     if ( this.model.isPublished() ) {
       var proto = window.location.protocol.replace( ':', '' ),
+          prefix = this.model.getPublishUrl(proto),
           embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
 
       promises.push( Promise
@@ -30,6 +31,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         .then( function(data) {
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
+          $.each(view.$( '#screenshots img' ), function(){
+            $(this).attr( 'src', prefix+$(this).attr('path') );
+            $(this).removeAttr( 'path' );
+          });
         }).catch(function(error) {
           logger.error(error);
         }) );
@@ -46,6 +51,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var $form = this.$el.find('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes;
+
+    $($form).keypress(function(event){
+      if (event.keyCode === 10 || event.keyCode === 13){
+        event.preventDefault();
+      }
+    });
 
     if ( this.model.isNew() ) {
       form_config = this.model.blueprint.get('config').form;

@@ -32,6 +32,7 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
+    $(window).scrollTop(0);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.listener.start();
@@ -47,8 +48,12 @@ module.exports = Backbone.Router.extend({
         app = this.app, query = {}, view;
     if(params) { query = querystring.parse(params); }
 
-    Promise.resolve( blueprints.fetch() ).then(function() {
-      view = new views.ListBlueprints({ collection: blueprints, query: query, app: app });
+    Promise.resolve( blueprints.fetch({data: query}) ).then(function() {
+      view = new views.ListBlueprints({
+        collection: blueprints,
+        query: _.pick(query, 'type', 'tag', 'status', 'search'),
+        app: app
+      });
       view.render();
       app.view
         .display( view )
@@ -120,10 +125,10 @@ module.exports = Backbone.Router.extend({
       jqxhr = projects.getFirstPage();
     }
 
-    Promise.resolve( jqxhr ).then(function() {
+    Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'blueprint_type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'type', 'theme', 'search'),
         app: app
       });
       view.render();
