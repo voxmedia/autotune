@@ -46,7 +46,7 @@ function App(config) {
 
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
-  
+
   this.listener = new Listener();
   this.listener.on('change:blueprint', this.handleBlueprintChange, this);
   this.listener.on('change:project',   this.handleProjectChange, this);
@@ -83,10 +83,8 @@ function App(config) {
   if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
       this.hasFocus = true;
-      // Tell the listener to cancel the timeout, and make sure it's started
-      this.listener
-        .cancelStop()
-        .start();
+      // Tell the listener to cancel the timeout
+      this.listener.cancelStop();
       // Proxy the event on the app object
       this.trigger('focus');
     }, this));
@@ -158,7 +156,7 @@ _.extend(App.prototype, Backbone.Events, {
   },
 
   handleListenerStop: function() {
-    this.view.alert('Updates are stopped', 'notice', true);
+    this.view.alert('Reload to see changes', 'notice', true);
   }
 });
 

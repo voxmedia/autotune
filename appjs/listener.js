@@ -93,13 +93,13 @@ _.extend(Listener.prototype, Backbone.Events, {
     this.trigger('error', evt);
   },
 
-  handleOpen: function(evt){
+  handleOpen: function(evt) {
     logger.debug('Connection open', evt);
     this.openTime = evt.timeStamp;
     this.trigger('open', evt);
   },
 
-  handleClose: function(evt){
+  handleClose: function(evt) {
     var timeConnected = ( evt.timeStamp - this.openTime ) / 1000;
     logger.debug(
       'Connection closed by server in ' + timeConnected + ' seconds', evt);
