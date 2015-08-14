@@ -102,7 +102,7 @@ module.exports = Backbone.Router.extend({
     if(params) { query = querystring.parse(params); }
     query['status'] = 'ready';
 
-    Promise.resolve( blueprints.fetch() ).then(function() {
+    Promise.resolve( blueprints.fetch({data: query}) ).then(function() {
       view = new views.ChooseBlueprint({ collection: blueprints, query: query, app: app });
       view.render();
       app.view
