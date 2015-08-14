@@ -53,8 +53,11 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         form_config, config_themes;
 
     $($form).keypress(function(event){
+      var field_type = event.originalEvent.srcElement.type;
       if (event.keyCode === 10 || event.keyCode === 13){
-        event.preventDefault();
+        if(field_type !== 'textarea'){
+          event.preventDefault();
+        }
       }
     });
 
