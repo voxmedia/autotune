@@ -29697,11 +29697,10 @@ module.exports = BaseView.extend(require('./mixins/links.js'), {
     return this.alert(message, 'success');
   },
 
-  alert: function(message, level, permanent, wait) {
+  alert: function(message, level, permanent) {
     var opts = _.defaults({
       text: message,
-      type: level || 'info',
-      delay: wait || 8000
+      type: level || 'info'
     }, this.alertDefaults);
 
     if ( permanent ) {
@@ -30051,8 +30050,7 @@ var $ = require('jquery'),
     models = require('../models'),
     helpers = require('../helpers'),
     logger = require('../logger'),
-    BaseView = require('./BaseView'),
-    slugify = require("underscore.string/slugify");
+    BaseView = require('./BaseView');
 
 function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
@@ -30121,6 +30119,21 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
+      var slugify = function(text){
+        return text.toLowerCase()
+                   .replace(/[^\w\s]+/g,'')
+                   .replace(/\s+/g,'-');
+      };
+
+      var renderSlug = function(field){
+        var title = field.getParent().childrenByPropertyId["title"];
+        var theme = field.getParent().childrenByPropertyId["theme"];
+        var slug = field.getParent().childrenByPropertyId["slug"];
+        if (title.getValue() !== '' && theme.getValue() !== '') {
+          slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,60) );
+        }
+      };
+
       var themes = this.app.themes.filter(function(theme) {
             if ( _.isEqual(config_themes, ['generic']) ) {
               return true;
@@ -30128,15 +30141,6 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
               return _.contains(config_themes, theme.get('value'));
             }
           }),
-          social_chars = {
-            "sbnation": 8,
-            "theverge": 5,
-            "polygon": 7,
-            "racked": 6,
-            "eater": 5,
-            "vox": 9,
-            "custom": 0
-          },
           schema_properties = {
             "title": {
               "title": "Title",
@@ -30153,10 +30157,6 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             "slug": {
               "title": "Slug",
               "type": "string"
-            },
-            "tweet_text":{
-              "type": "string",
-              "minLength": 0
             }
           },
           options_form = {
@@ -30168,14 +30168,27 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
             }
           },
           options_fields = {
+            "title": {
+              "label": "Title",
+              "validator": function(callback){
+                if (newProject){
+                  renderSlug(this);
+                }
+              }
+            },
             "theme": {
               "type": "select",
               "optionLabels": pluckAttr(themes, 'label'),
+              "validator": function(callback){
+                if (newProject){
+                  renderSlug(this);
+                }
+              }
             },
             "slug": {
-              "label": "Slug",
+              "label": "Slug", 
               "validator": function(callback){
-                var slugPattern = /^[0-9a-z\-_]{0,60}$/;
+                var slugPattern = /^[0-9a-z\-_]{0,59}$/;
                 var slug = this.getValue();
                 if ( slugPattern.test(slug) ){
                   callback({
@@ -30193,12 +30206,6 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
                   });
                 }
               }
-            },
-            "tweet_text":{
-              "label": "Social share text",
-              "constrainMaxLength": true,
-              "constrainMinLength": true,
-              "showMaxLengthIndicator": true
             }
           };
 
@@ -30227,25 +30234,6 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         },
         "postRender": _.bind(function(control) {
           this.alpaca = control;
-
-          var title = control.childrenByPropertyId["title"],
-              theme = control.childrenByPropertyId["theme"],
-               slug = control.childrenByPropertyId["slug"],
-             social = control.childrenByPropertyId["tweet_text"];
-
-          social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
-          social.updateMaxLengthIndicator();
-
-          $([title, theme]).each(function(){
-            this.on('change', function(){
-              if (newProject && (title.getValue() !== '' && theme.getValue() !== '')) {
-                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,57) );
-              }
-              social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
-              social.updateMaxLengthIndicator();
-            });
-          });
-
           control.form.form.append( helpers.render(button_tmpl, this.templateData()) );
           resolve();
         }, this)
@@ -30290,7 +30278,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   }
 } );
 
-},{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133,"underscore.string/slugify":109}],25:[function(require,module,exports){
+},{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"jquery":61,"underscore":133}],25:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30384,8 +30372,6 @@ module.exports = {
       .then(function(resp) {
         view.app.view.alert(action_message, 'success', false, 4000);
 
-        logger.debug(next);
-
         if (action.indexOf('build') > -1){
           view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
         }
@@ -30393,6 +30379,7 @@ module.exports = {
         if ( next === 'show' ) {
           Backbone.history.navigate( view.model.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
+
           view.render();
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
@@ -30487,6 +30474,8 @@ module.exports = {
         } else {
           view.app.view.alert(model_class+' updates saved', 'success', false, 4000);
         }
+        logger.debug('FORM.js!!!');
+        logger.debug(view.model.url(), view.model, values);
 
         if ( next === 'show' ) {
           var redirectURL = view.model.url();
