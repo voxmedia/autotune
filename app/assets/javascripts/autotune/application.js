@@ -30381,6 +30381,8 @@ module.exports = {
       .then(function(resp) {
         view.app.view.alert(action_message, 'success', false, 4000);
 
+        logger.debug(next);
+
         if (action.indexOf('build') > -1){
           view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
         }
@@ -30388,7 +30390,6 @@ module.exports = {
         if ( next === 'show' ) {
           Backbone.history.navigate( view.model.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
-
           view.render();
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );

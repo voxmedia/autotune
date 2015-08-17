@@ -22,7 +22,7 @@ module WorkDir
     private
 
     def phantomjs(*args)
-      cmd(*['phantomjs'] + args)
+      cmd(*['phantomjs', '--disk-cache=true'] + args)
     end
   end
 end
