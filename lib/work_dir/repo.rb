@@ -16,6 +16,7 @@ module WorkDir
         git 'checkout', 'master'
         git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
+        git 'submodule', 'foreach', "'git fetch origin'"
         git 'checkout', branch
         git 'submodule', 'update', '--init'
       end
@@ -57,8 +58,6 @@ module WorkDir
         cmd 'tar', '-x', :stdin_data => archive(branch_or_tag), :binmode => true
       end
     end
-
-    private
 
     # run a git command
     def git(*args)
