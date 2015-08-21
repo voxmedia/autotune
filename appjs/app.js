@@ -10,6 +10,7 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     bootstrap = require('bootstrap'),
+    moment = require('moment'),
     Alpaca = require('./vendor/alpaca'),
     // Load our components and run the app
     Router = require('./router'),
@@ -168,4 +169,5 @@ if ( typeof(window) !== 'undefined' ) {
   window.Backbone = Backbone;
   window.$ = $;
   window._ = _;
+  window.moment = moment;
 }
