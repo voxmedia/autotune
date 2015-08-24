@@ -21,7 +21,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
 
   afterRender: function() {
     var view = this, promises = [];
-    if ( this.model.isPublished() ) {
+    if ( this.model.isPublished() && this.model.blueprint.type === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),
           embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
@@ -37,7 +37,13 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           });
         }).catch(function(error) {
           logger.error(error);
-        }) );
+        })
+      );
+    }
+
+    if ( this.model.hasStatus('broken') && this.model.has('error_message') ) {
+      this.app.view.alert(
+        this.model.get('error_message'), 'error', true);
     }
 
     promises.push( new Promise( function(resolve, reject) {

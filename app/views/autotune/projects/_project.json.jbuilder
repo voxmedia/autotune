@@ -8,6 +8,7 @@ json.type project.blueprint.type
 json.blueprint_title project.blueprint.title
 json.theme project.theme.value
 json.created_by project.user.name
+json.error_message project.meta['error_message'] unless project.meta['error_message'].blank?
 
 # Only send build script output to superusers
 json.output project.output if role? :superuser
