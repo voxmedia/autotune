@@ -60,9 +60,6 @@ function App(config) {
   // Initialize top-level view
   this.view = new views.Application({ app: this });
 
-  // Clear error messages when window is focused
-  this.on('focus', function() { this.view.clearError(); }, this);
-
   // Show or hide spinner on loading events
   this.on('loadingStart', function() { this.view.spinStart(); }, this);
   this.on('loadingStop', function() { this.view.spinStop(); }, this);

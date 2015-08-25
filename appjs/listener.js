@@ -51,7 +51,7 @@ _.extend(Listener.prototype, Backbone.Events, {
 
   stopAfter: function(seconds) {
     logger.debug('Stopping listener in ' + seconds);
-    if ( this.stopTimeout ) { this.cancelStop(); }
+    if ( this.stopTimeout ) { clearTimeout(this.stopTimeout); }
     this.stopTimeout = setTimeout(_.bind(this.stop, this), seconds*1000);
     return this;
   },
