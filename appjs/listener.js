@@ -40,7 +40,7 @@ _.extend(Listener.prototype, Backbone.Events, {
    */
   stop: function() {
     logger.debug('Stopping listener now');
-    if ( this.hasStatus('open') ) {
+    if ( this.hasStatus('open', 'connecting') ) {
       logger.debug('Close event listener');
       this.conn.close();
     }
@@ -50,6 +50,8 @@ _.extend(Listener.prototype, Backbone.Events, {
   },
 
   stopAfter: function(seconds) {
+    if ( this.hasStatus('closed') ) { return; }
+
     logger.debug('Stopping listener in ' + seconds);
     if ( this.stopTimeout ) { clearTimeout(this.stopTimeout); }
     this.stopTimeout = setTimeout(_.bind(this.stop, this), seconds*1000);
@@ -57,6 +59,8 @@ _.extend(Listener.prototype, Backbone.Events, {
   },
 
   cancelStop: function() {
+    if ( this.hasStatus('closed') || !this.stopTimeout ) { return; }
+
     logger.debug('Canceling listener stop');
     clearTimeout(this.stopTimeout);
     return this;
@@ -80,13 +84,13 @@ _.extend(Listener.prototype, Backbone.Events, {
   },
 
   handleChange: function(evt) {
-    if ( !this.paused ) {
-      var data = JSON.parse(evt.data),
-          eventName = 'change:' + data.type,
-          eventData = _.pick(data, 'id', 'status');
-      logger.debug(eventName, eventData);
-      this.trigger(eventName, eventData);
-    }
+    if ( this.paused ) { return; }
+
+    var data = JSON.parse(evt.data),
+        eventName = 'change:' + data.type,
+        eventData = _.pick(data, 'id', 'status');
+    logger.debug(eventName, eventData);
+    this.trigger(eventName, eventData);
   },
 
   handleError: function(evt) {
