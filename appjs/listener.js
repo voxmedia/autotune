@@ -39,6 +39,7 @@ _.extend(Listener.prototype, Backbone.Events, {
    * Disable the server side event listener
    */
   stop: function() {
+    logger.debug('Stopping listener now');
     if ( this.hasStatus('open') ) {
       logger.debug('Close event listener');
       this.conn.close();
@@ -49,15 +50,15 @@ _.extend(Listener.prototype, Backbone.Events, {
   },
 
   stopAfter: function(seconds) {
-    this.cancelStop();
+    logger.debug('Stopping listener in ' + seconds);
+    if ( this.stopTimeout ) { this.cancelStop(); }
     this.stopTimeout = setTimeout(_.bind(this.stop, this), seconds*1000);
     return this;
   },
 
   cancelStop: function() {
-    if ( this.stopTimeout ) {
-      clearTimeout(this.stopTimeout);
-    }
+    logger.debug('Canceling listener stop');
+    clearTimeout(this.stopTimeout);
     return this;
   },
 
