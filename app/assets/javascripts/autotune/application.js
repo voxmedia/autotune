@@ -87,6 +87,7 @@ function App(config) {
   if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
       this.hasFocus = true;
+      logger.debug('App has focus');
       // Tell the listener to cancel the timeout
       this.listener.cancelStop();
       // Proxy the event on the app object
@@ -95,6 +96,7 @@ function App(config) {
 
     $(window).on('blur', _.bind(function(){
       this.hasFocus = false;
+      logger.debug('App lost focus');
       // Tell the listener to time out in 20 seconds
       this.listener.stopAfter(200);
       // Proxy the event on the app object
