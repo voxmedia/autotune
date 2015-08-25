@@ -42,9 +42,9 @@ _.extend(Listener.prototype, Backbone.Events, {
     if ( this.hasStatus('open') ) {
       logger.debug('Close event listener');
       this.conn.close();
-      this.trigger('stop');
     }
 
+    this.trigger('stop');
     return this;
   },
 
