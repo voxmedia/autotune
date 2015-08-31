@@ -6,7 +6,6 @@
 <% if ( ! model.isNew() ) { %>
   <% if ( model.hasUnpublishedUpdates() || model.isDraft() ) { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
-     <% if ( !model.hasStatus('built') ) { %>disabled="true"<% } %>
      href="<%=model.getPreviewUrl('http') %>">Preview</a>
   <% } else { %>
   <a class="btn btn-default" target="_blank" id="viewBtn"

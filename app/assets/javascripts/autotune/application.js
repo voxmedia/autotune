@@ -1312,11 +1312,7 @@ __p+='\n          data-loading-text="Saving...">Save</button>\n\n';
  if ( ! model.isNew() ) { 
 __p+='\n  ';
  if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
-__p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     ';
- if ( !model.hasStatus('built') ) { 
-__p+='disabled="true"';
- } 
-__p+='\n     href="'+
+__p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     href="'+
 ((__t=(model.getPreviewUrl('http') ))==null?'':__t)+
 '">Preview</a>\n  ';
  } else { 
@@ -78291,6 +78287,8 @@ function merge_text_nodes( jsonml ) {
 		sticker: true,
 		// Only show the sticker button on hover.
 		sticker_hover: true,
+		// Show the buttons even when the nonblock module is in use.
+		show_on_nonblock: false,
 		// The various displayed text, helps facilitating internationalization.
 		labels: {
 			close: "Close",
@@ -78310,28 +78308,38 @@ function merge_text_nodes( jsonml ) {
 			notice.elem.on({
 				"mouseenter": function(e){
 					// Show the buttons.
-					if (that.myOptions.sticker && !(notice.options.nonblock && notice.options.nonblock.nonblock)) that.sticker.trigger("pnotify_icon").css("visibility", "visible");
-					if (that.myOptions.closer && !(notice.options.nonblock && notice.options.nonblock.nonblock)) that.closer.css("visibility", "visible");
+					if (that.myOptions.sticker && (!(notice.options.nonblock && notice.options.nonblock.nonblock) || that.myOptions.show_on_nonblock)) {
+						that.sticker.trigger("pnotify_icon").css("visibility", "visible");
+					}
+					if (that.myOptions.closer && (!(notice.options.nonblock && notice.options.nonblock.nonblock) || that.myOptions.show_on_nonblock)) {
+						that.closer.css("visibility", "visible");
+					}
 				},
 				"mouseleave": function(e){
 					// Hide the buttons.
-					if (that.myOptions.sticker_hover)
+					if (that.myOptions.sticker_hover) {
 						that.sticker.css("visibility", "hidden");
-					if (that.myOptions.closer_hover)
+					}
+					if (that.myOptions.closer_hover) {
 						that.closer.css("visibility", "hidden");
+					}
 				}
 			});
 
 			// Provide a button to stick the notice.
 			this.sticker = $("<div />", {
 				"class": "ui-pnotify-sticker",
-				"css": {"cursor": "pointer", "visibility": options.sticker_hover ? "hidden" : "visible"},
+				"css": {
+					"cursor": "pointer",
+					"visibility": options.sticker_hover ? "hidden" : "visible"
+				},
 				"click": function(){
 					notice.options.hide = !notice.options.hide;
-					if (notice.options.hide)
+					if (notice.options.hide) {
 						notice.queueRemove();
-					else
+					} else {
 						notice.cancelRemove();
+					}
 					$(this).trigger("pnotify_icon");
 				}
 			})
@@ -78340,8 +78348,9 @@ function merge_text_nodes( jsonml ) {
 			})
 			.append($("<span />", {"class": notice.styles.pin_up, "title": options.labels.stick}))
 			.prependTo(notice.container);
-			if (!options.sticker || (notice.options.nonblock && notice.options.nonblock.nonblock))
+			if (!options.sticker || (notice.options.nonblock && notice.options.nonblock.nonblock && !options.show_on_nonblock)) {
 				this.sticker.css("display", "none");
+			}
 
 			// Provide a button to close the notice.
 			this.closer = $("<div />", {
@@ -78355,33 +78364,43 @@ function merge_text_nodes( jsonml ) {
 			})
 			.append($("<span />", {"class": notice.styles.closer, "title": options.labels.close}))
 			.prependTo(notice.container);
-			if (!options.closer || (notice.options.nonblock && notice.options.nonblock.nonblock))
+			if (!options.closer || (notice.options.nonblock && notice.options.nonblock.nonblock && !options.show_on_nonblock)) {
 				this.closer.css("display", "none");
+			}
 		},
 		update: function(notice, options){
 			this.myOptions = options;
 			// Update the sticker and closer buttons.
-			if (!options.closer || (notice.options.nonblock && notice.options.nonblock.nonblock))
+			if (!options.closer || (notice.options.nonblock && notice.options.nonblock.nonblock && !options.show_on_nonblock)) {
 				this.closer.css("display", "none");
-			else if (options.closer)
+			} else if (options.closer) {
 				this.closer.css("display", "block");
-			if (!options.sticker || (notice.options.nonblock && notice.options.nonblock.nonblock))
+			}
+			if (!options.sticker || (notice.options.nonblock && notice.options.nonblock.nonblock && !options.show_on_nonblock)) {
 				this.sticker.css("display", "none");
-			else if (options.sticker)
+			} else if (options.sticker) {
 				this.sticker.css("display", "block");
+			}
 			// Update the sticker icon.
 			this.sticker.trigger("pnotify_icon");
 			// Update the hover status of the buttons.
-			if (options.sticker_hover)
+			if (options.sticker_hover) {
 				this.sticker.css("visibility", "hidden");
-			else if (!(notice.options.nonblock && notice.options.nonblock.nonblock))
+			} else if (!(notice.options.nonblock && notice.options.nonblock.nonblock && !options.show_on_nonblock)) {
 				this.sticker.css("visibility", "visible");
-			if (options.closer_hover)
+			}
+			if (options.closer_hover) {
 				this.closer.css("visibility", "hidden");
-			else if (!(notice.options.nonblock && notice.options.nonblock.nonblock))
+			} else if (!(notice.options.nonblock && notice.options.nonblock.nonblock && !options.show_on_nonblock)) {
 				this.closer.css("visibility", "visible");
+			}
 		}
 	};
+	$.extend(PNotify.styling.brighttheme, {
+		closer: "brighttheme-icon-closer",
+		pin_up: "brighttheme-icon-sticker",
+		pin_down: "brighttheme-icon-sticker brighttheme-icon-stuck"
+	});
 	$.extend(PNotify.styling.jqueryui, {
 		closer: "ui-icon ui-icon-close",
 		pin_up: "ui-icon ui-icon-pin-w",
@@ -78443,7 +78462,7 @@ license GPL/LGPL/MPL
 		spacing2: 25,
 		context: $("body")
 	};
-	var timer, // Position all timer.
+	var posTimer, // Position all timer.
 		body,
 		jwindow = $(window);
 	// Set global variables.
@@ -78453,9 +78472,12 @@ license GPL/LGPL/MPL
 		jwindow = $(window);
 		// Reposition the notices when the window resizes.
 		jwindow.bind('resize', function(){
-			if (timer)
-				clearTimeout(timer);
-			timer = setTimeout(function(){ PNotify.positionAll(true) }, 10);
+			if (posTimer) {
+				clearTimeout(posTimer);
+			}
+			posTimer = setTimeout(function(){
+				PNotify.positionAll(true);
+			}, 10);
 		});
 	};
 	PNotify = function(options){
@@ -78478,8 +78500,8 @@ license GPL/LGPL/MPL
 			text: false,
 			// Whether to escape the content of the text. (Not allow HTML.)
 			text_escape: false,
-			// What styling classes to use. (Can be either jqueryui or bootstrap.)
-			styling: "bootstrap3",
+			// What styling classes to use. (Can be either "brighttheme", "jqueryui", "bootstrap2", "bootstrap3", or "fontawesome".)
+			styling: "brighttheme",
 			// Additional classes to be added to the notice. (For custom styling.)
 			addclass: "",
 			// Class to be added to the notice for corner styling.
@@ -78535,8 +78557,9 @@ license GPL/LGPL/MPL
 			var curArg;
 			for (var module in this.modules) {
 				curArg = ((typeof arg === "object" && module in arg) ? arg[module] : arg);
-				if (typeof this.modules[module][event] === 'function')
+				if (typeof this.modules[module][event] === 'function') {
 					this.modules[module][event](this, typeof this.options[module] === 'object' ? this.options[module] : {}, curArg);
+				}
 			}
 		},
 
@@ -78576,16 +78599,21 @@ license GPL/LGPL/MPL
 				"aria-live": "assertive",
 				"mouseenter": function(e){
 					if (that.options.mouse_reset && that.animating === "out") {
-						if (!that.timerHide)
+						if (!that.timerHide) {
 							return;
+						}
 						that.cancelRemove();
 					}
 					// Stop the close timer.
-					if (that.options.hide && that.options.mouse_reset) that.cancelRemove();
+					if (that.options.hide && that.options.mouse_reset) {
+						that.cancelRemove();
+					}
 				},
 				"mouseleave": function(e){
 					// Start the close timer.
-					if (that.options.hide && that.options.mouse_reset && that.animating !== "out") that.queueRemove();
+					if (that.options.hide && that.options.mouse_reset && that.animating !== "out") {
+						that.queueRemove();
+					}
 					PNotify.positionAll();
 				}
 			});
@@ -78594,11 +78622,13 @@ license GPL/LGPL/MPL
 				"class": this.styles.container+" ui-pnotify-container "+(this.options.type === "error" ? this.styles.error : (this.options.type === "info" ? this.styles.info : (this.options.type === "success" ? this.styles.success : this.styles.notice))),
 				"role": "alert"
 			}).appendTo(this.elem);
-			if (this.options.cornerclass !== "")
+			if (this.options.cornerclass !== "") {
 				this.container.removeClass("ui-corner-all").addClass(this.options.cornerclass);
+			}
 			// Create a drop shadow.
-			if (this.options.shadow)
+			if (this.options.shadow) {
 				this.container.addClass("ui-pnotify-shadow");
+			}
 
 
 			// Add the appropriate icon.
@@ -78613,40 +78643,46 @@ license GPL/LGPL/MPL
 				"class": "ui-pnotify-title"
 			})
 			.appendTo(this.container);
-			if (this.options.title === false)
+			if (this.options.title === false) {
 				this.title_container.hide();
-			else if (this.options.title_escape)
+			} else if (this.options.title_escape) {
 				this.title_container.text(this.options.title);
-			else
+			} else {
 				this.title_container.html(this.options.title);
+			}
 
 			// Add text.
 			this.text_container = $("<div />", {
 				"class": "ui-pnotify-text"
 			})
 			.appendTo(this.container);
-			if (this.options.text === false)
+			if (this.options.text === false) {
 				this.text_container.hide();
-			else if (this.options.text_escape)
+			} else if (this.options.text_escape) {
 				this.text_container.text(this.options.text);
-			else
+			} else {
 				this.text_container.html(this.options.insert_brs ? String(this.options.text).replace(/\n/g, "<br />") : this.options.text);
+			}
 
 			// Set width and min height.
-			if (typeof this.options.width === "string")
+			if (typeof this.options.width === "string") {
 				this.elem.css("width", this.options.width);
-			if (typeof this.options.min_height === "string")
+			}
+			if (typeof this.options.min_height === "string") {
 				this.container.css("min-height", this.options.min_height);
+			}
 
 
 			// Add the notice to the notice array.
-			if (this.options.stack.push === "top")
+			if (this.options.stack.push === "top") {
 				PNotify.notices = $.merge([this], PNotify.notices);
-			else
+			} else {
 				PNotify.notices = $.merge(PNotify.notices, [this]);
+			}
 			// Now position all the notices if they are to push to the top.
-			if (this.options.stack.push === "top")
+			if (this.options.stack.push === "top") {
 				this.queuePosition(false, 1);
+			}
 
 
 
@@ -78658,8 +78694,9 @@ license GPL/LGPL/MPL
 			this.runModules('init');
 
 			// Display the notice.
-			if (this.options.auto_display)
+			if (this.options.auto_display) {
 				this.open();
+			}
 			return this;
 		},
 
@@ -78670,41 +78707,48 @@ license GPL/LGPL/MPL
 			// Then update to the new options.
 			this.parseOptions(oldOpts, options);
 			// Update the corner class.
-			if (this.options.cornerclass !== oldOpts.cornerclass)
+			if (this.options.cornerclass !== oldOpts.cornerclass) {
 				this.container.removeClass("ui-corner-all "+oldOpts.cornerclass).addClass(this.options.cornerclass);
+			}
 			// Update the shadow.
 			if (this.options.shadow !== oldOpts.shadow) {
-				if (this.options.shadow)
+				if (this.options.shadow) {
 					this.container.addClass("ui-pnotify-shadow");
-				else
+				} else {
 					this.container.removeClass("ui-pnotify-shadow");
+				}
 			}
 			// Update the additional classes.
-			if (this.options.addclass === false)
+			if (this.options.addclass === false) {
 				this.elem.removeClass(oldOpts.addclass);
-			else if (this.options.addclass !== oldOpts.addclass)
+			} else if (this.options.addclass !== oldOpts.addclass) {
 				this.elem.removeClass(oldOpts.addclass).addClass(this.options.addclass);
+			}
 			// Update the title.
-			if (this.options.title === false)
+			if (this.options.title === false) {
 				this.title_container.slideUp("fast");
-			else if (this.options.title !== oldOpts.title) {
-				if (this.options.title_escape)
+			} else if (this.options.title !== oldOpts.title) {
+				if (this.options.title_escape) {
 					this.title_container.text(this.options.title);
-				else
+				} else {
 					this.title_container.html(this.options.title);
-				if (oldOpts.title === false)
+				}
+				if (oldOpts.title === false) {
 					this.title_container.slideDown(200)
+				}
 			}
 			// Update the text.
 			if (this.options.text === false) {
 				this.text_container.slideUp("fast");
 			} else if (this.options.text !== oldOpts.text) {
-				if (this.options.text_escape)
+				if (this.options.text_escape) {
 					this.text_container.text(this.options.text);
-				else
+				} else {
 					this.text_container.html(this.options.insert_brs ? String(this.options.text).replace(/\n/g, "<br />") : this.options.text);
-				if (oldOpts.text === false)
+				}
+				if (oldOpts.text === false) {
 					this.text_container.slideDown(200)
+				}
 			}
 			// Change the notice type.
 			if (this.options.type !== oldOpts.type)
@@ -78731,19 +78775,23 @@ license GPL/LGPL/MPL
 				}
 			}
 			// Update the width.
-			if (this.options.width !== oldOpts.width)
+			if (this.options.width !== oldOpts.width) {
 				this.elem.animate({width: this.options.width});
+			}
 			// Update the minimum height.
-			if (this.options.min_height !== oldOpts.min_height)
+			if (this.options.min_height !== oldOpts.min_height) {
 				this.container.animate({minHeight: this.options.min_height});
+			}
 			// Update the opacity.
-			if (this.options.opacity !== oldOpts.opacity)
+			if (this.options.opacity !== oldOpts.opacity) {
 				this.elem.fadeTo(this.options.animate_speed, this.options.opacity);
+			}
 			// Update the timed hiding.
-			if (!this.options.hide)
+			if (!this.options.hide) {
 				this.cancelRemove();
-			else if (!oldOpts.hide)
+			} else if (!oldOpts.hide) {
 				this.queueRemove();
+			}
 			this.queuePosition(true);
 
 			// Run the modules.
@@ -78759,26 +78807,30 @@ license GPL/LGPL/MPL
 
 			var that = this;
 			// If the notice is not in the DOM, append it.
-			if (!this.elem.parent().length)
+			if (!this.elem.parent().length) {
 				this.elem.appendTo(this.options.stack.context ? this.options.stack.context : body);
+			}
 			// Try to put it in the right position.
-			if (this.options.stack.push !== "top")
+			if (this.options.stack.push !== "top") {
 				this.position(true);
+			}
 			// First show it, then set its opacity, then hide it.
 			if (this.options.animation === "fade" || this.options.animation.effect_in === "fade") {
 				// If it's fading in, it should start at 0.
 				this.elem.show().fadeTo(0, 0).hide();
 			} else {
 				// Or else it should be set to the opacity.
-				if (this.options.opacity !== 1)
+				if (this.options.opacity !== 1) {
 					this.elem.show().fadeTo(0, this.options.opacity).hide();
+				}
 			}
 			this.animateIn(function(){
 				that.queuePosition(true);
 
 				// Now set it to hide.
-				if (that.options.hide)
+				if (that.options.hide) {
 					that.queueRemove();
+				}
 
 				that.state = "open";
 
@@ -78831,7 +78883,9 @@ license GPL/LGPL/MPL
 		// === Class Methods ===
 
 		// Get the DOM element.
-		get: function(){ return this.elem; },
+		get: function(){
+			return this.elem;
+		},
 
 		// Put all the options in the right places.
 		parseOptions: function(options, moreOptions){
@@ -78841,8 +78895,9 @@ license GPL/LGPL/MPL
 			var optArray = [options, moreOptions], curOpts;
 			for (var curIndex=0; curIndex < optArray.length; curIndex++) {
 				curOpts = optArray[curIndex];
-				if (typeof curOpts == "undefined")
+				if (typeof curOpts == "undefined") {
 					break;
+				}
 				if (typeof curOpts !== 'object') {
 					this.options.text = curOpts;
 				} else {
@@ -78863,27 +78918,34 @@ license GPL/LGPL/MPL
 			// Declare that the notice is animating in. (Or has completed animating in.)
 			this.animating = "in";
 			var animation;
-			if (typeof this.options.animation.effect_in !== "undefined")
+			if (typeof this.options.animation.effect_in !== "undefined") {
 				animation = this.options.animation.effect_in;
-			else
+			} else {
 				animation = this.options.animation;
+			}
 			if (animation === "none") {
 				this.elem.show();
 				callback();
-			} else if (animation === "show")
+			} else if (animation === "show") {
 				this.elem.show(this.options.animate_speed, callback);
-			else if (animation === "fade")
+			} else if (animation === "fade") {
 				this.elem.show().fadeTo(this.options.animate_speed, this.options.opacity, callback);
-			else if (animation === "slide")
+			} else if (animation === "slide") {
 				this.elem.slideDown(this.options.animate_speed, callback);
-			else if (typeof animation === "function")
+			} else if (typeof animation === "function") {
 				animation("in", callback, this.elem);
-			else
+			} else {
 				this.elem.show(animation, (typeof this.options.animation.options_in === "object" ? this.options.animation.options_in : {}), this.options.animate_speed, callback);
-			if (this.elem.parent().hasClass('ui-effects-wrapper'))
-				this.elem.parent().css({"position": "fixed", "overflow": "visible"});
-			if (animation !== "slide")
+			}
+			if (this.elem.parent().hasClass('ui-effects-wrapper')) {
+				this.elem.parent().css({
+					"position": "fixed",
+					"overflow": "visible"
+				});
+			}
+			if (animation !== "slide") {
 				this.elem.css("overflow", "visible");
+			}
 			this.container.css("overflow", "hidden");
 		},
 
@@ -78892,27 +78954,34 @@ license GPL/LGPL/MPL
 			// Declare that the notice is animating out. (Or has completed animating out.)
 			this.animating = "out";
 			var animation;
-			if (typeof this.options.animation.effect_out !== "undefined")
+			if (typeof this.options.animation.effect_out !== "undefined") {
 				animation = this.options.animation.effect_out;
-			else
+			} else {
 				animation = this.options.animation;
+			}
 			if (animation === "none") {
 				this.elem.hide();
 				callback();
-			} else if (animation === "show")
+			} else if (animation === "show") {
 				this.elem.hide(this.options.animate_speed, callback);
-			else if (animation === "fade")
+			} else if (animation === "fade") {
 				this.elem.fadeOut(this.options.animate_speed, callback);
-			else if (animation === "slide")
+			} else if (animation === "slide") {
 				this.elem.slideUp(this.options.animate_speed, callback);
-			else if (typeof animation === "function")
+			} else if (typeof animation === "function") {
 				animation("out", callback, this.elem);
-			else
+			} else {
 				this.elem.hide(animation, (typeof this.options.animation.options_out === "object" ? this.options.animation.options_out : {}), this.options.animate_speed, callback);
-			if (this.elem.parent().hasClass('ui-effects-wrapper'))
-				this.elem.parent().css({"position": "fixed", "overflow": "visible"});
-			if (animation !== "slide")
+			}
+			if (this.elem.parent().hasClass('ui-effects-wrapper')) {
+				this.elem.parent().css({
+					"position": "fixed",
+					"overflow": "visible"
+				});
+			}
+			if (animation !== "slide") {
 				this.elem.css("overflow", "visible");
+			}
 			this.container.css("overflow", "hidden");
 		},
 
@@ -78922,17 +78991,29 @@ license GPL/LGPL/MPL
 			// Get the notice's stack.
 			var s = this.options.stack,
 				e = this.elem;
-			if (e.parent().hasClass('ui-effects-wrapper'))
-				e = this.elem.css({"left": "0", "top": "0", "right": "0", "bottom": "0"}).parent();
-			if (typeof s.context === "undefined")
+			if (e.parent().hasClass('ui-effects-wrapper')) {
+				e = this.elem.css({
+					"left": "0",
+					"top": "0",
+					"right": "0",
+					"bottom": "0"
+				}).parent();
+			}
+			if (typeof s.context === "undefined") {
 				s.context = body;
-			if (!s) return;
-			if (typeof s.nextpos1 !== "number")
+			}
+			if (!s) {
+				return;
+			}
+			if (typeof s.nextpos1 !== "number") {
 				s.nextpos1 = s.firstpos1;
-			if (typeof s.nextpos2 !== "number")
+			}
+			if (typeof s.nextpos2 !== "number") {
 				s.nextpos2 = s.firstpos2;
-			if (typeof s.addpos2 !== "number")
+			}
+			if (typeof s.addpos2 !== "number") {
 				s.addpos2 = 0;
+			}
 			var hidden = e.css("display") === "none";
 			// Skip this notice if it's not shown.
 			if (!hidden || dontSkipHidden) {
@@ -78956,8 +79037,9 @@ license GPL/LGPL/MPL
 						break;
 				}
 				curpos1 = parseInt(e.css(csspos1).replace(/(?:\..*|[^0-9.])/g, ''));
-				if (isNaN(curpos1))
+				if (isNaN(curpos1)) {
 					curpos1 = 0;
+				}
 				// Remember the first pos1, so the first visible notice goes there.
 				if (typeof s.firstpos1 === "undefined" && !hidden) {
 					s.firstpos1 = curpos1;
@@ -78980,8 +79062,9 @@ license GPL/LGPL/MPL
 						break;
 				}
 				curpos2 = parseInt(e.css(csspos2).replace(/(?:\..*|[^0-9.])/g, ''));
-				if (isNaN(curpos2))
+				if (isNaN(curpos2)) {
 					curpos2 = 0;
+				}
 				// Remember the first pos2, so the first visible notice goes there.
 				if (typeof s.firstpos2 === "undefined" && !hidden) {
 					s.firstpos2 = curpos2;
@@ -79014,20 +79097,23 @@ license GPL/LGPL/MPL
 							break;
 					}
 				} else {
-					if(typeof s.nextpos2 === "number")
+					if (typeof s.nextpos2 === "number") {
 						e.css(csspos2, s.nextpos2+"px");
+					}
 				}
 				// Keep track of the widest/tallest notice in the column/row, so we can push the next column/row.
 				switch (s.dir2) {
 					case "down":
 					case "up":
-						if (e.outerHeight(true) > s.addpos2)
+						if (e.outerHeight(true) > s.addpos2) {
 							s.addpos2 = e.height();
+						}
 						break;
 					case "left":
 					case "right":
-						if (e.outerWidth(true) > s.addpos2)
+						if (e.outerWidth(true) > s.addpos2) {
 							s.addpos2 = e.width();
+						}
 						break;
 				}
 				// Move the notice on dir1.
@@ -79048,12 +79134,17 @@ license GPL/LGPL/MPL
 								animate.left = s.nextpos1+"px";
 								break;
 						}
-					} else
+					} else {
 						e.css(csspos1, s.nextpos1+"px");
+					}
 				}
 				// Run the animation.
-				if (animate.top || animate.bottom || animate.right || animate.left)
-					e.animate(animate, {duration: this.options.position_animate_speed, queue: false});
+				if (animate.top || animate.bottom || animate.right || animate.left) {
+					e.animate(animate, {
+						duration: this.options.position_animate_speed,
+						queue: false
+					});
+				}
 				// Calculate the next dir1 position.
 				switch (s.dir1) {
 					case "down":
@@ -79071,25 +79162,33 @@ license GPL/LGPL/MPL
 		// Queue the position all function so it doesn't run repeatedly and
 		// use up resources.
 		queuePosition: function(animate, milliseconds){
-			if (timer)
-				clearTimeout(timer);
-			if (!milliseconds)
+			if (posTimer) {
+				clearTimeout(posTimer);
+			}
+			if (!milliseconds) {
 				milliseconds = 10;
-			timer = setTimeout(function(){ PNotify.positionAll(animate) }, milliseconds);
+			}
+			posTimer = setTimeout(function(){
+				PNotify.positionAll(animate);
+			}, milliseconds);
 			return this;
 		},
 
 
 		// Cancel any pending removal timer.
 		cancelRemove: function(){
-			if (this.timer)
+			if (this.timer) {
 				window.clearTimeout(this.timer);
+			}
 			if (this.state === "closing") {
 				// If it's animating out, animate back in really quickly.
 				this.elem.stop(true);
 				this.state = "open";
 				this.animating = "in";
-				this.elem.css("height", "auto").animate({"width": this.options.width, "opacity": this.options.opacity}, "fast");
+				this.elem.css("height", "auto").animate({
+					"width": this.options.width,
+					"opacity": this.options.opacity
+				}, "fast");
 			}
 			return this;
 		},
@@ -79110,21 +79209,25 @@ license GPL/LGPL/MPL
 		notices: [],
 		removeAll: function () {
 			$.each(PNotify.notices, function(){
-				if (this.remove)
+				if (this.remove) {
 					this.remove(false);
+				}
 			});
 		},
 		positionAll: function (animate) {
 			// This timer is used for queueing this function so it doesn't run
 			// repeatedly.
-			if (timer)
-				clearTimeout(timer);
-			timer = null;
+			if (posTimer) {
+				clearTimeout(posTimer);
+			}
+			posTimer = null;
 			// Reset the next position data.
 			if (PNotify.notices && PNotify.notices.length) {
 				$.each(PNotify.notices, function(){
 					var s = this.options.stack;
-					if (!s) return;
+					if (!s) {
+						return;
+					}
 					s.nextpos1 = s.firstpos1;
 					s.nextpos2 = s.firstpos2;
 					s.addpos2 = 0;
@@ -79142,6 +79245,18 @@ license GPL/LGPL/MPL
 			}
 		},
 		styling: {
+			brighttheme: {
+				// Bright Theme doesn't require any UI libraries.
+				container: "brighttheme",
+				notice: "brighttheme-notice",
+				notice_icon: "brighttheme-icon-notice",
+				info: "brighttheme-info",
+				info_icon: "brighttheme-icon-info",
+				success: "brighttheme-success",
+				success_icon: "brighttheme-icon-success",
+				error: "brighttheme-error",
+				error_icon: "brighttheme-icon-error"
+			},
 			jqueryui: {
 				container: "ui-widget ui-widget-content ui-corner-all",
 				notice: "ui-state-highlight",
@@ -79190,10 +79305,11 @@ license GPL/LGPL/MPL
 		error_icon: "fa fa-warning"
 	});
 
-	if (document.body)
+	if (document.body) {
 		do_when_ready();
-	else
+	} else {
 		$(do_when_ready);
+	}
 	return PNotify;
 }));
 
