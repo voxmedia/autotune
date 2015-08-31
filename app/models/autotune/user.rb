@@ -1,6 +1,7 @@
 module Autotune
   # Basic user account
   class User < ActiveRecord::Base
+    include Searchable
     has_many :authorizations, :dependent => :destroy
     has_many :projects
     serialize :meta, JSON
@@ -9,6 +10,8 @@ module Autotune
     validates :email,
               :uniqueness => { :case_sensitive => false }
     after_initialize :defaults
+
+    # search_fields(:name)
 
     def self.generate_api_key
       range = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a

@@ -31,7 +31,15 @@ module Autotune
       query = {}
       query[:status] = params[:status] if params.key? :status
       type = true if params.key? :type
-      @projects = @projects.search(params[:search]) if params.key? :search
+
+      if params.key? :search
+        users = User.search(params[:search], :name).pluck(:id)
+        ups = @projects.where(:user_id => users)
+        ups_ids = ups.pluck(:id)
+        ptitle = @projects.search(params[:search], :title)
+        ptitle_ids = ptitle.pluck(:id)
+        @projects = @projects.where(:id => ( ups + ptitle ).uniq)
+      end
 
       if params.key? :theme
         theme = Theme.find_by_value(params[:theme])
