@@ -128,7 +128,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'pub_status', 'type', 'theme', 'search'),
         app: app
       });
       view.render();

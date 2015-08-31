@@ -30,6 +30,15 @@ module Autotune
       type = false
       query = {}
       query[:status] = params[:status] if params.key? :status
+
+      if params.key? :pub_status
+        if params[:pub_status] == 'published'
+          @projects = @projects.where.not(:published_at => nil)
+        else
+          @projects = @projects.where(:published_at => nil)
+        end
+      end
+
       type = true if params.key? :type
 
       if params.key? :search
@@ -57,6 +66,7 @@ module Autotune
       end
 
       if query || type
+        puts query, '76'
         @projects = @projects.where(query)
         if params.key? :type
           @blueprints = Blueprint

@@ -807,7 +807,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'pub_status', 'type', 'theme', 'search'),
         app: app
       });
       view.render();
@@ -1430,6 +1430,22 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '">'+
 ((__t=(status ))==null?'':__t)+
+'</option>\n            ';
+ }) 
+__p+='\n            </select>\n          </div>\n          <div class="select">\n            <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.pub_status) { 
+__p+='selected';
+ } 
+__p+='>Pub status</option>\n            ';
+ _.each(app.config.project_pub_statuses, function(pub_status) { 
+__p+='\n              <option ';
+ if(pub_status === query.pub_status) { 
+__p+='selected';
+ } 
+__p+='\n                    value="'+
+((__t=(pub_status ))==null?'':__t)+
+'">'+
+((__t=(pub_status ))==null?'':__t)+
 '</option>\n            ';
  }) 
 __p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';

@@ -61,6 +61,15 @@
             <% }) %>
             </select>
           </div>
+          <div class="select">
+            <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.pub_status) { %>selected<% } %>>Pub status</option>
+            <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
+              <option <% if(pub_status === query.pub_status) { %>selected<% } %>
+                    value="<%=pub_status %>"><%=pub_status %></option>
+            <% }) %>
+            </select>
+          </div>
         </form>
       </td>
     </tr>
