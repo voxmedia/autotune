@@ -19,8 +19,11 @@ module Autotune
         project.working_dir,
         Rails.configuration.autotune.setup_environment)
 
-      # copy the blueprint to the project working dir
-      blueprint_dir.copy_to(project_dir.working_dir) unless project_dir.exist?
+      # Copy the blueprint to the project working dir. Because of
+      # issue #218, due to some weirdness in git 1.7, we can't just
+      # update the repo. We have to make a new copy.
+      project_dir.destroy if project_dir.exist?
+      blueprint_dir.copy_to(project_dir.working_dir)
 
       if project_dir.commit_hash != project.blueprint_version
         # checkout the right git version
