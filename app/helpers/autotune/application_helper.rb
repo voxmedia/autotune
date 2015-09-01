@@ -7,6 +7,7 @@ module Autotune
         :themes => current_user.nil? ? [] : current_user.author_themes.as_json,
         :user => current_user.as_json,
         :tags => Tag.all.as_json(:only => [:title, :slug]),
+        :blueprint_titles => Blueprint.all.as_json(:only => [:title, :id]),
         :project_statuses => Autotune::PROJECT_STATUSES,
         :project_pub_statuses => Autotune::PROJECT_PUB_STATUSES,
         :blueprint_statuses => Autotune::BLUEPRINT_STATUSES,

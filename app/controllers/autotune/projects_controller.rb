@@ -29,6 +29,7 @@ module Autotune
       # Filter and search query
       type = false
       query = {}
+
       query[:status] = params[:status] if params.key? :status
 
       if params.key? :pub_status
@@ -39,7 +40,9 @@ module Autotune
         end
       end
 
-      type = true if params.key? :type
+      # type = true if params.key? :type
+      # blueprint_id = true if params.key? :blueprint_title
+      query[:blueprint_id] = params[:blueprint_title] if params.key? :blueprint_title
 
       if params.key? :search
         users = User.search(params[:search], :name).pluck(:id)
@@ -65,17 +68,15 @@ module Autotune
         end
       end
 
-      if query || type
-        puts query, '76'
-        @projects = @projects.where(query)
-        if params.key? :type
-          @blueprints = Blueprint
-          @blueprint_ids = @blueprints.where({:type => params[:type]}).pluck(:id)
-          @projects = @projects.where( :blueprint_id => @blueprint_ids )
-        end
-      else
-        @projects = @projects.all
+      @projects = @projects.where(query)
+
+      if params.key? :type
+        @blueprints = Blueprint
+        @blueprint_ids = @blueprints.where({:type => params[:type]}).pluck(:id)
+        @projects = @projects.where( :blueprint_id => @blueprint_ids )
       end
+
+      # puts @projects.pluck(:blueprint_id)
 
       page = params[:page] || 1
       per_page = params[:per_page] || 15

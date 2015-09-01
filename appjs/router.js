@@ -115,6 +115,7 @@ module.exports = Backbone.Router.extend({
 
   listProjects: function(params) {
     var projects = this.app.projects,
+        // bp_list = this.app.blueprints.pluck('id', 'title'),
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }
@@ -128,7 +129,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'pub_status', 'type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
         app: app
       });
       view.render();

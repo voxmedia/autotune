@@ -794,6 +794,7 @@ module.exports = Backbone.Router.extend({
 
   listProjects: function(params) {
     var projects = this.app.projects,
+        // bp_list = this.app.blueprints.pluck('id', 'title'),
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }
@@ -807,7 +808,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( projects.fetch({data: query}) ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'pub_status', 'type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
         app: app
       });
       view.render();
@@ -1377,10 +1378,26 @@ __p+='>\n        ';
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
 __p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="5">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
- if(query.theme || query.blueprint_type || query.status) { 
+ if(query.theme || query.type || query.blueprint_title || query.status || query.pub_status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
-__p+='\n          &nbsp;\n          ';
+__p+='\n          &nbsp;\n          <div class="select">\n            <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.pub_status) { 
+__p+='selected';
+ } 
+__p+='>Editorial status</option>\n            ';
+ _.each(app.config.project_pub_statuses, function(pub_status) { 
+__p+='\n              <option ';
+ if(pub_status === query.pub_status) { 
+__p+='selected';
+ } 
+__p+='\n                    value="'+
+((__t=(pub_status ))==null?'':__t)+
+'">'+
+((__t=(pub_status ))==null?'':__t)+
+'</option>\n            ';
+ }) 
+__p+='\n            </select>\n          </div>\n          ';
  if ( app.themes.length > 1 ) { 
 __p+='\n          <div class="select">\n            <select name="theme" id="theme" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.theme) { 
@@ -1400,11 +1417,27 @@ __p+='\n                    value="'+
  }) 
 __p+='\n            </select>\n          </div>\n          ';
  } 
-__p+='\n          <div class="select">\n            <select name="type" id="type" class="form-control" data-auto-submit="true">\n              <option disabled ';
+__p+='\n          <div class="select">\n            <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.blueprint_title) { 
+__p+='selected';
+ } 
+__p+='>Blueprint</option>\n            ';
+ _.each(app.config.blueprint_titles, function(blueprint_title) { 
+__p+='\n              <option ';
+ if(String(blueprint_title.id) === query.blueprint_title) { 
+__p+='selected';
+ } 
+__p+='\n                    value="'+
+((__t=(blueprint_title.id ))==null?'':__t)+
+'">'+
+((__t=(blueprint_title.title ))==null?'':__t)+
+'</option>\n            ';
+ }) 
+__p+='\n            </select>\n          </div>\n          <div class="select">\n            <select name="type" id="type" class="form-control" data-auto-submit="true">\n              <option disabled ';
  if(!query.type) { 
 __p+='selected';
  } 
-__p+='>Type</option>\n            ';
+__p+='>Project type</option>\n            ';
  _.each(app.config.blueprint_types, function(type) { 
 __p+='\n              <option ';
  if(type === query.type) { 
@@ -1420,7 +1453,7 @@ __p+='\n            </select>\n          </div>\n          <div class="select">\
  if(!query.status) { 
 __p+='selected';
  } 
-__p+='>Status</option>\n            ';
+__p+='>Build status</option>\n            ';
  _.each(app.config.project_statuses, function(status) { 
 __p+='\n              <option ';
  if(status === query.status) { 
@@ -1432,23 +1465,7 @@ __p+='\n                    value="'+
 ((__t=(status ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n          <div class="select">\n            <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">\n              <option disabled ';
- if(!query.pub_status) { 
-__p+='selected';
- } 
-__p+='>Pub status</option>\n            ';
- _.each(app.config.project_pub_statuses, function(pub_status) { 
-__p+='\n              <option ';
- if(pub_status === query.pub_status) { 
-__p+='selected';
- } 
-__p+='\n                    value="'+
-((__t=(pub_status ))==null?'':__t)+
-'">'+
-((__t=(pub_status ))==null?'':__t)+
-'</option>\n            ';
- }) 
-__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
+__p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Editorial Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
  if(!hasObjects()) { 
 __p+='\n  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>\n  ';
  }
