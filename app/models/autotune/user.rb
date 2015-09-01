@@ -11,8 +11,6 @@ module Autotune
               :uniqueness => { :case_sensitive => false }
     after_initialize :defaults
 
-    # search_fields(:name)
-
     def self.generate_api_key
       range = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
       20.times.map { range[rand(61)] }.join('')

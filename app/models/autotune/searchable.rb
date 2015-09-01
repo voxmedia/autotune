@@ -10,12 +10,12 @@ module Autotune
       #
       # @param text [String] string of keywords
       # @return [ActiveRecord::Relation] matching model instances
-      def search(text, model_sym)
+      def search(text, field)
         return nil if text.nil? || text.empty?
         return nil unless defined? @@search_fields && @@search_fields.any?
         words = text.to_s.strip.split.uniq
         words.reduce(self) do |combined_scope, word|
-          search_fields(model_sym)
+          search_fields(field)
           query_tmpl = @@search_fields.map { |item| "#{item} LIKE ?" }
           combined_scope.where(
             [query_tmpl.join(' OR ')] +

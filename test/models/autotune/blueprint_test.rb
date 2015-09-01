@@ -18,9 +18,9 @@ module Autotune
     end
 
     test 'search blueprints' do
-      assert_equal 2, Blueprint.search('Example').count
-      assert_equal 1, Blueprint.search('two').count
-      assert_equal 0, Blueprint.search('foo').count
+      assert_equal 2, Blueprint.search('Example', :title).count
+      assert_equal 1, Blueprint.search('two', :title).count
+      assert_equal 0, Blueprint.search('foo', :title).count
     end
 
     test "that slugs don't change" do

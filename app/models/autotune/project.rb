@@ -19,15 +19,9 @@ module Autotune
 
     default_scope { order('updated_at DESC') }
 
-    # search_fields(:proj)
-
     before_save :check_for_updated_data
 
     after_save :pub_to_redis
-
-    # def user_name
-    #   self.uname = user.name
-    # end
 
     def draft?
       published_at.nil?

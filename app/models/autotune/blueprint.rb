@@ -20,8 +20,6 @@ module Autotune
     after_initialize :defaults
     after_save :pub_to_redis
 
-    search_fields :title
-
     default_scope { order('updated_at DESC') }
 
     def thumb_url
