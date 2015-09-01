@@ -16,7 +16,6 @@ module Autotune
     validates :title, :blueprint, :user, :theme, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
-    before_validation :defaults
 
     default_scope { order('updated_at DESC') }
 
@@ -29,6 +28,17 @@ module Autotune
     after_initialize do
       self.status ||= 'new'
       self.meta   ||= {}
+    end
+
+    before_validation do
+      # Make sure our slug includes the theme
+      if theme && (theme_changed? || slug_changed?)
+        self.slug = self.class.unique_slug(theme.value + '-' + slug_sans_theme)
+      end
+
+      # Make sure we stash version and config
+      self.blueprint_version ||= blueprint.version unless blueprint.nil?
+      self.blueprint_config  ||= blueprint.config unless blueprint.nil?
     end
 
     def draft?
@@ -78,21 +88,36 @@ module Autotune
       File.join(working_dir, blueprint_config['deploy_dir'] || 'build')
     end
 
+    def deployer(target)
+      Autotune.new_deployer(target.to_sym, self)
+    end
+
     def preview_url
-      Autotune.new_deployer(:preview, self).project_url
+      @preview_url ||= deployer(:preview).project_url
     end
 
     def publish_url
-      Autotune.new_deployer(:publish, self).project_url
+      @publish_url ||= deployer(:publish).project_url
+    end
+
+    def slug_sans_theme
+      @slug_sans_theme ||=
+        if theme_changed? && !theme_was.nil?
+          slug.sub(/^(#{theme.value}|#{theme_was.value})-/, '')
+        else
+          slug.sub(/^#{theme.value}-/, '')
+        end
+    end
+
+    def theme_was
+      @theme_was ||= theme_id_was.nil? ? nil : Theme.find(theme_id_was)
+    end
+
+    def theme_changed?
+      theme_id_changed?
     end
 
     private
-
-    def defaults
-      # self.data ||= {}  # seems to mess up check_for_updated_data
-      self.blueprint_version ||= blueprint.version unless blueprint.nil?
-      self.blueprint_config ||= blueprint.config unless blueprint.nil?
-    end
 
     def check_for_updated_data
       self.data_updated_at = DateTime.current if data_changed?
