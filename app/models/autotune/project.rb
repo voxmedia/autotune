@@ -89,7 +89,8 @@ module Autotune
     end
 
     def deployer(target)
-      Autotune.new_deployer(target.to_sym, self)
+      @deployers = {} unless @deployers.is_a? Hash
+      @deployers[target.to_sym] ||= Autotune.new_deployer(target.to_sym, self)
     end
 
     def preview_url
