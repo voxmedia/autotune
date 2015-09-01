@@ -111,5 +111,37 @@ module Autotune
       assert_equal 6, Project.search('Example').count
       assert_equal 0, Project.search('foo').count
     end
+
+    test 'slugs include themes' do
+      bp = autotune_blueprints(:example)
+      user = autotune_users(:developer)
+      theme = autotune_themes(:generic)
+
+      p = Project.create!(
+        :title => 'new project', :blueprint => bp, :user => user, :theme => theme)
+
+      assert_equal 'new-project', p.slug_sans_theme
+      assert_equal 'generic-new-project', p.slug
+
+      p.update!(:slug => 'foo-bar')
+      assert_equal 'foo-bar', p.slug_sans_theme
+      assert_equal 'generic-foo-bar', p.slug
+
+      p.update!(:theme => autotune_themes(:vox))
+      assert_equal 'foo-bar', p.slug_sans_theme
+      assert_equal 'vox-foo-bar', p.slug
+
+      p.update!(:theme => theme, :slug => 'new-project')
+      assert_equal 'new-project', p.slug_sans_theme
+      assert_equal 'generic-new-project', p.slug
+
+      p.update!(:theme => autotune_themes(:vox), :slug => 'vox-foo-foo')
+      assert_equal 'foo-foo', p.slug_sans_theme
+      assert_equal 'vox-foo-foo', p.slug
+
+      p.update!(:theme => theme, :slug => 'vox-new-project')
+      assert_equal 'new-project', p.slug_sans_theme
+      assert_equal 'generic-new-project', p.slug
+    end
   end
 end

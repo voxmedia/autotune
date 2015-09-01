@@ -101,16 +101,16 @@ module Autotune
     end
 
     def slug_sans_theme
-      @slug_sans_theme ||=
-        if theme_changed? && !theme_was.nil?
-          slug.sub(/^(#{theme.value}|#{theme_was.value})-/, '')
-        else
-          slug.sub(/^#{theme.value}-/, '')
-        end
+      if theme_changed? && theme_was
+        slug.sub(/^(#{theme.value}|#{theme_was.value})-/, '')
+      else
+        slug.sub(/^#{theme.value}-/, '')
+      end
     end
 
     def theme_was
-      @theme_was ||= theme_id_was.nil? ? nil : Theme.find(theme_id_was)
+      return @theme_was if @theme_was && @theme_was.id == theme_id_was
+      @theme_was = theme_id_was.nil? ? nil : Theme.find(theme_id_was)
     end
 
     def theme_changed?
