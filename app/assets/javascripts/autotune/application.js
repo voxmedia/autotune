@@ -30350,7 +30350,7 @@ var $ = require('jquery'),
 
 module.exports = {
   events: {
-    'click button[data-action],a[data-action]': 'handleAction',
+    'click button[data-action], a[data-action]': 'handleAction'
   },
 
   handleAction: function(eve) {
@@ -30365,6 +30365,7 @@ module.exports = {
         model_class = $btn.data('model'),
         model_id = $btn.data('model-id');
 
+    logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
     this.app.trigger('loadingStart');
     if ( $btn.hasClass('btn') ) {
@@ -30390,8 +30391,8 @@ module.exports = {
         if ( next === 'show' ) {
           Backbone.history.navigate( view.model.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
-
           view.render();
+          Backbone.history.loadUrl();
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
         }
