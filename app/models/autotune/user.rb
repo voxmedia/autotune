@@ -49,6 +49,12 @@ module Autotune
         :uid => auth_hash['uid']).first
       return if a.nil?
 
+      # if this auth model is missing a user, delete it
+      if a.user.nil?
+        a.destroy
+        return false
+      end
+
       a.update(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
 
       if a.user.meta['roles'] != roles
