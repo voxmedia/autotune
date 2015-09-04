@@ -30203,7 +30203,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         },
         "postRender": _.bind(function(control) {
           this.alpaca = control;
-          this.alpaca.childrenByPropertyId["slug"].setValue(this.model.get('slug_sans_theme'));
+          this.alpaca.childrenByPropertyId["slug"].setValue( this.model.get('slug_sans_theme') );
           control.form.form.append( helpers.render(button_tmpl, this.templateData()) );
           resolve();
         }, this)
