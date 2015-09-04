@@ -5,14 +5,18 @@ module Autotune
   class SyncProjectJob < ActiveJob::Base
     queue_as :default
 
-    def perform(project)
+    lock_job do
+      arguments.first.to_gid_param
+    end
+
+    def perform(project, force: false)
       # Create a new repo object based on the blueprints working dir
       blueprint_dir = WorkDir.repo(
         project.blueprint.working_dir,
         Rails.configuration.autotune.setup_environment)
 
       # Make sure the blueprint exists
-      SyncBlueprintJob.perform_now(project.blueprint) unless blueprint_dir.exist?
+      raise 'Missing files!' unless blueprint_dir.exist?
 
       # Create a new repo object based on the projects working dir
       project_dir = WorkDir.repo(
@@ -22,7 +26,7 @@ module Autotune
       # Copy the blueprint to the project working dir. Because of
       # issue #218, due to some weirdness in git 1.7, we can't just
       # update the repo. We have to make a new copy.
-      project_dir.destroy if project_dir.exist?
+      project_dir.destroy if project_dir.exist? && force
       blueprint_dir.copy_to(project_dir.working_dir)
 
       if project_dir.commit_hash != project.blueprint_version

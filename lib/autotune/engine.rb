@@ -11,6 +11,11 @@ module Autotune
 
     require 'will_paginate'
 
+    require 'active_job/chaining'
+    require 'active_job/locking'
+    require 'active_job/unique'
+    require 'active_job/chain'
+
     initializer 'autotune.init', :before => :load_config_initializers do |app|
       app.config.autotune = Config.new
 

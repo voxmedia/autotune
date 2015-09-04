@@ -5,6 +5,10 @@ module Autotune
   class SyncBlueprintJob < ActiveJob::Base
     queue_as :default
 
+    lock_job do
+      arguments.first.to_gid_param
+    end
+
     # do the deed
     def perform(blueprint, status = 'testing')
       # Create a new repo object based on the blueprints working dir

@@ -62,7 +62,11 @@ module Autotune
           :blueprint_version => blueprint.version,
           :blueprint_config => blueprint.config)
       end
-      BuildJob.perform_later(self, 'preview', true)
+      ActiveJob::Chain.new(
+        SyncBlueprintJob.new(blueprint),
+        SyncProjectJob.new(self, :force => true),
+        BuildJob.new(self)
+      ).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -70,7 +74,11 @@ module Autotune
 
     def build
       update(:status => 'building')
-      BuildJob.perform_later(self)
+      ActiveJob::Chain.new(
+        SyncBlueprintJob.new(blueprint),
+        SyncProjectJob.new(self),
+        BuildJob.new(self)
+      ).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -78,7 +86,11 @@ module Autotune
 
     def build_and_publish
       update(:status => 'building')
-      BuildJob.perform_later(self, 'publish')
+      ActiveJob::Chain.new(
+        SyncBlueprintJob.new(blueprint),
+        SyncProjectJob.new(self),
+        BuildJob.new(self, 'publish')
+      ).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -125,10 +137,10 @@ module Autotune
     end
 
     def pub_to_redis
-      return if Autotune.redis_pub.nil?
+      return if Autotune.redis.nil?
       msg = { :id => id,
               :status => status }
-      Autotune.redis_pub.publish 'project', msg.to_json
+      Autotune.redis.publish 'project', msg.to_json
     end
   end
 end
