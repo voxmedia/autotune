@@ -19,7 +19,7 @@ module Autotune
     end
 
     # Deploy one file
-    def deploy_file(_dir, _path)
+    def deploy_file(_source, _path)
       raise NotImplementedError
     end
 
