@@ -11,7 +11,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
     end
 
     assert_performed_jobs 1

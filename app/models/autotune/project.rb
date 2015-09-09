@@ -64,8 +64,8 @@ module Autotune
           :blueprint_config => blueprint.config)
       end
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :status => blueprint.status, :update => false),
-        SyncProjectJob.new(self, :force => true),
+        SyncBlueprintJob.new(blueprint),
+        SyncProjectJob.new(self, :update => true),
         BuildJob.new(self)
       ).enqueue
     rescue
@@ -76,7 +76,7 @@ module Autotune
     def build
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :update => false),
+        SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self)
       ).enqueue
@@ -88,7 +88,7 @@ module Autotune
     def build_and_publish
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :update => false),
+        SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self, 'publish')
       ).enqueue
