@@ -10,13 +10,17 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status = 'testing')
+    def perform(blueprint, status: 'testing', update: true)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
-      if repo.exist?
+
+      if repo.exist? && update
         # Update the repo
         repo.update
+      elsif repo.exist?
+        # if we're not updating, bail if we have the files
+        return
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
@@ -31,15 +35,6 @@ module Autotune
         raise "Can't read '%s' in blueprint '%s'" % [
           BLUEPRINT_CONFIG_FILENAME, blueprint.slug]
       end
-
-      # look in the config for stuff like descriptions, sample images, tags
-      blueprint.initialize_tags_from_config
-
-      # Associate themes
-      blueprint.initialize_themes_from_config
-
-      # Get the type from the config
-      blueprint.type = blueprint.config['type'].downcase
 
       # Track the current commit version
       blueprint.version = repo.version

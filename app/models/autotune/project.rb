@@ -6,6 +6,7 @@ module Autotune
     include Slugged
     include Searchable
     include WorkingDir
+    include Deployable
     serialize :data, JSON
     serialize :meta, JSON
     serialize :blueprint_config, JSON
@@ -63,7 +64,7 @@ module Autotune
           :blueprint_config => blueprint.config)
       end
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :status => blueprint.status, :update => false),
         SyncProjectJob.new(self, :force => true),
         BuildJob.new(self)
       ).enqueue
@@ -75,7 +76,7 @@ module Autotune
     def build
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :update => false),
         SyncProjectJob.new(self),
         BuildJob.new(self)
       ).enqueue
@@ -87,7 +88,7 @@ module Autotune
     def build_and_publish
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :update => false),
         SyncProjectJob.new(self),
         BuildJob.new(self, 'publish')
       ).enqueue
@@ -98,11 +99,6 @@ module Autotune
 
     def deploy_dir
       File.join(working_dir, blueprint_config['deploy_dir'] || 'build')
-    end
-
-    def deployer(target)
-      @deployers = {} unless @deployers.is_a? Hash
-      @deployers[target.to_sym] ||= Autotune.new_deployer(target.to_sym, self)
     end
 
     def preview_url
