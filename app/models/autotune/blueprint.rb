@@ -32,7 +32,7 @@ module Autotune
 
     before_validation do
       # Get the type from the config
-      self.type = config['type'].try(:downcase) || type
+      self.type = config['type'].downcase if config && config['type']
 
       update_tags_from_config
       update_themes_from_config
