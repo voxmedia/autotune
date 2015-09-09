@@ -24,7 +24,7 @@ module Autotune
     end
 
     # Hook for adjusting data and files before build
-    def before_build(build_data)
+    def before_build(build_data, env)
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
     end

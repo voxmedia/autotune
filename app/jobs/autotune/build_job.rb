@@ -40,11 +40,13 @@ module Autotune
           'slug' => project.slug,
           'theme' => project.theme.value)
 
+        # env  = Rails.configuration.autotune.build_environment.deep_dup
+
         # Get the deployer object
         deployer = Autotune.new_deployer(target.to_sym, project, :logger => outlogger)
 
         # Run the before build deployer hook
-        deployer.before_build(build_data)
+        deployer.before_build(build_data, repo.env)
 
         # Run the build
         repo.working_dir do

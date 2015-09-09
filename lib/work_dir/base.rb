@@ -6,6 +6,7 @@ module WorkDir
   # Thin API for doing shell stuff
   class Base
     attr_writer :logger
+    attr_accessor :env
 
     # Create a new shell object with a working directory and environment vars
     def initialize(path, env = {})
