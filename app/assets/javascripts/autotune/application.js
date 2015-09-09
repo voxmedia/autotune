@@ -1331,7 +1331,9 @@ __p+='disabled="true"';
  } 
 __p+='\n          data-action-message="Publishing..."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Publish</button>\n\n  <button type="button" class="btn btn-danger" id="deleteBtn"\n          ';
+'">Publish</button>\n\n  <button type="button" class="btn btn-info" id="duplicateBtn"\n          data-action-message="Project duplicated"\n          data-action="duplicate"\n          data-action-next="/projects" data-model="Project"\n          data-model-id="'+
+((__t=(model.get('slug') ))==null?'':__t)+
+'">Duplicate</button>\n\n  <button type="button" class="btn btn-danger" id="deleteBtn"\n          ';
  if ( model.hasStatus('building') ) { 
 __p+='disabled="true"';
  } 

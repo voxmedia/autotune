@@ -20,6 +20,12 @@
           data-action-next="reload"
           data-model-id="<%=model.get('slug') %>">Publish</button>
 
+  <button type="button" class="btn btn-info" id="duplicateBtn"
+          data-action-message="Project duplicated"
+          data-action="duplicate"
+          data-action-next="/projects" data-model="Project"
+          data-model-id="<%=model.get('slug') %>">Duplicate</button>
+
   <button type="button" class="btn btn-danger" id="deleteBtn"
           <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>
           data-action-message="Project deleted"
