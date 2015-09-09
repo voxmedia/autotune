@@ -197,33 +197,7 @@ module.exports = Backbone.Router.extend({
   },
 
   duplicateProject: function(slug) {
-    var project = this.app.projects.findWhere({ slug: slug }),
-        maybeFetch = Promise.resolve('some value'),
-        app = this.app, view, blueprint;
-
-    if ( !project ) {
-      project = new models.Project({ id: slug });
-      this.app.projects.add(project);
-      maybeFetch = Promise.resolve( project.fetch() );
-    }
-
-    maybeFetch.then(function() {
-      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
-
-      if ( !blueprint ) {
-        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
-        app.blueprints.add(blueprint);
-        return blueprint.fetch();
-      }
-    }).then(function() {
-      project.blueprint = blueprint;
-      view = new views.DuplicateProject({ model: project, app: app });
-      view.render();
-      app.view
-        .display( view )
-        .setTab('projects');
-    }).catch(function(jqXHR) {
-      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
-    });
+    this.app.projects.findWhere({ slug: slug }).status = 'duplicating';
+    this.editProject(slug);
   }
 });

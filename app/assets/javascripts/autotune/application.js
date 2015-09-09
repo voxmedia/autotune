@@ -878,34 +878,8 @@ module.exports = Backbone.Router.extend({
   },
 
   duplicateProject: function(slug) {
-    var project = this.app.projects.findWhere({ slug: slug }),
-        maybeFetch = Promise.resolve('some value'),
-        app = this.app, view, blueprint;
-
-    if ( !project ) {
-      project = new models.Project({ id: slug });
-      this.app.projects.add(project);
-      maybeFetch = Promise.resolve( project.fetch() );
-    }
-
-    maybeFetch.then(function() {
-      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
-
-      if ( !blueprint ) {
-        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
-        app.blueprints.add(blueprint);
-        return blueprint.fetch();
-      }
-    }).then(function() {
-      project.blueprint = blueprint;
-      view = new views.DuplicateProject({ model: project, app: app });
-      view.render();
-      app.view
-        .display( view )
-        .setTab('projects');
-    }).catch(function(jqXHR) {
-      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
-    });
+    this.app.projects.findWhere({ slug: slug }).status = 'duplicating';
+    this.editProject(slug);
   }
 });
 
@@ -1233,15 +1207,25 @@ var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="row m-page-heading">\n  <div class="col-xs-12">\n    <h3>';
- if ( model.isNew() ) { 
+__p+='<div class="row m-page-heading">\n  <div class="col-xs-12">\n    <h3>\n        ';
+ if ( model.isNew() ) {
+          
 __p+='New Project';
- } else { 
+
+        } else if ( model.status == 'duplicating' ) {
+          
 __p+=''+
-((__t=(model.get( 'title' ) ))==null?'':__t)+
+((__t=( 'New Copy of ' + model.get( 'title' ) ))==null?'':__t)+
 '';
- } 
-__p+='</h3>\n\n    ';
+
+        } else {
+          
+__p+=''+
+((__t=( model.get( 'title' ) ))==null?'':__t)+
+'';
+
+        } 
+__p+='\n    </h3>\n\n    ';
  if ( !model.isNew() ) { 
 __p+='\n    <p class="text-muted">\n      Status:\n      ';
  if ( model.hasStatus('broken') ) { 
@@ -1337,12 +1321,18 @@ var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<p class="margin-top">\n  <button type="submit" class="btn btn-default" id="saveBtn"\n          ';
+__p+='<p class="margin-top">\n  <button type="submit" class="btn btn-default" id="saveBtn"\n    ';
  if ( model.hasStatus('building') ) { 
 __p+='disabled="true"';
  } 
-__p+='\n          data-loading-text="Saving...">Save</button>\n\n';
- if ( ! model.isNew() ) { 
+__p+='\n      data-loading-text="Saving..."\n    ';
+ if (model.status == 'duplicating') {
+__p+=' > Create ';
+ } else { 
+__p+=' > Save ';
+ }
+__p+='\n  </button>\n\n';
+ if ( ! model.isNew()  && model.status != 'duplicating' ) { 
 __p+='\n  ';
  if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
 __p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     href="'+
@@ -1403,7 +1393,7 @@ __p+='<h3>Duplicating '+
 ((__t=( model.get('title') ))==null?'':__t)+
 '</h3>\n<p>'+
 ((__t=( JSON.stringify(model) ))==null?'':__t)+
-'</p>';
+'</p>\n\n<div id="projectForm"></div>';
 }
 return __p;
 };
@@ -29908,18 +29898,250 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
+    Datepicker = require('eonasdan-bootstrap-datetimepicker'),
     models = require('../models'),
-    BaseView = require('./BaseView');
+    helpers = require('../helpers'),
+    logger = require('../logger'),
+    BaseView = require('./BaseView'),
+    slugify = require("underscore.string/slugify");
+
+function pluckAttr(models, attribute) {
+  return _.map(models, function(t) { return t.get(attribute); });
+}
 
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project_duplicate.ejs'),
 
   afterInit: function() {
-    this.listenTo(this.model, 'update', this.render);
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  afterRender: function() {
+    var view = this, promises = [];
+    if ( this.model.isPublished() ) {
+      var proto = window.location.protocol.replace( ':', '' ),
+          prefix = this.model.getPublishUrl(proto),
+          embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
+
+      promises.push( Promise
+        .resolve( $.get( embedUrl ) )
+        .then( function(data) {
+          data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
+          view.$( '#embed textarea' ).text( data );
+          $.each(view.$( '#screenshots img' ), function(){
+            $(this).attr( 'src', prefix+$(this).attr('path') );
+            $(this).removeAttr( 'path' );
+          });
+        }).catch(function(error) {
+          logger.error(error);
+        }) );
+    }
+
+    promises.push( new Promise( function(resolve, reject) {
+      view.renderForm(resolve, reject);
+    } ) );
+
+    return Promise.all(promises);
+  },
+
+  renderForm: function(resolve, reject) {
+    var $form = this.$el.find('#projectForm'),
+        button_tmpl = require('../templates/project_buttons.ejs'),
+        form_config, config_themes, newProject;
+
+    $($form).keypress(function(event){
+      var field_type = event.originalEvent.srcElement.type;
+      if (event.keyCode === 10 || event.keyCode === 13){
+        if(field_type !== 'textarea'){
+          event.preventDefault();
+        }
+      }
+    });
+
+    if ( this.model.isNew() ) {
+      newProject = true;
+      form_config = this.model.blueprint.get('config').form;
+      config_themes = this.model.blueprint.get('config').themes || ['generic'];
+    } else {
+      newProject = false;
+      form_config = this.model.get('blueprint_config').form;
+      config_themes = this.model.get('blueprint_config').themes || ['generic'];
+    }
+
+    if(_.isUndefined(form_config)) {
+      this.app.view.error('This blueprint does not have a form!');
+      reject('This blueprint does not have a form!');
+    } else {
+      var themes = this.app.themes.filter(function(theme) {
+            if ( _.isEqual(config_themes, ['generic']) ) {
+              return true;
+            } else {
+              return _.contains(config_themes, theme.get('value'));
+            }
+          }),
+          social_chars = {
+            "sbnation": 8,
+            "theverge": 5,
+            "polygon": 7,
+            "racked": 6,
+            "eater": 5,
+            "vox": 9,
+            "custom": 0
+          },
+          schema_properties = {
+            "title": {
+              "title": "Title",
+              "type": "string",
+              "required": true
+            },
+            "theme": {
+              "title": "Theme",
+              "type": "string",
+              "required": true,
+              "default": pluckAttr(themes, 'value')[0],
+              "enum": pluckAttr(themes, 'value')
+            },
+            "slug": {
+              "title": "Slug",
+              "type": "string"
+            },
+            "tweet_text":{
+              "type": "string",
+              "minLength": 0
+            }
+          },
+          options_form = {
+            "attributes": {
+              "data-model": "Project",
+              "data-model-id": this.model.isNew() ? '' : this.model.id,
+              "data-action": this.model.isNew() ? 'new' : 'edit',
+              "data-next": 'show'
+            }
+          },
+          options_fields = {
+            "theme": {
+              "type": "select",
+              "optionLabels": pluckAttr(themes, 'label'),
+            },
+            "slug": {
+              "label": "Slug",
+              "validator": function(callback){
+                var slugPattern = /^[0-9a-z\-_]{0,60}$/;
+                var slug = this.getValue();
+                if ( slugPattern.test(slug) ){
+                  callback({
+                    "status": true
+                  });
+                } else if (slugPattern.test(slug.substring(0,60))){
+                  this.setValue(slug.substr(0,60));
+                  callback({
+                    "status": true
+                  });
+                } else {
+                  callback({
+                    "status": false,
+                    "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
+                  });
+                }
+              }
+            },
+            "tweet_text":{
+              "label": "Social share text",
+              "constrainMaxLength": true,
+              "constrainMinLength": true,
+              "showMaxLengthIndicator": true
+            }
+          };
+
+      // if there is only one theme option, hide the dropdown
+      if ( themes.length === 1 ) {
+        options_fields['theme']['type'] = 'hidden';
+      }
+
+      _.extend(schema_properties, form_config['schema']['properties'] || {});
+      if( form_config['options'] ) {
+        _.extend(options_form, form_config['options']['form'] || {});
+        _.extend(options_fields, form_config['options']['fields'] || {});
+      }
+
+      var opts = {
+        "schema": {
+          "title": this.model.blueprint.get('title'),
+          "description": this.model.blueprint.get('config').description,
+          "type": "object",
+          "properties": schema_properties
+        },
+        "options": {
+          "form": options_form,
+          "fields": options_fields,
+          "focus": this.firstRender
+        },
+        "postRender": _.bind(function(control) {
+          this.alpaca = control;
+
+          var title = control.childrenByPropertyId["title"],
+              theme = control.childrenByPropertyId["theme"],
+               slug = control.childrenByPropertyId["slug"],
+             social = control.childrenByPropertyId["tweet_text"];
+
+          social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+          social.updateMaxLengthIndicator();
+
+          $([title, theme]).each(function(){
+            this.on('change', function(){
+              if (newProject && (title.getValue() !== '' && theme.getValue() !== '')) {
+                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,57) );
+              }
+              social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+              social.updateMaxLengthIndicator();
+            });
+          });
+
+          control.form.form.append( helpers.render(button_tmpl, this.templateData()) );
+          resolve();
+        }, this)
+      };
+
+      if( form_config['view'] ) {
+        opts.view = form_config.view;
+      }
+
+      if(!this.model.isNew()) {
+        opts.data = this.model.formData();
+        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
+          opts.data.theme = pluckAttr(themes, 'value')[0];
+        }
+      }
+      $form.alpaca(opts);
+    }
+  },
+
+  formValues: function($form) {
+    var data = $form.alpaca('get').getValue();
+    return {
+      title: data['title'],
+      slug:  data['slug'],
+      theme: data['theme'],
+      data:  data,
+      blueprint_id: this.model.blueprint.get('id')
+    };
+  },
+
+  formValidate: function(inst, $form) {
+    var control = $form.alpaca('get'),
+        valid = control.form.isFormValid();
+    if ( !valid ) {
+      control.form.refreshValidationState(true);
+      $form.find('#validation-error').removeClass('hidden');
+    } else {
+      $form.find('#resolve-message').removeClass('hidden');
+      $form.find('#validation-error').addClass('hidden');
+    }
+    return valid;
   }
 } );
 
-},{"../models":5,"../templates/project_duplicate.ejs":16,"./BaseView":22,"./mixins/actions":29,"./mixins/form":30,"backbone":33,"jquery":65,"underscore":137}],25:[function(require,module,exports){
+},{"../helpers":2,"../logger":4,"../models":5,"../templates/project_buttons.ejs":15,"../templates/project_duplicate.ejs":16,"./BaseView":22,"./mixins/actions":29,"./mixins/form":30,"backbone":33,"eonasdan-bootstrap-datetimepicker":41,"jquery":65,"underscore":137,"underscore.string/slugify":113}],25:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -30177,6 +30399,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
+    } else if ( this.model.status === 'duplicating' ) {
+      newProject = true;
+      form_config = this.model.get('blueprint_config').form;
+      config_themes = this.model.get('blueprint_config').themes || ['generic'];
     } else {
       newProject = false;
       form_config = this.model.get('blueprint_config').form;
@@ -30228,8 +30454,8 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           options_form = {
             "attributes": {
               "data-model": "Project",
-              "data-model-id": this.model.isNew() ? '' : this.model.id,
-              "data-action": this.model.isNew() ? 'new' : 'edit',
+              "data-model-id": this.model.isNew() || this.model.status === 'duplicating' ? '' : this.model.id,
+              "data-action": this.model.isNew() || this.model.status === 'duplicating' ? 'new' : 'edit',
               "data-next": 'show'
             }
           },
@@ -30273,10 +30499,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         options_fields['theme']['type'] = 'hidden';
       }
 
-      _.extend(schema_properties, form_config['schema']['properties'] || {});
-      if( form_config['options'] ) {
-        _.extend(options_form, form_config['options']['form'] || {});
-        _.extend(options_fields, form_config['options']['fields'] || {});
+      if (this.model.status !== 'duplicating'){
+        _.extend(schema_properties, form_config['schema']['properties'] || {});
+        if( form_config['options'] ) {
+          _.extend(options_form, form_config['options']['form'] || {});
+          _.extend(options_fields, form_config['options']['fields'] || {});
+        }
       }
 
       var opts = {

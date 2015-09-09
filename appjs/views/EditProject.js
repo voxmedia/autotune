@@ -67,6 +67,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
+    } else if ( this.model.status === 'duplicating' ) {
+      newProject = true;
+      form_config = this.model.get('blueprint_config').form;
+      config_themes = this.model.get('blueprint_config').themes || ['generic'];
     } else {
       newProject = false;
       form_config = this.model.get('blueprint_config').form;
@@ -118,8 +122,8 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           options_form = {
             "attributes": {
               "data-model": "Project",
-              "data-model-id": this.model.isNew() ? '' : this.model.id,
-              "data-action": this.model.isNew() ? 'new' : 'edit',
+              "data-model-id": this.model.isNew() || this.model.status === 'duplicating' ? '' : this.model.id,
+              "data-action": this.model.isNew() || this.model.status === 'duplicating' ? 'new' : 'edit',
               "data-next": 'show'
             }
           },
@@ -163,10 +167,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         options_fields['theme']['type'] = 'hidden';
       }
 
-      _.extend(schema_properties, form_config['schema']['properties'] || {});
-      if( form_config['options'] ) {
-        _.extend(options_form, form_config['options']['form'] || {});
-        _.extend(options_fields, form_config['options']['fields'] || {});
+      if (this.model.status !== 'duplicating'){
+        _.extend(schema_properties, form_config['schema']['properties'] || {});
+        if( form_config['options'] ) {
+          _.extend(options_form, form_config['options']['form'] || {});
+          _.extend(options_fields, form_config['options']['fields'] || {});
+        }
       }
 
       var opts = {
