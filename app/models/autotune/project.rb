@@ -34,7 +34,7 @@ module Autotune
     before_validation do
       # Make sure our slug includes the theme
       if theme && (theme_changed? || slug_changed?)
-        self.slug = self.class.unique_slug(theme.value + '-' + slug_sans_theme)
+        self.slug = self.class.unique_slug(theme.value + '-' + slug_sans_theme, id)
       end
 
       # Make sure we stash version and config

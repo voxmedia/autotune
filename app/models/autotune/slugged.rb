@@ -18,9 +18,8 @@ module Autotune
     end
 
     def ensure_unique_slug
-      self.slug =
-        self.class.unique_slug(
-          slug || text_for_slug.try(:parameterize), id)
+      self.slug ||=
+        self.class.unique_slug(text_for_slug.try(:parameterize), id)
     end
 
     class_methods do
