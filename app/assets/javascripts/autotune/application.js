@@ -1291,17 +1291,9 @@ __p+='<span class="text-warning">'+
 ((__t=(capitalize(model.get('status')) ))==null?'':__t)+
 '</span>';
  } 
-__p+='\n      </p>\n\n      <p>\n        <button type="button" class="btn btn-default"\n                ';
- if ( model.hasStatus('building', 'updating') ) { 
-__p+='disabled="disabled"';
- } 
-__p+='\n                data-action-message="Build started" data-loading-text="Starting build..."\n                data-action="build" data-model="Project" data-action-next="reload"\n                data-model-id="'+
+__p+='\n      </p>\n\n      <p>\n        <button type="button" class="btn btn-default"\n                data-action-message="Build started" data-loading-text="Starting build..."\n                data-action="build" data-model="Project" data-action-next="reload"\n                data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Rebuild</button>\n        <button type="button" class="btn btn-warning"\n                ';
- if ( model.hasStatus('building', 'updating') ) { 
-__p+='disabled="disabled"';
- } 
-__p+='\n                data-action-message="Upgrade started" data-loading-text="Starting upgrade..."\n                data-action="update-snapshot" data-model="Project" data-action-next="reload"\n                data-model-id="'+
+'">Rebuild</button>\n        <button type="button" class="btn btn-warning"\n                data-action-message="Upgrade started" data-loading-text="Starting upgrade..."\n                data-action="update-snapshot" data-model="Project" data-action-next="reload"\n                data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Upgrade</button>\n      </p>\n\n      <h4>Blueprint data:</h4>\n      <pre>'+
 ((__t=(JSON.stringify(model.buildData(), null, 2) ))==null?'':__t)+
@@ -1319,35 +1311,19 @@ var _ = require("underscore");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<p class="margin-top">\n  <button type="submit" class="btn btn-default" id="saveBtn"\n          ';
- if ( model.hasStatus('building') ) { 
-__p+='disabled="true"';
- } 
-__p+='\n          data-loading-text="Saving...">Save</button>\n\n';
+__p+='<p class="margin-top">\n  <button type="submit" class="btn btn-default" id="saveBtn"\n          data-loading-text="Saving...">Save</button>\n\n';
  if ( ! model.isNew() ) { 
 __p+='\n  ';
  if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
-__p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     ';
- if ( !model.hasStatus('built') ) { 
-__p+='disabled="true"';
- } 
-__p+='\n     href="'+
+__p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     href="'+
 ((__t=(model.getPreviewUrl('http') ))==null?'':__t)+
 '">Preview</a>\n  ';
  } else { 
-__p+='\n  <a class="btn btn-default" target="_blank" id="viewBtn"\n     ';
- if ( !model.hasStatus('built') ) { 
-__p+='disabled="true"';
- } 
-__p+='\n     href="'+
+__p+='\n  <a class="btn btn-default" target="_blank" id="viewBtn"\n     href="'+
 ((__t=(model.getPublishUrl('http') ))==null?'':__t)+
 '">View</a>\n  ';
  } 
-__p+='\n\n  <button type="button" class="btn btn-success" id="publishBtn"\n          ';
- if ( !model.hasStatus('built') ) { 
-__p+='disabled="true"';
- } 
-__p+='\n          data-action-message="Publishing..."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
+__p+='\n\n  <button type="button" class="btn btn-success" id="publishBtn"\n          data-action-message="Publishing..."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Publish</button>\n\n  <button type="button" class="btn btn-danger" id="deleteBtn"\n          ';
  if ( model.hasStatus('building') ) { 

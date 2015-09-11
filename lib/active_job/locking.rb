@@ -8,13 +8,13 @@ module ActiveJob
       around_perform :if => :lock_key do |_job, block|
         lock_info = Autotune.lock(lock_key, lock_ttl)
         if lock_info
-          Rails.logger.debug 'Obtained lock'
+          logger.debug 'Obtained lock'
           ret = block.call
           Autotune.unlock(lock_info)
-          Rails.logger.debug 'Released lock'
+          logger.debug 'Released lock'
           ret
         else
-          Rails.logger.debug 'Failed to obtain lock, retry job'
+          logger.debug 'Failed to obtain lock, retry job'
           if lock_retry
             retry_job :wait => lock_retry
           else

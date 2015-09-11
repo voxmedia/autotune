@@ -107,12 +107,10 @@
 
       <p>
         <button type="button" class="btn btn-default"
-                <% if ( model.hasStatus('building', 'updating') ) { %>disabled="disabled"<% } %>
                 data-action-message="Build started" data-loading-text="Starting build..."
                 data-action="build" data-model="Project" data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>">Rebuild</button>
         <button type="button" class="btn btn-warning"
-                <% if ( model.hasStatus('building', 'updating') ) { %>disabled="disabled"<% } %>
                 data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
                 data-action="update-snapshot" data-model="Project" data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>">Upgrade</button>

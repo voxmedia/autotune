@@ -5,7 +5,7 @@ module ActiveJob
     included do
       after_perform :if => :next_job do |job|
         unless job.skip_next_job
-          Rails.logger.debug 'enqueue next job!'
+          logger.debug("Enqueue next: #{job.next_job.class}")
           job.next_job.enqueue
           Rails.cache.delete(job.next_job_key)
         end

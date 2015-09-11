@@ -8,7 +8,7 @@ module Autotune
   class BuildJob < ActiveJob::Base
     queue_as :default
 
-    lock_job do
+    lock_job :retry => 20.seconds do
       arguments.first.to_gid_param
     end
 

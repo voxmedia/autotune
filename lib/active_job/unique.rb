@@ -7,23 +7,27 @@ module ActiveJob
 
       around_enqueue :if => :unique_key do |job, block|
         if Rails.cache.exist?(unique_key)
-          Rails.logger.debug 'existing unique job, cancel enqueue'
+          logger.debug(
+            "Existing unique #{job.class}, cancel enqueue")
           false
         else
-          Rails.logger.debug 'enqueue unique job'
+          logger.debug("Enqueue unique #{job.class}")
           Rails.cache.write(unique_key, job_id, :expired_in => unique_ttl)
           block.call
         end
       end
 
       around_perform :if => :unique_key do |job, block|
-        if !Rails.cache.exist?(unique_key) ||
-           Rails.cache.read(unique_key) == job_id
-          Rails.logger.debug 'perform unique job'
-          Rails.cache.delete(unique_key)
+        unless Rails.cache.exist?(unique_key)
+          Rails.cache.write(unique_key, job_id, :expired_in => unique_ttl)
+        end
+
+        if Rails.cache.read(unique_key) == job_id
+          logger.debug("Perform unique #{job.class}")
           block.call
+          Rails.cache.delete(unique_key)
         else
-          Rails.logger.debug 'existing unique job, canceling perform'
+          logger.debug("Existing unique #{job.class}, cancel perform")
           false
         end
       end
