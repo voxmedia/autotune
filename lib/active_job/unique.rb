@@ -18,14 +18,11 @@ module ActiveJob
       end
 
       around_perform :if => :unique_key do |job, block|
-        unless Rails.cache.exist?(unique_key)
-          Rails.cache.write(unique_key, job_id, :expired_in => unique_ttl)
-        end
-
-        if Rails.cache.read(unique_key) == job_id
+        if !Rails.cache.exist?(unique_key) ||
+           Rails.cache.read(unique_key) == job_id
           logger.debug("Perform unique #{job.class}")
-          block.call
           Rails.cache.delete(unique_key)
+          block.call
         else
           logger.debug("Existing unique #{job.class}, cancel perform")
           false
