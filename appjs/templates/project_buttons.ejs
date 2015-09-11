@@ -21,7 +21,8 @@
           data-model-id="<%=model.get('slug') %>">Publish</button>
 
   <a class="btn btn-info" id="duplicateBtn"
-     href="/projects/<%=model.get('slug') %>/duplicate">Duplicate</a>
+          <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>
+          href="/projects/<%=model.get('slug') %>/duplicate">Duplicate</a>
 
   <button type="button" class="btn btn-danger" id="deleteBtn"
           <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>

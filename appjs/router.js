@@ -200,7 +200,7 @@ module.exports = Backbone.Router.extend({
     var project = this.app.projects.findWhere({ slug: slug }),
         maybeFetch = Promise.resolve('some value'),
         app = this.app, view, blueprint,
-        new_project, new_attributes;
+        new_project, old_attributes, new_attributes = {};
 
     if ( !project ) {
       project = new models.Project({ id: slug });
@@ -219,11 +219,17 @@ module.exports = Backbone.Router.extend({
     }).then(function() {
       project.blueprint = blueprint;
 
-      new_project = new models.Project(_.clone(project.attributes));
-      delete new_project.attributes.id;
-      delete new_project.attributes.created_at;
-      delete new_project.attributes.created_by;
-      new_project.attributes.title = 'Copy of ' + project.attributes.title;
+      new_attributes.blueprint_config = project.attributes.blueprint_config;
+      new_attributes.blueprint_id = project.attributes.blueprint_id;
+      new_attributes.blueprint_title = project.attributes.blueprint_title;
+      new_attributes.blueprint_version = project.attributes.blueprint_version;
+      new_attributes.data = project.attributes.data;
+      new_attributes.theme = project.attributes.theme;
+      new_attributes.title = 'Copy of ' + project.attributes.title;
+      new_attributes.type = project.attributes.type;
+      new_attributes.status = 'new';
+      
+      new_project = new models.Project(new_attributes);
       new_project.blueprint = project.blueprint;
 
       view = new views.EditProject({ model: new_project, app: app, copyProject: true });

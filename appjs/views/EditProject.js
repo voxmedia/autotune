@@ -18,9 +18,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   template: require('../templates/project.ejs'),
 
   afterInit: function(options) {
-    if (options){
-      this.copyProject = options.copyProject ? true : false;
-    }
+    this.copyProject = options.copyProject ? true : false;
     this.listenTo(this.model, 'change', this.render);
   },
 
@@ -76,7 +74,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       }
     });
 
-    if ( this.model.isNew() && (this.copyProject === false) ) {
+    if ( this.model.isNew() && !this.copyProject ) {
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
