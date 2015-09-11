@@ -200,7 +200,7 @@ module.exports = Backbone.Router.extend({
     var project = this.app.projects.findWhere({ slug: slug }),
         maybeFetch = Promise.resolve('some value'),
         app = this.app, view, blueprint,
-        new_project, old_attributes, new_attributes = {};
+        new_project, new_attributes = {};
 
     if ( !project ) {
       project = new models.Project({ id: slug });
@@ -228,7 +228,7 @@ module.exports = Backbone.Router.extend({
       new_attributes.title = 'Copy of ' + project.attributes.title;
       new_attributes.type = project.attributes.type;
       new_attributes.status = 'new';
-      
+
       new_project = new models.Project(new_attributes);
       new_project.blueprint = project.blueprint;
 
