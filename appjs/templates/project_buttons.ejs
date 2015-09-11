@@ -1,11 +1,9 @@
 <p class="margin-top">
   <button type="submit" class="btn btn-default" id="saveBtn"
     <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>
-      data-loading-text="Saving..."
-    <% if (model.status == 'duplicating') {%> > Create <% } else { %> > Save <% }%>
-  </button>
+      data-loading-text="Saving...">Save</button>
 
-<% if ( ! model.isNew()  && model.status != 'duplicating' ) { %>
+<% if ( ! model.isNew() ) { %>
   <% if ( model.hasUnpublishedUpdates() || model.isDraft() ) { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
      href="<%=model.getPreviewUrl('http') %>">Preview</a>

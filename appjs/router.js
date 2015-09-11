@@ -197,7 +197,43 @@ module.exports = Backbone.Router.extend({
   },
 
   duplicateProject: function(slug) {
-    this.app.projects.findWhere({ slug: slug }).status = 'duplicating';
-    this.editProject(slug);
+    var project = this.app.projects.findWhere({ slug: slug }),
+        maybeFetch = Promise.resolve('some value'),
+        app = this.app, view, blueprint,
+        new_project, new_attributes;
+
+    if ( !project ) {
+      project = new models.Project({ id: slug });
+      this.app.projects.add(project);
+      maybeFetch = Promise.resolve( project.fetch() );
+    }
+
+    maybeFetch.then(function() {
+      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
+
+      if ( !blueprint ) {
+        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
+        app.blueprints.add(blueprint);
+        return blueprint.fetch();
+      }
+    }).then(function() {
+      project.blueprint = blueprint;
+
+      new_project = new models.Project(_.clone(project.attributes));
+      delete new_project.attributes.id;
+      delete new_project.attributes.created_at;
+      delete new_project.attributes.created_by;
+      new_project.attributes.title = 'Copy of ' + project.attributes.title;
+      new_project.blueprint = project.blueprint;
+
+      view = new views.EditProject({ model: new_project, app: app, copyProject: true });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('projects');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   }
 });

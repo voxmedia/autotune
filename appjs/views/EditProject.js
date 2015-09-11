@@ -17,8 +17,21 @@ function pluckAttr(models, attribute) {
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
 
-  afterInit: function() {
+  afterInit: function(options) {
+    if (options){
+      this.copyProject = options.copyProject ? true : false;
+    }
     this.listenTo(this.model, 'change', this.render);
+  },
+
+  templateData: function() {
+    return {
+      model: this.model,
+      collection: this.collection,
+      app: this.app,
+      query: this.query,
+      copyProject: this.copyProject
+    };
   },
 
   afterRender: function() {
@@ -63,11 +76,11 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       }
     });
 
-    if ( this.model.isNew() ) {
+    if ( this.model.isNew() && (this.copyProject === false) ) {
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
-    } else if ( this.model.status === 'duplicating' ) {
+    } else if (this.copyProject) {
       newProject = true;
       form_config = this.model.get('blueprint_config').form;
       config_themes = this.model.get('blueprint_config').themes || ['generic'];
@@ -122,8 +135,8 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           options_form = {
             "attributes": {
               "data-model": "Project",
-              "data-model-id": this.model.isNew() || this.model.status === 'duplicating' ? '' : this.model.id,
-              "data-action": this.model.isNew() || this.model.status === 'duplicating' ? 'new' : 'edit',
+              "data-model-id": this.model.isNew() ? '' : this.model.id,
+              "data-action": this.model.isNew() ? 'new' : 'edit',
               "data-next": 'show'
             }
           },
@@ -167,12 +180,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         options_fields['theme']['type'] = 'hidden';
       }
 
-      if (this.model.status !== 'duplicating'){
-        _.extend(schema_properties, form_config['schema']['properties'] || {});
-        if( form_config['options'] ) {
-          _.extend(options_form, form_config['options']['form'] || {});
-          _.extend(options_fields, form_config['options']['fields'] || {});
-        }
+      _.extend(schema_properties, form_config['schema']['properties'] || {});
+      if( form_config['options'] ) {
+        _.extend(options_form, form_config['options']['form'] || {});
+        _.extend(options_fields, form_config['options']['fields'] || {});
       }
 
       var opts = {
@@ -217,7 +228,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         opts.view = form_config.view;
       }
 
-      if(!this.model.isNew()) {
+      if(!this.model.isNew() || this.copyProject) {
         opts.data = this.model.formData();
         if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
           opts.data.theme = pluckAttr(themes, 'value')[0];

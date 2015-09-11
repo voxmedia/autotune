@@ -1,10 +1,10 @@
 <div class="row m-page-heading">
   <div class="col-xs-12">
     <h3>
-        <% if ( model.isNew() ) {
+        <% if ( model.isNew() && (copyProject == false) ) {
           %>New Project<%
-        } else if ( model.status == 'duplicating' ) {
-          %><%= 'New Copy of ' + model.get( 'title' ) %><%
+        } else if ( copyProject ) {
+          %>New <%= model.get( 'title' ) %><%
         } else {
           %><%= model.get( 'title' ) %><%
         } %>

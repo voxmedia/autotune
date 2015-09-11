@@ -878,8 +878,44 @@ module.exports = Backbone.Router.extend({
   },
 
   duplicateProject: function(slug) {
-    this.app.projects.findWhere({ slug: slug }).status = 'duplicating';
-    this.editProject(slug);
+    var project = this.app.projects.findWhere({ slug: slug }),
+        maybeFetch = Promise.resolve('some value'),
+        app = this.app, view, blueprint,
+        new_project, new_attributes;
+
+    if ( !project ) {
+      project = new models.Project({ id: slug });
+      this.app.projects.add(project);
+      maybeFetch = Promise.resolve( project.fetch() );
+    }
+
+    maybeFetch.then(function() {
+      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
+
+      if ( !blueprint ) {
+        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
+        app.blueprints.add(blueprint);
+        return blueprint.fetch();
+      }
+    }).then(function() {
+      project.blueprint = blueprint;
+
+      new_project = new models.Project(_.clone(project.attributes));
+      delete new_project.attributes.id;
+      delete new_project.attributes.created_at;
+      delete new_project.attributes.created_by;
+      new_project.attributes.title = 'Copy of ' + project.attributes.title;
+      new_project.blueprint = project.blueprint;
+
+      view = new views.EditProject({ model: new_project, app: app, copyProject: true });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('projects');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
   }
 });
 
@@ -1208,14 +1244,14 @@ module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<div class="row m-page-heading">\n  <div class="col-xs-12">\n    <h3>\n        ';
- if ( model.isNew() ) {
+ if ( model.isNew() && (copyProject == false) ) {
           
 __p+='New Project';
 
-        } else if ( model.status == 'duplicating' ) {
+        } else if ( copyProject ) {
           
-__p+=''+
-((__t=( 'New Copy of ' + model.get( 'title' ) ))==null?'':__t)+
+__p+='New '+
+((__t=( model.get( 'title' ) ))==null?'':__t)+
 '';
 
         } else {
@@ -1325,14 +1361,8 @@ __p+='<p class="margin-top">\n  <button type="submit" class="btn btn-default" id
  if ( model.hasStatus('building') ) { 
 __p+='disabled="true"';
  } 
-__p+='\n      data-loading-text="Saving..."\n    ';
- if (model.status == 'duplicating') {
-__p+=' > Create ';
- } else { 
-__p+=' > Save ';
- }
-__p+='\n  </button>\n\n';
- if ( ! model.isNew()  && model.status != 'duplicating' ) { 
+__p+='\n      data-loading-text="Saving...">Save</button>\n\n';
+ if ( ! model.isNew() ) { 
 __p+='\n  ';
  if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
 __p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     href="'+
@@ -30085,8 +30115,21 @@ function pluckAttr(models, attribute) {
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
 
-  afterInit: function() {
+  afterInit: function(options) {
+    if (options){
+      this.copyProject = options.copyProject ? true : false;
+    }
     this.listenTo(this.model, 'change', this.render);
+  },
+
+  templateData: function() {
+    return {
+      model: this.model,
+      collection: this.collection,
+      app: this.app,
+      query: this.query,
+      copyProject: this.copyProject
+    };
   },
 
   afterRender: function() {
@@ -30131,11 +30174,11 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       }
     });
 
-    if ( this.model.isNew() ) {
+    if ( this.model.isNew() && (this.copyProject === false) ) {
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
-    } else if ( this.model.status === 'duplicating' ) {
+    } else if (this.copyProject) {
       newProject = true;
       form_config = this.model.get('blueprint_config').form;
       config_themes = this.model.get('blueprint_config').themes || ['generic'];
@@ -30190,8 +30233,8 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           options_form = {
             "attributes": {
               "data-model": "Project",
-              "data-model-id": this.model.isNew() || this.model.status === 'duplicating' ? '' : this.model.id,
-              "data-action": this.model.isNew() || this.model.status === 'duplicating' ? 'new' : 'edit',
+              "data-model-id": this.model.isNew() ? '' : this.model.id,
+              "data-action": this.model.isNew() ? 'new' : 'edit',
               "data-next": 'show'
             }
           },
@@ -30235,12 +30278,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         options_fields['theme']['type'] = 'hidden';
       }
 
-      if (this.model.status !== 'duplicating'){
-        _.extend(schema_properties, form_config['schema']['properties'] || {});
-        if( form_config['options'] ) {
-          _.extend(options_form, form_config['options']['form'] || {});
-          _.extend(options_fields, form_config['options']['fields'] || {});
-        }
+      _.extend(schema_properties, form_config['schema']['properties'] || {});
+      if( form_config['options'] ) {
+        _.extend(options_form, form_config['options']['form'] || {});
+        _.extend(options_fields, form_config['options']['fields'] || {});
       }
 
       var opts = {
@@ -30285,7 +30326,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         opts.view = form_config.view;
       }
 
-      if(!this.model.isNew()) {
+      if(!this.model.isNew() || this.copyProject) {
         opts.data = this.model.formData();
         if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
           opts.data.theme = pluckAttr(themes, 'value')[0];
