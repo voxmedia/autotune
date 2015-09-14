@@ -1,6 +1,14 @@
 <div class="row m-page-heading">
   <div class="col-xs-12">
-    <h3><% if ( model.isNew() ) { %>New Project<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+    <h3>
+        <% if ( model.isNew() && (copyProject == false) ) {
+          %>New Project<%
+        } else if ( copyProject ) {
+          %>New <%= model.get( 'title' ) %><%
+        } else {
+          %><%= model.get( 'title' ) %><%
+        } %>
+    </h3>
 
     <% if ( !model.isNew() ) { %>
     <p class="text-muted">

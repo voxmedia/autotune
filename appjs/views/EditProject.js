@@ -17,8 +17,19 @@ function pluckAttr(models, attribute) {
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
 
-  afterInit: function() {
+  afterInit: function(options) {
+    this.copyProject = options.copyProject ? true : false;
     this.listenTo(this.model, 'change', this.render);
+  },
+
+  templateData: function() {
+    return {
+      model: this.model,
+      collection: this.collection,
+      app: this.app,
+      query: this.query,
+      copyProject: this.copyProject
+    };
   },
 
   afterRender: function() {
@@ -63,10 +74,14 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       }
     });
 
-    if ( this.model.isNew() ) {
+    if ( this.model.isNew() && !this.copyProject ) {
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
+    } else if (this.copyProject) {
+      newProject = true;
+      form_config = this.model.get('blueprint_config').form;
+      config_themes = this.model.get('blueprint_config').themes || ['generic'];
     } else {
       newProject = false;
       form_config = this.model.get('blueprint_config').form;
@@ -211,7 +226,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         opts.view = form_config.view;
       }
 
-      if(!this.model.isNew()) {
+      if(!this.model.isNew() || this.copyProject) {
         opts.data = this.model.formData();
         if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
           opts.data.theme = pluckAttr(themes, 'value')[0];

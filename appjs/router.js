@@ -27,7 +27,8 @@ module.exports = Backbone.Router.extend({
     "projects": "listProjects",
     "projects/new": "chooseBlueprint",
     "projects/:slug": "editProject",
-    "projects/:slug/edit": "editProject"
+    "projects/:slug/edit": "editProject",
+    "projects/:slug/duplicate": "duplicateProject"
   },
 
   // This is called for every route
@@ -187,6 +188,53 @@ module.exports = Backbone.Router.extend({
       project.blueprint = blueprint;
       view = new views.EditProject({ model: project, app: app });
       view.render();
+      app.view
+        .display( view )
+        .setTab('projects');
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+
+  duplicateProject: function(slug) {
+    var project = this.app.projects.findWhere({ slug: slug }),
+        maybeFetch = Promise.resolve('some value'),
+        app = this.app, view, blueprint,
+        new_project, old_attributes, new_attributes = {};
+
+    if ( !project ) {
+      project = new models.Project({ id: slug });
+      this.app.projects.add(project);
+      maybeFetch = Promise.resolve( project.fetch() );
+    }
+
+    maybeFetch.then(function() {
+      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
+
+      if ( !blueprint ) {
+        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
+        app.blueprints.add(blueprint);
+        return blueprint.fetch();
+      }
+    }).then(function() {
+      old_attributes = _.clone(project.attributes);
+      
+      new_attributes.blueprint_config = old_attributes.blueprint_config;
+      new_attributes.blueprint_id = old_attributes.blueprint_id;
+      new_attributes.blueprint_title = old_attributes.blueprint_title;
+      new_attributes.blueprint_version = old_attributes.blueprint_version;
+      new_attributes.data = old_attributes.data;
+      new_attributes.theme = old_attributes.theme;
+      new_attributes.title = 'Copy of ' + old_attributes.title;
+      new_attributes.type = old_attributes.type;
+      new_attributes.status = 'new';
+
+      new_project = new models.Project(new_attributes);
+      new_project.blueprint = blueprint;
+
+      view = new views.EditProject({ model: new_project, app: app, copyProject: true });
+      view.render();
+
       app.view
         .display( view )
         .setTab('projects');

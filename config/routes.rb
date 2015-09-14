@@ -23,6 +23,9 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/build_and_publish',
       :to => 'projects#build_and_publish',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  get 'projects/:id/duplicate',
+      :to => 'application#index',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   get '/changemessages' => 'changemessages#index'
 
   # The priority is based upon order of creation: first created -> highest priority.
