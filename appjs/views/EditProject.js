@@ -8,6 +8,11 @@ var $ = require('jquery'),
     logger = require('../logger'),
     BaseView = require('./BaseView');
 
+require('brace/mode/javascript');
+require('brace/mode/html');
+require('brace/theme/textmate');
+require('brace/theme/chrome');
+
 function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
