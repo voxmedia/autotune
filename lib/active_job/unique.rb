@@ -6,6 +6,7 @@ module ActiveJob
       delegate :unique_key_callback, :unique_ttl, :to => :class
 
       around_enqueue :if => :unique_key do |job, block|
+        logger.debug "Unique with #{unique_key}"
         if Rails.cache.exist?(unique_key)
           logger.debug(
             "Existing unique #{job.class}, cancel enqueue")
@@ -33,7 +34,7 @@ module ActiveJob
     class_methods do
       def unique_job(**opts, &block)
         @unique_ttl = opts[:ttl] || 10.minutes
-        @unique_key_callback = block
+        @unique_key_callback = block_given? ? block : opts[:with]
       end
       attr_reader :unique_key_callback, :unique_ttl
     end
@@ -42,7 +43,10 @@ module ActiveJob
       @unique_key ||=
         if unique_key_callback.is_a? Proc
           deserialize_arguments_if_needed
-          instance_eval(&unique_key_callback)
+          "unique:#{Digest::SHA1.hexdigest(instance_eval(&unique_key_callback).to_s)}"
+        elsif unique_key_callback == :payload
+          deserialize_arguments_if_needed
+          "unique:#{Digest::SHA1.hexdigest(serialize_arguments(arguments).to_s)}"
         else
           nil
         end

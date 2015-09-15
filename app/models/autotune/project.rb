@@ -90,7 +90,7 @@ module Autotune
       ActiveJob::Chain.new(
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
-        BuildJob.new(self, 'publish')
+        BuildJob.new(self, :target => 'publish')
       ).enqueue
     rescue
       update!(:status => 'broken')
