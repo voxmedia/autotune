@@ -26,7 +26,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
 
   afterRender: function() {
     var view = this, promises = [];
-    if ( this.model.isPublished() && this.model.blueprint.type === 'graphic' ) {
+    if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),
           embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';

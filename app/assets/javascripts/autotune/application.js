@@ -1282,7 +1282,7 @@ __p+='\n        </div>\n        <div class="col-md-4">'+
 '</div>\n      </div>\n      ';
  } 
 __p+='\n    </div>\n    ';
- if ( model.blueprint.get('type') == 'graphic' ) { 
+ if ( model.blueprint.get('type') === 'graphic' ) { 
 __p+='\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    ';
  } 
 __p+='\n    <div role="tabpanel" class="tab-pane" id="screenshots">\n\n      <ul class="nav nav-pills">\n        <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>\n        <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>\n        <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>\n      </ul>\n\n      <div class="tab-content">\n        <div id="large-ss" class="row tab-pane active">\n          <img path="screenshots/screenshot_l.png" />\n        </div>\n        <div id="medium-ss" class="row tab-pane">\n          <img path="screenshots/screenshot_m.png" />\n        </div>\n        <div id="small-ss" class="row tab-pane">\n          <img path="screenshots/screenshot_s.png" />\n        </div>\n      </div>\n\n    </div>\n    ';
@@ -30073,7 +30073,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
 
   afterRender: function() {
     var view = this, promises = [];
-    if ( this.model.isPublished() && this.model.blueprint.type === 'graphic' ) {
+    if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),
           embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
