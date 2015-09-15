@@ -2,7 +2,8 @@
 
 var $ = require('jquery'),
     _ = require('underscore'),
-    querystring = require('querystring');
+    querystring = require('querystring'),
+    escape = require('escape-html');
 
 module.exports = {
   render: function(template, templateObj) {
@@ -51,5 +52,10 @@ module.exports = {
 
   getPreviousPageUrl: function() {
     return this.getPageUrl( this.collection.state.currentPage - 1 );
-  }
+  },
+
+  /**********
+   * Expose other stuff as helpers
+   */
+  escape: escape
 };

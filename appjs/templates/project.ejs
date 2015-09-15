@@ -117,10 +117,10 @@
       </p>
 
       <h4>Blueprint data:</h4>
-      <pre><%=JSON.stringify(model.buildData(), null, 2) %></pre>
+      <pre><%=escape( JSON.stringify(model.buildData(), null, 2) ) %></pre>
 
       <h4>Output from last build:</h4>
-      <pre><%=model.get('output') %></pre>
+      <pre><%=escape( model.get('output') ) %></pre>
     </div>
     <% } %>
   </div>
