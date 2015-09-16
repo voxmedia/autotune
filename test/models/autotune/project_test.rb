@@ -143,5 +143,72 @@ module Autotune
       assert_equal 'new-project', p.slug_sans_theme
       assert_equal 'generic-new-project', p.slug
     end
+
+    test 'slug automatic incrementing' do
+      skip
+      b = autotune_blueprints(:example)
+      b.slug = 'new-blueprint'
+      b.save!
+      b.reload
+      assert_equal 'new-blueprint', b.slug
+
+      b = Blueprint.create!(
+        :title => 'new blueprint',
+        :slug => 'new-blueprint',
+        :repo_url => repo_url + '#1')
+      assert_equal 'new-blueprint-1', b.slug
+      b.slug = 'new-blueprint'
+      b.save!
+      b.reload
+      assert_equal 'new-blueprint-1', b.slug
+      b.slug = 'new-blueprint-1'
+      b.save!
+      b.reload
+      assert_equal 'new-blueprint-1', b.slug
+
+      b = Blueprint.create!(
+        :title => 'foo bar',
+        :slug => 'foo-bar-50',
+        :repo_url => repo_url + '#2')
+      assert_equal 'foo-bar-50', b.slug
+
+      b = Blueprint.create!(
+        :title => 'foo bar',
+        :slug => 'foo-bar-50',
+        :repo_url => repo_url + '#3')
+      assert_equal 'foo-bar-50-1', b.slug
+
+      b = Blueprint.create!(
+        :title => 'new blueprint',
+        :slug => 'new-blueprint',
+        :repo_url => repo_url + '#4')
+      assert_equal 'new-blueprint-2', b.slug
+      b.slug = 'new-blueprint'
+      b.save!
+      b.reload
+      assert_equal 'new-blueprint-2', b.slug
+      b.slug = 'new-blueprint-1'
+      b.save!
+      b.reload
+      assert_equal 'new-blueprint-2', b.slug
+
+      b = Blueprint.create!(
+        :title => 'new blueprint',
+        :slug => 'new-blueprint-1',
+        :repo_url => repo_url + '#5')
+      assert_equal 'new-blueprint-3', b.slug
+
+      b = Blueprint.create!(
+        :title => 'new blueprint',
+        :slug => 'new-blueprint-5',
+        :repo_url => repo_url + '#6')
+      assert_equal 'new-blueprint-5', b.slug
+
+      b = Blueprint.create!(
+        :title => 'new blueprint',
+        :slug => 'new-blueprint-5',
+        :repo_url => repo_url + '#7')
+      assert_equal 'new-blueprint-6', b.slug
+    end
   end
 end
