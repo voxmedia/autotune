@@ -29,7 +29,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),
-          embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
+          embedUrl = this.model.getPublishUrl(proto) + '/embed.txt';
 
       promises.push( Promise
         .resolve( $.get( embedUrl ) )
@@ -37,7 +37,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
           $.each(view.$( '#screenshots img' ), function(){
-            $(this).attr( 'src', prefix+$(this).attr('path') );
+            $(this).attr( 'src', prefix + '/' + $(this).attr('path') );
             $(this).removeAttr( 'path' );
           });
         }).catch(function(error) {
