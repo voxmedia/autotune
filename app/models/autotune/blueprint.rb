@@ -8,6 +8,7 @@ module Autotune
     include Slugged
     include Searchable
     include WorkingDir
+    include Deployable
     serialize :config, JSON
     has_many :blueprint_tags, :dependent => :destroy
     has_many :tags, :through => :blueprint_tags
@@ -17,16 +18,27 @@ module Autotune
     validates :title, :repo_url, :presence => true
     validates :repo_url, :uniqueness => { :case_sensitive => false }
     validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
-    after_initialize :defaults
     after_save :pub_to_redis
 
     default_scope { order('updated_at DESC') }
 
+    after_initialize do
+      self.status ||= 'new'
+      self.type   ||= 'app'
+      self.config ||= {}
+    end
+
+    before_validation do
+      # Get the type from the config
+      self.type = config['type'].downcase if config && config['type']
+
+      update_tags_from_config
+      update_themes_from_config
+    end
+
     def thumb_url
       if config['thumbnail'] && !config['thumbnail'].empty?
-        File.join(
-          Rails.configuration.autotune.media[:base_url],
-          slug, config['thumbnail']).to_s
+        deployer(:media).url_for(config['thumbnail'])
       else
         ActionController::Base.helpers.asset_path('autotune/at_placeholder.png')
       end
@@ -50,34 +62,12 @@ module Autotune
 
     def update_repo
       final_status = ready? ? 'ready' : 'testing'
-      update(:status => 'updating')
-      SyncBlueprintJob.perform_later(self, final_status)
+      update!(:status => 'updating')
+      SyncBlueprintJob.perform_later(
+        self, :status => final_status, :update => true)
     rescue
       update!(:status => 'broken')
       raise
-    end
-
-    def initialize_themes_from_config
-      # Associate themes
-      if config['themes']
-        tmp_themes = []
-        config['themes'].each do |t|
-          next unless Rails.configuration.autotune.themes.include? t.to_sym
-          tmp_themes << Theme.find_or_create_by(
-            :value => t, :label => Rails.configuration.autotune.themes[t.to_sym])
-        end
-        self.themes = tmp_themes
-      else
-        self.themes = Rails.configuration.autotune.themes.map do |value, label|
-          Theme.find_or_create_by(:value => value, :label => label)
-        end
-      end
-    end
-
-    def initialize_tags_from_config
-      self.tags = config['tags'].map do |t|
-        Tag.find_or_create_by(:title => t.humanize)
-      end if config['tags']
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
@@ -88,17 +78,34 @@ module Autotune
 
     private
 
-    def defaults
-      self.status ||= 'new'
-      self.type ||= 'app'
-      self.config ||= {}
+    def update_themes_from_config
+      # Associate themes
+      if config['themes']
+        tmp_themes = []
+        config['themes'].each do |t|
+          next unless Autotune.config.themes.include? t.to_sym
+          tmp_themes << Theme.find_or_create_by(
+            :value => t, :label => Autotune.config.themes[t.to_sym])
+        end
+        self.themes = tmp_themes
+      else
+        self.themes = Autotune.config.themes.map do |value, label|
+          Theme.find_or_create_by(:value => value, :label => label)
+        end
+      end
+    end
+
+    def update_tags_from_config
+      self.tags = config['tags'].map do |t|
+        Tag.find_or_create_by(:title => t.humanize)
+      end if config['tags']
     end
 
     def pub_to_redis
-      return if Autotune.redis_pub.nil?
+      return if Autotune.redis.nil?
       msg = { :id => id,
               :status => status }
-      Autotune.redis_pub.publish 'blueprint', msg.to_json
+      Autotune.redis.publish 'blueprint', msg.to_json
     end
   end
 end

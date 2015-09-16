@@ -1,62 +1,84 @@
 require 'work_dir'
 require 'date'
+require 'logger'
+require 'stringio'
 
 module Autotune
   # project a blueprint
   class BuildJob < ActiveJob::Base
     queue_as :default
 
-    def perform(project, mode = 'preview', force_sync = false)
-      out = nil
+    lock_job :retry => 20.seconds do
+      arguments.first.to_gid_param
+    end
+
+    unique_job :with => :payload
+
+    def perform(project, target: 'preview')
       # Create a new repo object based on the projects working dir
       repo = WorkDir.repo(project.working_dir,
                           Rails.configuration.autotune.build_environment)
 
       # Make sure the repo exists and is up to date (if necessary)
-      SyncProjectJob.perform_now(project) if !repo.exist? || force_sync
+      raise 'Missing files!' unless repo.exist?
+
+      # Setup a new logger that logs to a string. The resulting log will
+      # be saved to the output field of the project.
+      out = StringIO.new
+      outlogger = Logger.new out
+      outlogger.formatter = proc do |severity, datetime, _progname, msg|
+        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
+      end
 
       # Add a few extras to the build data
-      build_data = project.data.dup
+      build_data = project.data.deep_dup
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme.value,
-        'base_url' => (mode == :publish) ? project.publish_url : project.preview_url)
+        'theme' => project.theme.value)
+
+      # Get the deployer object
+      deployer = Autotune.new_deployer(
+        target.to_sym, project, :logger => outlogger)
+
+      # Run the before build deployer hook
+      deployer.before_build(build_data, repo.env)
 
       # Run the build
       repo.working_dir do
-        out = repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
+        outlogger.info(repo.cmd(
+          BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
       end
 
       # Upload build
-      deploy_dir = project.blueprint_config['deploy_dir'] || 'build'
-      ws = WorkDir.website(repo.expand(deploy_dir))
-      if mode == 'publish'
-        ws_location = File.join(Rails.configuration.autotune.publish[:connect], project.slug)
-        ws.deploy(ws_location)
+      deployer.deploy(project.deploy_dir)
 
-        # capture screenshot and save it
-        save_screenshots(repo.expand(deploy_dir), project.publish_url, ws_location)
+      # Create screenshots (has to happen after upload)
+      url = deployer.base_url
+      phantom = WorkDir.phantom(project.deploy_dir)
+      phantom.capture_screenshot(get_full_url(url)) if phantom.phantomjs?
 
-        # Save the results
-        project.update!(
-          :output => out, :status => 'built', :published_at => DateTime.current)
-      else
-        ws_location = File.join(Rails.configuration.autotune.preview[:connect], project.slug)
-        ws.deploy(ws_location)
-
-        # capture screenshot and save it
-        save_screenshots(repo.expand(deploy_dir), project.preview_url, ws_location)
-
-        # Save the results
-        project.update!(:output => out, :status => 'built')
+      # Upload screens
+      phantom.screenshots.each do |filename|
+        deployer.deploy_file(project.deploy_dir, filename)
       end
+
+      # Set status and save project
+      project.published_at = DateTime.current if target.to_sym == :publish
+      project.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag
-      logger.error(exc)
-      out ||= "#{exc.message}\n#{exc.backtrace.join("\n")}"
-      project.update!(:output => out, :status => 'broken')
+      msg = exc.message + "\n" + exc.backtrace.join("\n")
+      logger.error(msg)
+      outlogger.error(msg)
+      project.status = 'broken'
       raise
+    ensure
+      # Always make sure to save the log and the project
+      out.rewind
+      project.output = out.read
+      project.save!
+      outlogger.close
     end
 
     private
@@ -64,15 +86,6 @@ module Autotune
     def get_full_url(url)
       return url if url.start_with?('http')
       url.start_with?('//') ? 'http:' + url : 'http://localhost:3000' + url
-    end
-
-    def save_screenshots(build_dir, url, deploy_dir)
-      phantom = WorkDir.phantom(build_dir)
-      if phantom.phantomjs?
-        phantom.capture_screenshot(get_full_url(url))
-        screenshots_dir = WorkDir.website(File.join(build_dir, 'screenshots'))
-        screenshots_dir.deploy(File.join(deploy_dir, 'screenshots'))
-      end
     end
   end
 end

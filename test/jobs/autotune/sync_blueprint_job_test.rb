@@ -11,7 +11,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
     end
 
     assert_performed_jobs 1
@@ -20,8 +20,10 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     assert bp.installed?, 'Blueprint should be installed'
     assert_equal 'testing', bp.status
-    # only `generic` theme is enabled for the test suite
+    # only `generic` and `vox` themes are enabled for the test suite
     # the sync should have reset all the themes to just the one available
-    assert_equal 1, bp.themes.count
+    assert_equal 2, bp.themes.count
+
+    assert_equal '/media/example-blueprint/thumbnail.jpg', bp.thumb_url
   end
 end

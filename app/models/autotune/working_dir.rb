@@ -10,7 +10,7 @@ module Autotune
 
     def working_dir
       File.join(
-        Rails.configuration.autotune.working_dir,
+        Autotune.config.working_dir,
         self.class.model_name.element.pluralize,
         slug).to_s
     end
@@ -18,7 +18,7 @@ module Autotune
     def working_dir_was
       return if !slug_changed? || slug_was.nil?
       File.join(
-        Rails.configuration.autotune.working_dir,
+        Autotune.config.working_dir,
         self.class.model_name.element.pluralize,
         slug_was).to_s
     end

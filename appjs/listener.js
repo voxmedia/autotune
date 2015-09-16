@@ -39,25 +39,30 @@ _.extend(Listener.prototype, Backbone.Events, {
    * Disable the server side event listener
    */
   stop: function() {
-    if ( this.hasStatus('open') ) {
+    logger.debug('Stopping listener now');
+    if ( this.hasStatus('open', 'connecting') ) {
       logger.debug('Close event listener');
       this.conn.close();
-      this.trigger('stop');
     }
 
+    this.trigger('stop');
     return this;
   },
 
   stopAfter: function(seconds) {
-    this.cancelStop();
+    if ( this.hasStatus('closed') ) { return; }
+
+    logger.debug('Stopping listener in ' + seconds);
+    if ( this.stopTimeout ) { clearTimeout(this.stopTimeout); }
     this.stopTimeout = setTimeout(_.bind(this.stop, this), seconds*1000);
     return this;
   },
 
   cancelStop: function() {
-    if ( this.stopTimeout ) {
-      clearTimeout(this.stopTimeout);
-    }
+    if ( this.hasStatus('closed') || !this.stopTimeout ) { return; }
+
+    logger.debug('Canceling listener stop');
+    clearTimeout(this.stopTimeout);
     return this;
   },
 
@@ -79,13 +84,13 @@ _.extend(Listener.prototype, Backbone.Events, {
   },
 
   handleChange: function(evt) {
-    if ( !this.paused ) {
-      var data = JSON.parse(evt.data),
-          eventName = 'change:' + data.type,
-          eventData = _.pick(data, 'id', 'status');
-      logger.debug(eventName, eventData);
-      this.trigger(eventName, eventData);
-    }
+    if ( this.paused ) { return; }
+
+    var data = JSON.parse(evt.data),
+        eventName = 'change:' + data.type,
+        eventData = _.pick(data, 'id', 'status');
+    logger.debug(eventName, eventData);
+    this.trigger(eventName, eventData);
   },
 
   handleError: function(evt) {
@@ -93,13 +98,13 @@ _.extend(Listener.prototype, Backbone.Events, {
     this.trigger('error', evt);
   },
 
-  handleOpen: function(evt){
+  handleOpen: function(evt) {
     logger.debug('Connection open', evt);
     this.openTime = evt.timeStamp;
     this.trigger('open', evt);
   },
 
-  handleClose: function(evt){
+  handleClose: function(evt) {
     var timeConnected = ( evt.timeStamp - this.openTime ) / 1000;
     logger.debug(
       'Connection closed by server in ' + timeConnected + ' seconds', evt);

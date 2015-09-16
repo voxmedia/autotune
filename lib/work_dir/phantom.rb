@@ -11,6 +11,10 @@ module WorkDir
       end
     end
 
+    def screenshots
+      glob('screenshots/*')
+    end
+
     # Is phantomJS installed?
     def phantomjs?
       cmd 'which', 'phantomjs'

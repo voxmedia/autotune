@@ -5,6 +5,7 @@ module Autotune
   class BlueprintTagTest < ActiveSupport::TestCase
     fixtures 'autotune/blueprints'
     setup do
+      autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
     end
 

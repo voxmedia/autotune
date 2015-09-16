@@ -10,7 +10,9 @@ var $ = require('jquery'),
     ace = require('brace');
 
 require('brace/mode/javascript');
+require('brace/mode/html');
 require('brace/theme/textmate');
+require('brace/theme/chrome');
 
 var setup = function(formData) {
   var data = formData.data,
@@ -141,10 +143,11 @@ var setup = function(formData) {
   };
 
   var updatePreview = function() {
+    logger.debug('Updating preview');
     try {
       JSON.parse(editor1.getValue());
     } catch (ex) {
-      // editor content is bad. bail
+      logger.error("Can't update preview, JSON is bad");
       return;
     }
 
@@ -156,13 +159,14 @@ var setup = function(formData) {
     doRefresh($("#previewDiv"), true);
   };
 
+  var debouncedUpdatePreview = _.debounce(updatePreview, 500);
+
   editor1.on("change", function() {
-    _.debounce(updatePreview, 500);
+    logger.debug('editor content changed');
+    debouncedUpdatePreview();
   });
 
   updatePreview();
-
-  doRefresh($("#previewDiv"));
 };
 
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {

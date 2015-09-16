@@ -11,10 +11,13 @@ class Autotune::SyncProjectJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      Autotune::SyncProjectJob.perform_later b
+      ActiveJob::Chain.new(
+        Autotune::SyncBlueprintJob.new(b.blueprint),
+        Autotune::SyncProjectJob.new(b)
+      ).enqueue
     end
 
-    assert_performed_jobs 1
+    assert_performed_jobs 2
 
     b.reload
 

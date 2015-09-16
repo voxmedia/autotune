@@ -10,6 +10,11 @@ var $ = require('jquery'),
     BaseView = require('./BaseView'),
     slugify = require("underscore.string/slugify");
 
+require('brace/mode/javascript');
+require('brace/mode/html');
+require('brace/theme/textmate');
+require('brace/theme/chrome');
+
 function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
@@ -34,10 +39,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
 
   afterRender: function() {
     var view = this, promises = [];
-    if ( this.model.isPublished() ) {
+    if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),
-          embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
+          embedUrl = this.model.getPublishUrl(proto) + '/embed.txt';
 
       promises.push( Promise
         .resolve( $.get( embedUrl ) )
@@ -45,12 +50,18 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
           $.each(view.$( '#screenshots img' ), function(){
-            $(this).attr( 'src', prefix+$(this).attr('path') );
+            $(this).attr( 'src', prefix + '/' + $(this).attr('path') );
             $(this).removeAttr( 'path' );
           });
         }).catch(function(error) {
           logger.error(error);
-        }) );
+        })
+      );
+    }
+
+    if ( this.model.hasStatus('broken') && this.model.has('error_message') ) {
+      this.app.view.alert(
+        this.model.get('error_message'), 'error', true);
     }
 
     promises.push( new Promise( function(resolve, reject) {
@@ -199,25 +210,23 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         "postRender": _.bind(function(control) {
           this.alpaca = control;
 
-          var title = control.childrenByPropertyId["title"],
-              theme = control.childrenByPropertyId["theme"],
-               slug = control.childrenByPropertyId["slug"],
+          var theme = control.childrenByPropertyId["theme"],
              social = control.childrenByPropertyId["tweet_text"];
 
           social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
           social.updateMaxLengthIndicator();
 
-          $([title, theme]).each(function(){
-            this.on('change', function(){
-              if (newProject && (title.getValue() !== '' && theme.getValue() !== '')) {
-                slug.setValue( ( slugify(theme.getValue()) + "-" + slugify(title.getValue()) ).substr(0,57) );
-              }
-              social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
-              social.updateMaxLengthIndicator();
-            });
+          $(theme).on('change', function(){
+            social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+            social.updateMaxLengthIndicator();
           });
 
-          control.form.form.append( helpers.render(button_tmpl, this.templateData()) );
+          this.alpaca.childrenByPropertyId["slug"].setValue(
+            this.model.get('slug_sans_theme') );
+
+          control.form.form.append(
+            helpers.render(button_tmpl, this.templateData()) );
+
           resolve();
         }, this)
       };

@@ -47,7 +47,7 @@ function App(config) {
 
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
-  
+
   this.listener = new Listener();
   this.listener.on('change:blueprint', this.handleBlueprintChange, this);
   this.listener.on('change:project',   this.handleProjectChange, this);
@@ -60,9 +60,6 @@ function App(config) {
 
   // Initialize top-level view
   this.view = new views.Application({ app: this });
-
-  // Clear error messages when window is focused
-  this.on('focus', function() { this.view.clearError(); }, this);
 
   // Show or hide spinner on loading events
   this.on('loadingStart', function() { this.view.spinStart(); }, this);
@@ -83,17 +80,19 @@ function App(config) {
   this.hasFocus = true;
   if ( typeof(window) !== 'undefined' ) {
     $(window).on('focus', _.bind(function(){
-      // Tell the listener to cancel the timeout, and make sure it's started
-      this.listener
-        .cancelStop()
-        .start();
+      this.hasFocus = true;
+      logger.debug('App has focus');
+      // Tell the listener to cancel the timeout
+      this.listener.cancelStop();
       // Proxy the event on the app object
       this.trigger('focus');
     }, this));
 
     $(window).on('blur', _.bind(function(){
+      this.hasFocus = false;
+      logger.debug('App lost focus');
       // Tell the listener to time out in 20 seconds
-      this.listener.stopAfter(20);
+      this.listener.stopAfter(200);
       // Proxy the event on the app object
       this.trigger('blur');
     }, this));
@@ -148,6 +147,7 @@ _.extend(App.prototype, Backbone.Events, {
     switch (data.status) {
       case 'new':
       case 'built':
+      case 'broken':
         inst.fetch();
         break;
       default:
@@ -156,7 +156,7 @@ _.extend(App.prototype, Backbone.Events, {
   },
 
   handleListenerStop: function() {
-    this.view.alert('Updates are stopped', 'notice', true);
+    this.view.alert('Reload to see changes', 'notice', true);
   }
 });
 

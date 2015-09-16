@@ -2,7 +2,7 @@ require 'test_helper'
 
 # test user model
 class Autotune::UserTest < ActiveSupport::TestCase
-  fixtures 'autotune/users', 'autotune/themes'
+  fixtures 'autotune/users', 'autotune/authorizations', 'autotune/themes'
   test 'creating user' do
     u = Autotune::User.create!(:name => 'foo')
     assert_equal 'foo', u.name

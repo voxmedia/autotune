@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class Autotune::AuthorizationTest < ActiveSupport::TestCase
+  fixtures 'autotune/authorizations'
   def setup
     @auth_hash = {
       'provider' => 'developer',
@@ -13,6 +14,7 @@ class Autotune::AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'creating authorization' do
+    autotune_authorizations(:developer).destroy
     assert_raises ActiveRecord::RecordInvalid do
       Autotune::Authorization.create!(@auth_hash)
     end

@@ -1,7 +1,6 @@
 <p class="margin-top">
   <button type="submit" class="btn btn-default" id="saveBtn"
-    <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>
-      data-loading-text="Saving...">Save</button>
+          data-loading-text="Saving...">Save</button>
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.hasUnpublishedUpdates() || model.isDraft() ) { %>
@@ -9,12 +8,10 @@
      href="<%=model.getPreviewUrl('http') %>">Preview</a>
   <% } else { %>
   <a class="btn btn-default" target="_blank" id="viewBtn"
-     <% if ( !model.hasStatus('built') ) { %>disabled="true"<% } %>
      href="<%=model.getPublishUrl('http') %>">View</a>
   <% } %>
 
   <button type="button" class="btn btn-success" id="publishBtn"
-          <% if ( !model.hasStatus('built') ) { %>disabled="true"<% } %>
           data-action-message="Publishing..."
           data-action="build-and-publish" data-model="Project"
           data-action-next="reload"

@@ -1,7 +1,6 @@
 require 'logger'
 require 'work_dir/base'
 require 'work_dir/repo'
-require 'work_dir/website'
 require 'work_dir/phantom'
 
 # Top-level module for work dir
@@ -32,10 +31,6 @@ module WorkDir
 
     def repo(*args)
       Repo.new(*args)
-    end
-
-    def website(*args)
-      Website.new(*args)
     end
 
     def phantom(*args)

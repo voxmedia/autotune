@@ -44,4 +44,12 @@ namespace :autotune do
     FileUtils.rm_rf(
       File.join(Rails.configuration.autotune.working_dir, 'projects'))
   end
+
+  desc 'List out of date projects'
+  task :list_upgradable_projects => :environment do
+    puts 'Projects which are out of date:'
+    Autotune::Project.all.each do |proj|
+      puts proj.slug if proj.blueprint.version != proj.blueprint_version
+    end
+  end
 end

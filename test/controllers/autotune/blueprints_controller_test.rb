@@ -19,7 +19,7 @@ module Autotune
       get :index
       assert_response :success
       assert_instance_of Array, decoded_response
-      assert_equal autotune_blueprints(:example_two).id, decoded_response.first['id']
+      assert_equal autotune_blueprints(:example).id, decoded_response.first['id']
     end
 
     test 'listing blueprints as author' do
@@ -29,7 +29,7 @@ module Autotune
       get :index
       assert_response :success
       assert_instance_of Array, decoded_response
-      assert_equal autotune_blueprints(:example_two).id, decoded_response.first['id']
+      assert_equal autotune_blueprints(:example).id, decoded_response.first['id']
     end
 
     test 'show blueprint' do
@@ -53,6 +53,7 @@ module Autotune
 
     test 'create blueprint' do
       # make sure we remove the example blueprint
+      autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 
       accept_json!
@@ -86,6 +87,7 @@ module Autotune
 
     test 'delete blueprint' do
       # make sure we remove the example blueprint
+      autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 
       accept_json!

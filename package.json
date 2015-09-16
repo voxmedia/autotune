@@ -36,6 +36,7 @@
     "browserify": "5.12.1",
     "browserify-shim": "3.8.0",
     "eonasdan-bootstrap-datetimepicker": "^4.15.35",
+    "escape-html": "^1.0.3",
     "handlebars": "1.3.0",
     "jquery": "2.1.1",
     "jquery-ui": "1.10.5",

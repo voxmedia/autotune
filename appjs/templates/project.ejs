@@ -42,14 +42,18 @@
         href="#edit" aria-controls="edit"
         role="tab" data-toggle="tab">Project info</a></li>
     <% if ( model.isPublished() ) { %>
+      <% if ( model.blueprint.get('type') === 'graphic' ) { %>
     <li role="presentation"><a
         href="#embed" aria-controls="embed"
         role="tab" data-toggle="tab">Embed</a></li>
+      <% } %>
     <li role="presentation"><a
         href="#screenshots" aria-controls="screenshots"
         role="tab" data-toggle="tab">Screenshots</a></li>
     <% } else { %>
+      <% if ( model.blueprint.get('type') === 'graphic' ) { %>
     <li role="presentation" class="disabled"><a>Embed</a></li>
+      <% } %>
     <li role="presentation" class="disabled"><a>Screenshots</a></li>
     <% } %>
     <% if ( hasRole('superuser') ) { %>
@@ -77,7 +81,9 @@
       </div>
       <% } %>
     </div>
+    <% if ( model.blueprint.get('type') === 'graphic' ) { %>
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
+    <% } %>
     <div role="tabpanel" class="tab-pane" id="screenshots">
 
       <ul class="nav nav-pills">
@@ -87,13 +93,13 @@
       </ul>
 
       <div class="tab-content">
-        <div id="large-ss" class="row tab-pane active">
+        <div id="large-ss" class="tab-pane active">
           <img path="screenshots/screenshot_l.png" />
         </div>
-        <div id="medium-ss" class="row tab-pane">
+        <div id="medium-ss" class="tab-pane">
           <img path="screenshots/screenshot_m.png" />
         </div>
-        <div id="small-ss" class="row tab-pane">
+        <div id="small-ss" class="tab-pane">
           <img path="screenshots/screenshot_s.png" />
         </div>
       </div>
@@ -109,22 +115,20 @@
 
       <p>
         <button type="button" class="btn btn-default"
-                <% if ( model.hasStatus('building', 'updating') ) { %>disabled="disabled"<% } %>
                 data-action-message="Build started" data-loading-text="Starting build..."
                 data-action="build" data-model="Project" data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>">Rebuild</button>
         <button type="button" class="btn btn-warning"
-                <% if ( model.hasStatus('building', 'updating') ) { %>disabled="disabled"<% } %>
                 data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
                 data-action="update-snapshot" data-model="Project" data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>">Upgrade</button>
       </p>
 
       <h4>Blueprint data:</h4>
-      <pre><%=JSON.stringify(model.buildData(), null, 2) %></pre>
+      <pre><%=escape( JSON.stringify(model.buildData(), null, 2) ) %></pre>
 
       <h4>Output from last build:</h4>
-      <pre><%=model.get('output') %></pre>
+      <pre><%=escape( model.get('output') ) %></pre>
     </div>
     <% } %>
   </div>

@@ -2,9 +2,6 @@ Autotune::Engine.routes.draw do
   resources :blueprints,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
 
-  get 'blueprints/:id/builder',
-      :to => 'blueprints#builder',
-      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   get 'blueprints/:id/update_repo',
       :to => 'blueprints#update_repo',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }

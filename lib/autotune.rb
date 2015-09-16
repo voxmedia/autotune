@@ -1,5 +1,7 @@
 require 'autotune/engine'
 require 'redis'
+require 'uri'
+require 'redlock'
 
 # Top-level autotune module
 module Autotune
@@ -19,18 +21,67 @@ module Autotune
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
-                      :preview, :publish, :media,
                       :verify_omniauth, :git_ssh, :git_askpass,
-                      :faq_url, :themes)
+                      :redis, :faq_url, :themes)
 
   class << self
-    attr_writer :redis
-    def redis_pub
-      @redis_pub ||= @redis.dup
-    end
+    delegate :redis, :to => :configuration
+    delegate :lock, :unlock, :to => :redlock
 
     def redis_sub
-      @redis_sub ||= @redis.dup
+      @redis_sub ||= configuration.redis.dup
     end
+
+    def redlock
+      @redlock ||= Redlock::Client.new([redis])
+    end
+
+    def register_deployer(scheme, deployer_class)
+      @deployers ||= {}
+      @deployers[scheme.to_sym] = deployer_class
+    end
+
+    def deployment(*args, &block)
+      @deployments ||= {}
+      target = args.first.to_sym
+      if block_given?
+        @deployments[target] = block
+      else
+        @deployments[target] = args.last
+      end
+    end
+
+    def new_deployer(target, project = nil, **opts)
+      dep = @deployments[target.to_sym]
+      dep = dep.call(project, opts) if dep.is_a? Proc
+      if dep.is_a? Hash
+        parts = URI.parse(dep[:connect])
+        unless @deployers.key? parts.scheme.to_sym
+          raise "No deployer registered for #{parts.scheme}://"
+        end
+        @deployers[parts.scheme.to_sym].new(
+          dep.dup.update(:project => project).update(opts))
+      else
+        dep
+      end
+    rescue => exc
+      Rails.logger.error exc.message + "\n" + exc.backtrace.join("\n")
+      raise
+    end
+
+    def configure
+      yield configuration
+    end
+
+    def configuration
+      @configuration ||= begin
+        Rails.configuration.autotune ||= Config.new
+      end
+    end
+    alias_method :config, :configuration
   end
 end
+
+# Load deployers
+require 'autotune/deployers/file'
+require 'autotune/deployers/s3'

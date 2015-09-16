@@ -14,7 +14,7 @@ module WorkDir
         git 'checkout', working_dir
         git 'clean', '-fd'
         git 'checkout', 'master'
-        git 'pull'
+        git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
         git 'checkout', branch
         git 'submodule', 'update', '--init'

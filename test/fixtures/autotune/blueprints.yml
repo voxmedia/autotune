@@ -4,8 +4,10 @@ example:
   slug: example-blueprint
   title: Example blueprint
   repo_url: https://github.com/voxmedia/autotune-example-blueprint.git
+  updated_at: <%= 5.day.ago.to_s(:db) %>
 
 example_two:
   slug: example-blueprint-two
   title: Example blueprint two
   repo_url: https://github.com/voxmedia/autotune-wtfengine.git
+  updated_at: <%= 6.day.ago.to_s(:db) %>
