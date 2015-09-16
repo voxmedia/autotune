@@ -28,7 +28,7 @@
       <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
           Filters
-          <% if(query.theme || query.blueprint_title || query.status) { %>
+          <% if(query.theme || query.blueprint_title || query.pub_status) { %>
             (<a href="/projects">clear</a>)
           <% } %>
           &nbsp;
@@ -54,11 +54,11 @@
           </div>
           </div>
           <div class="select">
-            <select name="status" id="status" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
-            <% _.each(app.config.project_statuses, function(status) { %>
-              <option <% if(status === query.status) { %>selected<% } %>
-                    value="<%=status %>"><%=status %></option>
+            <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
+              <option disabled <% if(!query.pub_status) { %>selected<% } %>>Status</option>
+            <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
+              <option <% if(pub_status === query.pub_status) { %>selected<% } %>
+                    value="<%=pub_status %>"><%=pub_status %></option>
             <% }) %>
             </select>
           </div>

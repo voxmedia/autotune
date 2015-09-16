@@ -1443,7 +1443,7 @@ __p+='>\n        ';
 __p+='\n          <a href="/projects">clear</a>\n        ';
  } 
 __p+='\n        </div>\n      </div>\n    </form>\n  </div>\n</div>\n<table class="table projects">\n  <thead>\n    <tr>\n      <td>\n        <a id="new-project" class="btn btn-primary btn-xs"\n       href="/projects/new">New project</a>\n      </td>\n      <td class="text-right" colspan="5">\n        <form class="form-inline" method="get" action="/projects">\n          Filters\n          ';
- if(query.theme || query.blueprint_title || query.status) { 
+ if(query.theme || query.blueprint_title || query.pub_status) { 
 __p+='\n            (<a href="/projects">clear</a>)\n          ';
  } 
 __p+='\n          &nbsp;\n          ';
@@ -1482,20 +1482,20 @@ __p+='\n                    value="'+
 ((__t=(blueprint_title.title ))==null?'':__t)+
 '</option>\n            ';
  }) 
-__p+='\n            </select>\n          </div>\n          </div>\n          <div class="select">\n            <select name="status" id="status" class="form-control" data-auto-submit="true">\n              <option disabled ';
- if(!query.status) { 
+__p+='\n            </select>\n          </div>\n          </div>\n          <div class="select">\n            <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">\n              <option disabled ';
+ if(!query.pub_status) { 
 __p+='selected';
  } 
 __p+='>Status</option>\n            ';
- _.each(app.config.project_statuses, function(status) { 
+ _.each(app.config.project_pub_statuses, function(pub_status) { 
 __p+='\n              <option ';
- if(status === query.status) { 
+ if(pub_status === query.pub_status) { 
 __p+='selected';
  } 
 __p+='\n                    value="'+
-((__t=(status ))==null?'':__t)+
+((__t=(pub_status ))==null?'':__t)+
 '">'+
-((__t=(status ))==null?'':__t)+
+((__t=(pub_status ))==null?'':__t)+
 '</option>\n            ';
  }) 
 __p+='\n            </select>\n          </div>\n        </form>\n      </td>\n    </tr>\n  </thead>\n  <tbody>\n\n  <tr class="m-table-heading">\n    <td>Project</td>\n    <td>Author</td>\n    <td>Status</td>\n    <td>Theme</td>\n    <td>Blueprint</td>\n    <td class="text-right">Bold Actions</td>\n  </tr>\n  ';
