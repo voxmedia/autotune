@@ -6,26 +6,25 @@ module ActiveJob
       delegate :lock_key_callback, :lock_ttl, :lock_retry, :to => :class
 
       around_perform :if => :lock_key do |_job, block|
-        lock_info = Autotune.lock(lock_key, lock_ttl)
-        logger.debug "Locked with #{lock_key}"
-        if lock_info
-          logger.debug 'Obtained lock'
-          ret = nil
-          begin
-            ret = block.call
-          ensure
-            Autotune.unlock(lock_info)
-            logger.debug 'Released lock'
-          end
-          ret
-        else
-          logger.debug 'Failed to obtain lock, retry job'
+        if Rails.cache.exist?(lock_key)
+          logger.debug "Retry job; Lock failed #{lock_key}"
           if lock_retry
             retry_job :wait => lock_retry
           else
             retry_job
           end
           false
+        else
+          logger.debug "Obtained lock #{lock_key}"
+          Rails.cache.write(lock_key, job_id, :expired_in => lock_ttl)
+          ret = nil
+          begin
+            ret = block.call
+          ensure
+            Rails.cache.delete(lock_key)
+            logger.debug "Released lock #{lock_key}"
+          end
+          ret
         end
       end
     end

@@ -1,7 +1,6 @@
 require 'autotune/engine'
 require 'redis'
 require 'uri'
-require 'redlock'
 
 # Top-level autotune module
 module Autotune
@@ -26,14 +25,9 @@ module Autotune
 
   class << self
     delegate :redis, :to => :configuration
-    delegate :lock, :unlock, :to => :redlock
 
     def redis_sub
       @redis_sub ||= configuration.redis.dup
-    end
-
-    def redlock
-      @redlock ||= Redlock::Client.new([redis])
     end
 
     def register_deployer(scheme, deployer_class)

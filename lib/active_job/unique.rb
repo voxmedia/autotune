@@ -5,27 +5,26 @@ module ActiveJob
     included do
       delegate :unique_key_callback, :unique_ttl, :to => :class
 
-      around_enqueue :if => :unique_key do |job, block|
-        logger.debug "Unique with #{unique_key}"
+      around_enqueue :if => :unique_key do |_job, block|
         if Rails.cache.exist?(unique_key)
           logger.debug(
-            "Existing unique #{job.class}, cancel enqueue")
+            "Cancel enqueue; Existing unique #{unique_key}")
           false
         else
-          logger.debug("Enqueue unique #{job.class}")
+          logger.debug("Enqueue unique #{unique_key}")
           Rails.cache.write(unique_key, job_id, :expired_in => unique_ttl)
           block.call
         end
       end
 
-      around_perform :if => :unique_key do |job, block|
+      around_perform :if => :unique_key do |_job, block|
         if !Rails.cache.exist?(unique_key) ||
            Rails.cache.read(unique_key) == job_id
-          logger.debug("Perform unique #{job.class}")
+          logger.debug("Perform unique #{unique_key}")
           Rails.cache.delete(unique_key)
           block.call
         else
-          logger.debug("Existing unique #{job.class}, cancel perform")
+          logger.debug("Cancel perform; Existing unique #{unique_key}")
           false
         end
       end
