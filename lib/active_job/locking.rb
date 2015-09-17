@@ -10,9 +10,13 @@ module ActiveJob
         logger.debug "Locked with #{lock_key}"
         if lock_info
           logger.debug 'Obtained lock'
-          ret = block.call
-          Autotune.unlock(lock_info)
-          logger.debug 'Released lock'
+          ret = nil
+          begin
+            ret = block.call
+          ensure
+            Autotune.unlock(lock_info)
+            logger.debug 'Released lock'
+          end
           ret
         else
           logger.debug 'Failed to obtain lock, retry job'

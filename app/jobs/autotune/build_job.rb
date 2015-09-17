@@ -70,7 +70,11 @@ module Autotune
       project.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag
-      msg = exc.message + "\n" + exc.backtrace.join("\n")
+      if exc.is_a? CommandError
+        msg = exc.message
+      else
+        msg = exc.message + "\n" + exc.backtrace.join("\n")
+      end
       logger.error(msg)
       outlogger.error(msg)
       project.status = 'broken'
