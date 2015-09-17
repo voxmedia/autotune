@@ -70,7 +70,7 @@ module Autotune
       project.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag
-      if exc.is_a? CommandError
+      if exc.is_a? ::WorkDir::CommandError
         msg = exc.message
       else
         msg = exc.message + "\n" + exc.backtrace.join("\n")
