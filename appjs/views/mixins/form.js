@@ -70,9 +70,6 @@ module.exports = {
 
         if ( next === 'show' ) {
           var redirectURL = view.model.url();
-          if ( redirectURL === '/projects' ){
-            redirectURL += '/'+values.slug;
-          }
           Backbone.history.navigate(redirectURL, {trigger: true});
         } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
