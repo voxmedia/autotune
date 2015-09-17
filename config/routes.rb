@@ -1,3 +1,5 @@
+require 'resque/server'
+
 Autotune::Engine.routes.draw do
   resources :blueprints,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
@@ -85,8 +87,12 @@ Autotune::Engine.routes.draw do
   get '/logout'                    => 'sessions#destroy', :as => :logout
   get '/login'                     => 'sessions#new',     :as => :login
 
-  unless Rails.env.production?
-    require 'resque/server'
+  resque_web_constraint = lambda do |request|
+    current_user = Autotune::User.find_by_api_key(
+      request.env['rack.session']['api_key'])
+    current_user.present? && current_user.meta['roles'].include?('superuser')
+  end
+  constraints resque_web_constraint do
     mount Resque::Server.new, :at => '/resque'
   end
 end
