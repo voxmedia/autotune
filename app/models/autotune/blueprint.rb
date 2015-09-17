@@ -80,7 +80,7 @@ module Autotune
 
     def update_themes_from_config
       # Associate themes
-      if config['themes']
+      if config.present? && config['themes'].present?
         tmp_themes = []
         config['themes'].each do |t|
           next unless Autotune.config.themes.include? t.to_sym
@@ -98,7 +98,7 @@ module Autotune
     def update_tags_from_config
       self.tags = config['tags'].map do |t|
         Tag.find_or_create_by(:title => t.humanize)
-      end if config['tags']
+      end if config.present? && config['tags'].present?
     end
 
     def pub_to_redis
