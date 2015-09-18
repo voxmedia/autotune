@@ -56,7 +56,7 @@ module Autotune
       # Create screenshots (has to happen after upload)
       phantom = WorkDir.phantom(project.deploy_dir)
       if phantom.phantomjs? && !Rails.env.test?
-        url = deployer.base_url
+        url = deployer.project_url
         phantom.capture_screenshot(get_full_url(url))
 
         # Upload screens
