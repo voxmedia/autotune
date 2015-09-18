@@ -15,6 +15,9 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
+      # Reset any previous error messages:
+      project.meta.delete('error_message')
+
       # Create a new repo object based on the projects working dir
       repo = WorkDir.repo(project.working_dir,
                           Rails.configuration.autotune.build_environment)
