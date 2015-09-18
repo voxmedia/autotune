@@ -69,7 +69,7 @@ module Autotune
           end
         rescue ::WorkDir::CommandError => exc
           logger.error(exc.message)
-          outlogger.warning(exc.message)
+          outlogger.warn(exc.message)
         end
       end
 
