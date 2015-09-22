@@ -47,7 +47,7 @@
         href="#edit" aria-controls="edit"
         role="tab" data-toggle="tab">Project info</a></li>
     <% if ( model.isPublished() ) { %>
-      <% if ( model.blueprint.get('type') === 'graphic' ) { %>
+      <% if ( model.hasType( 'graphic' ) ) { %>
     <li role="presentation"><a
         href="#embed" aria-controls="embed"
         role="tab" data-toggle="tab">Embed</a></li>
@@ -56,7 +56,7 @@
         href="#screenshots" aria-controls="screenshots"
         role="tab" data-toggle="tab">Screenshots</a></li>
     <% } else { %>
-      <% if ( model.blueprint.get('type') === 'graphic' ) { %>
+      <% if ( model.hasType( 'graphic' ) ) { %>
     <li role="presentation" class="disabled"><a>Embed</a></li>
       <% } %>
     <li role="presentation" class="disabled"><a>Screenshots</a></li>
@@ -86,7 +86,7 @@
       </div>
       <% } %>
     </div>
-    <% if ( model.blueprint.get('type') === 'graphic' ) { %>
+    <% if ( model.hasType( 'graphic' ) ) { %>
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
     <% } %>
     <div role="tabpanel" class="tab-pane" id="screenshots">

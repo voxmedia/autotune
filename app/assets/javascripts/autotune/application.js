@@ -521,6 +521,18 @@ exports.Project = Backbone.Model.extend({
   },
 
   /**
+   * Does this project have any of these types?
+   * @param {string} status Check for this status
+   * @returns {boolean}
+   **/
+  hasType: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'type' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  /**
    * Is this project a draft?
    * @returns {boolean}
    **/
@@ -542,6 +554,14 @@ exports.Project = Backbone.Model.extend({
    **/
   hasUnpublishedUpdates: function() {
     return moment(this.get('data_updated_at')).isAfter(this.get('published_at'));
+  },
+
+  /**
+   * Can this project be published?
+   * @returns {boolean}
+   **/
+  isPublishable: function() {
+    return this.isDraft() || this.hasUnpublishedUpdates();
   },
 
   /**
@@ -640,6 +660,18 @@ exports.Blueprint = Backbone.Model.extend({
   hasStatus: function() {
     var iteratee = function(m, i) {
       return m || this.get( 'status' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  /**
+   * Does this project have any of these types?
+   * @param {string} status Check for this status
+   * @returns {boolean}
+   **/
+  hasType: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'type' ) === i;
     };
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
@@ -1289,13 +1321,13 @@ __p+='\n    <p class="text-danger">\n     <span class="m-status status-alert"><i
 __p+='\n  </div>\n</div>\n\n<div role="tabpanel">\n\n  <!-- Nav tabs -->\n  <ul class="nav nav-tabs" role="tablist">\n    <li role="presentation" class="active"><a\n        href="#edit" aria-controls="edit"\n        role="tab" data-toggle="tab">Project info</a></li>\n    ';
  if ( model.isPublished() ) { 
 __p+='\n      ';
- if ( model.blueprint.get('type') === 'graphic' ) { 
+ if ( model.hasType( 'graphic' ) ) { 
 __p+='\n    <li role="presentation"><a\n        href="#embed" aria-controls="embed"\n        role="tab" data-toggle="tab">Embed</a></li>\n      ';
  } 
 __p+='\n    <li role="presentation"><a\n        href="#screenshots" aria-controls="screenshots"\n        role="tab" data-toggle="tab">Screenshots</a></li>\n    ';
  } else { 
 __p+='\n      ';
- if ( model.blueprint.get('type') === 'graphic' ) { 
+ if ( model.hasType( 'graphic' ) ) { 
 __p+='\n    <li role="presentation" class="disabled"><a>Embed</a></li>\n      ';
  } 
 __p+='\n    <li role="presentation" class="disabled"><a>Screenshots</a></li>\n    ';
@@ -1321,7 +1353,7 @@ __p+='\n        </div>\n        <div class="col-sm-4">'+
 '</div>\n      </div>\n      ';
  } 
 __p+='\n    </div>\n    ';
- if ( model.blueprint.get('type') === 'graphic' ) { 
+ if ( model.hasType( 'graphic' ) ) { 
 __p+='\n    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>\n    ';
  } 
 __p+='\n    <div role="tabpanel" class="tab-pane" id="screenshots">\n\n      <ul class="nav nav-pills">\n        <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>\n        <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>\n        <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>\n      </ul>\n\n      <div class="tab-content">\n        <div id="large-ss" class="tab-pane active">\n          <img path="screenshots/screenshot_l.png" />\n        </div>\n        <div id="medium-ss" class="tab-pane">\n          <img path="screenshots/screenshot_m.png" />\n        </div>\n        <div id="small-ss" class="tab-pane">\n          <img path="screenshots/screenshot_s.png" />\n        </div>\n      </div>\n\n    </div>\n    ';
@@ -1359,7 +1391,7 @@ with(obj||{}){
 __p+='<p class="margin-top">\n  <button type="submit" class="btn btn-default" id="saveBtn"\n          data-loading-text="Saving...">Save</button>\n\n';
  if ( ! model.isNew() ) { 
 __p+='\n  ';
- if ( model.hasUnpublishedUpdates() || model.isDraft() ) { 
+ if ( model.isPublishable() ) { 
 __p+='\n  <a class="btn btn-default" target="_blank" id="previewBtn"\n     href="'+
 ((__t=(model.getPreviewUrl('http') ))==null?'':__t)+
 '">Preview</a>\n  ';
@@ -1368,13 +1400,13 @@ __p+='\n  <a class="btn btn-default" target="_blank" id="viewBtn"\n     href="'+
 ((__t=(model.getPublishUrl('http') ))==null?'':__t)+
 '">View</a>\n  ';
  } 
-__p+='\n\n  <button type="button" class="btn btn-success" id="publishBtn"\n          data-action-message="Publishing..."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
+__p+='\n\n  ';
+ if ( model.isPublishable() ) { 
+__p+='\n  <button type="button" class="btn btn-success" id="publishBtn"\n          data-action-message="Publishing..."\n          data-action="build-and-publish" data-model="Project"\n          data-action-next="reload"\n          data-model-id="'+
 ((__t=(model.get('slug') ))==null?'':__t)+
-'">Publish</button>\n\n  <a class="btn btn-info" id="duplicateBtn"\n          ';
- if ( model.hasStatus('building') ) { 
-__p+='disabled="true"';
+'">Publish</button>\n  ';
  } 
-__p+='\n          href="/projects/'+
+__p+='\n\n  <a class="btn btn-info" id="duplicateBtn"\n          href="/projects/'+
 ((__t=(model.get('slug') ))==null?'':__t)+
 '/duplicate">Duplicate</a>\n\n  <button type="button" class="btn btn-danger" id="deleteBtn"\n          ';
  if ( model.hasStatus('building') ) { 

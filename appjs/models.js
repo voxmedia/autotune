@@ -158,6 +158,18 @@ exports.Project = Backbone.Model.extend({
   },
 
   /**
+   * Does this project have any of these types?
+   * @param {string} status Check for this status
+   * @returns {boolean}
+   **/
+  hasType: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'type' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  /**
    * Is this project a draft?
    * @returns {boolean}
    **/
@@ -179,6 +191,14 @@ exports.Project = Backbone.Model.extend({
    **/
   hasUnpublishedUpdates: function() {
     return moment(this.get('data_updated_at')).isAfter(this.get('published_at'));
+  },
+
+  /**
+   * Can this project be published?
+   * @returns {boolean}
+   **/
+  isPublishable: function() {
+    return this.isDraft() || this.hasUnpublishedUpdates();
   },
 
   /**
@@ -277,6 +297,18 @@ exports.Blueprint = Backbone.Model.extend({
   hasStatus: function() {
     var iteratee = function(m, i) {
       return m || this.get( 'status' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  /**
+   * Does this project have any of these types?
+   * @param {string} status Check for this status
+   * @returns {boolean}
+   **/
+  hasType: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'type' ) === i;
     };
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },

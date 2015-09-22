@@ -3,7 +3,7 @@
           data-loading-text="Saving...">Save</button>
 
 <% if ( ! model.isNew() ) { %>
-  <% if ( model.hasUnpublishedUpdates() || model.isDraft() ) { %>
+  <% if ( model.isPublishable() ) { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
      href="<%=model.getPreviewUrl('http') %>">Preview</a>
   <% } else { %>
@@ -11,14 +11,15 @@
      href="<%=model.getPublishUrl('http') %>">View</a>
   <% } %>
 
+  <% if ( model.isPublishable() ) { %>
   <button type="button" class="btn btn-success" id="publishBtn"
           data-action-message="Publishing..."
           data-action="build-and-publish" data-model="Project"
           data-action-next="reload"
           data-model-id="<%=model.get('slug') %>">Publish</button>
+  <% } %>
 
   <a class="btn btn-info" id="duplicateBtn"
-          <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>
           href="/projects/<%=model.get('slug') %>/duplicate">Duplicate</a>
 
   <button type="button" class="btn btn-danger" id="deleteBtn"
