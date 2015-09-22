@@ -8,7 +8,7 @@ module Autotune
 
     # Bootstrap for css
     require 'bootstrap-sass'
-    require 'will_paginate'
+    require 'bootstrap3-datetimepicker-rails'
 
     require 'will_paginate'
 

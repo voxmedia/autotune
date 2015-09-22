@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'jbuilder', '~> 2.0'
   s.add_dependency 's3deploy', '~> 0.2'
   s.add_dependency 'bootstrap-sass', '~> 3.3.4'
+  s.add_dependency 'bootstrap3-datetimepicker-rails', '~> 4.15.35'
   s.add_dependency 'sass-rails', '>= 3.2'
   s.add_dependency 'will_paginate', '~> 3.0.7'
 
