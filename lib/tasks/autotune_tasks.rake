@@ -5,6 +5,14 @@ namespace :autotune do
     Autotune::Blueprint.all.each { |b| b.update_repo }
   end
 
+  desc 'Sync all the blueprints'
+  task :sync_blueprints => :environment do
+    puts 'Updating all blueprints'
+    Autotune::Blueprint.all.each do |b|
+      Autotune::SyncBlueprintJob.perform_later b
+    end
+  end
+
   desc 'Reset all the blueprints themes'
   task :reset_blueprint_themes => :environment do
     puts 'Updating all blueprints'
