@@ -26,6 +26,9 @@ var $ = require('jquery'),
 // required to make Backbone work in browserify
 Backbone.$ = $;
 
+// Cause there doesn't seem to be a better way to set defaults for Alpaca
+Alpaca.RuntimeView.prototype.toolbarSticky = true;
+
 /**
  * Autotune admin UI
  * @constructor
@@ -52,10 +55,9 @@ function App(config) {
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
 
+  // Initialize server event listener
   this.listener = new Listener();
-  this.listener.on('change:blueprint', this.handleBlueprintChange, this);
-  this.listener.on('change:project',   this.handleProjectChange, this);
-  this.listener.on('stop',             this.handleListenerStop, this);
+  this.listenTo(this.listener, 'stop', this.handleListenerStop, this);
   this.listener.start();
 
   this.config = config;
@@ -65,18 +67,14 @@ function App(config) {
   // Initialize top-level view
   this.view = new views.Application({ app: this });
 
-  // Show or hide spinner on loading events
-  this.on('loadingStart', function() { this.view.spinStart(); }, this);
-  this.on('loadingStop', function() { this.view.spinStop(); }, this);
-
   // Initialize routing
   this.router = new Router({ app: this });
 
   // Start the app once the top-level view is rendered
-  var view = this.view;
+  var view = this.view, app = this;
   this.view.render().then(function() {
     $('body').prepend(view.$el);
-    view.app.trigger( 'loadingStart' );
+    app.trigger( 'loadingStart' );
     Backbone.history.start({ pushState: true });
   });
 
@@ -126,39 +124,8 @@ _.extend(App.prototype, Backbone.Events, {
   },
 
   /**
-   * Handle updating a blueprint
+   * Do something when the listener shuts down
    **/
-  handleBlueprintChange: function(data) {
-    var inst = this.blueprints.get(data.id);
-    if ( !inst ) { return; }
-    switch (data.status) {
-      case 'new':
-      case 'testing':
-      case 'broken':
-        inst.fetch();
-        break;
-      default:
-        inst.set('status', data.status);
-    }
-  },
-
-  /**
-   * Handle updating a blueprint
-   **/
-  handleProjectChange: function(data) {
-    var inst = this.projects.get(data.id);
-    if ( !inst ) { return; }
-    switch (data.status) {
-      case 'new':
-      case 'built':
-      case 'broken':
-        inst.fetch();
-        break;
-      default:
-        inst.set('status', data.status);
-    }
-  },
-
   handleListenerStop: function() {
     this.view.alert('Reload to see changes', 'notice', true);
   }
@@ -174,6 +141,7 @@ if ( typeof(window) !== 'undefined' ) {
   window.$ = $;
   window._ = _;
   window.moment = moment;
+  window.Alpaca = Alpaca;
 }
 
 },{"./listener":3,"./logger":4,"./models":5,"./router":6,"./vendor/alpaca":18,"./views":19,"backbone":31,"bootstrap":32,"jquery":84,"moment":87,"underscore":156}],2:[function(require,module,exports){
@@ -327,12 +295,16 @@ _.extend(Listener.prototype, Backbone.Events, {
 
   handleChange: function(evt) {
     if ( this.paused ) { return; }
+    var data = JSON.parse(evt.data);
 
-    var data = JSON.parse(evt.data),
-        eventName = 'change:' + data.type,
-        eventData = _.pick(data, 'id', 'status');
-    logger.debug(eventName, eventData);
-    this.trigger(eventName, eventData);
+    logger.debug('change', data);
+
+    this.trigger('change',
+                 _.pick(data, 'type', 'id', 'status'));
+    this.trigger(['change', data.type].join(':'),
+                 _.pick(data, 'id', 'status'));
+    this.trigger(['change', data.type, data.id].join(':'),
+                 data.status);
   },
 
   handleError: function(evt) {
@@ -1661,3174 +1633,2168 @@ return __p;
     
         this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
 this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-array-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+this["HandlebarsPrecompiled"]["web-display"]["container-array-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"itemField","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container-array"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "\n            ";
+  stack1 = ((helper = (helper = helpers.item || (depth0 != null ? depth0.item : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"item","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.item) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n";
+},"2":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container-object-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"itemField","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container-object"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "\n            ";
+  stack1 = ((helper = (helper = helpers.item || (depth0 != null ? depth0.item : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"item","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.item) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n";
+},"2":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-array"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container-table-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <tr>\n        "
+    + ((stack1 = (helpers.itemField || (depth0 && depth0.itemField) || helpers.helperMissing).call(depth0,"td",{"name":"itemField","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </tr>\n\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container-table"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-object-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+  return "                    <th>"
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.value : depth0)) != null ? stack1.title : stack1), depth0))
+    + "</th>\n";
+},"5":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "\n                "
+    + ((stack1 = (helpers.item || (depth0 && depth0.item) || helpers.helperMissing).call(depth0,"tr",{"name":"item","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, alias1=helpers.helperMissing, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  stack1 = ((helper = (helper = helpers.arrayToolbar || (depth0 != null ? depth0.arrayToolbar : depth0)) != null ? helper : alias1),(options={"name":"arrayToolbar","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.arrayToolbar) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n"
+    + ((stack1 = (helpers.eachProperty || (depth0 && depth0.eachProperty) || alias1).call(depth0,((stack1 = ((stack1 = (depth0 != null ? depth0.schema : depth0)) != null ? stack1.items : stack1)) != null ? stack1.properties : stack1),{"name":"eachProperty","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </tbody>\n\n        </table>\n\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container-tablerow-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <td>\n        ";
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"itemField","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n    </td>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container-tablerow"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "            ";
+  stack1 = ((helper = (helper = helpers.item || (depth0 != null ? depth0.item : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"item","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.item) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n";
+},"2":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-object"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-merge-up\">\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["container"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "        <legend class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " alpaca-container-label\">"
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "</legend>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-table-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0));
+},"4":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"5":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <tr>\n        ";
-  stack1 = (helper = helpers.itemField || (depth0 && depth0.itemField),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "td", options) : helperMissing.call(depth0, "itemField", "td", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </tr>\n\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-table"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing;
+  return "        <p class=\"alpaca-helper "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"alpaca-icon-helper\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"8":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        ";
+  stack1 = ((helper = (helper = helpers.container || (depth0 != null ? depth0.container : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"container","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.container) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-any"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                    <th>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.value)),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</th>\n                    ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>"
+    + ((stack1 = (helpers.str || (depth0 && depth0.str) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.data : depth0),{"name":"str","hash":{},"data":data})) != null ? stack1 : "")
+    + "</div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-checkbox"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program5(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n                ";
-  stack1 = (helper = helpers.item || (depth0 && depth0.item),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "tr", options) : helperMissing.call(depth0, "item", "tr", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>"
+    + ((stack1 = (helpers.str || (depth0 && depth0.str) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.data : depth0),{"name":"str","hash":{},"data":data})) != null ? stack1 : "")
+    + "</div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-hidden"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    return "<script type=\"text/x-handlebars-template\">\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-image"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.arrayToolbar) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.arrayToolbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.arrayToolbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n                    ";
-  stack1 = (helper = helpers.eachProperty || (depth0 && depth0.eachProperty),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options) : helperMissing.call(depth0, "eachProperty", ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n            ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </tbody>\n\n        </table>\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-tablerow-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <td>\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </td>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container-tablerow"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-merge-up\">\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["container"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <legend class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " alpaca-container-label\">";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</legend>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-function program4(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"alpaca-helper ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"alpaca-icon-helper\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program5(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data}
-  if (helper = helpers.container) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.container); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.container) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-any"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, helperMissing=helpers.helperMissing;
-
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>";
-  stack1 = (helper = helpers.str || (depth0 && depth0.str),options={hash:{},data:data},helper ? helper.call(depth0, (depth0 && depth0.data), options) : helperMissing.call(depth0, "str", (depth0 && depth0.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-checkbox"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, helperMissing=helpers.helperMissing;
-
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>";
-  stack1 = (helper = helpers.str || (depth0 && depth0.str),options={hash:{},data:data},helper ? helper.call(depth0, (depth0 && depth0.data), options) : helperMissing.call(depth0, "str", (depth0 && depth0.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-image"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
-
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-image-display\">\n        <img id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "-image\" src=\"";
-  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-image-display\">\n        <img id=\""
+    + alias3(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "-image\" src=\""
+    + alias3(((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"data","hash":{},"data":data}) : helper)))
     + "\">\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-radio"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", self=this, helperMissing=helpers.helperMissing;
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-password"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.value), (depth1 && depth1.data), options) : helperMissing.call(depth0, "compare", (depth0 && depth0.value), (depth1 && depth1.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                ";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>"
+    + ((stack1 = (helpers.disguise || (depth0 && depth0.disguise) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.data : depth0),"&bull;",{"name":"disguise","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "</div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-radio"] = Handlebars.template({"1":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.selectOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(1, program1, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-select"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", self=this, helperMissing=helpers.helperMissing;
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.value : depth0),(depths[1] != null ? depths[1].data : depths[1]),{"name":"compare","hash":{},"fn":this.program(2, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"2":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program1(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.value), (depth1 && depth1.data), options) : helperMissing.call(depth0, "compare", (depth0 && depth0.value), (depth1 && depth1.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                ";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            ";
-  return buffer;
-  }
+  return "                "
+    + ((stack1 = ((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.selectOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(1, program1, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-text"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function";
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.selectOptions : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n\n</script>\n";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-select"] = Handlebars.template({"1":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.value : depth0),(depths[1] != null ? depths[1].data : depths[1]),{"name":"compare","hash":{},"fn":this.program(2, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"2":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>";
-  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-textarea"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function";
+  return "                "
+    + ((stack1 = ((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.selectOptions : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n\n</script>\n";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-text"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <p>\n        ";
-  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </p>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control-url"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>"
+    + ((stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"data","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-textarea"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "target=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.anchorTarget)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return "<script type=\"text/x-handlebars-template\">\n\n    <p>\n        "
+    + ((stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"data","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n    </p>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control-url"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "target=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.anchorTarget : stack1), depth0))
     + "\"";
-  return buffer;
-  }
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program3(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.anchorTitle)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.anchorTitle : stack1), depth0));
+},"5":function(depth0,helpers,partials,data) {
+    var helper;
 
-function program5(depth0,data) {
-  
-  var stack1, helper;
-  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  return escapeExpression(stack1);
-  }
+  return this.escapeExpression(((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"data","hash":{},"data":data}) : helper)));
+},"7":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program7(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n            "
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.anchorTitle)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return "            "
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.anchorTitle : stack1), depth0))
+    + "\n";
+},"9":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "            "
+    + this.escapeExpression(((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"data","hash":{},"data":data}) : helper)))
+    + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-control-url-anchor-wrapper\">\n        <a href=\""
+    + this.escapeExpression(((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"data","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.anchorTarget : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " title=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.anchorTitle : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.program(5, data, 0),"data":data})) != null ? stack1 : "")
+    + "\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.anchorTitle : stack1),{"name":"if","hash":{},"fn":this.program(7, data, 0),"inverse":this.program(9, data, 0),"data":data})) != null ? stack1 : "")
+    + "        </a>\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["control"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "        <label class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " alpaca-control-label\" for=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\">"
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "</label>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0));
+},"4":function(depth0,helpers,partials,data) {
+    return "";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"7":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <p class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"info-sign\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
     + "\n        ";
-  return buffer;
-  }
+  stack1 = ((helper = (helper = helpers.control || (depth0 != null ? depth0.control : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"control","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.control) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-display"]["form"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"3":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
-function program9(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n            ";
-  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\n        ";
-  return buffer;
-  }
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"each","hash":{},"fn":this.program(4, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"4":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <a href=\"";
-  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.anchorTarget), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " title=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.anchorTitle), {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.anchorTitle), {hash:{},inverse:self.program(9, program9, data),fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </a>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["control"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <label class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " alpaca-control-label\" for=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</label>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-function program4(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-function program6(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"info-sign\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program7(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}
-  if (helper = helpers.control) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.control); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.control) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-display"] = this["HandlebarsPrecompiled"]["web-display"] || {};
-this["HandlebarsPrecompiled"]["web-display"]["form"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-function program3(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n            ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.buttons), {hash:{},inverse:self.noop,fn:self.programWithDepth(4, program4, data, depth1),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            ";
-  return buffer;
-  }
-function program4(depth0,data,depth2) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            <button data-key=\""
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.type), "submit", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.type), "submit", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.type), "reset", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.type), "reset", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " class=\"alpaca-form-button alpaca-form-button-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return "            <button data-key=\""
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depth0 != null ? depth0.type : depth0),"submit",{"name":"compare","hash":{},"fn":this.program(5, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
     + " "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.value), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</button>\n            ";
-  return buffer;
-  }
-function program5(depth0,data) {
-  
-  
-  return "type=\"submit\"";
-  }
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depth0 != null ? depth0.type : depth0),"reset",{"name":"compare","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " class=\"alpaca-form-button alpaca-form-button-"
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + " "
+    + alias3(this.lambda(((stack1 = ((stack1 = (depths[2] != null ? depths[2].view : depths[2])) != null ? stack1.styles : stack1)) != null ? stack1.button : stack1), depth0))
+    + "\" "
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.value : depth0),{"name":"each","hash":{},"fn":this.program(9, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + ((stack1 = ((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</button>\n";
+},"5":function(depth0,helpers,partials,data) {
+    return "type=\"submit\"";
+},"7":function(depth0,helpers,partials,data) {
+    return "type=\"reset\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-function program7(depth0,data) {
-  
-  
-  return "type=\"reset\"";
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
+  return alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias3(((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper)))
     + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <form role=\"form\">\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.formItems) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.formItems); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.formItems) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <div class=\"alpaca-form-buttons-container\">\n            ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.buttons), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </div>\n\n    </form>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <form role=\"form\">\n\n        ";
+  stack1 = ((helper = (helper = helpers.formItems || (depth0 != null ? depth0.formItems : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"formItems","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.formItems) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n        <div class=\"alpaca-form-buttons-container\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "        </div>\n\n    </form>\n\n</script>";
+},"useData":true,"useDepths":true});
 this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-array-actionbar"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+this["HandlebarsPrecompiled"]["web-edit"]["container-array-actionbar"] = Handlebars.template({"1":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=this.escapeExpression;
 
-function program1(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <button class=\"alpaca-array-actionbar-action "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth1 && depth1.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.smallButton)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-alpaca-array-actionbar-action=\"";
-  if (helper = helpers.action) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.action); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">\n            ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </button>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n            <i class=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"></i>\n            ";
-  return buffer;
-  }
+  return "        <button class=\"alpaca-array-actionbar-action "
+    + alias1(this.lambda(((stack1 = ((stack1 = (depths[1] != null ? depths[1].view : depths[1])) != null ? stack1.styles : stack1)) != null ? stack1.smallButton : stack1), depth0))
+    + "\" data-alpaca-array-actionbar-action=\""
+    + alias1(((helper = (helper = helpers.action || (depth0 != null ? depth0.action : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"action","hash":{},"data":data}) : helper)))
+    + "\">\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.iconClass : depth0),{"name":"if","hash":{},"fn":this.program(2, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.label : depth0),{"name":"if","hash":{},"fn":this.program(4, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        </button>\n";
+},"2":function(depth0,helpers,partials,data) {
+    return "            <i class=\""
+    + this.escapeExpression(this.lambda((depth0 != null ? depth0.iconClass : depth0), depth0))
+    + "\"></i>\n";
+},"4":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program4(depth0,data) {
-  
-  var stack1, helper;
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
-  }
+  return ((stack1 = ((helper = (helper = helpers.label || (depth0 != null ? depth0.label : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"label","hash":{},"data":data}) : helper))) != null ? stack1 : "");
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-array-actionbar alpaca-array-actionbar-";
-  if (helper = helpers.actionbarStyle) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.actionbarStyle); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + " btn-group\" data-alpaca-array-actionbar-parent-field-id=\"";
-  if (helper = helpers.parentFieldId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.parentFieldId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" data-alpaca-array-actionbar-field-id=\"";
-  if (helper = helpers.fieldId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.fieldId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" data-alpaca-array-actionbar-item-index=\"";
-  if (helper = helpers.itemIndex) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.itemIndex); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.actions), {hash:{},inverse:self.noop,fn:self.programWithDepth(1, program1, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-array-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n        <div class=\"pull-left\">\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-array-actionbar alpaca-array-actionbar-"
+    + alias3(((helper = (helper = helpers.actionbarStyle || (depth0 != null ? depth0.actionbarStyle : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"actionbarStyle","hash":{},"data":data}) : helper)))
+    + " btn-group\" data-alpaca-array-actionbar-parent-field-id=\""
+    + alias3(((helper = (helper = helpers.parentFieldId || (depth0 != null ? depth0.parentFieldId : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"parentFieldId","hash":{},"data":data}) : helper)))
+    + "\" data-alpaca-array-actionbar-field-id=\""
+    + alias3(((helper = (helper = helpers.fieldId || (depth0 != null ? depth0.fieldId : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"fieldId","hash":{},"data":data}) : helper)))
+    + "\" data-alpaca-array-actionbar-item-index=\""
+    + alias3(((helper = (helper = helpers.itemIndex || (depth0 != null ? depth0.itemIndex : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"itemIndex","hash":{},"data":data}) : helper)))
+    + "\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.actions : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-array-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, alias1=helpers.helperMissing, alias2="function", alias3=helpers.blockHelperMissing, buffer = 
+  "        <div class=\"pull-left\">\n            ";
+  stack1 = ((helper = (helper = helpers.arrayActionbar || (depth0 != null ? depth0.arrayActionbar : depth0)) != null ? helper : alias1),(options={"name":"arrayActionbar","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === alias2 ? helper.call(depth0,options) : helper));
+  if (!helpers.arrayActionbar) { stack1 = alias3.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
   buffer += "\n        </div>\n        <div class=\"pull-right\">\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </div>\n        <div class=\"clear\"></div>\n    ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : alias1),(options={"name":"itemField","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === alias2 ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = alias3.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n        </div>\n        <div class=\"clear\"></div>\n";
+},"2":function(depth0,helpers,partials,data) {
+    return "";
+},"4":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program4(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n        ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "right", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "right", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    ";
-  return buffer;
-  }
-function program5(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            <div class=\"pull-left\">\n                ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.actionbarStyle : depth0),"right",{"name":"compare","hash":{},"fn":this.program(5, data, 0),"inverse":this.program(7, data, 0),"data":data})) != null ? stack1 : "");
+},"5":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, alias1=helpers.helperMissing, alias2="function", alias3=helpers.blockHelperMissing, buffer = 
+  "            <div class=\"pull-left\">\n                ";
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : alias1),(options={"name":"itemField","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === alias2 ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = alias3.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
   buffer += "\n            </div>\n            <div class=\"pull-right\">\n                ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </div>\n            <div class=\"alpaca-clear\"></div>\n        ";
-  return buffer;
-  }
+  stack1 = ((helper = (helper = helpers.arrayActionbar || (depth0 != null ? depth0.arrayActionbar : depth0)) != null ? helper : alias1),(options={"name":"arrayActionbar","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === alias2 ? helper.call(depth0,options) : helper));
+  if (!helpers.arrayActionbar) { stack1 = alias3.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n            </div>\n            <div class=\"alpaca-clear\"></div>\n";
+},"7":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, alias1=helpers.helperMissing, buffer = 
+  "            <div>\n\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depth0 != null ? depth0.actionbarStyle : depth0),"top",{"name":"compare","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n                ";
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : alias1),(options={"name":"itemField","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depth0 != null ? depth0.actionbarStyle : depth0),"bottom",{"name":"compare","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n            </div>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "                ";
+  stack1 = ((helper = (helper = helpers.arrayActionbar || (depth0 != null ? depth0.arrayActionbar : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"arrayActionbar","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.arrayActionbar) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            <div>\n\n                ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "top", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "top", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "bottom", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "bottom", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            </div>\n        ";
-  return buffer;
-  }
-function program8(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n                ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.actionbarStyle : depth0),"left",{"name":"compare","hash":{},"fn":this.program(1, data, 0),"inverse":this.program(4, data, 0),"data":data})) != null ? stack1 : "")
+    + "    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-array-toolbar"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return " btn-group";
+},"3":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=helpers.helperMissing;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n    ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.program(4, program4, data),fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.actionbarStyle), "left", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.actionbarStyle), "left", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-array-toolbar"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+  return "\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depths[1] != null ? depths[1].toolbarStyle : depths[1]),"link",{"name":"compare","hash":{},"fn":this.program(4, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depths[1] != null ? depths[1].toolbarStyle : depths[1]),"button",{"name":"compare","hash":{},"fn":this.program(6, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n";
+},"4":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=this.lambda;
 
-function program1(depth0,data) {
-  
-  
-  return " btn-group";
-  }
+  return "                <a href=\"#\" class=\"alpaca-array-toolbar-action\" data-alpaca-array-toolbar-action=\""
+    + this.escapeExpression(alias1((depths[1] != null ? depths[1].action : depths[1]), depth0))
+    + "\">"
+    + ((stack1 = alias1((depths[1] != null ? depths[1].label : depths[1]), depth0)) != null ? stack1 : "")
+    + "</a>\n";
+},"6":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
 
-function program3(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(4, program4, data, depth0),data:data},helper ? helper.call(depth0, (depth1 && depth1.toolbarStyle), "link", options) : helperMissing.call(depth0, "compare", (depth1 && depth1.toolbarStyle), "link", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(6, program6, data, depth0, depth1),data:data},helper ? helper.call(depth0, (depth1 && depth1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", (depth1 && depth1.toolbarStyle), "button", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program4(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                <a href=\"#\" class=\"alpaca-array-toolbar-action\" data-alpaca-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth1 && depth1.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">";
-  stack1 = ((stack1 = (depth1 && depth1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</a>\n            ";
-  return buffer;
-  }
-
-function program6(depth0,data,depth1,depth2) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                <button class=\"alpaca-array-toolbar-action "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.smallButton)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return "                <button class=\"alpaca-array-toolbar-action "
+    + alias2(alias1(((stack1 = ((stack1 = (depths[2] != null ? depths[2].view : depths[2])) != null ? stack1.styles : stack1)) != null ? stack1.smallButton : stack1), depth0))
     + "\" data-alpaca-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth1 && depth1.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n                    ";
-  stack1 = helpers['if'].call(depth0, (depth1 && depth1.iconClass), {hash:{},inverse:self.noop,fn:self.programWithDepth(7, program7, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                    ";
-  stack1 = helpers['if'].call(depth0, (depth1 && depth1.label), {hash:{},inverse:self.noop,fn:self.programWithDepth(9, program9, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                </button>\n            ";
-  return buffer;
-  }
-function program7(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                    <i class=\""
-    + escapeExpression(((stack1 = (depth1 && depth1.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"></i>\n                    ";
-  return buffer;
-  }
+    + alias2(alias1((depths[1] != null ? depths[1].action : depths[1]), depth0))
+    + "\">\n"
+    + ((stack1 = helpers['if'].call(depth0,(depths[1] != null ? depths[1].iconClass : depths[1]),{"name":"if","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                    "
+    + ((stack1 = helpers['if'].call(depth0,(depths[1] != null ? depths[1].label : depths[1]),{"name":"if","hash":{},"fn":this.program(9, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n                </button>\n";
+},"7":function(depth0,helpers,partials,data,blockParams,depths) {
+    return "                    <i class=\""
+    + this.escapeExpression(this.lambda((depths[1] != null ? depths[1].iconClass : depths[1]), depth0))
+    + "\"></i>\n";
+},"9":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
-function program9(depth0,data,depth1) {
-  
-  var stack1;
-  stack1 = ((stack1 = (depth1 && depth1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
-  }
+  return ((stack1 = this.lambda((depths[1] != null ? depths[1].label : depths[1]), depth0)) != null ? stack1 : "");
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-array-toolbar\" data-alpaca-array-toolbar-field-id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.toolbarStyle), "button", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.actions), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-array"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-array-toolbar\" data-alpaca-array-toolbar-field-id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depth0 != null ? depth0.toolbarStyle : depth0),"button",{"name":"compare","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.actions : depth0),{"name":"each","hash":{},"fn":this.program(3, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-array"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "\n            ";
+  stack1 = ((helper = (helper = helpers.item || (depth0 != null ? depth0.item : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"item","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.item) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  stack1 = ((helper = (helper = helpers.arrayToolbar || (depth0 != null ? depth0.arrayToolbar : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"arrayToolbar","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.arrayToolbar) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-object-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"itemField","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-object"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "\n            ";
+  stack1 = ((helper = (helper = helpers.item || (depth0 != null ? depth0.item : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"item","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.item) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n";
+},"2":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-table-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program3(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <tr>\n        "
+    + ((stack1 = (helpers.itemField || (depth0 && depth0.itemField) || helpers.helperMissing).call(depth0,"td",{"name":"itemField","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </tr>\n\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-table"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.arrayToolbar) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.arrayToolbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.arrayToolbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-object-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+  return "                    <th data-header-id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.hidden : depth0),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</th>\n";
+},"4":function(depth0,helpers,partials,data) {
+    return "class=\"alpaca-table-column-hidden\"";
+},"6":function(depth0,helpers,partials,data) {
+    return "                        <th>Actions</th>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "\n                "
+    + ((stack1 = (helpers.item || (depth0 && depth0.item) || helpers.helperMissing).call(depth0,"tr",{"name":"item","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
+  stack1 = ((helper = (helper = helpers.arrayToolbar || (depth0 != null ? depth0.arrayToolbar : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"arrayToolbar","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.arrayToolbar) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.headers : depth0),{"name":"each","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showActionsColumn : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </tbody>\n\n        </table>\n\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-tablerow-item"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <td>\n        ";
+  stack1 = ((helper = (helper = helpers.itemField || (depth0 != null ? depth0.itemField : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"itemField","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.itemField) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n    </td>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container-tablerow"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-object"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
+  return ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.hidden : depth0),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.program(4, data, 0),"data":data})) != null ? stack1 : "");
+},"2":function(depth0,helpers,partials,data) {
+    return "";
+},"4":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "                ";
+  stack1 = ((helper = (helper = helpers.item || (depth0 != null ? depth0.item : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"item","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.item) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "            <div class=\"alpaca-merge-up\">\n                ";
+  stack1 = ((helper = (helper = helpers.arrayActionbar || (depth0 != null ? depth0.arrayActionbar : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"arrayActionbar","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.arrayActionbar) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n            </div>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-merge-up\">\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.items : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        <!-- actions cell -->\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showActionsColumn : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["container"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-table-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
+  return "        <legend class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " alpaca-container-label\">"
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "</legend>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0));
+},"4":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <tr>\n        ";
-  stack1 = (helper = helpers.itemField || (depth0 && depth0.itemField),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "td", options) : helperMissing.call(depth0, "itemField", "td", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </tr>\n\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-table"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing;
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"5":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "        <p class=\"alpaca-helper "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"alpaca-icon-helper\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                    <th>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.value)),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</th>\n                    ";
-  return buffer;
-  }
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"8":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        ";
+  stack1 = ((helper = (helper = helpers.container || (depth0 != null ? depth0.container : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"container","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.container) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-any"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"3":function(depth0,helpers,partials,data) {
+    var helper;
 
-function program5(depth0,data) {
-  
-  
-  return "\n                        <th>Actions</th>\n                    ";
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n                ";
-  stack1 = (helper = helpers.item || (depth0 && depth0.item),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "tr", options) : helperMissing.call(depth0, "item", "tr", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.arrayToolbar) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.arrayToolbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.arrayToolbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <table>\n\n            <!-- table headers -->\n            <thead>\n                <tr>\n                    ";
-  stack1 = (helper = helpers.eachProperty || (depth0 && depth0.eachProperty),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options) : helperMissing.call(depth0, "eachProperty", ((stack1 = ((stack1 = (depth0 && depth0.schema)),stack1 == null || stack1 === false ? stack1 : stack1.items)),stack1 == null || stack1 === false ? stack1 : stack1.properties), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                    ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.showActionsColumn), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                </tr>\n            </thead>\n\n            <!-- table body -->\n            <tbody>\n            ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </tbody>\n\n        </table>\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-tablerow-item"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <td>\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.itemField) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.itemField); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.itemField) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </td>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container-tablerow"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.item) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.item); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.item) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-function program4(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            <div class=\"alpaca-merge-up\">\n                ";
-  options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}
-  if (helper = helpers.arrayActionbar) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.arrayActionbar); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.arrayActionbar) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </div>\n        ";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-merge-up\">\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.items), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <!-- actions cell -->\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.showActionsColumn), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["container"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <legend class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " alpaca-container-label\">";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</legend>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-function program4(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"alpaca-helper ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"alpaca-icon-helper\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program5(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data}
-  if (helper = helpers.container) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.container); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.container) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-any"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
     + "\"";
-  return buffer;
-  }
+},"5":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program5(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
     + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
+    + alias1(this.lambda(depth0, depth0))
     + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"text\" id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" size=\"40\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-checkbox"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.checkboxOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(2, program2, data, depth1),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    ";
-  return buffer;
-  }
-function program2(depth0,data,depth2) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n\n            <div>\n\n                <label>\n\n                    <input type=\"checkbox\" data-checkbox-index=\""
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-checkbox-value=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth2 && depth2.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth2 && depth2.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n                    ";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                </label>\n            </div>\n\n        ";
-  return buffer;
-  }
-function program3(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program5(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n\n        <div>\n\n            <label>\n\n                <input type=\"checkbox\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n                ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.rightLabel)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </label>\n\n        </div>\n\n    ";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.multiple), {hash:{},inverse:self.program(9, program9, data),fn:self.programWithDepth(1, program1, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-ckeditor"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
-
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <textarea id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" cols=\"80\" rows=\"10\">\n    </textarea>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-editor"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
-
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" class=\"control-field-editor-el\"></div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-file"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "size=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program5(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"file\" id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-hidden"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"hidden\" id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-image"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "placeholder=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "size=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program5(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"text\" id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n    <div class=\"alpaca-image-display\">\n        <h5>Preview</h5>\n        <img id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "-image\" src=\"";
-  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-password"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "placeholder=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "size=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program5(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"password\" id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-radio"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-  
-  
-  return "\n    ";
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n    <div class=\"radio\">\n        <label>\n            <input type=\"radio\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" value=\"\"/>";
-  if (helper = helpers.noneLabel) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.noneLabel); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </label>\n    </div>\n    ";
-  return buffer;
-  }
-function program4(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program6(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n    <div class=\"radio\">\n        <label>\n            <input type=\"radio\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " name=\""
-    + escapeExpression(((stack1 = (depth1 && depth1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" value=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.value), (depth1 && depth1.data), options) : helperMissing.call(depth0, "compare", (depth0 && depth0.value), (depth1 && depth1.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </label>\n    </div>\n    ";
-  return buffer;
-  }
-function program7(depth0,data) {
-  
-  
-  return "checked=\"checked\"";
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.hideNone), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.selectOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(6, program6, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-select"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program3(depth0,data) {
-  
-  
-  return "multiple=\"multiple\"";
-  }
-
-function program5(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "size=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.hideNone), {hash:{},inverse:self.program(12, program12, data),fn:self.program(10, program10, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.selectOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(14, program14, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    ";
-  return buffer;
-  }
-function program10(depth0,data) {
-  
-  
-  return "\n        ";
-  }
-
-function program12(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <option value=\"\">";
-  if (helper = helpers.noneLabel) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.noneLabel); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</option>\n        ";
-  return buffer;
-  }
-
-function program14(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <option value=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\" ";
-  stack1 = helpers.each.call(depth0, (depth1 && depth1.data), {hash:{},inverse:self.noop,fn:self.programWithDepth(15, program15, data, depth1),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</option>\n        ";
-  return buffer;
-  }
-function program15(depth0,data,depth2) {
-  
-  var stack1, helper, options;
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(16, program16, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.value), (depth2 && depth2.value), options) : helperMissing.call(depth0, "compare", (depth0 && depth0.value), (depth2 && depth2.value), options));
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
-  }
-function program16(depth0,data) {
-  
-  
-  return "selected=\"selected\"";
-  }
-
-function program18(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.hideNone), {hash:{},inverse:self.program(12, program12, data),fn:self.program(10, program10, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.selectOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(19, program19, data, depth1),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    ";
-  return buffer;
-  }
-function program19(depth0,data,depth2) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n        <option value=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(16, program16, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.value), (depth2 && depth2.data), options) : helperMissing.call(depth0, "compare", (depth0 && depth0.value), (depth2 && depth2.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</option>\n        ";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <select id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.multiple), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n\n    ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.multiple), {hash:{},inverse:self.programWithDepth(18, program18, data, depth0),fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </select>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-text"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "placeholder=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "size=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program5(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "\"";
-  return buffer;
-  }
-
-function program11(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"";
-  if (helper = helpers.inputType) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.inputType); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.attributes), {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-textarea"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "placeholder=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "rows=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.rows)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program5(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "cols=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.cols)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program7(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program11(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "data-";
-  if (helper = helpers.fieldId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.fieldId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <textarea id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.rows), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.cols), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control-url"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "placeholder=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "size=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"";
-  return buffer;
-  }
-
-function program5(depth0,data) {
-  
-  
-  return "readonly=\"readonly\"";
-  }
-
-function program7(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"";
-  return buffer;
-  }
-
-function program9(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "data-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\""
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "\"";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"text\" id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.placeholder), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.size), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.readonly), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.name), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.data), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "/>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["control"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <label class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " alpaca-control-label\" for=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</label>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-function program4(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-function program6(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"info-sign\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program7(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}
-  if (helper = helpers.control) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.control); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.control) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["form"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
-
-function program1(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-function program3(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                ";
-  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.buttons), {hash:{},inverse:self.noop,fn:self.programWithDepth(4, program4, data, depth1),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            ";
-  return buffer;
-  }
-function program4(depth0,data,depth2) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                    <button data-key=\""
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" type=\"";
-  if (helper = helpers.type) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.type); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" class=\"alpaca-form-button alpaca-form-button-"
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"text\" id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" size=\"40\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
     + " "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.value), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</button>\n                ";
-  return buffer;
-  }
-function program5(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "=\"";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-checkbox"] = Handlebars.template({"1":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.checkboxOptions : depth0),{"name":"each","hash":{},"fn":this.program(2, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n";
+},"2":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
+
+  return "\n            <div>\n\n                <label>\n\n                    <input type=\"checkbox\" data-checkbox-index=\""
+    + alias3(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"index","hash":{},"data":data}) : helper)))
+    + "\" data-checkbox-value=\""
+    + alias3(((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depths[2] != null ? depths[2].options : depths[2])) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(5, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depths[2] != null ? depths[2].options : depths[2])) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n                    "
+    + ((stack1 = ((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n\n                </label>\n            </div>\n\n";
+},"3":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"5":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
     + "\"";
-  return buffer;
-  }
+},"7":function(depth0,helpers,partials,data) {
+    var helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <form role=\"form\">\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
-  if (helper = helpers.formItems) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.formItems); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.formItems) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <div class=\"alpaca-form-buttons-container\">\n            ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.buttons), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </div>\n\n    </form>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["message"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function";
+  return "data-"
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias3(((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper)))
+    + "\"";
+},"9":function(depth0,helpers,partials,data) {
+    var stack1;
 
+  return "\n        <div>\n\n            <label>\n\n                <input type=\"checkbox\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n                "
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.rightLabel : stack1), depth0)) != null ? stack1 : "")
+    + "\n            </label>\n\n        </div>\n\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-message alpaca-message-";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n        ";
-  if (helper = helpers.message) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.message); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["web-edit"] = this["HandlebarsPrecompiled"]["web-edit"] || {};
-this["HandlebarsPrecompiled"]["web-edit"]["wizard"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+  return "<script type=\"text/x-handlebars-template\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.multiple : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "\n</script>\n";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-ckeditor"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var helper;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <div class=\"alpaca-wizard-nav\">\n            <nav class=\"navbar navbar-default\" role=\"navigation\">\n                <div class=\"container-fluid alpaca-wizard-back\">\n                    <ul class=\"nav navbar-nav\">\n                        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.steps), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                    </ul>\n                </div>\n            </nav>\n        </div>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                        <li data-alpaca-wizard-step-index=\""
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n                            <div class=\"holder\">\n                                <div class=\"title\">";
-  if (helper = helpers.title) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.title); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</div>\n                                <div class=\"description\">";
-  if (helper = helpers.description) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.description); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</div>\n                            </div>\n                            <div class=\"chevron\"></div>\n                        </li>\n                        ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <textarea id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" cols=\"80\" rows=\"10\">\n    </textarea>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-editor"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var helper;
 
-function program4(depth0,data) {
-  
-  
-  return "\n        <div class=\"alpaca-wizard-progress-bar\">\n            <div class=\"progress\">\n                <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 60%;\">\n                </div>\n            </div>\n        </div>\n        ";
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" class=\"control-field-editor-el\"></div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-file"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program6(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n            <h3>";
-  if (helper = helpers.wizardTitle) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.wizardTitle); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</h3>\n        ";
-  return buffer;
-  }
+  return "size=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1), depth0))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"5":function(depth0,helpers,partials,data) {
+    var helper;
 
-function program8(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n            <h4>";
-  if (helper = helpers.wizardDescription) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.wizardDescription); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</h4>\n        ";
-  return buffer;
-  }
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program10(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n                    ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(11, program11, data, depth1),data:data},helper ? helper.call(depth0, (depth0 && depth0.align), "left", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.align), "left", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                ";
-  return buffer;
-  }
-function program11(depth0,data,depth2) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                        <button type=\"";
-  if (helper = helpers.type) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.type); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" class=\""
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-alpaca-wizard-button-key=\""
-    + escapeExpression(((stack1 = (data == null || data === false ? data : data.key)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">";
-  if (helper = helpers.title) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.title); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</button>\n                    ";
-  return buffer;
-  }
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program13(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n                    ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(11, program11, data, depth1),data:data},helper ? helper.call(depth0, (depth0 && depth0.align), "right", options) : helperMissing.call(depth0, "compare", (depth0 && depth0.align), "right", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"file\" id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-hidden"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var helper;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-wizard\">\n\n        <!-- nav bar -->\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.showSteps), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <!-- wizard progress bar -->\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.showProgressBar), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.wizardTitle), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.wizardDescription), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <!-- wizard steps -->\n        <div class=\"alpaca-wizard-steps\">\n\n        </div>\n\n        <!-- wizard buttons -->\n        <div class=\"alpaca-wizard-buttons\">\n\n            <div class=\"pull-left\">\n                ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.buttons), {hash:{},inverse:self.noop,fn:self.programWithDepth(10, program10, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </div>\n\n            <div class=\"pull-right\">\n                ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.buttons), {hash:{},inverse:self.noop,fn:self.programWithDepth(13, program13, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </div>\n\n            <div style=\"clear:both\"></div>\n\n        </div>\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"]["container"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <legend class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "alpaca-container-label\">\n\n            ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.collapsible), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.collapsible), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        </legend>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + " ";
-  return buffer;
-  }
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program4(depth0,data) {
-  
-  
-  return "\n            <span data-toggle=\"collapse\">\n            ";
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"hidden\" id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-image"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program6(depth0,data) {
-  
-  
-  return "\n            </span>\n            ";
-  }
+  return "placeholder=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1), depth0))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program8(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"alpaca-helper help-block ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"alpaca-icon-16 glyphicon glyphicon-info-sign\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program9(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
+  return "size=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1), depth0))
+    + "\"";
+},"5":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper;
 
-function program11(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data}
-  if (helper = helpers.container) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.container); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.container) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"]["control-radio"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", self=this, helperMissing=helpers.helperMissing;
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-function program1(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.value), (depth1 && depth1.data), options) : helperMissing.call(depth0, "compare", (depth0 && depth0.value), (depth1 && depth1.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                ";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"text\" id=\""
+    + alias3(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n    <div class=\"alpaca-image-display\">\n        <h5>Preview</h5>\n        <img id=\""
+    + alias3(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "-image\" src=\""
+    + alias3(((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"data","hash":{},"data":data}) : helper)))
+    + "\">\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-optiontree"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.selectOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(1, program1, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"]["control-select"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", self=this, helperMissing=helpers.helperMissing;
+  return "placeholder=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1), depth0))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n        ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.value), (depth1 && depth1.data), options) : helperMissing.call(depth0, "compare", (depth0 && depth0.value), (depth1 && depth1.data), options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n            ";
-  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  return buffer;
-  }
+  return "size=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1), depth0))
+    + "\"";
+},"5":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.selectOptions), {hash:{},inverse:self.noop,fn:self.programWithDepth(1, program1, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"]["control"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <label class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " control-label alpaca-control-label\" for=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</label>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"11":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program4(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-function program6(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"help-block ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"glyphicon glyphicon-info-sign\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program7(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"optiontree\"></div>\n\n    <input type=\""
+    + alias3(((helper = (helper = helpers.inputType || (depth0 != null ? depth0.inputType : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"inputType","hash":{},"data":data}) : helper)))
+    + "\" id=\""
+    + alias3(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.attributes : stack1),{"name":"each","hash":{},"fn":this.program(11, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-password"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"form-group\">\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}
-  if (helper = helpers.control) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.control); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.control) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-display"]["message"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function";
+  return "placeholder=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1), depth0))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
 
+  return "size=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1), depth0))
+    + "\"";
+},"5":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"help-block\">\n        <i class=\"glyphicon glyphicon-exclamation-sign\"></i>&nbsp;";
-  if (helper = helpers.message) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.message); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["container-grid"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program1(depth0,data) {
-  
-  
-  return " btn-group";
-  }
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program3(depth0,data,depth1) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n\n                ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data},helper ? helper.call(depth0, ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "link", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "link", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n                ";
-  stack1 = (helper = helpers.compare || (depth1 && depth1.compare),options={hash:{},inverse:self.noop,fn:self.programWithDepth(6, program6, data, depth1),data:data},helper ? helper.call(depth0, ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth1 && depth1.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  return buffer;
-  }
-function program4(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                <a href=\"#\" class=\"alpaca-array-toolbar-action\" data-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"password\" id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-radio"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
+
+  return "    <div class=\"radio\">\n        <label>\n            <input type=\"radio\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\" value=\"\"/>"
+    + ((stack1 = ((helper = (helper = helpers.noneLabel || (depth0 != null ? depth0.noneLabel : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"noneLabel","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n        </label>\n    </div>\n";
+},"4":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"6":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=this.escapeExpression, alias2=helpers.helperMissing, alias3="function";
+
+  return "    <div class=\"radio\">\n        <label>\n            <input type=\"radio\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depths[1] != null ? depths[1].options : depths[1])) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " name=\""
+    + alias1(this.lambda((depths[1] != null ? depths[1].name : depths[1]), depth0))
+    + "\" value=\""
+    + alias1(((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias2).call(depth0,(depth0 != null ? depth0.value : depth0),(depths[1] != null ? depths[1].data : depths[1]),{"name":"compare","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>"
+    + ((stack1 = ((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n        </label>\n    </div>\n";
+},"7":function(depth0,helpers,partials,data) {
+    return "checked=\"checked\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.hideNone : depth0),{"name":"if","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.program(3, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.selectOptions : depth0),{"name":"each","hash":{},"fn":this.program(6, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-select"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"3":function(depth0,helpers,partials,data) {
+    return "multiple=\"multiple\"";
+},"5":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "size=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1), depth0))
+    + "\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"9":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.hideNone : depth0),{"name":"if","hash":{},"fn":this.program(10, data, 0, blockParams, depths),"inverse":this.program(12, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.selectOptions : depth0),{"name":"each","hash":{},"fn":this.program(14, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n";
+},"10":function(depth0,helpers,partials,data) {
+    return "";
+},"12":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "        <option value=\"\">"
+    + ((stack1 = ((helper = (helper = helpers.noneLabel || (depth0 != null ? depth0.noneLabel : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"noneLabel","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</option>\n";
+},"14":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
+
+  return "        <option value=\""
+    + ((stack1 = ((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\" "
+    + ((stack1 = helpers.each.call(depth0,(depths[1] != null ? depths[1].data : depths[1]),{"name":"each","hash":{},"fn":this.program(15, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + this.escapeExpression(((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper)))
+    + "</option>\n";
+},"15":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.value : depth0),(depths[2] != null ? depths[2].value : depths[2]),{"name":"compare","hash":{},"fn":this.program(16, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"16":function(depth0,helpers,partials,data) {
+    return "selected=\"selected\"";
+},"18":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.hideNone : depth0),{"name":"if","hash":{},"fn":this.program(10, data, 0, blockParams, depths),"inverse":this.program(12, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.selectOptions : depth0),{"name":"each","hash":{},"fn":this.program(19, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n";
+},"19":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
+
+  return "        <option value=\""
+    + ((stack1 = ((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\" "
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,(depth0 != null ? depth0.value : depth0),(depths[2] != null ? depths[2].data : depths[2]),{"name":"compare","hash":{},"fn":this.program(16, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + this.escapeExpression(((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper)))
+    + "</option>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <select id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.multiple : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.multiple : stack1),{"name":"if","hash":{},"fn":this.program(9, data, 0, blockParams, depths),"inverse":this.program(18, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "\n    </select>\n\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-text"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "placeholder=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1), depth0))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "size=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1), depth0))
+    + "\"";
+},"5":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
+
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"11":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
+
+  return alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <input type=\""
+    + alias3(((helper = (helper = helpers.inputType || (depth0 != null ? depth0.inputType : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"inputType","hash":{},"data":data}) : helper)))
+    + "\" id=\""
+    + alias3(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.attributes : stack1),{"name":"each","hash":{},"fn":this.program(11, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-textarea"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "placeholder=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1), depth0))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "rows=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.rows : stack1), depth0))
+    + "\"";
+},"5":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "cols=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.cols : stack1), depth0))
+    + "\"";
+},"7":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"11":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
+
+  return "data-"
+    + this.escapeExpression(((helper = (helper = helpers.fieldId || (depth0 != null ? depth0.fieldId : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"fieldId","hash":{},"data":data}) : helper)))
+    + "=\""
+    + ((stack1 = ((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <textarea id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.rows : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.cols : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(11, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control-url"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "placeholder=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1), depth0))
+    + "\"";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "size=\""
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1), depth0))
+    + "\"";
+},"5":function(depth0,helpers,partials,data) {
+    return "readonly=\"readonly\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "name=\""
+    + this.escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
+
+  return "data-"
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <input type=\"text\" id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.placeholder : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.size : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.readonly : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.name : depth0),{"name":"if","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.data : stack1),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["control"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "        <label class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " alpaca-control-label\" for=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
     + "\">"
-    + escapeExpression(((stack1 = (depth0 && depth0.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</a>\n                ";
-  return buffer;
-  }
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "</label>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program6(depth0,data,depth2) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                <button class=\"alpaca-array-toolbar-action "
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth2 && depth2.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-array-toolbar-action=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.action)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n                    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                </button>\n                ";
-  return buffer;
-  }
-function program7(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                    <i class=\""
-    + escapeExpression(((stack1 = (depth0 && depth0.iconClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"></i>\n                    ";
-  return buffer;
-  }
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0));
+},"4":function(depth0,helpers,partials,data) {
+    return "";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program9(depth0,data) {
-  
-  var stack1, helper;
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
-  }
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"7":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        <div class=\"alpaca-array-toolbar\" ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options) : helperMissing.call(depth0, "compare", ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.toolbarStyle), "button", options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n\n            ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.arrayToolbarActions), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        </div>\n\n        <div class=\"alpaca-container-grid-holder\"></div>\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["container"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+  return "        <p class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"info-sign\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <legend class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "alpaca-container-label\">\n\n            ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.collapsible), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n            ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.collapsible), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        </legend>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + " ";
-  return buffer;
-  }
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"10":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program4(depth0,data) {
-  
-  
-  return "\n            <span data-toggle=\"collapse\">\n            ";
-  }
+  return ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"if","hash":{},"fn":this.program(11, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"11":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program6(depth0,data) {
-  
-  
-  return "\n            </span>\n            ";
-  }
+  return "            <div class=\"alpaca-control-buttons-container\">\n"
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"each","hash":{},"fn":this.program(12, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </div>\n";
+},"12":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-function program8(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"alpaca-helper help-block ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"alpaca-icon-16 glyphicon glyphicon-info-sign\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program9(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
+  return "                <button data-key=\""
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" type=\""
+    + alias3(((helper = (helper = helpers.type || (depth0 != null ? depth0.type : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"type","hash":{},"data":data}) : helper)))
+    + "\" class=\"alpaca-control-button alpaca-control-button-"
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + " "
+    + alias3(((helper = (helper = helpers.styles || (depth0 != null ? depth0.styles : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"styles","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.value : depth0),{"name":"each","hash":{},"fn":this.program(13, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + ((stack1 = ((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</button>\n";
+},"13":function(depth0,helpers,partials,data) {
+    var helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-function program11(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
-
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data}
-  if (helper = helpers.container) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.container); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.container) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>\n";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["control-upload-partial-download"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <td></td>\n        <td class=\"name\">\n            <span>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</span>\n        </td>\n        <td class=\"size\">\n            <span>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</span>\n        </td>\n        <td class=\"error\" colspan=\"2\">\n            Error:\n            "
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.error)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\n        </td>\n    ";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <td class=\"preview\">\n            ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.thumbnailUrl), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </td>\n        <td class=\"name\">\n            <a href=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.url)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" title=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-gallery=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.thumbnailUrl)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "gallery\" download=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</a>\n        </td>\n        <td class=\"size\"><span>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</span></td>\n        <td colspan=\"2\"></td>\n    ";
-  return buffer;
-  }
-function program4(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n            <a href=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.url)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" title=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-gallery=\"gallery\" download=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n                <img src=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.thumbnailUrl)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n            </a>\n            ";
-  return buffer;
-  }
-
-function program6(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.buttons), {hash:{},inverse:self.noop,fn:self.programWithDepth(7, program7, data, depth0),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            ";
-  return buffer;
-  }
-function program7(depth0,data,depth1) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.isDelete), {hash:{},inverse:self.programWithDepth(11, program11, data, depth1),fn:self.program(8, program8, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                ";
-  return buffer;
-  }
-function program8(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                        <button class=\"delete btn btn-danger\" data-type=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.deleteType)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-file-id=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" data-url=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.deleteUrl)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias3(((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper)))
     + "\" ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.deleteWithCredentials), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n                            <i class=\"glyphicon glyphicon-trash glyphicon-white\"></i>\n                        </button>\n                    ";
-  return buffer;
-  }
-function program9(depth0,data) {
-  
-  
-  return "data-xhr-fields=\"{\\\"withCredentials\\\":true}\" ";
-  }
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        ";
+  stack1 = ((helper = (helper = helpers.control || (depth0 != null ? depth0.control : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"control","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.control) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.renderButtons : stack1),{"name":"if","hash":{},"fn":this.program(10, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["form"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program11(depth0,data,depth2) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                        <button class=\"";
-  if (helper = helpers.key) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.key); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + " btn ";
-  if (helper = helpers.buttonClass) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.buttonClass); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" data-file-id=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth2 && depth2.file)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n                            ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.iconClass), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                            ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.label), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                        </button>\n                    ";
-  return buffer;
-  }
-function program12(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                                <i class=\"";
-  if (helper = helpers.iconClass) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.iconClass); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\"></i>\n                            ";
-  return buffer;
-  }
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"each","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"4":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
 
-function program14(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n                                ";
-  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\n                            ";
-  return buffer;
-  }
+  return "                    <button data-key=\""
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" type=\""
+    + alias3(((helper = (helper = helpers.type || (depth0 != null ? depth0.type : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"type","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.id : depth0),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " class=\"alpaca-form-button alpaca-form-button-"
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + " "
+    + alias3(((helper = (helper = helpers.styles || (depth0 != null ? depth0.styles : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"styles","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.value : depth0),{"name":"each","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.attributes : depth0),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + ((stack1 = ((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</button>\n";
+},"5":function(depth0,helpers,partials,data) {
+    var helper;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <tr class=\"template-download\">\n    ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.error), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        <td>\n            ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.buttons), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </td>\n    </tr>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["control-upload-partial-upload"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+  return "id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\"";
+},"7":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program1(depth0,data) {
-  
-  
-  return "\n        <td class=\"preview\">\n            <span class=\"fade\"></span>\n        </td>\n    ";
-  }
+  return alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"9":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
 
-function program3(depth0,data) {
-  
-  
-  return "\n        <td></td>\n    ";
-  }
+  return " "
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <form role=\"form\">\n\n        ";
+  stack1 = ((helper = (helper = helpers.formItems || (depth0 != null ? depth0.formItems : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"formItems","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.formItems) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n        <div class=\"alpaca-form-buttons-container\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "        </div>\n\n    </form>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["message"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
 
-function program5(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <td class=\"error\" colspan=\"2\"><span class=\"label label-important\">Error</span> "
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.error)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</td>\n    ";
-  return buffer;
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-message alpaca-message-"
+    + ((stack1 = ((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\">\n        "
+    + ((stack1 = ((helper = (helper = helpers.message || (depth0 != null ? depth0.message : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"message","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["web-edit"]["wizard"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program7(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.valid), {hash:{},inverse:self.program(15, program15, data),fn:self.program(8, program8, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    ";
-  return buffer;
-  }
-function program8(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data},helper ? helper.call(depth0, (data == null || data === false ? data : data.index), 0, options) : helperMissing.call(depth0, "compare", (data == null || data === false ? data : data.index), 0, options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            <td class=\"start\">\n                ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.autoUpload), {hash:{},inverse:self.program(13, program13, data),fn:self.program(11, program11, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </td>\n        ";
-  return buffer;
-  }
-function program9(depth0,data) {
-  
-  
-  return "\n                <td>\n                    <div class=\"progress progress-success progress-striped active\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"0\">\n                        <div class=\"progress-bar\" style=\"width:0%;\"></div>\n                    </div>\n                </td>\n            ";
-  }
+  return "        <div class=\"alpaca-wizard-nav\">\n            <nav class=\"navbar navbar-default\" role=\"navigation\">\n                <div class=\"container-fluid alpaca-wizard-back\">\n                    <ul class=\"nav navbar-nav\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.steps : depth0),{"name":"each","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                    </ul>\n                </div>\n            </nav>\n        </div>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
 
-function program11(depth0,data) {
-  
-  
-  return "\n                ";
-  }
+  return "                        <li data-alpaca-wizard-step-index=\""
+    + this.escapeExpression(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"index","hash":{},"data":data}) : helper)))
+    + "\">\n                            <div class=\"holder\">\n                                <div class=\"title\">"
+    + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</div>\n                                <div class=\"description\">"
+    + ((stack1 = ((helper = (helper = helpers.description || (depth0 != null ? depth0.description : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"description","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</div>\n                            </div>\n                            <div class=\"chevron\"></div>\n                        </li>\n";
+},"4":function(depth0,helpers,partials,data) {
+    return "        <div class=\"alpaca-wizard-progress-bar\">\n            <div class=\"progress\">\n                <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 60%;\">\n                </div>\n            </div>\n        </div>\n";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program13(depth0,data) {
-  
-  
-  return "\n                <button class=\"btn btn-primary\"> \\\n                    <i class=\"glyphicon glyphicon-upload glyphicon-white\"></i>\n                    <span>Start</span>\n                </button>\n                ";
-  }
+  return "            <h3>"
+    + ((stack1 = ((helper = (helper = helpers.wizardTitle || (depth0 != null ? depth0.wizardTitle : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"wizardTitle","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</h3>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-function program15(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\n            <td></td>\n            <td class=\"cancel\">\n                ";
-  stack1 = (helper = helpers.compare || (depth0 && depth0.compare),options={hash:{},inverse:self.noop,fn:self.program(16, program16, data),data:data},helper ? helper.call(depth0, (data == null || data === false ? data : data.index), 0, options) : helperMissing.call(depth0, "compare", (data == null || data === false ? data : data.index), 0, options));
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n            </td>\n        ";
-  return buffer;
-  }
-function program16(depth0,data) {
-  
-  
-  return "\n                <button class=\"btn btn-warning\">\n                    <i class=\"glyphicon glyphicon-ban-circle glyphicon-white\"></i>\n                    <span>Cancel</span>\n                </button>\n                ";
-  }
+  return "            <h4>"
+    + ((stack1 = ((helper = (helper = helpers.wizardDescription || (depth0 != null ? depth0.wizardDescription : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"wizardDescription","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</h4>\n";
+},"10":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <tr class=\"template-upload\">\n\n    ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.showUploadPreview), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <td class=\"name\"><span>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.align : depth0),"left",{"name":"compare","hash":{},"fn":this.program(11, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"11":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
+
+  return "                        <button type=\""
+    + alias3(((helper = (helper = helpers.type || (depth0 != null ? depth0.type : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"type","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.id : depth0),{"name":"if","hash":{},"fn":this.program(12, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " class=\""
+    + alias3(this.lambda(((stack1 = ((stack1 = (depths[2] != null ? depths[2].view : depths[2])) != null ? stack1.styles : stack1)) != null ? stack1.button : stack1), depth0))
+    + "\" data-alpaca-wizard-button-key=\""
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.attributes : depth0),{"name":"each","hash":{},"fn":this.program(14, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</button>\n";
+},"12":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "id=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\"";
+},"14":function(depth0,helpers,partials,data) {
+    var helper, alias1=this.escapeExpression;
+
+  return " "
+    + alias1(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias1(this.lambda(depth0, depth0))
+    + "\"";
+},"16":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.align : depth0),"right",{"name":"compare","hash":{},"fn":this.program(11, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-wizard\">\n\n        <!-- nav bar -->\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.showSteps : depth0),{"name":"if","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        <!-- wizard progress bar -->\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.showProgressBar : depth0),{"name":"if","hash":{},"fn":this.program(4, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.wizardTitle : depth0),{"name":"if","hash":{},"fn":this.program(6, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.wizardDescription : depth0),{"name":"if","hash":{},"fn":this.program(8, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        <!-- wizard steps -->\n        <div class=\"alpaca-wizard-steps\">\n\n        </div>\n\n        <!-- wizard buttons -->\n        <div class=\"alpaca-wizard-buttons\">\n\n            <div class=\"pull-left\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.buttons : depth0),{"name":"each","hash":{},"fn":this.program(10, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </div>\n\n            <div class=\"pull-right\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.buttons : depth0),{"name":"each","hash":{},"fn":this.program(16, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </div>\n\n            <div style=\"clear:both\"></div>\n\n        </div>\n\n    </div>\n\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"] = this["HandlebarsPrecompiled"]["bootstrap-display"] || {};
+this["HandlebarsPrecompiled"]["bootstrap-display"]["container"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <legend class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "alpaca-container-label\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.collapsible : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n            "
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.collapsible : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        </legend>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0))
+    + " ";
+},"4":function(depth0,helpers,partials,data) {
+    return "            <span data-toggle=\"collapse\">\n";
+},"6":function(depth0,helpers,partials,data) {
+    return "            </span>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"9":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <p class=\"alpaca-helper help-block "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(10, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"alpaca-icon-16 glyphicon glyphicon-info-sign\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"10":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"12":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        ";
+  stack1 = ((helper = (helper = helpers.container || (depth0 != null ? depth0.container : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"container","hash":{},"fn":this.program(12, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.container) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"]["control-radio"] = Handlebars.template({"1":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.value : depth0),(depths[1] != null ? depths[1].data : depths[1]),{"name":"compare","hash":{},"fn":this.program(2, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"2":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "                "
+    + ((stack1 = ((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.selectOptions : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n\n</script>\n";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"]["control-select"] = Handlebars.template({"1":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(depth0 != null ? depth0.value : depth0),(depths[1] != null ? depths[1].data : depths[1]),{"name":"compare","hash":{},"fn":this.program(2, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"2":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "            "
+    + ((stack1 = ((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"text","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.selectOptions : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n\n</script>\n";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"]["control-upload-partial-download"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "        <td></td>\n        <td class=\"name\">\n            <span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "</span>\n        </td>\n        <td class=\"size\">\n            <span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.size : stack1), depth0))
+    + "</span>\n        </td>\n        <td class=\"error\" colspan=\"2\">\n            Error:\n            "
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1), depth0))
+    + "\n        </td>\n";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "        <td class=\"preview\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.thumbnailUrl : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "        </td>\n        <td class=\"name\">\n            <a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.url : stack1), depth0))
+    + "\" title=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\" data-gallery=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
+    + "gallery\" download=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\">"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "</a>\n        </td>\n        <td class=\"size\"><span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.size : stack1), depth0))
+    + "</span></td>\n        <td colspan=\"2\"></td>\n";
+},"4":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "            <a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.url : stack1), depth0))
+    + "\" title=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\" data-gallery=\"gallery\" download=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\">\n                <img src=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
+    + "\">\n            </a>\n";
+},"6":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.buttons : depth0),{"name":"each","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"7":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.isDelete : depth0),{"name":"if","hash":{},"fn":this.program(8, data, 0, blockParams, depths),"inverse":this.program(10, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+},"8":function(depth0,helpers,partials,data,blockParams,depths) {
+    var alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "                        <button class=\"delete btn btn-danger\" data-file-index=\""
+    + alias2(alias1((depths[3] != null ? depths[3].fileIndex : depths[3]), depth0))
+    + "\" data-button-key=\""
+    + alias2(alias1((depths[1] != null ? depths[1].key : depths[1]), depth0))
+    + "\">\n                            <i class=\"glyphicon glyphicon-trash glyphicon-white\"></i>\n                        </button>\n";
+},"10":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression, alias4=this.lambda;
+
+  return "                        <button class=\""
+    + alias3(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + " btn "
+    + alias3(((helper = (helper = helpers.buttonClass || (depth0 != null ? depth0.buttonClass : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"buttonClass","hash":{},"data":data}) : helper)))
+    + "\" data-file-index=\""
+    + alias3(alias4((depths[3] != null ? depths[3].fileIndex : depths[3]), depth0))
+    + "\" data-button-key=\""
+    + alias3(alias4((depths[1] != null ? depths[1].key : depths[1]), depth0))
+    + "\">\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.iconClass : depth0),{"name":"if","hash":{},"fn":this.program(11, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.label : depth0),{"name":"if","hash":{},"fn":this.program(13, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                        </button>\n";
+},"11":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "                                <i class=\""
+    + this.escapeExpression(((helper = (helper = helpers.iconClass || (depth0 != null ? depth0.iconClass : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"iconClass","hash":{},"data":data}) : helper)))
+    + "\"></i>\n";
+},"13":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "                                "
+    + this.escapeExpression(((helper = (helper = helpers.label || (depth0 != null ? depth0.label : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"label","hash":{},"data":data}) : helper)))
+    + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <tr class=\"template-download\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.program(3, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "        <td>\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.buttons : depth0),{"name":"if","hash":{},"fn":this.program(6, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "        </td>\n    </tr>\n\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"]["control-upload-partial-upload"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "        <td class=\"preview\">\n            <span class=\"fade\"></span>\n        </td>\n";
+},"3":function(depth0,helpers,partials,data) {
+    return "        <td></td>\n";
+},"5":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <td class=\"error\" colspan=\"2\"><span class=\"label label-important\">Error</span> "
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1), depth0))
+    + "</td>\n";
+},"7":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.valid : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.program(15, data, 0),"data":data})) != null ? stack1 : "");
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(data && data.index),0,{"name":"compare","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            <td class=\"start\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.autoUpload : stack1),{"name":"if","hash":{},"fn":this.program(11, data, 0),"inverse":this.program(13, data, 0),"data":data})) != null ? stack1 : "")
+    + "            </td>\n";
+},"9":function(depth0,helpers,partials,data) {
+    return "                <td>\n                    <div class=\"progress progress-success progress-striped active\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"0\">\n                        <div class=\"progress-bar\" style=\"width:0%;\"></div>\n                    </div>\n                </td>\n";
+},"11":function(depth0,helpers,partials,data) {
+    return "";
+},"13":function(depth0,helpers,partials,data) {
+    return "                <button class=\"btn btn-primary\"> \\\n                    <i class=\"glyphicon glyphicon-upload glyphicon-white\"></i>\n                    <span>Start</span>\n                </button>\n";
+},"15":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "            <td></td>\n            <td class=\"cancel\">\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(data && data.index),0,{"name":"compare","hash":{},"fn":this.program(16, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </td>\n";
+},"16":function(depth0,helpers,partials,data) {
+    return "                <button class=\"btn btn-warning\">\n                    <i class=\"glyphicon glyphicon-ban-circle glyphicon-white\"></i>\n                    <span>Cancel</span>\n                </button>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <tr class=\"template-upload\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showUploadPreview : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + "\n        <td class=\"name\"><span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
     + "</span></td>\n        <td class=\"size\"><span>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.size)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</span></td>\n\n    ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.file)),stack1 == null || stack1 === false ? stack1 : stack1.error), {hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        <td></td>\n    </tr>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.size : stack1), depth0))
+    + "</span></td>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.program(7, data, 0),"data":data})) != null ? stack1 : "")
+    + "        <td></td>\n    </tr>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"]["control-upload"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return this.escapeExpression(((helper = (helper = helpers.cssClasses || (depth0 != null ? depth0.cssClasses : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"cssClasses","hash":{},"data":data}) : helper)));
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "                        <thead>\n                            <tr>\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showUploadPreview : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.program(6, data, 0),"data":data})) != null ? stack1 : "")
+    + "                                <td>Name</td>\n                                <td>Size</td>\n                                <td colspan=\"2\"></td><!-- error or start or progress indicator -->\n                                <td>Actions</td>\n                            </tr>\n                        </thead>\n";
+},"4":function(depth0,helpers,partials,data) {
+    return "                                    <td>Thumbnail</td>\n";
+},"6":function(depth0,helpers,partials,data) {
+    return "                                    <td></td>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=this.escapeExpression, alias2=helpers.helperMissing, alias3="function";
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-fileupload-container "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.cssClasses : depth0),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n        <div class=\"container-fluid\">\n            <div class=\"row alpaca-fileupload-chooserow\">\n                <div class=\"col-md-12\">\n                    <div class=\"btn-group\">\n                        <span class=\""
+    + alias1(this.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.view : depth0)) != null ? stack1.styles : stack1)) != null ? stack1.button : stack1), depth0))
+    + " fileinput-button\">\n                            <i class=\"glyphicon glyphicon-upload\"></i>\n                            <span class=\"fileupload-add-button\">"
+    + alias1(((helper = (helper = helpers.chooseButtonLabel || (depth0 != null ? depth0.chooseButtonLabel : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"chooseButtonLabel","hash":{},"data":data}) : helper)))
+    + "</span>\n                            <input class=\"alpaca-fileupload-input\" type=\"file\" name=\""
+    + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "_files\">\n                            <input class=\"alpaca-fileupload-input-hidden\" type=\"hidden\" name=\""
+    + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "_files_hidden\">\n                        </span>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row alpaca-fileupload-well\">\n                <div class=\"col-md-12 fileupload-active-zone\">\n                    <table class=\"table table-striped\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showHeaders : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                        <tbody class=\"files\">\n                        </tbody>\n                    </table>\n                    <p align=\"center\" class=\"dropzone-message\">"
+    + alias1(((helper = (helper = helpers.dropZoneMessage || (depth0 != null ? depth0.dropZoneMessage : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"dropZoneMessage","hash":{},"data":data}) : helper)))
+    + "</p>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-md-12\">\n                    <div id=\"progress\" class=\"progress\">\n                        <div class=\"progress-bar progress-bar-success\"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"]["control"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "        <label class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " control-label alpaca-control-label\" for=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\">"
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "</label>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0));
+},"4":function(depth0,helpers,partials,data) {
+    return "";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"7":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <p class=\"help-block "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"glyphicon glyphicon-info-sign\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"form-group\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        ";
+  stack1 = ((helper = (helper = helpers.control || (depth0 != null ? depth0.control : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"control","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.control) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-display"]["message"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"help-block\">\n        <i class=\"glyphicon glyphicon-exclamation-sign\"></i>&nbsp;"
+    + ((stack1 = ((helper = (helper = helpers.message || (depth0 != null ? depth0.message : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"message","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
 this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["control-upload"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+this["HandlebarsPrecompiled"]["bootstrap-edit"]["container-grid"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return " btn-group";
+},"3":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=helpers.helperMissing;
 
-function program1(depth0,data) {
-  
-  var stack1, helper;
-  if (helper = helpers.cssClasses) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.cssClasses); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  return escapeExpression(stack1);
-  }
+  return "\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,((stack1 = (depths[1] != null ? depths[1].options : depths[1])) != null ? stack1.toolbarStyle : stack1),"link",{"name":"compare","hash":{},"fn":this.program(4, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || alias1).call(depth0,((stack1 = (depths[1] != null ? depths[1].options : depths[1])) != null ? stack1.toolbarStyle : stack1),"button",{"name":"compare","hash":{},"fn":this.program(6, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n";
+},"4":function(depth0,helpers,partials,data) {
+    var alias1=this.lambda, alias2=this.escapeExpression;
 
-function program3(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n                        <thead>\n                            <tr>\n                                ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.showUploadPreview), {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                                <td>Name</td>\n                                <td>Size</td>\n                                <td colspan=\"2\"></td><!-- error or start or progress indicator -->\n                                <td>Actions</td>\n                            </tr>\n                        </thead>\n                        ";
-  return buffer;
-  }
-function program4(depth0,data) {
-  
-  
-  return "\n                                    <td>Thumbnail</td>\n                                ";
-  }
+  return "                <a href=\"#\" class=\"alpaca-array-toolbar-action\" data-array-toolbar-action=\""
+    + alias2(alias1((depth0 != null ? depth0.action : depth0), depth0))
+    + "\">"
+    + alias2(alias1((depth0 != null ? depth0.label : depth0), depth0))
+    + "</a>\n";
+},"6":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
 
-function program6(depth0,data) {
-  
-  
-  return "\n                                    <td></td>\n                                ";
-  }
+  return "                <button class=\"alpaca-array-toolbar-action "
+    + alias2(alias1(((stack1 = ((stack1 = (depths[2] != null ? depths[2].view : depths[2])) != null ? stack1.styles : stack1)) != null ? stack1.button : stack1), depth0))
+    + "\" data-array-toolbar-action=\""
+    + alias2(alias1((depth0 != null ? depth0.action : depth0), depth0))
+    + "\">\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.iconClass : depth0),{"name":"if","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                    "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.label : depth0),{"name":"if","hash":{},"fn":this.program(9, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n                </button>\n";
+},"7":function(depth0,helpers,partials,data) {
+    return "                    <i class=\""
+    + this.escapeExpression(this.lambda((depth0 != null ? depth0.iconClass : depth0), depth0))
+    + "\"></i>\n";
+},"9":function(depth0,helpers,partials,data) {
+    var stack1, helper;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-fileupload-container ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.cssClasses), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n        <div class=\"container-fluid\">\n            <div class=\"row\">\n                <div class=\"col-md-12\">\n                    <div class=\"btn-group\">\n                        <span class=\""
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.view)),stack1 == null || stack1 === false ? stack1 : stack1.styles)),stack1 == null || stack1 === false ? stack1 : stack1.button)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + " fileinput-button\">\n                            <i class=\"glyphicon glyphicon-upload\"></i>\n                            <span class=\"fileupload-add-button\">Choose files...</span>\n                            <input class=\"alpaca-fileupload-input\" type=\"file\" name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "_files\">\n                            <input class=\"alpaca-fileupload-input-hidden\" type=\"hidden\" name=\"";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "_files_hidden\">\n                        </span>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row alpaca-fileupload-well\">\n                <div class=\"col-md-12 fileupload-active-zone\">\n                    <table class=\"table table-striped\">\n                        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.showHeaders), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n                        <tbody class=\"files\">\n                        </tbody>\n                    </table>\n                    <p align=\"center\" class=\"dropzone-message\">Click the Choose button or Drag and Drop files here to start...</p>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-md-12\">\n                    <div id=\"progress\" class=\"progress\">\n                        <div class=\"progress-bar progress-bar-success\"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["control"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+  return ((stack1 = ((helper = (helper = helpers.label || (depth0 != null ? depth0.label : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"label","hash":{},"data":data}) : helper))) != null ? stack1 : "");
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <label class=\"";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " control-label alpaca-control-label\" for=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</label>\n        ";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.labelClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n        <div class=\"alpaca-array-toolbar\" "
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.toolbarStyle : stack1),"button",{"name":"compare","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">\n\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.arrayToolbarActions : depth0),{"name":"each","hash":{},"fn":this.program(3, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        </div>\n\n        <div class=\"alpaca-container-grid-holder\"></div>\n\n    </div>\n\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["bootstrap-edit"]["container"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program4(depth0,data) {
-  
-  var buffer = "";
-  return buffer;
-  }
+  return "        <legend class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "alpaca-container-label\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.collapsible : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n            "
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.collapsible : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        </legend>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
 
-function program6(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        <p class=\"help-block ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n            <i class=\"glyphicon glyphicon-info-sign\"></i>\n            ";
-  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        </p>\n        ";
-  return buffer;
-  }
-function program7(depth0,data) {
-  
-  var stack1;
-  return escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helperClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
-  }
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0))
+    + " ";
+},"4":function(depth0,helpers,partials,data) {
+    return "            <span data-toggle=\"collapse\">\n";
+},"6":function(depth0,helpers,partials,data) {
+    return "            </span>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"form-group\">\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.label), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  options={hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}
-  if (helper = helpers.control) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.control); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.control) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.options)),stack1 == null || stack1 === false ? stack1 : stack1.helper), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    </div>\n\n</script>";
-  return buffer;
-  };
-this["HandlebarsPrecompiled"] = this["HandlebarsPrecompiled"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"] = this["HandlebarsPrecompiled"]["bootstrap-edit"] || {};
-this["HandlebarsPrecompiled"]["bootstrap-edit"]["message"] = function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function";
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"9":function(depth0,helpers,partials,data) {
+    var stack1;
 
+  return "        <p class=\"alpaca-helper help-block "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(10, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"alpaca-icon-16 glyphicon glyphicon-info-sign\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"10":function(depth0,helpers,partials,data) {
+    var stack1;
 
-  buffer += "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"help-block alpaca-message alpaca-message-";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n        <i class=\"glyphicon glyphicon-exclamation-sign\"></i>&nbsp;";
-  if (helper = helpers.message) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.message); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </div>\n\n</script>";
-  return buffer;
-  };
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"12":function(depth0,helpers,partials,data) {
+    return "";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        ";
+  stack1 = ((helper = (helper = helpers.container || (depth0 != null ? depth0.container : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"container","hash":{},"fn":this.program(12, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.container) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n    </div>\n\n</script>\n";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-edit"]["control-upload-partial-download"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "        <td></td>\n        <td class=\"name\">\n            <span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "</span>\n        </td>\n        <td class=\"size\">\n            <span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.size : stack1), depth0))
+    + "</span>\n        </td>\n        <td class=\"error\" colspan=\"2\">\n            Error:\n            "
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1), depth0))
+    + "\n        </td>\n";
+},"3":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "        <td class=\"preview\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.thumbnailUrl : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "        </td>\n        <td class=\"name\">\n            <a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.url : stack1), depth0))
+    + "\" title=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\" data-gallery=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
+    + "gallery\" download=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\">"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "</a>\n        </td>\n        <td class=\"size\"><span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.size : stack1), depth0))
+    + "</span></td>\n        <td colspan=\"2\"></td>\n";
+},"4":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "            <a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.url : stack1), depth0))
+    + "\" title=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\" data-gallery=\"gallery\" download=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\">\n                <img src=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
+    + "\">\n            </a>\n";
+},"6":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.buttons : depth0),{"name":"each","hash":{},"fn":this.program(7, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"7":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.isDelete : depth0),{"name":"if","hash":{},"fn":this.program(8, data, 0, blockParams, depths),"inverse":this.program(10, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+},"8":function(depth0,helpers,partials,data,blockParams,depths) {
+    var alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "                        <button class=\"delete btn btn-danger\" data-file-index=\""
+    + alias2(alias1((depths[3] != null ? depths[3].fileIndex : depths[3]), depth0))
+    + "\" data-button-key=\""
+    + alias2(alias1((depths[1] != null ? depths[1].key : depths[1]), depth0))
+    + "\">\n                            <i class=\"glyphicon glyphicon-trash glyphicon-white\"></i>\n                        </button>\n";
+},"10":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression, alias4=this.lambda;
+
+  return "                        <button class=\""
+    + alias3(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + " btn "
+    + alias3(((helper = (helper = helpers.buttonClass || (depth0 != null ? depth0.buttonClass : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"buttonClass","hash":{},"data":data}) : helper)))
+    + "\" data-file-index=\""
+    + alias3(alias4((depths[3] != null ? depths[3].fileIndex : depths[3]), depth0))
+    + "\" data-button-key=\""
+    + alias3(alias4((depths[1] != null ? depths[1].key : depths[1]), depth0))
+    + "\">\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.iconClass : depth0),{"name":"if","hash":{},"fn":this.program(11, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.label : depth0),{"name":"if","hash":{},"fn":this.program(13, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                        </button>\n";
+},"11":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "                                <i class=\""
+    + this.escapeExpression(((helper = (helper = helpers.iconClass || (depth0 != null ? depth0.iconClass : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"iconClass","hash":{},"data":data}) : helper)))
+    + "\"></i>\n";
+},"13":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "                                "
+    + this.escapeExpression(((helper = (helper = helpers.label || (depth0 != null ? depth0.label : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"label","hash":{},"data":data}) : helper)))
+    + "\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <tr class=\"template-download\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0, blockParams, depths),"inverse":this.program(3, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "        <td>\n"
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.buttons : depth0),{"name":"if","hash":{},"fn":this.program(6, data, 0, blockParams, depths),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "        </td>\n    </tr>\n\n</script>";
+},"useData":true,"useDepths":true});
+this["HandlebarsPrecompiled"]["bootstrap-edit"]["control-upload-partial-upload"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    return "        <td class=\"preview\">\n            <span class=\"fade\"></span>\n        </td>\n";
+},"3":function(depth0,helpers,partials,data) {
+    return "        <td></td>\n";
+},"5":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <td class=\"error\" colspan=\"2\"><span class=\"label label-important\">Error</span> "
+    + this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1), depth0))
+    + "</td>\n";
+},"7":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.valid : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.program(15, data, 0),"data":data})) != null ? stack1 : "");
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(data && data.index),0,{"name":"compare","hash":{},"fn":this.program(9, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            <td class=\"start\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.autoUpload : stack1),{"name":"if","hash":{},"fn":this.program(11, data, 0),"inverse":this.program(13, data, 0),"data":data})) != null ? stack1 : "")
+    + "            </td>\n";
+},"9":function(depth0,helpers,partials,data) {
+    return "                <td>\n                    <div class=\"progress progress-success progress-striped active\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"0\">\n                        <div class=\"progress-bar\" style=\"width:0%;\"></div>\n                    </div>\n                </td>\n";
+},"11":function(depth0,helpers,partials,data) {
+    return "";
+},"13":function(depth0,helpers,partials,data) {
+    return "                <button class=\"btn btn-primary\"> \\\n                    <i class=\"glyphicon glyphicon-upload glyphicon-white\"></i>\n                    <span>Start</span>\n                </button>\n";
+},"15":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "            <td></td>\n            <td class=\"cancel\">\n"
+    + ((stack1 = (helpers.compare || (depth0 && depth0.compare) || helpers.helperMissing).call(depth0,(data && data.index),0,{"name":"compare","hash":{},"fn":this.program(16, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </td>\n";
+},"16":function(depth0,helpers,partials,data) {
+    return "                <button class=\"btn btn-warning\">\n                    <i class=\"glyphicon glyphicon-ban-circle glyphicon-white\"></i>\n                    <span>Cancel</span>\n                </button>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <tr class=\"template-upload\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showUploadPreview : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + "\n        <td class=\"name\"><span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.name : stack1), depth0))
+    + "</span></td>\n        <td class=\"size\"><span>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.size : stack1), depth0))
+    + "</span></td>\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.file : depth0)) != null ? stack1.error : stack1),{"name":"if","hash":{},"fn":this.program(5, data, 0),"inverse":this.program(7, data, 0),"data":data})) != null ? stack1 : "")
+    + "        <td></td>\n    </tr>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-edit"]["control-upload"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return this.escapeExpression(((helper = (helper = helpers.cssClasses || (depth0 != null ? depth0.cssClasses : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"cssClasses","hash":{},"data":data}) : helper)));
+},"3":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "                        <thead>\n                            <tr>\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showUploadPreview : stack1),{"name":"if","hash":{},"fn":this.program(4, data, 0),"inverse":this.program(6, data, 0),"data":data})) != null ? stack1 : "")
+    + "                                <td>Name</td>\n                                <td>Size</td>\n                                <td colspan=\"2\"></td><!-- error or start or progress indicator -->\n                                <td>Actions</td>\n                            </tr>\n                        </thead>\n";
+},"4":function(depth0,helpers,partials,data) {
+    return "                                    <td>Thumbnail</td>\n";
+},"6":function(depth0,helpers,partials,data) {
+    return "                                    <td></td>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=this.escapeExpression, alias2=helpers.helperMissing, alias3="function";
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"alpaca-fileupload-container "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.cssClasses : depth0),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n        <div class=\"container-fluid\">\n            <div class=\"row alpaca-fileupload-chooserow\">\n                <div class=\"col-md-12\">\n                    <div class=\"btn-group\">\n                        <span class=\""
+    + alias1(this.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.view : depth0)) != null ? stack1.styles : stack1)) != null ? stack1.button : stack1), depth0))
+    + " fileinput-button\">\n                            <i class=\"glyphicon glyphicon-upload\"></i>\n                            <span class=\"fileupload-add-button\">"
+    + alias1(((helper = (helper = helpers.chooseButtonLabel || (depth0 != null ? depth0.chooseButtonLabel : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"chooseButtonLabel","hash":{},"data":data}) : helper)))
+    + "</span>\n                            <input class=\"alpaca-fileupload-input\" type=\"file\" name=\""
+    + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "_files\">\n                            <input class=\"alpaca-fileupload-input-hidden\" type=\"hidden\" name=\""
+    + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "_files_hidden\">\n                        </span>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row alpaca-fileupload-well\">\n                <div class=\"col-md-12 fileupload-active-zone\">\n                    <table class=\"table table-striped\">\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.showHeaders : stack1),{"name":"if","hash":{},"fn":this.program(3, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "                        <tbody class=\"files\">\n                        </tbody>\n                    </table>\n                    <p align=\"center\" class=\"dropzone-message\">"
+    + alias1(((helper = (helper = helpers.dropZoneMessage || (depth0 != null ? depth0.dropZoneMessage : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(depth0,{"name":"dropZoneMessage","hash":{},"data":data}) : helper)))
+    + "</p>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-md-12\">\n                    <div id=\"progress\" class=\"progress\">\n                        <div class=\"progress-bar progress-bar-success\"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-edit"]["control"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper;
+
+  return "        <label class=\""
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + " control-label alpaca-control-label\" for=\""
+    + this.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\">"
+    + ((stack1 = this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1), depth0)) != null ? stack1 : "")
+    + "</label>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.labelClass : stack1), depth0));
+},"4":function(depth0,helpers,partials,data) {
+    return "";
+},"6":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"each","hash":{},"fn":this.program(7, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"7":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <p class=\"help-block "
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1),{"name":"if","hash":{},"fn":this.program(8, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n            <i class=\"glyphicon glyphicon-info-sign\"></i>\n            "
+    + ((stack1 = this.lambda(depth0, depth0)) != null ? stack1 : "")
+    + "\n        </p>\n";
+},"8":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return this.escapeExpression(this.lambda(((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helperClass : stack1), depth0));
+},"10":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"if","hash":{},"fn":this.program(11, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "");
+},"11":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "            <div class=\"alpaca-control-buttons-container\">\n"
+    + ((stack1 = helpers.each.call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.buttons : stack1),{"name":"each","hash":{},"fn":this.program(12, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </div>\n";
+},"12":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
+
+  return "                <button data-key=\""
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" type=\""
+    + alias3(((helper = (helper = helpers.type || (depth0 != null ? depth0.type : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"type","hash":{},"data":data}) : helper)))
+    + "\" class=\"alpaca-control-button alpaca-control-button-"
+    + alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + " "
+    + alias3(((helper = (helper = helpers.styles || (depth0 != null ? depth0.styles : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"styles","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.value : depth0),{"name":"each","hash":{},"fn":this.program(13, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ">"
+    + ((stack1 = ((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "</button>\n";
+},"13":function(depth0,helpers,partials,data) {
+    var helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
+
+  return alias3(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"key","hash":{},"data":data}) : helper)))
+    + "=\""
+    + alias3(((helper = (helper = helpers.value || (depth0 != null ? depth0.value : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"value","hash":{},"data":data}) : helper)))
+    + "\" ";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"form-group\">\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.label : stack1),{"name":"if","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n        ";
+  stack1 = ((helper = (helper = helpers.control || (depth0 != null ? depth0.control : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"control","hash":{},"fn":this.program(4, data, 0),"inverse":this.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0,options) : helper));
+  if (!helpers.control) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.helpers : stack1),{"name":"if","hash":{},"fn":this.program(6, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers['if'].call(depth0,((stack1 = (depth0 != null ? depth0.options : depth0)) != null ? stack1.renderButtons : stack1),{"name":"if","hash":{},"fn":this.program(10, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
+this["HandlebarsPrecompiled"]["bootstrap-edit"]["message"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function";
+
+  return "<script type=\"text/x-handlebars-template\">\n\n    <div class=\"help-block alpaca-message alpaca-message-"
+    + ((stack1 = ((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\">\n        <i class=\"glyphicon glyphicon-exclamation-sign\"></i>&nbsp;"
+    + ((stack1 = ((helper = (helper = helpers.message || (depth0 != null ? depth0.message : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"message","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\n    </div>\n\n</script>";
+},"useData":true});
 /**
  * Using fork:
  * https://github.com/kcmoot/Base.js-Fork/blob/master/build/base.js
@@ -5329,7 +4295,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     return (existing ? true : false);
                 }
                 else if ("destroy" === specialFunctionName) {
-                    existing.destroy();
+                    if (existing) {
+                        existing.destroy();
+                    }
                     return;
                 }
 
@@ -5510,6 +4478,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // pick first element in form
                                 if (field.children && field.children.length > 0)
                                 {
+                                    /*
                                     for (var z = 0; z < field.children.length; z++)
                                     {
                                         if (field.children[z].isControlField)
@@ -5521,6 +4490,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                             }
                                         }
                                     }
+                                    */
+
+                                    doFocus(field);
                                 }
                             }
                             else if (typeof(options.focus) === "string")
@@ -5763,9 +4735,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Finds whether a variable is empty.
          * @param {Any} obj The variable being evaluated.
+         * @param [boolean] includeFunctions whether to include functions in any counts
          * @returns {Boolean} True if the variable is empty, false otherwise.
          */
-        isEmpty: function(obj) {
+        isEmpty: function(obj, includeFunctions) {
 
             var self = this;
 
@@ -5780,7 +4753,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (obj && Alpaca.isObject(obj))
             {
-                var count = self.countProperties(obj);
+                var count = self.countProperties(obj, includeFunctions);
                 if (count === 0)
                 {
                     return true;
@@ -5794,18 +4767,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          * Counts the number of properties in an object.
          *
          * @param obj
+         * @param includeFunctions
+         *
          * @returns {number}
          */
-        countProperties: function(obj) {
+        countProperties: function(obj, includeFunctions) {
             var count = 0;
 
             if (obj && Alpaca.isObject(obj))
             {
                 for (var k in obj)
                 {
-                    if (obj.hasOwnProperty(k) && typeof(obj[k]) !== "function")
+                    if (obj.hasOwnProperty(k))
                     {
-                        count++;
+                        if (includeFunctions) {
+                            count++;
+                        } else {
+                            if (typeof(obj[k]) !== "function") {
+                                count++;
+                            }
+                        }
                     }
                 }
             }
@@ -6049,6 +5030,41 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * Makes a best guess at the options field type if none provided.
+         *
+         * @param schema
+         * @returns {string} the field type
+         */
+        guessOptionsType: function(schema)
+        {
+            var type = null;
+
+            if (schema && typeof(schema["enum"]) !== "undefined")
+            {
+                if (schema["enum"].length > 3)
+                {
+                    type = "select";
+                }
+                else
+                {
+                    type = "radio";
+                }
+            }
+            else
+            {
+                type = Alpaca.defaultSchemaFieldMapping[schema.type];
+            }
+
+            // check if it has format defined
+            if (schema.format && Alpaca.defaultFormatFieldMapping[schema.format])
+            {
+                type = Alpaca.defaultFormatFieldMapping[schema.format];
+            }
+
+            return type;
+        },
+
+        /**
          * Alpaca Views.
          */
         views: {},
@@ -6255,7 +5271,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         regexps:
         {
             "email": /^[a-z0-9!\#\$%&'\*\-\/=\?\+\-\^_`\{\|\}~]+(?:\.[a-z0-9!\#\$%&'\*\-\/=\?\+\-\^_`\{\|\}~]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,6}$/i,
-            "url": /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(\:[0-9]{1,5})?(([0-9]{1,5})?\/.*)?$/i,
+            "url": /^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(\:[0-9]{1,5})?(\/.*)?$/i,
+            "intranet-url": /^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*(\:[0-9]{1,5})?(\/.*)?$/i,
             "password": /^[0-9a-zA-Z\x20-\x7E]*$/,
             "date": /^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.]\d\d$/,
             "integer": /^([\+\-]?([1-9]\d*)|0)$/,
@@ -6263,7 +5280,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             "phone":/^(\D?(\d{3})\D?\D?(\d{3})\D?(\d{4}))?$/,
             "ipv4":/^(?:1\d?\d?|2(?:[0-4]\d?|[6789]|5[0-5]?)?|[3-9]\d?|0)(?:\.(?:1\d?\d?|2(?:[0-4]\d?|[6789]|5[0-5]?)?|[3-9]\d?|0)){3}$/,
             "zipcode-five": /^(\d{5})?$/,
-            "zipcode-nine": /^(\d{5}(-\d{4})?)?$/
+            "zipcode-nine": /^(\d{5}(-\d{4})?)?$/,
+            "whitespace": /^\s+$/
         },
 
         /**
@@ -6734,11 +5752,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          * Finds whether a variable has empty value or not.
          *
          * @param {Any} val Variable to be evaluated.
+         * @param [boolean] includeFunctions whether to include function in any counts
+         *
          * @returns {Boolean} True if the variable has empty value, false otherwise.
          */
-        isValEmpty : function(val) {
+        isValEmpty : function(val, includeFunctions) {
             var empty = false;
-            if (Alpaca.isEmpty(val)) {
+            if (Alpaca.isEmpty(val, includeFunctions)) {
                 empty = true;
             } else {
                 if (Alpaca.isString(val) && val === "") {
@@ -7056,20 +6076,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          * @returns {Alpaca.Field} New field instance.
          */
         createFieldInstance : function(el, data, options, schema, view, connector, errorCallback) {
+
             // make sure options and schema are not empty
-            if (Alpaca.isValEmpty(options)) {
+            if (Alpaca.isValEmpty(options, true)) {
                 options = {};
             }
-            if (Alpaca.isValEmpty(schema)) {
+            if (Alpaca.isValEmpty(schema, true)) {
                 schema = {};
             }
+
             // options can be a string that identifies the kind of field to construct (i.e. "text")
             if (options && Alpaca.isString(options)) {
                 var fieldType = options;
                 options = {};
                 options.type = fieldType;
             }
-            if (!options.type) {
+            if (!options.type)
+            {
                 // if nothing passed in, we can try to make a guess based on the type of data
                 if (!schema.type) {
                     schema.type = Alpaca.getSchemaType(data);
@@ -7082,19 +6105,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         schema.type = "object"; // fallback
                     }
                 }
-                if (schema && schema["enum"]) {
-                    if (schema["enum"].length > 3) {
-                        options.type = "select";
-                    } else {
-                        options.type = "radio";
-                    }
-                } else {
-                    options.type = Alpaca.defaultSchemaFieldMapping[schema.type];
-                }
-                // check if it has format defined
-                if (schema.format && Alpaca.defaultFormatFieldMapping[schema.format]) {
-                    options.type = Alpaca.defaultFormatFieldMapping[schema.format];
-                }
+
+                // using what we now about schema, try to guess the type
+                options.type = Alpaca.guessOptionsType(schema);
             }
             // find the field class registered for this field type
             var FieldClass = Alpaca.getFieldClass(options.type);
@@ -7228,7 +6241,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (template && typeof(template) === "string")
                 {
                     var x = template.toLowerCase();
-                    if (x.indexOf("http://") === 0 || x.indexOf("https://") === 0 || x.indexOf("/") === 0 || x.indexOf("./") === 0)
+                    if (Alpaca.isUri(x))
                     {
                         // we assume this is a URL and let the template engine deal with it
                     }
@@ -7963,7 +6976,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         }
         else
         {
-            if (schema && schema.properties)
+            if (schema.properties)
             {
                 for (var propertyId in schema.properties)
                 {
@@ -7979,6 +6992,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     {
                         return x;
                     }
+                }
+            }
+            else if (schema.items)
+            {
+                var subSchema = schema.items;
+                var subOptions = null;
+                if (options && options.items)
+                {
+                    subOptions = options.items;
+                }
+
+                var x = Alpaca.resolveReference(subSchema, subOptions, referenceId);
+                if (x)
+                {
+                    return x;
                 }
             }
         }
@@ -9772,6 +8800,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
      */
     Alpaca.createEmptyDataInstance = function(schema)
     {
+        if (!schema) {
+            return "";
+        }
+
+        if (schema.type === "object") {
+            return {};
+        }
+
+        if (schema.type === "array") {
+            return [];
+        }
+
+        if (schema.type === "number") {
+            return -1;
+        }
+
+        if (schema.type === "boolean") {
+            return false;
+        }
+
         return "";
     };
 
@@ -9845,6 +8893,49 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         _swap(source, target, duration, callback);
     };
+
+    Alpaca.readCookie = function(name)
+    {
+        function _readCookie(name)
+        {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++)
+            {
+                var c = ca[i];
+                while (c.charAt(0)==' ')
+                {
+                    c = c.substring(1,c.length);
+                }
+
+                if (c.indexOf(nameEQ) == 0)
+                {
+                    return c.substring(nameEQ.length,c.length);
+                }
+            }
+            return null;
+        }
+
+        var value = null;
+
+        if (typeof(document) !== "undefined")
+        {
+            value = _readCookie(name);
+        }
+
+        return value;
+    };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // CSRF Support
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    Alpaca.CSRF_TOKEN = null;
+    Alpaca.CSRF_COOKIE_NAMES = ["CSRF-TOKEN", "XSRF-TOKEN"];
+    Alpaca.CSRF_HEADER_NAME = "X-CSRF-TOKEN";
+
 
 })(jQuery);
 
@@ -10459,7 +9550,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (Alpaca.isString(template))
             {
                 var lc = template.toLowerCase();
-                if (lc.indexOf("http://") === 0 || lc.indexOf("https://") === 0 || lc.indexOf("./") === 0 || lc.indexOf("/") === 0 || lc.indexOf("../") === 0)
+                if (Alpaca.isUri(lc))
                 {
                     type = "uri";
                 }
@@ -10862,6 +9953,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         return message;
     });
 
+    Handlebars.registerHelper("disguise", function(text, character) {
+
+        var replaced = "";
+        for (var i = 0; i < text.length; i++) {
+            replaced += character;
+        }
+
+        return replaced;
+
+    });
+
 
 
     //Handlebars.registerHelper("each", helpers["each"]);
@@ -10932,6 +10034,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var functionString = Handlebars.precompile(html);
                 template = eval("(" + functionString + ")"); // jshint ignore:line
 
+                // convert to function - fn(model)
+                template = Handlebars.template(template);
+
                 // CACHE: write
                 COMPILED_TEMPLATES[cacheKey] = template;
             }
@@ -10960,7 +10065,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var html = null;
             try
             {
-                html = Handlebars.template(templateFunction)(model);
+                html = templateFunction(model);
             }
             catch (e)
             {
@@ -11299,7 +10404,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         getViewParam: function (configId, topLevelOnly) {
 
-            // Try the fields
+            var self = this;
+
+            // look for exact match
             var fieldPath = this.field.path;
             if (this.fields && this.fields[fieldPath]) {
                 var configVal = this._getConfigVal(this.fields[fieldPath], configId);
@@ -11308,11 +10415,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            // array related field path
+            // array related field path (using [*] syntax)  i.e.  /a/b[*]/c/d[*]/e
             if (fieldPath && fieldPath.indexOf('[') !== -1 && fieldPath.indexOf(']') !== -1) {
-                fieldPath = fieldPath.replace(/\[\d+\]/g,"[*]");
-                if (this.fields && this.fields[fieldPath]) {
-                    var configVal = this._getConfigVal(this.fields[fieldPath], configId);
+                var newFieldPath = fieldPath.replace(/\[\d+\]/g,"[*]");
+                if (this.fields && this.fields[newFieldPath]) {
+                    var configVal = this._getConfigVal(this.fields[newFieldPath], configId);
+                    if (!Alpaca.isEmpty(configVal)) {
+                        return configVal;
+                    }
+                }
+            }
+
+            // array related field path (using pure path syntax)   i.e. /a/b/c/d/e
+            if (fieldPath && fieldPath.indexOf('[') !== -1 && fieldPath.indexOf(']') !== -1) {
+                var newFieldPath = fieldPath.replace(/\[\d+\]/g,"");
+                if (this.fields && this.fields[newFieldPath]) {
+                    var configVal = this._getConfigVal(this.fields[newFieldPath], configId);
                     if (!Alpaca.isEmpty(configVal)) {
                         return configVal;
                     }
@@ -11469,6 +10587,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.options.helper = this.schema.description;
             }
             */
+
+            // legacy support: options.helper -> convert to options.helpers
+            if (!this.options.helpers) {
+                this.options.helpers = [];
+            }
+            if (this.options.helper) {
+                if (!Alpaca.isArray(this.options.helper)) {
+                    this.options.helpers.push(this.options.helper);
+                } else {
+                    for (var i = 0; i < this.options.helper.length; i++) {
+                        this.options.helpers.push(this.options.helper[i]);
+                    }
+                }
+
+                // remove legacy value
+                delete this.options.helper;
+            }
 
             if (Alpaca.isEmpty(this.options.readonly) && !Alpaca.isEmpty(this.schema.readonly)) {
                 this.options.readonly = this.schema.readonly;
@@ -11689,7 +10824,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         on: function(name, fn)
         {
             Alpaca.logDebug("Adding listener for event: " + name);
-            this._events[name] = fn;
+
+            if (!this._events[name]) {
+                this._events[name] = [];
+            }
+
+            this._events[name].push(fn);
             return this;
         },
 
@@ -11719,27 +10859,33 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          *
          * @returns {null}
          */
-        trigger: function(name, event)
+        trigger: function(name, event, arg1, arg2, arg3)
         {
             // NOTE: this == control
 
-            var handler = this._events[name];
-
-            var ret = null;
-            if (typeof(handler) === "function")
+            var handlers = this._events[name];
+            if (handlers)
             {
-                Alpaca.logDebug("Firing event: " + name);
-                try
+                for (var i = 0; i < handlers.length; i++)
                 {
-                    ret = handler.call(this, event);
-                }
-                catch (e)
-                {
-                    Alpaca.logDebug("The event handler caught an exception: " + name);
+                    var handler = handlers[i];
+
+                    var ret = null;
+                    if (typeof(handler) === "function")
+                    {
+                        Alpaca.logDebug("Firing event: " + name);
+                        try
+                        {
+                            ret = handler.call(this, event, arg1, arg2, arg3);
+                        }
+                        catch (e)
+                        {
+                            Alpaca.logDebug("The event handler caught an exception: " + name);
+                            Alpaca.logDebug(e);
+                        }
+                    }
                 }
             }
-
-            return ret;
         },
 
         /**
@@ -11816,6 +10962,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 else
                 {
+                    // generate name from the path
                     if (this.path)
                     {
                         this.name = this.path.replace(/\//g,"").replace(/\[/g,"_").replace(/\]/g,"");
@@ -11879,6 +11026,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         // allow any post-rendering facilities to kick in
                         self.postRender(function() {
 
+                            // finished initializing
+                            self.initializing = false;
+
+                            // allow for form to do some late updates
+                            if (self.form)
+                            {
+                                self.form.afterInitialize();
+                            }
+
                             // callback
                             if (callback && Alpaca.isFunction(callback))
                             {
@@ -11899,6 +11055,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     // allow any post-rendering facilities to kick in
                     self.postRender(function() {
+
+                        // finished initializing
+                        self.initializing = false;
 
                         // callback
                         if (callback && Alpaca.isFunction(callback))
@@ -12028,6 +11187,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * This gets called typically once per render.  If a DOM element is moved within a container and it's indexing
+         * changes, this will get called against to ensure that DOM properties are kept in sync.
+         */
+        updateDOMElement: function()
+        {
+            // all fields get their path
+            this.field.attr("data-alpaca-field-path", this.getPath());
+
+            // all fields get their name
+            this.field.attr("data-alpaca-field-name", this.getName());
+
+            // name should not appear on field
+            this.field.removeAttr("name");
+        },
+
+        /**
          * This method will be called after the field rendition is complete. It is served as a way to make final
          * modifications to the dom elements that were produced.
          */
@@ -12043,6 +11218,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // all fields get field id data attribute
             this.field.attr("data-alpaca-field-id", this.getId());
+
+            this.updateDOMElement();
 
             // try to avoid adding unnecessary injections for display view.
             if (this.view.type !== 'view') {
@@ -12066,7 +11243,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var doDisableField = function()
                 {
                     // mark "disabled" attribute onto underlying element
-                    Alpaca.disabled($(':input', self.field), true);
+                    Alpaca.disabled($('input', self.field), true);
                     Alpaca.disabled($('select', self.field), true);
                     Alpaca.disabled($(':radio', self.field), true);
                     Alpaca.disabled($(':checkbox', self.field), true);
@@ -12084,7 +11261,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     });
 
                     // special case (input field)
-                    $(":input", self.field).off().click(function(e) {
+                    $("input", self.field).off().click(function(e) {
                         e.preventDefault();
                         e.stopImmediatePropagation();
                         return false;
@@ -12097,7 +11274,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 {
                     $(this.field).addClass("alpaca-readonly");
 
-                    $(':input', this.field).attr('readonly', 'readonly');
+                    $('input', this.field).attr('readonly', 'readonly');
 
                     // disable the field
                     doDisableField();
@@ -12203,9 +11380,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             {
                 this.field.hide();
             }
-
-            // finished initializing
-            this.initializing = false;
 
             var defaultHideInitValidationError = (this.view.type === 'create') && !this.refreshed;
             this.hideInitValidationError = Alpaca.isValEmpty(this.options.hideInitValidationError) ? defaultHideInitValidationError : this.options.hideInitValidationError;
@@ -12326,10 +11500,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return this.id;
         },
 
-        /*        getType: function() {
-         return this.type;
-         },*/
-
         /**
          * Returns this field's parent.
          *
@@ -12340,12 +11510,46 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * Retrieves the path to this element in the graph of JSON data.
+         *
+         * @returns {string} the path to this element
+         */
+        getPath: function() {
+            return this.path;
+        },
+
+        /**
+         * Retrieves the name of this element at the current level of JSON data.
+         *
+         * @returns {*}
+         */
+        getName: function() {
+            return this.name;
+        },
+
+        /**
          * Finds if this field is top level.
          *
          * @returns {Boolean} True if this field is the top level one, false otherwise.
          */
         isTopLevel: function() {
             return Alpaca.isEmpty(this.parent);
+        },
+
+        /**
+         * Walks up the parent chain and returns the top most control.  If no parents, then current control is top control.
+         *
+         * @returns {Control} top most control
+         */
+        top: function()
+        {
+            var top = this;
+
+            while (top.parent) {
+                top = top.parent;
+            }
+
+            return top;
         },
 
         /**
@@ -12375,6 +11579,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.updateObservable();
 
             this.triggerUpdate();
+
+            // special case - if we're in a display mode and not first render, then do a refresh here
+            if (this.isDisplayOnly() && !this.initializing)
+            {
+                this.refresh();
+            }
         },
 
         /**
@@ -12428,6 +11638,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // remove any alpaca messages for this field
             $(this.getFieldEl()).children(".alpaca-message").remove();
+
+            // maxMessage
+            if (messages && messages.length > 0) {
+                if(this.options.maxMessages && Alpaca.isNumber(this.options.maxMessages) && this.options.maxMessages > -1) {
+                    messages = messages.slice(0,this.options.maxMessages);
+                }
+            }
 
             // CALLBACK: "removeMessages"
             self.fireCallback("removeMessages");
@@ -12711,8 +11928,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return false;
             }
 
+            if (this.options.disallowOnlyEmptySpaces && Alpaca.testRegex(Alpaca.regexps.whitespace, this.getValue())) {
+                return false;
+            }
+
             return true;
         },
+
 
         /**
          * Checks whether the field value is allowed or not.
@@ -12770,9 +11992,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         /**
          * Focuses on the field.
+         *
+         * If a callback is provided, the callback receives the control focused upon.
          */
-        focus: function() {
+        focus: function(onFocusCallback) {
             // OVERRIDE
+
+            if (onFocusCallback)
+            {
+                onFocusCallback(this);
+            }
+
         },
 
         /**
@@ -13039,6 +12269,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             {
                 this.refreshValidationState();
             }
+
+            // trigger "fieldblur"
+            $(this.field).trigger("fieldblur");
         },
 
         /**
@@ -13080,27 +12313,44 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          * @returns {Alpaca.Field} Field control mapped to the path.
          */
         getControlByPath: function(path) {
-            var parentControl = this;
-            if (path) {
+
+            var result = null;
+
+            if (path)
+            {
+                // strip off the leading "/" if it is there
+                if (path.indexOf("/") === 0) {
+                    path = path.substring(1);
+                }
+
+                // strip off the trailing "/" if it is there
+                if (Alpaca.endsWith(path, "/")) {
+                    path = path.substring(0, path.length - 1);
+                }
+
+                var current = this;
+
                 var pathArray = path.split('/');
-                for (var i = 0; i < pathArray.length; i++) {
-                    if (!Alpaca.isValEmpty(pathArray[i])) {
-                        if (parentControl && parentControl.childrenByPropertyId) {
-                            //check to see if we need to add the properties field
-                            if (parentControl.childrenByPropertyId[pathArray[i]]) {
-                                parentControl = parentControl.childrenByPropertyId[pathArray[i]];
-                            } else {
-                                return null;
-                            }
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        return null;
+                for (var i = 0; i < pathArray.length; i++)
+                {
+                    var pathElement = pathArray[i];
+
+                    if (pathElement.indexOf("[") === 0)
+                    {
+                        // index into an array
+                        var index = parseInt(pathElement.substring(1, pathElement.length - 1), 10);
+                        current = current.children[index];
+                    }
+                    else
+                    {
+                        current = current.childrenByPropertyId[pathElement];
                     }
                 }
-                return parentControl;
+
+                result = current;
             }
+
+            return result;
         },
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13476,6 +12726,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "description": "Field help message.",
                         "type": "string"
                     },
+                    "helpers": {
+                        "title": "Helpers",
+                        "description": "An array of field help messages.  Each message will be displayed on it's own line.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
                     "fieldClass": {
                         "title": "CSS class",
                         "description": "Specifies one or more CSS classes that should be applied to the dom element for this field once it is rendered.  Supports a single value, comma-delimited values, space-delimited values or values passed in as an array.",
@@ -13533,12 +12791,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     "enum":["post","get"],
                                     "type": "string"
                                 },
-				"rubyrails": {
-				    "title": "Ruby On Rails",
-				    "description": "Ruby on Rails Name Standard",
-				    "enum": ["true", "false"],
-				    "type": "string"
-				},
+                                "rubyrails": {
+                                    "title": "Ruby On Rails",
+                                    "description": "Ruby on Rails Name Standard",
+                                    "enum": ["true", "false"],
+                                    "type": "string"
+                                },
                                 "name": {
                                     "title": "Name",
                                     "description": "Form name",
@@ -13622,6 +12880,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     },
                     "helper": {
                         "type": "textarea"
+                    },
+                    "helpers": {
+                        "type": "array",
+                        "items": {
+                            "type": "textarea"
+                        }
                     },
                     "fieldClass": {
                         "type": "text"
@@ -13737,6 +13001,34 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             this.controlDescriptor = this.view.getTemplateDescriptor("control-" + controlTemplateType, self);
+
+            // buttons
+            if (typeof(this.options.renderButtons) === "undefined")
+            {
+                this.options.renderButtons = true;
+            }
+            if (this.options.buttons)
+            {
+                for (var k in this.options.buttons)
+                {
+                    if (this.options.buttons[k].label)
+                    {
+                        this.options.buttons[k].value = this.options.buttons[k].label;
+                    }
+                    if (this.options.buttons[k].title)
+                    {
+                        this.options.buttons[k].value = this.options.buttons[k].title;
+                    }
+                    if (!this.options.buttons[k].type)
+                    {
+                        this.options.buttons[k].type = "button";
+                    }
+                    if (!this.options.buttons[k].styles)
+                    {
+                        this.options.buttons[k].styles = this.view.styles.button;
+                    }
+                }
+            }
         },
 
         getControlEl: function()
@@ -13871,6 +13163,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         beforeRenderControl: function(model, callback)
         {
+            var self = this;
+
             callback();
         },
 
@@ -13898,6 +13192,34 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     self.updateObservable();
                 }
             }
+
+            // buttons
+            $(this.getFieldEl()).find(".alpaca-control-button").each(function() {
+
+                $(this).click(function(e) {
+                    $(this).attr("button-pushed", true);
+                });
+
+                // custom click handler?
+                var key = $(this).attr("data-key");
+                if (key)
+                {
+                    var buttonConfig = self.options.buttons[key];
+                    if (buttonConfig)
+                    {
+                        if (buttonConfig.click)
+                        {
+                            $(this).click(function(control, handler) {
+                                return function(e) {
+                                    e.preventDefault();
+                                    handler.call(control, e);
+                                }
+                            }(self, buttonConfig.click));
+                        }
+                    }
+                }
+            });
+
 
             callback();
         },
@@ -13951,11 +13273,52 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * Ensures that the "name" property on the control is kept in sync.
+         */
+        updateDOMElement: function()
+        {
+            this.base();
+
+            // update the name field
+            this.control.attr("name", this.getName());
+        },
+
+        /**
          * @see Alpaca.Field#setDefault
          */
         setDefault: function() {
             var defaultData = Alpaca.isEmpty(this.schema['default']) ? "" : this.schema['default'];
             this.setValue(defaultData);
+        },
+
+        /**
+         * Returns the value of this field.
+         *
+         * @returns {Any} value Field value.
+         */
+        getValue: function()
+        {
+            var self = this;
+
+            var value = this.base();
+
+            if (!this.isDisplayOnly())
+            {
+                value = self.getControlValue();
+            }
+
+            // some correction for type
+            value = self.ensureProperType(value);
+
+            return value;
+        },
+
+        /**
+         * Extension point
+         */
+        getControlValue: function()
+        {
+            return this._getControlVal(true);
         },
 
         /**
@@ -14035,34 +13398,60 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             });
 
             control.focus(function(e) {
+
+                self.wasFocused = true;
+
                 if (!self.suspendBlurFocus)
                 {
-                    self.onFocus.call(self, e);
-                    self.trigger("focus", e);
+                    var x = self.onFocus.call(self, e);
+                    if (x !== false) {
+                        x = self.trigger("focus", e);
+                    }
+
+                    return x;
                 }
             });
 
             control.blur(function(e) {
+
+                self.wasBlurred = true;
+
                 if (!self.suspendBlurFocus)
                 {
-                    self.onBlur.call(self, e);
-                    self.trigger("blur", e);
+                    var x = self.onBlur.call(self, e);
+                    if (x !== false) {
+                        x = self.trigger("blur", e);
+                    }
+
+                    return x;
                 }
             });
 
             control.keypress(function(e) {
-                self.onKeyPress.call(self, e);
-                self.trigger("keypress", e);
+                var x = self.onKeyPress.call(self, e);
+                if (x !== false) {
+                    x = self.trigger("keypress", e);
+                }
+
+                return x;
             });
 
             control.keyup(function(e) {
-                self.onKeyUp.call(self, e);
-                self.trigger("keyup", e);
+                var x = self.onKeyUp.call(self, e);
+                if (x !== false) {
+                    x = self.trigger("keyup", e);
+                }
+
+                return x;
             });
 
             control.keydown(function(e) {
-                self.onKeyDown.call(self, e);
-                self.trigger("keydown", e);
+                var x = self.onKeyDown.call(self, e);
+                if (x !== false) {
+                    x = self.trigger("keydown", e);
+                }
+
+                return x;
             });
         },
 
@@ -14075,14 +13464,32 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             var self = this;
 
-            // if the field is currently invalid, then we provide early feedback to the user as to when they enter
-            // if the field was valid, we don't render invalidation feedback until they blur the field
+            var refresh = false;
 
-            // was the control valid previously?
-            var wasValid = this.isValid();
-            if (!wasValid)
+            // if we're in edit mode
+            if (self.view.type && self.view.type === 'edit')
             {
-                //
+                // if the field is currently invalid, then we provide early feedback to the user as to when they enter
+                // if the field was valid, we don't render invalidation feedback until they blur the field
+
+                // was the control valid previously?
+                var wasValid = this.isValid();
+                if (!wasValid)
+                {
+                    refresh = true;
+                }
+            }
+            else if (self.view.type && self.view.type === 'create')
+            {
+                var wasValid = this.isValid();
+                if (!wasValid && self.wasBlurred)
+                {
+                    refresh = true;
+                }
+            }
+
+            if (refresh)
+            {
                 // we use a timeout because at this exact moment, the value of the control is still the old value
                 // jQuery raises the keypress event ahead of the input receiving the new data which would incorporate
                 // the key that was pressed
@@ -14090,7 +13497,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // this timeout provides the browser with enough time to plug the value into the input control
                 // which the validation logic uses to determine whether the control is now in a valid state
                 //
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     self.refreshValidationState();
                 }, 50);
             }
@@ -14148,6 +13555,86 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             {
                 $(this.control).prop("disabled", false);
             }
+        },
+
+        /**
+         * Sorts the schema.enum and options.optionLabels into a display order that is described by sortSelectableOptions().
+         * This ensures that drop down values are in some sensible display order (alphabetical / numeric) for the end user.
+         */
+        sortEnum: function()
+        {
+            var self = this;
+
+            if (self.schema.enum && self.schema.enum.length > 0)
+            {
+                var selectableOptions = [];
+
+                for (var i = 0; i < self.schema.enum.length; i++)
+                {
+                    var value = self.schema.enum[i];
+                    var text = self.schema.enum[i];
+
+                    if (self.options && self.options.optionLabels && self.options.optionLabels.length >= i + 1)
+                    {
+                        text = self.options.optionLabels[i];
+                    }
+
+                    selectableOptions.push({
+                        "value": value,
+                        "text": text
+                    });
+                }
+
+                // sort it
+                self.sortSelectableOptions(selectableOptions);
+
+                // now set back
+                self.schema.enum = [];
+                self.options.optionLabels = [];
+                for (var i = 0; i < selectableOptions.length; i++)
+                {
+                    self.schema.enum.push(selectableOptions[i].value);
+                    self.options.optionLabels.push(selectableOptions[i].text);
+                }
+            }
+        },
+
+        /**
+         * Sorts a select options array by order of displayable text.
+         *
+         * If you're looking to provide a custom sort order, you may wish to override this function.
+         * Alternatively, you can provide an options.sort function - fn(a, b).
+         *
+         * @param selectableOptions
+         */
+        sortSelectableOptions: function(selectableOptions)
+        {
+            var self = this;
+
+            var defaultSort = function(a, b) {
+
+                if (a.text > b.text) {
+                    return 1;
+                }
+                else if (a.text < b.text) {
+                    return -1;
+                }
+
+                return 0;
+            };
+
+            // assume a default sort function
+            var sortFn = defaultSort;
+
+            // is there a custom sort function defined?
+            if (self.options.sort) {
+                if (typeof(self.options.sort) === "function") {
+                    sortFn = self.options.sort;
+                }
+            }
+
+            // sort it
+            selectableOptions.sort(sortFn);
         }
 
 
@@ -14197,6 +13684,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "title": "Field Name",
                         "description": "Field Name.",
                         "type": "string"
+                    },
+                    "sort": {
+                        "title": "Sort Function",
+                        "description": "Defines an f(a,b) sort function for the array of enumerated values [{text, value}].  This is used to sort enum and optionLabels as well as results that come back from any data sources (for select and radio controls).",
+                        "type": "function"
                     }
                 }
             });
@@ -14672,6 +14164,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                         if (holder.length > 0)
                         {
+                            // appending into a layout binding holder
                             $(item.containerItemEl).appendTo(holder);
 
                             // reset domEl to allow for refresh
@@ -14775,56 +14268,83 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          * This method gets invoked after items are dynamically added, removed or moved around in the child chain.
          * It adjusts classes on child DOM elements to make sure they're correct.
          */
-        updateChildDOMElements: function()
+        updateDOMElement: function()
         {
             var self = this;
 
-            var layoutBindings = null;
-            if (self.view.getLayout()) {
-                layoutBindings = self.view.getLayout().bindings;
+            this.base();
+
+            if (self.children.length > 0)
+            {
+                $(self.getContainerEl()).addClass("alpaca-container-has-items");
+                $(self.getContainerEl()).attr("data-alpaca-container-item-count", self.children.length);
+            }
+            else
+            {
+                $(self.getContainerEl()).removeClass("alpaca-container-has-items");
+                $(self.getContainerEl()).removeAttr("data-alpaca-container-item-count");
             }
 
-            if (!layoutBindings)
+            for (var i = 0; i < self.children.length; i++)
             {
-                if (self.children.length > 0)
+                var child = self.children[i];
+
+                // set path if not set
+                if (!child.path)
                 {
-                    $(self.getContainerEl()).addClass("alpaca-container-has-items");
-                    $(self.getContainerEl()).attr("data-alpaca-container-item-count", self.children.length);
-                }
-                else
-                {
-                    $(self.getContainerEl()).removeClass("alpaca-container-has-items");
-                    $(self.getContainerEl()).removeAttr("data-alpaca-container-item-count");
-                }
-
-                for (var i = 0; i < self.children.length; i++)
-                {
-                    var child = self.children[i];
-
-                    // reset path and name
-                    child.path = self.path + "[" + i + "]";
-                    child.calculateName();
-
-                    $(child.containerItemEl).removeClass("alpaca-container-item-first");
-                    $(child.containerItemEl).removeClass("alpaca-container-item-last");
-                    $(child.containerItemEl).removeClass("alpaca-container-item-index");
-                    $(child.containerItemEl).removeClass("alpaca-container-item-key");
-
-                    $(child.containerItemEl).addClass("alpaca-container-item");
-
-                    if (i === 0)
+                    if (child.schema.type === "array")
                     {
-                        $(child.containerItemEl).addClass("alpaca-container-item-first");
+                        child.path = self.path + "[" + i + "]";
                     }
-                    if (i + 1 === self.children.length)
+                    else
                     {
-                        $(child.containerItemEl).addClass("alpaca-container-item-last");
+                        child.path = self.path + "/" + child.propertyId;
                     }
-
-                    $(child.containerItemEl).attr("data-alpaca-container-item-index", i);
-                    $(child.containerItemEl).attr("data-alpaca-container-item-name", child.name);
-                    $(child.containerItemEl).attr("data-alpaca-container-item-parent-field-id", self.getId());
                 }
+
+                child.calculateName();
+
+                $(child.containerItemEl).removeClass("alpaca-container-item-first");
+                $(child.containerItemEl).removeClass("alpaca-container-item-last");
+                $(child.containerItemEl).removeClass("alpaca-container-item-index");
+                $(child.containerItemEl).removeClass("alpaca-container-item-key");
+
+                $(child.containerItemEl).addClass("alpaca-container-item");
+
+                if (i === 0)
+                {
+                    $(child.containerItemEl).addClass("alpaca-container-item-first");
+                }
+                if (i + 1 === self.children.length)
+                {
+                    $(child.containerItemEl).addClass("alpaca-container-item-last");
+                }
+
+                $(child.containerItemEl).attr("data-alpaca-container-item-index", i);
+                $(child.containerItemEl).attr("data-alpaca-container-item-name", child.name);
+                $(child.containerItemEl).attr("data-alpaca-container-item-parent-field-id", self.getId());
+
+                child.updateDOMElement();
+            }
+        },
+
+        /**
+         * Gets called whenever an item is dynamically added or removed from a container.  This allows all of the
+         * container markers to refresh on the DOM.
+         */
+        handleRepositionDOMRefresh: function()
+        {
+            var self = this;
+
+            if (self.getParent())
+            {
+                // call update dom markers for parent which will trickle down to to cover this field and our siblings
+                self.getParent().updateDOMElement();
+            }
+            else
+            {
+                // just ourselves
+                self.updateDOMElement();
             }
         },
 
@@ -14854,30 +14374,69 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         /**
          * Focus an element in the container.  Find the first invalid element or if no invalid elements, pick
-         * the first child.
+         * the first child.  If a callback is provided, the callback is fired and passed the control element
+         * that received the focus.
          */
-        focus: function()
+        focus: function(onFocusCallback)
         {
+            var self = this;
+
+            if (this.isDisplayOnly())
+            {
+                if (onFocusCallback) {
+                    onFocusCallback();
+                }
+                return;
+            }
+
             this.base();
 
-            var index = -1;
+            var invalidIndex = -1;
 
-            for (var i = 0; i < this.children.length; i++)
+            // use the dom to create an array that orders things as they are laid out on the page
+            var pageOrderedChildren = new Array(this.children.length);
+            var el = this.getContainerEl();
+            if (this.form) {
+                el = this.form.getFormEl();
+            }
+            var pageOrder = 0;
+            $(el).find(".alpaca-container-item[data-alpaca-container-item-parent-field-id='" + this.getId() + "']").each(function() {
+                var childIndex = $(this).attr("data-alpaca-container-item-index");
+                pageOrderedChildren[pageOrder] = self.children[childIndex];
+                pageOrder++;
+            });
+
+            // walk the ordered children and find first invalid
+            for (var i = 0; i < pageOrderedChildren.length; i++)
             {
-                if (!this.children[i].isValid(true))
+                if (pageOrderedChildren[i])
                 {
-                    index = i;
-                    break;
+                    if (!pageOrderedChildren[i].isValid(true) &&
+                        pageOrderedChildren[i].isControlField &&
+                        pageOrderedChildren[i].isAutoFocusable() &&
+                        !pageOrderedChildren[i].options.readonly)
+                    {
+                        invalidIndex = i;
+                        break;
+                    }
                 }
             }
-            if (index === -1 && this.children.length > 0)
+
+            // if we didn't find anything invalid, just focus on first item
+            if (invalidIndex === -1 && pageOrderedChildren.length > 0)
             {
-                index = 0;
+                invalidIndex = 0;
             }
 
-            if (index > -1)
+            // do the focus if we found something
+            if (invalidIndex > -1)
             {
-                this.children[index].focus();
+                pageOrderedChildren[invalidIndex].focus();
+
+                if (onFocusCallback)
+                {
+                    onFocusCallback(pageOrderedChildren[invalidIndex]);
+                }
             }
         },
 
@@ -14905,6 +14464,56 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             {
                 this.children[i].enable();
             }
+        },
+
+        /**
+         * Returns the value of this field.
+         *
+         * @returns {Any} value Field value.
+         */
+        getValue: function()
+        {
+            var self = this;
+
+            var value = self.getContainerValue();
+
+            if (self.isDisplayOnly())
+            {
+                if (value)
+                {
+                    value = JSON.stringify(value, null, "  ");
+                }
+            }
+
+            return value;
+        },
+
+        /**
+         * Extension point
+         */
+        getContainerValue: function()
+        {
+            return null;
+        },
+
+        firstChild: function() {
+            var child = null;
+
+            if (this.children.length > 0) {
+                child = this.children[0];
+            }
+
+            return child;
+        },
+
+        lastChild: function() {
+            var child = null;
+
+            if (this.children.length > 0) {
+                child = this.children[this.children.length - 1];
+            }
+
+            return child;
         }
 
         /* builder_helpers */
@@ -15107,6 +14716,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // set a runtime view
             this.view = new Alpaca.RuntimeView(viewId, this);
+
+            // for each button, make sure that classes is set minimally to view.styles.button
+            for (var k in this.options.buttons)
+            {
+                if (!this.options.buttons[k].styles) {
+                    this.options.buttons[k].styles = this.view.styles.button;
+                }
+            }
+
         },
 
         /**
@@ -15139,6 +14757,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // execute callback
                 callback(self);
             });
+        },
+
+        afterInitialize: function()
+        {
+            var self = this;
+
+            if (self.options.toggleSubmitValidState) {
+
+                // adjust submit button state
+                self.adjustSubmitButtonState();
+
+            }
+
         },
 
         /**
@@ -15241,7 +14872,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // the form field
-            parentEl.find("form").attr(this.attributes);
+            $(parentEl).find("form").attr(this.attributes);
 
             // populate the buttons as well
             this.buttons = {};
@@ -15347,7 +14978,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     _this.adjustSubmitButtonState();
                 });
 
-                this.adjustSubmitButtonState();
+                $(_this.topControl.getFieldEl()).bind("fieldkeyup", function() {
+                    _this.adjustSubmitButtonState();
+                });
+
+                $(_this.topControl.getFieldEl()).bind("fieldblur", function() {
+                    _this.adjustSubmitButtonState();
+                });
+
             }
         },
 
@@ -15364,6 +15002,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         onSubmit: function(e, form)
         {
+            if (!this.isFormValid())
+            {
+                e.stopPropagation();
+
+                this.refreshValidationState(true);
+
+                return false;
+            }
+
             if (this.submitHandler)
             {
                 e.stopPropagation();
@@ -15420,10 +15067,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         /**
          * Focuses on this form.
+         *
+         * If a callback is provided, the callback receives the focused control.
          */
-        focus: function()
+        focus: function(onFocusCallback)
         {
-            this.topControl.focus();
+            this.topControl.focus(function(controlWithFocus) {
+                if (onFocusCallback)
+                {
+                    onFocusCallback(controlWithFocus);
+                }
+            });
         },
 
         /**
@@ -15518,18 +15172,62 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Fires the submit in the background and hands back the jQuery promise.
          *
+         * An optional config can be passed in to control the underlying jQuery ajax XHR.
+         *
          * @returns {*}
          */
-        ajaxSubmit: function()
+        ajaxSubmit: function(config)
         {
             var self = this;
 
-            return $.ajax({
-                data: this.getValue(),
-                url: self.options.attributes.action,
-                type: self.options.attributes.method,
-                dataType: "json"
-            });
+            if (!config) {
+                config = {};
+            }
+
+            config.url = self.options.attributes.action;
+            config.type = self.options.attributes.method;
+
+            if (!config.data) {
+                config.data = this.getValue();
+            }
+
+            if (!config.dataType) {
+                config.dataType = "json";
+            }
+            if (!config.headers) {
+                config.headers = {};
+            }
+
+            // support CSRF here
+            var csrfToken = self.determineCsrfToken();
+            if (csrfToken) {
+                config.headers[Alpaca.CSRF_HEADER_NAME] = csrfToken;
+            }
+
+            return $.ajax(config);
+        },
+
+        determineCsrfToken: function()
+        {
+            // is there a direct token specified?
+            var csrfToken = Alpaca.CSRF_TOKEN;
+            if (!csrfToken)
+            {
+                // is there a cookie that we can pull the value from?
+                for (var t = 0; t < Alpaca.CSRF_COOKIE_NAMES.length; t++)
+                {
+                    var cookieName = Alpaca.CSRF_COOKIE_NAMES[t];
+
+                    var cookieValue = Alpaca.readCookie(cookieName);
+                    if (cookieValue)
+                    {
+                        csrfToken = cookieValue;
+                        break;
+                    }
+                }
+            }
+
+            return csrfToken;
         }
 
     });
@@ -15627,11 +15325,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Loads JSON data.
          *
-         * @param {Object|String} resource Resource to be loaded.
+         * @param {Object|String} resource Resource to be loaded
+         * @param {Object} resources Map of resources
          * @param {Function} onSuccess onSuccess callback
          * @param {Function} onError onError callback
          */
-        loadData: function (resource, successCallback, errorCallback)
+        loadData: function (resource, resources, successCallback, errorCallback)
         {
             return this._handleLoadJsonResource(resource, successCallback, errorCallback);
         },
@@ -15639,11 +15338,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Loads JSON schema.
          *
-         * @param {Object|String} resource Resource to be loaded.
-         * @param {Function} onSuccess onSuccess callback.
-         * @param {Function} onError onError callback.
+         * @param {Object|String} resource Resource to be loaded
+         * @param {Object} resources Map of resources
+         * @param {Function} onSuccess onSuccess callback
+         * @param {Function} onError onError callback
          */
-        loadSchema: function (resource, successCallback, errorCallback)
+        loadSchema: function (resource, resources, successCallback, errorCallback)
         {
             return this._handleLoadJsonResource(resource, successCallback, errorCallback);
         },
@@ -15651,11 +15351,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Loads JSON options.
          *
-         * @param {Object|String} resource Resource to be loaded.
-         * @param {Function} onSuccess onSuccess callback.
-         * @param {Function} onError onError callback.
+         * @param {Object|String} resource Resource to be loaded
+         * @param {Object} resources Map of resources
+         * @param {Function} onSuccess onSuccess callback
+         * @param {Function} onError onError callback
          */
-        loadOptions: function (resource, successCallback, errorCallback)
+        loadOptions: function (resource, resources, successCallback, errorCallback)
         {
             return this._handleLoadJsonResource(resource, successCallback, errorCallback);
         },
@@ -15663,11 +15364,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Loads JSON view.
          *
-         * @param {Object|String} resource Resource to be loaded.
-         * @param {Function} onSuccess onSuccess callback.
-         * @param {Function} onError onError callback.
+         * @param {Object|String} resource Resource to be loaded
+         * @param {Object} resources Map of resources
+         * @param {Function} onSuccess onSuccess callback
+         * @param {Function} onError onError callback
          */
-        loadView: function (resource, successCallback, errorCallback)
+        loadView: function (resource, resources, successCallback, errorCallback)
         {
             return this._handleLoadJsonResource(resource, successCallback, errorCallback);
         },
@@ -15776,7 +15478,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // fire off all of the invokes
                 if (dataSource)
                 {
-                    self.loadData(dataSource, function(data) {
+                    self.loadData(dataSource, resources, function(data) {
 
                         doMerge("data", resources.data, data);
 
@@ -15786,7 +15488,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (schemaSource)
                 {
-                    self.loadSchema(schemaSource, function(schema) {
+                    self.loadSchema(schemaSource, resources, function(schema) {
 
                         doMerge("schema", resources.schema, schema);
 
@@ -15796,7 +15498,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (optionsSource)
                 {
-                    self.loadOptions(optionsSource, function(options) {
+                    self.loadOptions(optionsSource, resources, function(options) {
 
                         doMerge("options", resources.options, options);
 
@@ -15806,7 +15508,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (viewSource)
                 {
-                    self.loadView(viewSource, function(view) {
+                    self.loadView(viewSource, resources, function(view) {
 
                         doMerge("view", resources.view, view);
 
@@ -16347,26 +16049,100 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     self.branch = this;
 
+                    self.bindHelperFunctions(self.branch);
+
+                    // also store a reference on Alpaca for global use
+                    Alpaca.branch = self.branch;
+
                     onSuccess();
                 });
             });
+        },
+
+        bindHelperFunctions: function(branch)
+        {
+            if (!branch.loadAlpacaSchema)
+            {
+                branch.loadAlpacaSchema = function(schemaIdentifier, resources, callback)
+                {
+                    var uriFunction = function()
+                    {
+                        return branch.getUri() + "/alpaca/schema";
+                    };
+
+                    var params = {};
+                    params["id"] = schemaIdentifier;
+
+                    return this.chainGetResponse(this, uriFunction, params).then(function(response) {
+                        callback.call(this, null, response);
+                    });
+                };
+            }
+
+            if (!branch.loadAlpacaOptions)
+            {
+                branch.loadAlpacaOptions = function(optionsIdentifier, resources, callback)
+                {
+                    var uriFunction = function()
+                    {
+                        return branch.getUri() + "/alpaca/options";
+                    };
+
+                    var params = {};
+                    params["schemaId"] = resources.schemaSource;
+                    params["id"] = optionsIdentifier;
+
+                    return this.chainGetResponse(this, uriFunction, params).then(function(response) {
+                        callback.call(this, null, response);
+                    });
+                };
+            }
+
+            if (!branch.loadAlpacaData)
+            {
+                branch.loadAlpacaData = function(dataIdentifier, resources, callback)
+                {
+                    var uriFunction = function()
+                    {
+                        return branch.getUri() + "/alpaca/data";
+                    };
+
+                    var params = {};
+                    params["id"] = dataIdentifier;
+
+                    return this.chainGetResponse(this, uriFunction, params).then(function(response) {
+                        callback.call(this, null, response);
+                    });
+                };
+            }
         },
 
         /**
          * Loads data from Cloud CMS.
          *
          * @param {String} nodeId the node id to load
+         * @param {Object} resources Map of resources
          * @param {Function} onSuccess onSuccess callback
          * @param {Function} onError onError callback
          */
-        loadData: function (nodeId, successCallback, errorCallback)
+        loadData: function (nodeId, resources, successCallback, errorCallback)
         {
-            Chain(this.branch).trap(function(err) {
-                errorCallback(err);
-                return false;
-            }).readNode(nodeId).then(function() {
+            var self = this;
 
-                var obj = JSON.parse(JSON.stringify(this));
+            self.branch.loadAlpacaData(nodeId, resources, function(err, data) {
+
+                if (err)
+                {
+                    errorCallback(err);
+                    return;
+                }
+
+                var obj = null;
+
+                if (data)
+                {
+                    obj = JSON.parse(JSON.stringify(data));
+                }
 
                 successCallback(obj);
             });
@@ -16375,73 +16151,125 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Loads json schema from Cloud CMS.
          *
-         * @param {Object|String} qname the definition qname to load
+         * @param {Object|String} schemaIdentifier the definition qname to load
+         * @param {Object} resources Map of resources
          * @param {Function} onSuccess onSuccess callback.
          * @param {Function} onError onError callback.
          */
-        loadSchema: function (qname, successCallback, errorCallback)
+        loadSchema: function (schemaIdentifier, resources, successCallback, errorCallback)
         {
-            Chain(this.branch).trap(function(err) {
-                errorCallback(err);
-                return false;
-            }).readDefinition(qname).then(function() {
+            var self = this;
 
-                var obj = JSON.parse(JSON.stringify(this));
+            self.branch.loadAlpacaSchema(schemaIdentifier, resources, function(err, schema) {
 
-                successCallback(obj);
+                if (err)
+                {
+                    errorCallback(err);
+                    return;
+                }
+
+                // TODO: cleanup schema
+
+                successCallback(schema);
             });
         },
 
         /**
          * Loads json options from Cloud CMS.
          *
-         * @param {Object|String} formNodeId the form to load
+         * @param {Object|String} optionsIdentifier the form key to load
+         * @param {Object} resources Map of resources
          * @param {Function} onSuccess onSuccess callback.
          * @param {Function} onError onError callback.
          */
-        loadOptions: function (formNodeId, successCallback, errorCallback)
+        loadOptions: function (optionsIdentifier, resources, successCallback, errorCallback)
         {
-            Chain(this.branch).trap(function(err) {
-                errorCallback(err);
-                return false;
-            }).readNode(formNodeId).then(function() {
+            var self = this;
 
-                var obj = JSON.parse(JSON.stringify(this));
+            self.branch.loadAlpacaOptions(optionsIdentifier, resources, function(err, options) {
 
-                successCallback(obj);
+                if (err)
+                {
+                    errorCallback(err);
+                    return;
+                }
+
+                if (!options) {
+                    options = {};
+                }
+
+                // TODO: cleanup options
+
+                // mix in buttons onto form
+                options.form.buttons = {
+                    "submit": {
+                        "title": "Submit",
+                        "click": function(e) {
+
+                            var form = this;
+
+                            var value = this.getValue();
+                            if (!value) {
+                                value = {};
+                            }
+
+                            var promise = this.ajaxSubmit({
+                                "xhrFields": {
+                                    "withCredentials": true
+                                },
+                                "crossDomain": true,
+                                "processData": false,
+                                "data": JSON.stringify(value),
+                                "contentType": "application/json; charset=utf-8"
+                            });
+                            promise.done(function () {
+                                form.topControl.trigger("formSubmitSuccess");
+                            });
+                            promise.fail(function () {
+                                form.topControl.trigger("formSubmitFail");
+                            });
+                        }
+                    }
+                };
+
+                if (typeof(options.focus) === "undefined")
+                {
+                    options.focus = true;
+                }
+
+                // adjust the action handler relative to baseURL
+                options.form.attributes.action = self.config.baseURL + options.form.attributes.action;
+
+                successCallback(options);
             });
         },
 
         /**
          * Loads a referenced JSON schema by it's qname from Cloud CMS.
          *
-         * @param {Object|String} qname schema to load
+         * @param {Object|String} schemaIdentifier schema to load
          * @param {Function} onSuccess onSuccess callback.
          * @param {Function} onError onError callback.
          */
-        loadReferenceSchema: function (qname, successCallback, errorCallback)
+        loadReferenceSchema: function (schemaIdentifier, successCallback, errorCallback)
         {
-            Chain(this.branch).trap(function(err) {
-                errorCallback(err);
-                return false;
-            }).readDefinition(qname).then(function() {
+            var self = this;
 
-                var obj = JSON.parse(JSON.stringify(this));
-
-                successCallback(obj);
-            });
+            return self.loadSchema(schemaIdentifier, successCallback, errorCallback);
         },
 
         /**
          * Loads referenced JSON options by it's form key from Cloud CMS.
          *
-         * @param {Object|String} formKey form to load.
+         * @param {Object|String} optionsIdentifier form to load.
          * @param {Function} onSuccess onSuccess callback.
          * @param {Function} onError onError callback.
          */
-        loadReferenceOptions: function (formKey, successCallback, errorCallback)
+        loadReferenceOptions: function (optionsIdentifier, successCallback, errorCallback)
         {
-            successCallback({});
+            var self = this;
+
+            return self.loadOptions(optionsIdentifier, successCallback, errorCallback);
         }
 
     });
@@ -16533,6 +16361,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             {
                 this.options.autocomplete = false;
             }
+
+            if (typeof(this.options.disallowEmptySpaces) === "undefined")
+            {
+                this.options.disallowEmptySpaces = false;
+            }
+
+            if (typeof(this.options.disallowOnlyEmptySpaces) === "undefined")
+            {
+                this.options.disallowOnlyEmptySpaces = false;
+            }
         },
 
         /**
@@ -16582,7 +16420,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var self = this;
 
             // autocomplete
-            if (self.options.autocomplete)
+            if (typeof(self.options.autocomplete) !== "undefined")
             {
                 $(self.field).addClass("alpaca-autocomplete");
                 $(self.control).attr("autocomplete", (self.options.autocomplete ? "on" : "off"));
@@ -16633,7 +16471,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 {
                     var bloodHoundConfig = {
                         datumTokenizer: function(d) {
-                            return Bloodhound.tokenizers.whitespace(d.value);
+                            var tokens = "";
+                            for (var k in d) {
+                                if (d.hasOwnProperty(k) || d[k]) {
+                                    tokens += " " + d[k];
+                                }
+                            }
+                            return Bloodhound.tokenizers.whitespace(tokens);
                         },
                         queryTokenizer: Bloodhound.tokenizers.whitespace
                     };
@@ -16822,32 +16666,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Field#getValue
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             var self = this;
 
-            var value = null;
+            var value = this._getControlVal(true);
 
-            if (!this.isDisplayOnly() && this.control && this.control.length > 0)
+            if (self.control.mask && self.options.maskString)
             {
-                value = this._getControlVal(true);
-
-                if (self.control.mask && self.options.maskString)
+                // get unmasked value
+                var fn = $(this.control).data($.mask.dataName);
+                if (fn)
                 {
-                    // get unmasked value
-                    var fn = $(this.control).data($.mask.dataName);
-                    if (fn)
-                    {
-                        value = fn();
-                        value = self.ensureProperType(value);
-                    }
+                    value = fn();
+                    value = self.ensureProperType(value);
                 }
-            }
-            else
-            {
-                value = this.base();
             }
 
             return value;
@@ -16917,17 +16752,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.schema.pattern)
             {
                 var val = this.getValue();
+
                 if (val === "" && this.options.allowOptionalEmpty && !this.isRequired())
                 {
                     return true;
                 }
+
                 if (Alpaca.isEmpty(val))
                 {
                     val = "";
                 }
-                if (!val.match(this.schema.pattern))
+
+                if (typeof(val) === "string")
                 {
-                    return false;
+                    if (!val.match(this.schema.pattern))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -16944,6 +16785,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (!Alpaca.isEmpty(this.schema.minLength))
             {
                 var val = this.getValue();
+                if(val !== val) {
+                    // NaN
+                    val = "";
+                }
                 if (val === "" && this.options.allowOptionalEmpty && !this.isRequired())
                 {
                     return true;
@@ -16952,7 +16797,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 {
                     val = "";
                 }
-                if (val.length < this.schema.minLength)
+                if ((""+val).length < this.schema.minLength)
                 {
                     return false;
                 }
@@ -16978,7 +16823,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 {
                     val = "";
                 }
-                if (val.length > this.schema.maxLength)
+                if ((""+val).length > this.schema.maxLength)
                 {
                     return false;
                 }
@@ -16989,7 +16834,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * @see Alpaca.Field#focus
          */
-        focus: function()
+        focus: function(onFocusCallback)
         {
             if (this.control && this.control.length > 0)
             {
@@ -17007,6 +16852,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
 
                 el.focus();
+
+                if (onFocusCallback)
+                {
+                    onFocusCallback(this);
+                }
+
             }
         },
 
@@ -17020,9 +16871,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * @see Alpaca.ControlField#onKeyPress
          */
-        onKeyDown: function(e)
+        onKeyPress: function(e)
         {
             var self = this;
+
+            // ignore tab and arrow keys
+            if (e.keyCode === 9 || e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40 ) {
+                return;
+            }
 
             if (e.keyCode === 8) // backspace
             {
@@ -17050,6 +16906,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
             }
+
+            if (e.keyCode === 32) // space
+            {
+                if (self.options.disallowEmptySpaces)
+                {
+                    // kill event
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+            }
         },
 
         onKeyUp: function(e)
@@ -17058,6 +16924,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // if applicable, update the max length indicator
             self.updateMaxLengthIndicator();
+
+            // trigger "fieldkeyup"
+            $(this.field).trigger("fieldkeyup");
         }
 
 
@@ -17174,6 +17043,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "title": "HTML autocomplete attribute for the underlying DOM input control",
                         "description": "Allows you to specify the autocomplete attribute for the underlying input control whether or not field should have autocomplete enabled.",
                         "type": "string"
+                    },
+                    "disallowEmptySpaces": {
+                        "title": "Disallow Empty Spaces",
+                        "description": "Whether to disallow the entry of empty spaces in the text",
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "disallowOnlyEmptySpaces": {
+                        "title": "Disallow Only Empty Spaces",
+                        "description": "Whether to disallow the entry of only empty spaces in the text",
+                        "type": "boolean",
+                        "default": false
                     }
                 }
             });
@@ -17505,6 +17386,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 //
                 $(self.getFieldEl()).find("input:checkbox").change(function(evt) {
                     self.triggerWithPropagation("change");
+                    //evt.preventDefault();
+                    //evt.stopImmediatePropagation();
                 });
 
                 // for multiple mode, mark values
@@ -17539,7 +17422,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * @see Alpaca.Field#getValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             var self = this;
 
@@ -17626,6 +17509,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
 
                 // walk through values and assign into appropriate inputs
+                Alpaca.checked($(self.getFieldEl()).find("input[data-checkbox-value]"), false);
                 for (var j = 0; j < values.length; j++)
                 {
                     var input = $(self.getFieldEl()).find("input[data-checkbox-value=\"" + values[j] + "\"]");
@@ -17715,6 +17599,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             $(this.control).find("input").each(function() {
                 $(this).disabled = true;
+                $(this).prop("disabled", true);
             });
 
         },
@@ -17726,6 +17611,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             $(this.control).find("input").each(function() {
                 $(this).disabled = false;
+                $(this).prop("disabled", false);
             });
 
         },
@@ -17832,7 +17718,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.triggerUpdate();
         },
 
-        getValue: function()
+        /**
+         * @see Alpaca.Fields.ControlField#getControlValue
+         */
+        getControlValue: function()
         {
             return this.data;
         },
@@ -17881,9 +17770,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
             }
-        },
+        }
 
         /* builder_helpers */
+        ,
 
         /**
          * @see Alpaca.Fields.TextField#getTitle
@@ -17951,30 +17841,33 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         setup: function()
         {
-            var _this = this;
+            var self = this;
 
-            _this.base();
+            self.base();
 
-            _this.selectOptions = [];
+            self.selectOptions = [];
 
-            if (_this.getEnum())
+            if (self.getEnum())
             {
-                $.each(_this.getEnum(), function(index, value)
+                // sort the enumerated values
+                self.sortEnum();
+
+                $.each(self.getEnum(), function(index, value)
                 {
                     var text = value;
-                    if (_this.options.optionLabels)
+                    if (self.options.optionLabels)
                     {
-                        if (!Alpaca.isEmpty(_this.options.optionLabels[index]))
+                        if (!Alpaca.isEmpty(self.options.optionLabels[index]))
                         {
-                            text = _this.options.optionLabels[index];
+                            text = self.options.optionLabels[index];
                         }
-                        else if (!Alpaca.isEmpty(_this.options.optionLabels[value]))
+                        else if (!Alpaca.isEmpty(self.options.optionLabels[value]))
                         {
-                            text = _this.options.optionLabels[value];
+                            text = self.options.optionLabels[value];
                         }
                     }
 
-                    _this.selectOptions.push({
+                    self.selectOptions.push({
                         "value": value,
                         "text": text
                     });
@@ -17984,14 +17877,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             /**
              * Auto assign data if we have data and the field is required and removeDefaultNone is either unspecified or true
              */
-            if (_this.isRequired() && !_this.data)
+            if (self.isRequired() && !self.data)
             {
-                //if ((typeof(_this.options.removeDefaultNone) == "undefined") || _this.options.removeDefaultNone === true)
-                if ((_this.options.removeDefaultNone === true))
+                //if ((typeof(self.options.removeDefaultNone) == "undefined") || self.options.removeDefaultNone === true)
+                if ((self.options.removeDefaultNone === true))
                 {
-                    if (_this.schema.enum && _this.schema.enum.length > 0)
+                    if (self.schema.enum && self.schema.enum.length > 0)
                     {
-                        _this.data = _this.schema.enum[0];
+                        self.data = self.schema.enum[0];
                     }
                 }
             }
@@ -18036,9 +17929,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * @see Alpaca.Field#getValue
          */
-        getValue: function(val)
+        convertValue: function(val)
         {
             var _this = this;
+
             if (Alpaca.isArray(val))
             {
                 $.each(val, function(index, itemVal) {
@@ -18081,9 +17975,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     var completionFunction = function()
                     {
+                        // apply sorting to whatever we produce
+                        self.sortSelectableOptions(self.selectOptions);
+
+                        // now build out the enum and optionLabels
                         self.schema.enum = [];
                         self.options.optionLabels = [];
-
                         for (var i = 0; i < self.selectOptions.length; i++)
                         {
                             self.schema.enum.push(self.selectOptions[i].value);
@@ -18186,7 +18083,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             "error": function(jqXHR, textStatus, errorThrown) {
 
                                 self.errorCallback({
-                                    "message":"Unable to load data from uri : " + _this.options.dataSource,
+                                    "message":"Unable to load data from uri : " + self.options.dataSource,
                                     "stage": "DATASOURCE_LOADING_ERROR",
                                     "details": {
                                         "jqXHR" : jqXHR,
@@ -18212,6 +18109,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             {
                                 self.selectOptions.push(self.options.dataSource[i]);
                             }
+                        }
+
+                        completionFunction();
+                    }
+                    else if (Alpaca.isObject(self.options.dataSource))
+                    {
+                        for (var k in self.options.dataSource)
+                        {
+                            self.selectOptions.push({
+                                "text": self.options.dataSource[k],
+                                "value": k
+                            });
                         }
 
                         completionFunction();
@@ -18375,9 +18284,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Field#getValue
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             var self = this;
 
@@ -18498,25 +18407,45 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         onClick: function(e)
         {
+            var self = this;
+            var currentValue = self.getValue();
+
             this.base(e);
 
-            var self = this;
-
             var val = $(e.currentTarget).find("input").val();
-            if (typeof(val) != "undefined")
+            if (typeof(val) !== "undefined")
             {
                 self.setValue(val);
                 self.refreshValidationState();
+
+                // manually trigger change event
+                if (currentValue !== val) {
+
+                    self.trigger("change");
+                }
             }
+        },
 
-            /*
-            Alpaca.later(25, this, function(){
-                var v = self.getValue();
-                self.setValue(v);
-                self.refreshValidationState();
-            });
-            */
+        /**
+         * @see Alpaca.Field#disable
+         */
+        disable: function()
+        {
+            this.base();
 
+            // for radio buttons, we also mark the outer DIV as disabled to prevent label clicks
+            // and apply some CSS styling
+            this.getFieldEl().addClass("disabled");
+        },
+
+        /**
+         * @see Alpaca.Field#enable
+         */
+        enable: function()
+        {
+            this.base();
+
+            this.getFieldEl().removeClass("disabled");
         }
 
         /* builder_helpers */
@@ -18599,20 +18528,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Field#getValue
+         * @see Alpaca.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
-            if (this.control && this.control.length > 0)
+            var val = this._getControlVal(true);
+            if (typeof(val) === "undefined")
             {
-                var val = this._getControlVal(true);
-                if (typeof(val) === "undefined")
-                {
-                    val = this.data;
-                }
-
-                return this.base(val);
+                val = this.data;
             }
+
+            return this.convertValue(val);
         },
 
         /**
@@ -18905,6 +18831,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             };
 
             return baseStatus && valInfo["tooManyItems"]["status"] && valInfo["notEnoughItems"]["status"];
+        },
+
+        /**
+         * @see Alpaca.Field#focus
+         */
+        focus: function(onFocusCallback)
+        {
+            if (this.control && this.control.length > 0)
+            {
+                // set focus onto the select
+                var el = $(this.control).get(0);
+
+                el.focus();
+
+                if (onFocusCallback)
+                {
+                    onFocusCallback(this);
+                }
+            }
         }
 
         /* builder_helpers */
@@ -19013,6 +18958,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // @see http://stackoverflow.com/questions/16420828/jquery-val-refuses-to-return-non-numeric-input-from-a-number-field-under-chrome
 
             this.base();
+
+            if (typeof(this.options.numericEntry) === "undefined")
+            {
+                this.options.numericEntry = false;
+            }
+
         },
 
         /**
@@ -19023,9 +18974,44 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Fields.TextField#getValue
+         * @see Alpaca.ControlField#postRender
          */
-        getValue: function()
+        postRender: function(callback) {
+
+            var self = this;
+
+            this.base(function() {
+
+                if (self.control)
+                {
+                    self.on("keypress", function(e) {
+
+                        var key = e.charCode || e.keyCode || 0;
+
+                        var valid = true;
+
+                        if (self.options.numericEntry) {
+                            valid = valid && (key >= 48 && key <= 57);
+                        }
+
+                        if(!valid) {
+                            // don't even allow entry of invalid characters
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                        }
+
+                        return valid;
+                    });
+                }
+
+                callback();
+            });
+        },
+
+        /**
+         * @see Alpaca.Fields.ControlField#getControlValue
+         */
+        getControlValue: function()
         {
             var val = this._getControlVal(true);
 
@@ -19094,7 +19080,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // hand back a true/false
-            return baseStatus && valInfo["stringNotANumber"]["status"] && valInfo["stringDivisibleBy"]["status"] && valInfo["stringValueTooLarge"]["status"] && valInfo["stringValueTooSmall"]["status"] && valInfo["stringValueNotMultipleOf"]["status"];
+            return baseStatus && valInfo["stringNotANumber"]["status"] && valInfo["stringDivisibleBy"]["status"] && valInfo["stringValueTooLarge"]["status"] && valInfo["stringValueTooSmall"]["status"] && valInfo["stringValueNotMultipleOf"]["status"] && valInfo["invalidPattern"]["status"] && valInfo["stringTooLong"]["status"] && valInfo["stringTooShort"]["status"];
         },
 
         /**
@@ -19216,6 +19202,73 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return "number";
         },
 
+        /**
+         * @see Alpaca.ControlField#onKeyPress
+         */
+        onKeyPress: function(e)
+        {
+            var self = this;
+
+            // ignore tab and arrow keys
+            if (e.keyCode === 9 || e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40 ) {
+                return;
+            }
+
+            if (e.keyCode === 8) // backspace
+            {
+                if (!Alpaca.isEmpty(self.schema.minLength) && (self.options.constrainLengths || self.options.constrainMinLength))
+                {
+                    var newValue = self.getValue() || "";
+                    if(Alpaca.isNumber(newValue)) {
+                        newValue = newValue.toString();
+                    }
+                    if (newValue.length <= self.schema.minLength)
+                    {
+                        // kill event
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                    }
+                }
+            }
+            else
+            {
+                if (!Alpaca.isEmpty(self.schema.maxLength) && (self.options.constrainLengths || self.options.constrainMaxLength))
+                {
+                    var newValue = self.getValue() || "";
+                    if(Alpaca.isNumber(newValue)) {
+                        newValue = newValue.toString();
+                    }
+                    if (newValue.length >= self.schema.maxLength)
+                    {
+                        // kill event
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                    }
+                }
+            }
+
+            if (e.keyCode === 32) // space
+            {
+                if (self.options.disallowEmptySpaces)
+                {
+                    // kill event
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+            }
+        },
+
+        onKeyUp: function(e)
+        {
+            var self = this;
+
+            // if applicable, update the max length indicator
+            self.updateMaxLengthIndicator();
+
+            // trigger "fieldkeyup"
+            $(this.field).trigger("fieldkeyup");
+        },
+
         /* builder_helpers */
 
         /**
@@ -19287,6 +19340,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "rightLabel": "Exclusive Maximum ?",
                         "helper": "Field value must be less than but not equal to this number if checked",
                         "type": "checkbox"
+                    }
+                }
+            });
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.NumberField#getSchemaOfOptions
+         */
+        getSchemaOfOptions: function() {
+            return Alpaca.merge(this.base(), {
+                "properties": {
+                    "numericEntry": {
+                        "title": "Numeric Entry",
+                        "description": "Whether to constrain data entry key presses to numeric values (0-9)",
+                        "type": "boolean",
+                        "default": false
                     }
                 }
             });
@@ -19372,6 +19442,32 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.options.actionbarStyle = "top";
             }
 
+            if (!this.schema.items)
+            {
+                this.schema.items = {};
+            }
+
+            if (!this.options.items)
+            {
+                this.options.items = {};
+            }
+
+            // legacy - uniqueItems, maxItems, minItems
+            if (this.schema.items.maxItems) {
+                this.schema.maxItems = this.schema.items.maxItems;
+                delete this.schema.items.maxItems;
+            }
+
+            if (this.schema.items.minItems) {
+                this.schema.minItems = this.schema.items.minItems;
+                delete this.schema.items.minItems;
+            }
+
+            if (this.schema.items.uniqueItems) {
+                this.schema.uniqueItems = this.schema.items.uniqueItems;
+                delete this.schema.items.uniqueItems;
+            }
+
             // determine whether we are using "ruby on rails" compatibility mode
             this.options.rubyrails = false;
             if (this.parent && this.parent.options && this.parent.options.form && this.parent.options.form.attributes)
@@ -19382,12 +19478,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            if (!this.options.items)
-            {
-                this.options.items = {};
-            }
-
-            var toolbarSticky = true;
+            var toolbarSticky = undefined;
 
             if (!Alpaca.isEmpty(this.view.toolbarSticky))
             {
@@ -19400,6 +19491,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             this.options.toolbarSticky = toolbarSticky;
+
+            // by default, hide toolbar when children.count > 0
+            if (typeof(self.options.hideToolbarWithChildren) === "undefined")
+            {
+                self.options.hideToolbarWithChildren = true;
+            }
 
             // Enable forceRevalidation option so that any change in children will trigger parent's revalidation.
             if (this.schema.items && this.schema.uniqueItems)
@@ -19521,13 +19618,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "label": self.getMessage("addItemButtonLabel"),
                 "action": "add",
                 "iconClass": self.view.getStyle("addIcon"),
-                "click": function(key, action)
-                {
-                    self.resolveItemSchemaOptions(function(itemSchema, itemOptions) {
-                        var itemData = Alpaca.createEmptyDataInstance(itemSchema);
-                        self.addItem(0, itemSchema, itemOptions, itemData, function() {
-                            // all done
-                        });
+                "click": function(key, action) {
+
+                    self.handleToolBarAddItemClick(function(item) {
+                        // done
                     });
                 }
             });
@@ -19553,13 +19647,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "iconClass": self.view.getStyle("addIcon"),
                 "click": function(key, action, itemIndex) {
 
-                    self.resolveItemSchemaOptions(function(itemSchema, itemOptions) {
-                        var itemData = Alpaca.createEmptyDataInstance(itemSchema);
-                        self.addItem(itemIndex + 1, itemSchema, itemOptions, itemData, function() {
-                            // all done
-                        });
+                    self.handleActionBarAddItemClick(itemIndex, function(item) {
+                        // done
                     });
-
                 }
             });
             applyAction(self.actionbar.actions, "remove", {
@@ -19568,10 +19658,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "iconClass": self.view.getStyle("removeIcon"),
                 "click": function(key, action, itemIndex) {
 
-                    self.removeItem(itemIndex, function() {
-                        // all done
+                    self.handleActionBarRemoveItemClick(itemIndex, function(item) {
+                        // done
                     });
-
                 }
             });
             applyAction(self.actionbar.actions, "up", {
@@ -19580,10 +19669,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "iconClass": self.view.getStyle("upIcon"),
                 "click": function(key, action, itemIndex) {
 
-                    self.moveItem(itemIndex, itemIndex - 1, self.options.animate, function() {
-                        // all done
+                    self.handleActionBarMoveItemUpClick(itemIndex, function() {
+                        // done
                     });
-
                 }
             });
             applyAction(self.actionbar.actions, "down", {
@@ -19592,10 +19680,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "iconClass": self.view.getStyle("downIcon"),
                 "click": function(key, action, itemIndex) {
 
-                    self.moveItem(itemIndex, itemIndex + 1, self.options.animate, function() {
-                        // all done
+                    self.handleActionBarMoveItemDownClick(itemIndex, function() {
+                        // done
                     });
-
                 }
             });
             cleanupActions(self.actionbar.actions, self.actionbar.showLabels);
@@ -19645,11 +19732,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // then we need to add the new fields
             if (i < data.length)
             {
-                self.resolveItemSchemaOptions(function(schema, options) {
+                self.resolveItemSchemaOptions(function(itemSchema, itemOptions, circular) {
 
-                    if (!schema)
+                    if (!itemSchema)
                     {
                         Alpaca.logDebug("Unable to resolve schema for item: " + i);
+                    }
+
+                    // we only allow addition if the resolved schema isn't circularly referenced
+                    // or the schema is optional
+                    if (circular)
+                    {
+                        return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + JSON.stringify(itemSchema), self.errorCallback);
                     }
 
                     // waterfall functions
@@ -19661,7 +19755,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         {
                             return function(callback)
                             {
-                                self.addItem(i, schema, options, data[i], function() {
+                                self.addItem(i, itemSchema, itemOptions, data[i], function() {
 
                                     // by the time we get here, we may have constructed a very large child chain of
                                     // sub-dependencies and so we use nextTick() instead of a straight callback so as to
@@ -19688,21 +19782,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.ContainerField#getValue
+         * @see Alpaca.ContainerField#getContainerValue
          */
-        getValue: function()
+        getContainerValue: function()
         {
             // if we're empty and we're also not required, then we hand back undefined
             if (this.children.length === 0 && !this.isRequired())
             {
-                return;
+                return [];
             }
 
-            // otherwise, construct an array and had it back
+            // otherwise, construct an array and hand it back
             var o = [];
             for (var i = 0; i < this.children.length; i++)
             {
                 var v = this.children[i].getValue();
+
+                if(v !== v) {
+                    // NaN
+                    v = undefined;
+                }
 
                 if (typeof(v) !== "undefined")
                 {
@@ -19725,11 +19824,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var items = [];
 
-            if (self.data)
+            if (self.data && self.data.length > 0)
             {
                 // all items within the array have the same schema and options
                 // so we only need to load this once
-                self.resolveItemSchemaOptions(function(schema, options) {
+                self.resolveItemSchemaOptions(function(itemSchema, itemOptions, circular) {
+
+                    // we only allow addition if the resolved schema isn't circularly referenced
+                    // or the schema is optional
+                    if (circular)
+                    {
+                        return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + JSON.stringify(itemSchema), self.errorCallback);
+                    }
 
                     // waterfall functions
                     var funcs = [];
@@ -19741,7 +19847,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         {
                             return function(callback)
                             {
-                                self.createItem(index, schema, options, value, function(item) {
+                                self.createItem(index, itemSchema, itemOptions, value, function(item) {
 
                                     items.push(item);
 
@@ -19948,7 +20054,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                     }
 
-                    var circular = (refCount > 1);
+                    // use a higher limit for arrays, perhaps 10
+                    //var circular = (refCount > 1);
+                    var circular = (refCount > 10);
 
                     var resolvedItemSchema = {};
                     if (originalItemSchema) {
@@ -19999,13 +20107,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             status = this._validateMaxItems();
             valInfo["tooManyItems"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("tooManyItems"), [this.schema.items.maxItems]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("tooManyItems"), [this.schema.maxItems]),
                 "status": status
             };
 
             status = this._validateMinItems();
             valInfo["notEnoughItems"] = {
-                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("notEnoughItems"), [this.schema.items.minItems]),
+                "message": status ? "" : Alpaca.substituteTokens(this.getMessage("notEnoughItems"), [this.schema.minItems]),
                 "status": status
             };
 
@@ -20018,9 +20126,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         _validateEqualMaxItems: function()
         {
-            if (this.schema.items && this.schema.items.maxItems)
+            if (this.schema.maxItems && this.schema.maxItems >= 0)
             {
-                if (this.getSize() >= this.schema.items.maxItems)
+                if (this.getSize() >= this.schema.maxItems)
                 {
                     return false;
                 }
@@ -20035,9 +20143,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         _validateEqualMinItems: function()
         {
-            if (this.schema.items && this.schema.items.minItems)
+            if (this.schema.minItems && this.schema.minItems >= 0)
             {
-                if (this.getSize() <= this.schema.items.minItems)
+                if (this.getSize() <= this.schema.minItems)
                 {
                     return false;
                 }
@@ -20052,9 +20160,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         _validateMinItems: function()
         {
-            if (this.schema.items && this.schema.items.minItems)
+            if (this.schema.minItems && this.schema.minItems >= 0)
             {
-                if (this.getSize() < this.schema.items.minItems)
+                if (this.getSize() < this.schema.minItems)
                 {
                     return false;
                 }
@@ -20069,9 +20177,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         _validateMaxItems: function()
         {
-            if (this.schema.items && this.schema.items.maxItems)
+            if (this.schema.maxItems && this.schema.maxItems >= 0)
             {
-                if (this.getSize() > this.schema.items.maxItems)
+                if (this.getSize() > this.schema.maxItems)
                 {
                     return false;
                 }
@@ -20281,7 +20389,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             //
 
             var toolbarEl = $(this.getFieldEl()).find(".alpaca-array-toolbar[data-alpaca-array-toolbar-field-id='" + self.getId() + "']");
-            if (this.children.length > 0)
+            if (this.children.length > 0 && self.options.hideToolbarWithChildren)
             {
                 // hide toolbar
                 $(toolbarEl).hide();
@@ -20312,15 +20420,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             //
 
             // if we're not using the "sticky" toolbar, then show and hide the item action buttons when hovered
-            if (!this.options.toolbarSticky)
+            if (typeof(this.options.toolbarSticky) === "undefined" || this.options.toolbarSticky === null)
             {
                 // find each item
-                var items = this.getFieldEl().find(".alpaca-container-item");
+                var items = this.getFieldEl().find(".alpaca-container-item[data-alpaca-container-item-parent-field-id='" + self.getId() +  "']");
                 $(items).each(function(itemIndex) {
 
                     // find the actionbar for this item
                     // find from containerItemEl
-                    var actionbarEl = $(self.containerItemEl).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-field-id='" + self.getId() +  "'][data-alpaca-array-actionbar-item-index='" + itemIndex + "']");
+                    var actionbarEl = $(self.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-parent-field-id='" + self.getId() +  "'][data-alpaca-array-actionbar-item-index='" + itemIndex + "']");
                     if (actionbarEl && actionbarEl.length > 0)
                     {
                         $(this).hover(function() {
@@ -20333,14 +20441,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 });
             }
-            else
+            else if (this.options.toolbarSticky)
             {
-                // otherwise, always show the actionbars
-                $(self.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-field-id='" + self.getId() +  "']").show();
+                // always show the actionbars
+                $(self.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-parent-field-id='" + self.getId() +  "']").show();
+            }
+            else if (!this.options.toolbarSticky)
+            {
+                // always hide the actionbars
+                $(self.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-parent-field-id='" + self.getId() +  "']").hide();
             }
 
             // CLICK: actionbar buttons
-            var actionbarEls = $(this.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-parent-field-id='" + self.getId() + "']");
+            var actionbarEls = $(self.getFieldEl()).find(".alpaca-array-actionbar[data-alpaca-array-actionbar-parent-field-id='" + self.getId() + "']");
             $(actionbarEls).each(function() {
 
                 var targetIndex = $(this).attr("data-alpaca-array-actionbar-item-index");
@@ -20366,6 +20479,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // if we're at max capacity, disable "add" buttons
                 if (self._validateEqualMaxItems())
                 {
+                    $(this).find("[data-alpaca-array-toolbar-action='add']").each(function(index) {
+                        $(this).removeClass('alpaca-button-disabled');
+                        self.fireCallback("enableButton", this);
+                    });
+
                     $(this).find("[data-alpaca-array-actionbar-action='add']").each(function(index) {
                         $(this).removeClass('alpaca-button-disabled');
                         self.fireCallback("enableButton", this);
@@ -20373,6 +20491,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 else
                 {
+                    $(this).find("[data-alpaca-array-toolbar-action='add']").each(function(index) {
+                        $(this).addClass('alpaca-button-disabled');
+                        self.fireCallback("disableButton", this);
+                    });
+
                     $(this).find("[data-alpaca-array-actionbar-action='add']").each(function(index) {
                         $(this).addClass('alpaca-button-disabled');
                         self.fireCallback("disableButton", this);
@@ -20420,6 +20543,86 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var self = this;
 
             return $(self.container);
+        },
+
+        handleToolBarAddItemClick: function(callback)
+        {
+            var self = this;
+
+            self.resolveItemSchemaOptions(function(itemSchema, itemOptions, circular) {
+
+                // we only allow addition if the resolved schema isn't circularly referenced
+                // or the schema is optional
+                if (circular)
+                {
+                    return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + JSON.stringify(itemSchema), self.errorCallback);
+                }
+
+                // how many children do we have currently?
+                var insertionPoint = self.children.length;
+
+                var itemData = Alpaca.createEmptyDataInstance(itemSchema);
+                self.addItem(insertionPoint, itemSchema, itemOptions, itemData, function(item) {
+                    if (callback) {
+                        callback(item);
+                    }
+                });
+            });
+        },
+
+        handleActionBarAddItemClick: function(itemIndex, callback)
+        {
+            var self = this;
+
+            self.resolveItemSchemaOptions(function(itemSchema, itemOptions, circular) {
+
+                // we only allow addition if the resolved schema isn't circularly referenced
+                // or the schema is optional
+                if (circular)
+                {
+                    return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + JSON.stringify(itemSchema), self.errorCallback);
+                }
+
+                var itemData = Alpaca.createEmptyDataInstance(itemSchema);
+                self.addItem(itemIndex + 1, itemSchema, itemOptions, itemData, function(item) {
+                    if (callback) {
+                        callback(item);
+                    }
+                });
+            });
+        },
+
+        handleActionBarRemoveItemClick: function(itemIndex, callback)
+        {
+            var self = this;
+
+            self.removeItem(itemIndex, function() {
+                if (callback) {
+                    callback();
+                }
+            });
+        },
+
+        handleActionBarMoveItemUpClick: function(itemIndex, callback)
+        {
+            var self = this;
+
+            self.moveItem(itemIndex, itemIndex - 1, self.options.animate, function() {
+                if (callback) {
+                    callback();
+                }
+            });
+        },
+
+        handleActionBarMoveItemDownClick: function(itemIndex, callback)
+        {
+            var self = this;
+
+            self.moveItem(itemIndex, itemIndex + 1, self.options.animate, function() {
+                if (callback) {
+                    callback();
+                }
+            });
         },
 
         doAddItem: function(index, item)
@@ -20479,8 +20682,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // insert into dom
                     self.doAddItem(index, item);
 
-                    // updates child dom marker elements
-                    self.updateChildDOMElements();
+                    // updates dom markers for this element and any siblings
+                    self.handleRepositionDOMRefresh();
 
                     // update the array item toolbar state
                     self.updateToolbars();
@@ -20488,12 +20691,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // refresh validation state
                     self.refreshValidationState();
 
+                    // dispatch event: add
+                    self.trigger("add", item);
+
                     // trigger update
                     self.triggerUpdate();
 
                     if (callback)
                     {
-                        callback();
+                        callback(item);
                     }
                 });
             }
@@ -20529,14 +20735,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // remove itemContainerEl from DOM
                 self.doRemoveItem(childIndex);
 
-                // updates child dom marker elements
-                self.updateChildDOMElements();
+                // updates dom markers for this element and any siblings
+                self.handleRepositionDOMRefresh();
 
                 // update the array item toolbar state
                 self.updateToolbars();
 
                 // refresh validation state
                 self.refreshValidationState();
+
+                // dispatch event: remove
+                self.trigger("remove", childIndex);
 
                 // trigger update
                 self.triggerUpdate();
@@ -20648,12 +20857,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 tempSourceMarker.replaceWith(targetContainer);
                 tempTargetMarker.replaceWith(sourceContainer);
 
-                // updates child dom marker elements
-                self.updateChildDOMElements();
+                // updates dom markers for this element and any siblings
+                self.handleRepositionDOMRefresh();
 
                 // update the action bar bindings
-                $(sourceContainer).find(".alpaca-container-item[data-alpaca-array-actionbar-item-index='" + sourceIndex + "']").attr("data-alpaca-array-actionbar-item-index", targetIndex);
-                $(targetContainer).find(".alpaca-container-item[data-alpaca-array-actionbar-item-index='" + targetIndex + "']").attr("data-alpaca-array-actionbar-item-index", sourceIndex);
+                $(sourceContainer).find(".alpaca-container-item[data-alpaca-array-actionbar-item-index='" + sourceIndex + "'][data-alpaca-container-item-parent-field-id='" + self.getId() +  "']").attr("data-alpaca-array-actionbar-item-index", targetIndex);
+                $(targetContainer).find(".alpaca-container-item[data-alpaca-array-actionbar-item-index='" + targetIndex + "'][data-alpaca-container-item-parent-field-id='" + self.getId() +  "']").attr("data-alpaca-array-actionbar-item-index", sourceIndex);
 
                 // update the array item toolbar state
                 self.updateToolbars();
@@ -20663,6 +20872,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 // trigger update
                 self.triggerUpdate();
+
+                // dispatch event: move
+                self.trigger("move");
 
                 if (callback)
                 {
@@ -20716,25 +20928,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "items": {
                         "title": "Array Items",
                         "description": "Schema for array items.",
-                        "type": "object",
-                        "properties": {
-                            "minItems": {
-                                "title": "Minimum Items",
-                                "description": "Minimum number of items.",
-                                "type": "number"
-                            },
-                            "maxItems": {
-                                "title": "Maximum Items",
-                                "description": "Maximum number of items.",
-                                "type": "number"
-                            },
-                            "uniqueItems": {
-                                "title": "Items Unique",
-                                "description": "Item values should be unique if true.",
-                                "type": "boolean",
-                                "default": false
-                            }
-                        }
+                        "type": "object"
+                    },
+                    "minItems": {
+                        "title": "Minimum Items",
+                        "description": "Minimum number of items.",
+                        "type": "number"
+                    },
+                    "maxItems": {
+                        "title": "Maximum Items",
+                        "description": "Maximum number of items.",
+                        "type": "number"
+                    },
+                    "uniqueItems": {
+                        "title": "Items Unique",
+                        "description": "Item values should be unique if true.",
+                        "type": "boolean",
+                        "default": false
                     }
                 }
             };
@@ -20754,18 +20964,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return Alpaca.merge(this.base(), {
                 "fields": {
                     "items": {
-                        "type": "object",
-                        "fields": {
-                            "minItems": {
-                                "type": "integer"
-                            },
-                            "maxItems": {
-                                "type": "integer"
-                            },
-                            "uniqueItems": {
-                                "type": "checkbox"
-                            }
-                        }
+                        "type": "object"
+                    },
+                    "minItems": {
+                        "type": "integer"
+                    },
+                    "maxItems": {
+                        "type": "integer"
+                    },
+                    "uniqueItems": {
+                        "type": "checkbox"
                     }
                 }
             });
@@ -20780,9 +20988,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "properties": {
                     "toolbarSticky": {
                         "title": "Sticky Toolbar",
-                        "description": "Array item toolbar will be aways on if true.",
+                        "description": "If true, the array item toolbar will always be enabled.  If false, the toolbar is always disabled.  If undefined or null, the toolbar will appear when hovered over.",
                         "type": "boolean",
-                        "default": false
+                        "default": undefined
                     },
                     "toolbarStyle": {
                         "title": "Toolbar Style",
@@ -20870,6 +21078,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 }
                             }
                         }
+                    },
+                    "hideToolbarWithChildren": {
+                        "type": "boolean",
+                        "title": "Hide Toolbar with Children",
+                        "description": "Indicates whether to hide the top toolbar when child elements are available.",
+                        "default": true
                     }
                 }
             };
@@ -21060,9 +21274,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * Reconstructs the data object from the child fields.
          *
-         * @see Alpaca.Field#getValue
+         * @see Alpaca.ContainerField#getContainerValue
          */
-        getValue: function()
+        getContainerValue: function()
         {
             // if we don't have any children and we're not required, hand back empty object
             if (this.children.length === 0 && !this.isRequired())
@@ -21085,6 +21299,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var propertyId = this.children[i].propertyId;
                 var fieldValue = this.children[i].getValue();
 
+                if(fieldValue !== fieldValue) {
+                    // NaN
+                    fieldValue = undefined;
+                }
+
                 if (typeof(fieldValue) !== "undefined")
                 {
                     if (this.determineAllDependenciesValid(propertyId))
@@ -21099,7 +21318,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         {
                             assignedValue = fieldValue;
                         }
-                        else if (fieldValue)
+                        else if (fieldValue || fieldValue === 0)
                         {
                             assignedValue = fieldValue;
                         }
@@ -21168,7 +21387,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         createItems: function(callback)
         {
-            var _this = this;
+            var self = this;
 
             var items = [];
 
@@ -21179,13 +21398,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             //
             // this is primarily maintained for debugging purposes, so as to inform the developer of mismatches
             var extraDataProperties = {};
-            for (var dataKey in _this.data) {
+            for (var dataKey in self.data) {
                 extraDataProperties[dataKey] = dataKey;
             }
 
-            var properties = _this.data;
-            if (_this.schema && _this.schema.properties) {
-                properties = _this.schema.properties;
+            var properties = self.data;
+            if (self.schema && self.schema.properties) {
+                properties = self.schema.properties;
             }
 
             var cf = function()
@@ -21215,9 +21434,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (var propertyId in properties)
             {
                 var itemData = null;
-                if (_this.data)
+                if (self.data)
                 {
-                    itemData = _this.data[propertyId];
+                    if (self.data.hasOwnProperty(propertyId))
+                    {
+                        itemData = self.data[propertyId];
+                    }
                 }
 
                 var pf = (function(propertyId, itemData, extraDataProperties)
@@ -21225,21 +21447,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     return function(callback)
                     {
                         // only allow this if we have data, otherwise we end up with circular reference
-                        _this.resolvePropertySchemaOptions(propertyId, function(schema, options, circular) {
+                        self.resolvePropertySchemaOptions(propertyId, function (schema, options, circular) {
 
                             // we only allow addition if the resolved schema isn't circularly referenced
                             // or the schema is optional
-                            if (circular)
-                            {
-                                return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + JSON.stringify(schema), _this.errorCallback);
+                            if (circular) {
+                                return Alpaca.throwErrorWithCallback("Circular reference detected for schema: " + JSON.stringify(schema), self.errorCallback);
                             }
 
-                            if (!schema)
-                            {
+                            if (!schema) {
                                 Alpaca.logDebug("Unable to resolve schema for property: " + propertyId);
                             }
 
-                            _this.createItem(propertyId, schema, options, itemData, null, function(addedItemControl) {
+                            self.createItem(propertyId, schema, options, itemData, null, function (addedItemControl) {
 
                                 items.push(addedItemControl);
 
@@ -21249,7 +21469,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // by the time we get here, we may have constructed a very large child chain of
                                 // sub-dependencies and so we use nextTick() instead of a straight callback so as to
                                 // avoid blowing out the stack size
-                                Alpaca.nextTick(function() {
+                                Alpaca.nextTick(function () {
                                     callback();
                                 });
                             });
@@ -21262,6 +21482,36 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             Alpaca.series(propertyFunctions, function(err) {
+
+                // is there any order information in the items?
+                var hasOrderInformation = false;
+                for (var i = 0; i < items.length; i++) {
+                    if (typeof(items[i].options.order) !== "undefined") {
+                        hasOrderInformation = true;
+                        break;
+                    }
+                }
+
+                if (hasOrderInformation)
+                {
+                    // sort by order?
+                    items.sort(function (a, b) {
+
+                        var orderA = a.options.order;
+                        if (!orderA)
+                        {
+                            orderA = 0;
+                        }
+                        var orderB = b.options.order;
+                        if (!orderB)
+                        {
+                            orderB = 0;
+                        }
+
+                        return (orderA - orderB);
+                    });
+                }
+
                 cf();
             });
         },
@@ -21610,6 +21860,49 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * Helper function for resolving dependencies for a child property.
+         * This takes into account JSON Schema v4 and also provides for legacy v3 support.
+         *
+         * @param propertyId
+         */
+        getChildDependencies: function(propertyId)
+        {
+            // first, check for dependencies declared within the object (container)
+            var itemDependencies = null;
+            if (this.schema.dependencies)
+            {
+                itemDependencies = this.schema.dependencies[propertyId];
+            }
+            if (!itemDependencies)
+            {
+                // second, check for dependencies declared on the item itself
+                // this is to support legacy v3 json schema
+                var item = this.childrenByPropertyId[propertyId];
+                if (item)
+                {
+                    itemDependencies = item.schema.dependencies;
+                }
+            }
+
+            return itemDependencies;
+        },
+
+        getChildConditionalDependencies: function(propertyId)
+        {
+            var itemConditionalDependencies = null;
+
+            // second, check for conditional dependencies declared on the item itself
+            // this is to support legacy v3 json options
+            var item = this.childrenByPropertyId[propertyId];
+            if (item)
+            {
+                itemConditionalDependencies = item.options.dependencies;
+            }
+
+            return itemConditionalDependencies;
+        },
+
+        /**
          * Determines whether the dependencies for a property pass.
          *
          * @param propertyId
@@ -21624,7 +21917,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return Alpaca.throwErrorWithCallback("Missing property: " + propertyId, self.errorCallback);
             }
 
-            var itemDependencies = item.schema.dependencies;
+            // first check for dependencies declared within the object (container)
+            var itemDependencies = self.getChildDependencies(propertyId);;
             if (!itemDependencies)
             {
                 // no dependencies, so yes, we pass
@@ -21661,7 +21955,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return Alpaca.throwErrorWithCallback("Missing property: " + propertyId, self.errorCallback);
             }
 
-            var itemDependencies = item.schema.dependencies;
+            var itemDependencies = self.getChildDependencies(propertyId);
             if (!itemDependencies)
             {
                 // no dependencies, so simple return
@@ -21717,7 +22011,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 return Alpaca.throwErrorWithCallback("Missing property: " + propertyId, self.errorCallback);
             }
 
-            var itemDependencies = propertyField.schema.dependencies;
+            var itemDependencies = self.getChildDependencies(propertyId);
             if (!itemDependencies)
             {
                 // no dependencies, so simple return
@@ -21779,7 +22073,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var valid = false;
 
             // go one of two directions depending on whether we have conditional dependencies or not
-            var conditionalDependencies = this.childrenByPropertyId[propertyId].options.dependencies;
+            var conditionalDependencies = this.getChildConditionalDependencies(propertyId);
             if (!conditionalDependencies || conditionalDependencies.length === 0)
             {
                 //
@@ -21918,30 +22212,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 self.registerChild(child, ((index != null) ? index + 1 : null));
 
                 // insert into dom
-                if (!index)
-                {
-                    // insert first into container
-                    $(self.container).append(child.getFieldEl());
-                }
-                else
-                {
-                    // insert at a specific index
-                    var existingElement = self.getContainerEl().children("[data-alpaca-container-item-index='" + index + "']");
-                    if (existingElement && existingElement.length > 0)
-                    {
-                        // insert after
-                        existingElement.after(child.getFieldEl());
-                    }
-                }
+                self.doAddItem(index, child);
 
-                // updates child dom marker elements
-                self.updateChildDOMElements();
+                // updates dom markers for this element and any siblings
+                self.handleRepositionDOMRefresh();
 
                 // update the array item toolbar state
                 //self.updateToolbars();
 
                 // refresh validation state
                 self.refreshValidationState(true, function() {
+
+                    // dispatch event: add
+                    self.trigger("add", child);
 
                     // trigger update
                     self.triggerUpdate();
@@ -21955,6 +22238,42 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             });
         },
 
+        doAddItem: function(index, item)
+        {
+            var self = this;
+
+            // insert into dom
+            if (!index)
+            {
+                // insert first into container
+                $(self.container).append(item.containerItemEl);
+            }
+            else
+            {
+                // insert at a specific index
+                var existingElement = self.getContainerEl().children("[data-alpaca-container-item-index='" + index + "']");
+                if (existingElement && existingElement.length > 0)
+                {
+                    // insert after
+                    existingElement.after(item.containerItemEl);
+                }
+            }
+
+            self.doAfterAddItem(item);
+        },
+
+        doAfterAddItem: function(item)
+        {
+
+        },
+
+        doResolveItemContainer: function()
+        {
+            var self = this;
+
+            return $(self.container);
+        },
+
         /**
          * Removes an item from the object.
          *
@@ -21965,33 +22284,53 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         {
             var self = this;
 
-            this.children = $.grep(this.children, function(val, index) {
-                return (val.getId() != propertyId);
-            });
-
-            var childField = this.childrenById[propertyId];
-
-            delete this.childrenById[propertyId];
-            if (childField.propertyId)
+            var childField = this.childrenByPropertyId[propertyId];
+            if (childField)
             {
-                delete this.childrenByPropertyId[childField.propertyId];
+                this.children = $.grep(this.children, function (val, index) {
+                    return (val.propertyId !== propertyId);
+                });
+
+                delete this.childrenByPropertyId[propertyId];
+                delete this.childrenById[childField.getId()];
+
+                // remove itemContainerEl from DOM
+                self.doRemoveItem(childField);
+
+                this.refreshValidationState(true, function () {
+
+                    // updates dom markers for this element and any siblings
+                    self.handleRepositionDOMRefresh();
+
+                    // dispatch event: remove
+                    self.trigger("remove", childField);
+
+                    // trigger update handler
+                    self.triggerUpdate();
+
+                    if (callback)
+                    {
+                        callback();
+                    }
+                });
             }
-
-            childField.destroy();
-
-            this.refreshValidationState(true, function() {
-
-                // trigger update handler
-                self.triggerUpdate();
-
-                if (callback)
-                {
-                    callback();
-                }
-            });
+            else
+            {
+                callback();
+            }
         },
 
+        doRemoveItem: function(item)
+        {
+            var self = this;
 
+            var removeItemContainer = self.doResolveItemContainer();
+
+            removeItemContainer.children(".alpaca-container-item[data-alpaca-container-item-name='" + item.name + "']").remove();
+
+            // destroy child field itself
+            item.destroy();
+        },
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
         //
@@ -22412,6 +22751,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                                     refreshSteps();
                                 }
+                                else
+                                {
+                                    // allow focus to settle on invalid field
+                                    window.setTimeout(function() {
+                                        self.focus(function(field) {
+                                            // done
+                                        });
+                                    }, 250);
+                                }
                             });
                         }
                     });
@@ -22441,6 +22789,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                             }
                                         }
                                     }
+                                }
+                                else
+                                {
+                                    // allow focus to settle on invalid field
+                                    window.setTimeout(function() {
+                                        self.focus(function(field) {
+                                            // done
+                                        });
+                                    }, 250);
                                 }
                             });
                         }
@@ -22576,23 +22933,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             var step = 1;
-            var col = [];
+            var stepFields = [];
             do
             {
                 // collect fields in this step
-                col = [];
+                stepFields = [];
                 for (var propertyId in stepBindings)
                 {
-                    if (stepBindings[propertyId] == step)
+                    if (stepBindings[propertyId] === step)
                     {
                         if (this.childrenByPropertyId && this.childrenByPropertyId[propertyId])
                         {
-                            col.push(this.childrenByPropertyId[propertyId].field);
+                            //col.push(this.childrenByPropertyId[propertyId].field);
+                            //col.push(this.childrenByPropertyId[propertyId].containerItemEl);
+                            stepFields.push(this.childrenByPropertyId[propertyId]);
                         }
                     }
                 }
 
-                if (col.length > 0)
+                if (stepFields.length > 0)
                 {
                     var stepEl = null;
                     if (createSteps)
@@ -22605,19 +22964,53 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         stepEl = $($(this.field).find("[data-alpaca-wizard-role='step']")[step-1]);
                     }
 
-                    // move elements in
-                    for (var i = 0; i < col.length; i++)
+                    // is there any order information in the items?
+                    var hasOrderInformation = false;
+                    for (var i = 0; i < stepFields.length; i++) {
+                        if (typeof(stepFields[i].options.order) !== "undefined") {
+                            hasOrderInformation = true;
+                            break;
+                        }
+                    }
+
+                    if (hasOrderInformation)
                     {
-                        $(stepEl).append(col[i]);
+                        // sort by order?
+                        stepFields.sort(function (a, b) {
+
+                            var orderA = a.options.order;
+                            if (!orderA)
+                            {
+                                orderA = 0;
+                            }
+                            var orderB = b.options.order;
+                            if (!orderB)
+                            {
+                                orderB = 0;
+                            }
+
+                            return (orderA - orderB);
+                        });
+                    }
+
+                    // move elements in
+                    for (var i = 0; i < stepFields.length; i++)
+                    {
+                        $(stepEl).append(stepFields[i].containerItemEl);
                     }
 
                     step++;
                 }
             }
-            while (col.length > 0);
+            while (stepFields.length > 0);
 
             // now run the normal wizard
             this.wizard();
+
+            // if the container element doesn't have any children left, hide it
+            if ($(this.container).children().length === 0) {
+                $(this.container).css("display", "none");
+            }
         },
 
         /**
@@ -22717,8 +23110,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 tempSourceMarker.replaceWith(targetContainer);
                 tempTargetMarker.replaceWith(sourceContainer);
 
-                // updates child dom marker elements
-                self.updateChildDOMElements();
+                // updates dom markers for this element and any siblings
+                self.handleRepositionDOMRefresh();
 
                 // update the action bar bindings
                 $(sourceContainer).find("[data-alpaca-array-actionbar-item-index='" + sourceIndex + "']").attr("data-alpaca-array-actionbar-item-index", targetIndex);
@@ -22729,6 +23122,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 // trigger update
                 self.triggerUpdate();
+
+                // dispatch event: move
+                self.trigger("move");
 
                 if (callback)
                 {
@@ -22813,6 +23209,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         getSchemaOfOptions: function() {
             var schemaOfOptions = Alpaca.merge(this.base(), {
                 "properties": {
+                },
+                "order": {
+                    "type": "number",
+                    "title": "Order",
+                    "description": "Allows for optional specification of the index of this field in the properties array."
                 }
             });
 
@@ -22880,9 +23281,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Field#getValue
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             return this._getControlVal(true);
         },
@@ -22924,9 +23325,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * @see Alpaca.Field#focus
          */
-        focus: function()
+        focus: function(onFocusCallback)
         {
             this.control.focus();
+
+            if (onFocusCallback)
+            {
+                onFocusCallback(this);
+            }
         },
 
         /**
@@ -23031,9 +23437,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Field#getValue
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             return this._getControlVal(true);
         },
@@ -23406,7 +23812,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                         self.editor = CKEDITOR.replace($(self.control)[0], self.options.ckeditor);
 
-                    }, 250);
+                    }, 500);
                 }
 
                 // if the ckeditor's dom element gets destroyed, make sure we clean up the editor instance
@@ -23415,7 +23821,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (self.editor)
                     {
                         self.editor.removeAllListeners();
-                        self.editor.destroy(false);
+                        // catch here because CKEditor has an issue if DOM element deletes before CKEditor cleans up
+                        // see: https://github.com/lemonde/angular-ckeditor/issues/7
+                        try { self.editor.destroy(false); } catch (e) { }
                         self.editor = null;
                     }
 
@@ -23425,16 +23833,105 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             });
         },
 
+        initControlEvents: function()
+        {
+            var self = this;
+
+            setTimeout(function() {
+
+                if (self.editor)
+                {
+                    // click event
+                    self.editor.on("click", function (e) {
+                        self.onClick.call(self, e);
+                        self.trigger("click", e);
+                    });
+
+                    // change event
+                    self.editor.on("change", function (e) {
+                        self.onChange();
+                        self.triggerWithPropagation("change", e);
+                    });
+
+                    // blur event
+                    self.editor.on('blur', function (e) {
+                        self.onBlur();
+                        self.trigger("blur", e);
+                    });
+
+                    // focus event
+                    self.editor.on("focus", function (e) {
+                        self.onFocus.call(self, e);
+                        self.trigger("focus", e);
+                    });
+
+                    // keypress event
+                    self.editor.on("key", function (e) {
+                        self.onKeyPress.call(self, e);
+                        self.trigger("keypress", e);
+                    });
+
+                    // NOTE: these do not seem to work with CKEditor?
+                    /*
+                     // keyup event
+                     self.editor.on("keyup", function(e) {
+                     self.onKeyUp.call(self, e);
+                     self.trigger("keyup", e);
+                     });
+
+                     // keydown event
+                     self.editor.on("keydown", function(e) {
+                     self.onKeyDown.call(self, e);
+                     self.trigger("keydown", e);
+                     });
+                     */
+                }
+
+            }, 525); // NOTE: odd timing dependencies
+        },
+
+        setValue: function(value)
+        {
+            var self = this;
+
+            // be sure to call into base method
+            this.base(value);
+
+            if (self.editor)
+            {
+                self.editor.setData(value);
+            }
+        },
+
+        /**
+         * @see Alpaca.Fields.ControlField#getControlValue
+         */
+        getControlValue: function()
+        {
+            var self = this;
+
+            var value = null;
+
+            if (self.editor)
+            {
+                value = self.editor.getData();
+            }
+
+            return value;
+        },
+
         /**
          * @see Alpaca.Field#destroy
          */
         destroy: function()
         {
+            var self = this;
+
             // destroy the plugin instance
-            if (this.editor)
+            if (self.editor)
             {
-                this.editor.destroy();
-                this.editor = null;
+                self.editor.destroy();
+                self.editor = null;
             }
 
             // call up to base method
@@ -23741,13 +24238,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Fields.TextField#getValue
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function() {
+        getControlValue: function() {
 
             var field = this.getControlEl();
 
-            var val = $(field).is('input') ? field.val() : field.hmtl();
+            var val = $(field).is('input') ? field.val() : field.html();
             if (this.options.unmask || this.options.round !== "none") {
                 var unmasked = function() {
                     var result = '';
@@ -24003,12 +24500,53 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 self.options.picker.format = self.options.dateFormat;
             }
 
+            if (!self.options.picker.locale) {
+                self.options.picker.locale = "en_US";
+            }
+
+            if (!self.options.picker.dayViewHeaderFormat) {
+                self.options.picker.dayViewHeaderFormat = "MMMM YYYY";
+            }
+
             // extra formats
             if (!self.options.picker.extraFormats) {
                 var extraFormats = self.getDefaultExtraFormats();
                 if (extraFormats) {
                     self.options.picker.extraFormats = extraFormats;
                 }
+            }
+
+            if (typeof(self.options.manualEntry) === "undefined")
+            {
+                self.options.manualEntry = false;
+            }
+        },
+        
+        onKeyPress: function(e)
+        {
+            if (this.options.manualEntry)
+            {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+            else
+            {
+                this.base(e);
+                return;
+            }
+        },
+        
+        onKeyDown: function(e)
+        {
+            if (this.options.manualEntry)
+            {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+            else
+            {
+                this.base(e);
+                return;
             }
         },
 
@@ -24036,12 +24574,33 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         {
                             self.options.dateFormat = self.picker.format();
                         }
+
+                        // with date-time picker, trigger change using plugin
+                        self.getFieldEl().on("dp.change", function(e) {
+
+                            // we use a timeout here because we want this to run AFTER control click handlers
+                            setTimeout(function() {
+                                self.onChange.call(self, e);
+                                self.triggerWithPropagation("change", e);
+                            }, 250);
+
+                        });
                     }
                 }
 
                 callback();
 
             });
+        },
+
+        /**
+         * Allows manual entry mode to be toggled on and off.
+         *
+         * @param manualEntry
+         */
+        setManualEntry: function(manualEntry)
+        {
+            this.options.manualEntry = manualEntry;
         },
 
         /**
@@ -24169,14 +24728,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.picker.date(value);
                 }
             }
-        },
-
-        /**
-         * @see Alpaca.Fields.TextField#getValue
-         */
-        getValue: function()
-        {
-            return this.base();
         },
 
         destroy: function()
@@ -24695,9 +25246,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.Fields.TextField#getValue
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             var value = null;
 
@@ -25111,7 +25662,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * @see Alpaca.Fields.NumberField#getValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             var val = this.base();
 
@@ -25486,9 +26037,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.ContainerField#getValue
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             var val = this.base();
 
@@ -25770,6 +26321,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * @see Alpaca.Fields.TextField#setup
+         */
+        setup: function()
+        {
+            var self = this;
+
+            this.base();
+
+            if (this.data) {
+                this.data = this.data.toLowerCase();
+            }
+        },
+
+        /**
          * @see Alpaca.Fields.TextField#setValue
          */
         setValue: function(val)
@@ -25875,9 +26440,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
-         * @see Alpaca.ContainerField#getValue
+         * @see Alpaca.ContainerField#getContainerValue
          */
-        getValue: function()
+        getContainerValue: function()
         {
             // if we don't have any children and we're not required, hand back undefined
             if (this.children.length === 0 && !this.isRequired())
@@ -26002,6 +26567,499 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         "keyNotUnique": "Keys of map field are not unique.",
         "keyMissing": "Map contains an empty key."
     });
+
+})(jQuery);
+
+(function($) {
+
+    var Alpaca = $.alpaca;
+
+    Alpaca.Fields.OptionTreeField = Alpaca.Fields.TextField.extend(
+    /**
+     * @lends Alpaca.Fields.OptionTree.prototype
+     */
+    {
+        /**
+         * @see Alpaca.Fields.ObjectField#getFieldType
+         */
+        getFieldType: function() {
+            return "optiontree";
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.ObjectField#setup
+         */
+        setup: function()
+        {
+            var self = this;
+
+            this.base();
+
+            if (!this.options.tree)
+            {
+                this.options.tree = {};
+            }
+
+            if (!this.options.tree.selectors)
+            {
+                this.options.tree.selectors = {};
+            }
+
+            if (!this.options.tree.order)
+            {
+                this.options.tree.order = [];
+            }
+
+            // ensure all options have schema
+            for (var k in this.options.tree.selectors)
+            {
+                if (!this.options.tree.selectors[k].schema) {
+                    Alpaca.logError("OptionTree selector for: " + k + " is missing schema");
+                    return;
+                }
+
+                if (!this.options.tree.selectors[k].options) {
+                    this.options.tree.selectors[k].options = {};
+                }
+            }
+
+            if (!this.options.tree.data)
+            {
+                this.options.tree.data = [];
+            }
+
+            // walk data
+            for (var i = 0; i < this.options.tree.data.length; i++)
+            {
+                var item = this.options.tree.data[i];
+
+                if (item.attributes)
+                {
+                    for (var k in item.attributes)
+                    {
+                        if (!this.options.tree.selectors[k])
+                        {
+                            this.options.tree.selectors[k] = {};
+                        }
+
+                        if (!this.options.tree.selectors[k].label)
+                        {
+                            this.options.tree.selectors[k].options.noneLabel = "Choose...";
+                        }
+
+                        if (!this.options.tree.selectors[k].type)
+                        {
+                            this.options.tree.selectors[k].options.type = "select";
+                        }
+                    }
+                }
+            }
+
+            // assume the order from the options if not otherwise provided
+            if (!self.options.tree.order)
+            {
+                self.options.tree.order = [];
+
+                for (var k in self.options.tree.selectors)
+                {
+                    self.options.tree.order.push(self.options.tree.selectors[k]);
+                }
+            }
+
+            if (typeof(self.options.tree.horizontal) === "undefined")
+            {
+                self.options.tree.horizontal = true;
+            }
+
+            // create a lookup list for option list key/value based on location
+            this.locationValueLists = {};
+            this.locationValues = {};
+
+            for (var i = 0; i < self.options.tree.data.length; i++)
+            {
+                if (self.options.tree.data[i].attributes)
+                {
+                    var location = "root";
+
+                    for (var k in self.options.tree.data[i].attributes)
+                    {
+                        var v = self.options.tree.data[i].attributes[k];
+
+                        var array = this.locationValueLists[location];
+                        if (!array) {
+                            array = [];
+                            this.locationValueLists[location] = array;
+                        }
+
+                        var exists = false;
+                        for (var x = 0; x < array.length; x++)
+                        {
+                            if (array[x].value === v) {
+                                exists = true;
+                                break;
+                            }
+                        }
+
+                        if (!exists)
+                        {
+                            array.push({
+                                "text": v,
+                                "value": v
+                            });
+                        }
+
+                        if (location.length > 0) {
+                            location += "~";
+                        }
+
+                        location += k + "=" + v;
+                    }
+
+                    this.locationValues[location] = self.options.tree.data[i].value;
+                }
+            }
+
+            this.currentAttributes = {};
+            this.controls = {};
+        },
+
+        toLocation: function(attrs)
+        {
+            var location = "root";
+
+            for (var k in attrs)
+            {
+                var v = attrs[k];
+
+                if (location.length > 0) {
+                    location += "~";
+                }
+
+                location += k + "=" + v;
+            }
+
+            return location;
+        },
+
+        existsLocationWithPrefix: function(prefix)
+        {
+            var match = false;
+
+            for (var k in this.locationValueLists)
+            {
+                if (k.indexOf(prefix) > -1)
+                {
+                    match = true;
+                    break;
+                }
+            }
+
+            return match;
+        },
+
+        /**
+         * @see Alpaca.Field#afterRenderControl
+         */
+        afterRenderControl: function(model, callback) {
+
+            var self = this;
+
+            self.optionTreeHolder = $(self.field).find(".optiontree");
+
+            if (self.options.tree.horizontal)
+            {
+                $(self.field).addClass("optiontree-horizontal");
+            }
+
+            this.base(model, function() {
+
+                self.refreshOptionTreeControls(function() {
+                    callback();
+                });
+
+            });
+        },
+
+        refreshOptionTreeControls: function(callback)
+        {
+            var self = this;
+
+            // hide all of the controls
+            for (var k in self.controls)
+            {
+                self.controls[k].hide();
+            }
+
+            // find the index of the last option for which we are missing a value
+            var displayUpToIndex = 0;
+            for (var i = 0; i < self.options.tree.order.length; i++)
+            {
+                var selectorId = self.options.tree.order[i];
+
+                if (typeof(self.currentAttributes[selectorId]) !== "undefined" && self.currentAttributes[selectorId] !== null  && self.currentAttributes[selectorId] !== "")
+                {
+                    displayUpToIndex++;
+                }
+            }
+
+            // walk through order and construct render functions
+            var location = "root";
+            var fns = [];
+            var displayCount = 0;
+            var i = 0;
+            do
+            {
+                if (i < self.options.tree.order.length)
+                {
+                    var selectorId = self.options.tree.order[i];
+
+                    var hasMatches = (i == self.options.tree.order.length - 1) || (self.existsLocationWithPrefix(location + "~" + selectorId + "="));
+                    if (hasMatches)
+                    {
+                        if (displayCount <= displayUpToIndex)
+                        {
+                            if (self.controls[selectorId])
+                            {
+                                // show this one
+                                self.controls[selectorId].show();
+
+                                location += "~" + selectorId + "=" + self.currentAttributes[selectorId];
+                            }
+                            else
+                            {
+                                var selector = self.options.tree.selectors[selectorId];
+                                var last = (i + 1 === self.options.tree.order.length);
+
+                                var fn = function(index, selectorId, selector, controls, optionTreeHolder, last) {
+                                    return function(done) {
+
+                                        var alpacaSchema = selector.schema;
+
+                                        var alpacaOptions = selector.options;
+                                        if (!alpacaOptions) {
+                                            alpacaOptions = {};
+                                        }
+                                        if (!alpacaOptions.type) {
+                                            alpacaOptions.type = "select";
+                                        }
+
+                                        if (alpacaOptions.type === "select") {
+
+                                            alpacaOptions.dataSource = function(callback) {
+
+                                                var currentLocation = self.toLocation(self.currentAttributes);
+                                                var currentValueList = self.locationValueLists[currentLocation];
+
+                                                callback(currentValueList);
+
+                                            };
+                                        }
+
+                                        // render via alpaca
+                                        var domEl = $("<div class='optiontree-selector'></div>");
+
+                                        $(domEl).alpaca({
+                                            "schema": alpacaSchema,
+                                            "options": alpacaOptions,
+                                            "postRender": function(control) {
+
+                                                controls[selectorId] = control;
+
+                                                // append to the holder element
+                                                $(optionTreeHolder).append(domEl);
+
+                                                control.selectorId = selectorId;
+
+                                                // when the value of this control changes, we record it into our
+                                                // current attribute set
+                                                control.on("change", function() {
+
+                                                    var selectorId = this.selectorId;
+
+                                                    // set our attribute value
+                                                    self.currentAttributes[selectorId] = this.getValue();
+
+                                                    // clear out everything past our index value
+                                                    for (var i = 0; i < self.options.tree.order.length; i++)
+                                                    {
+                                                        if (i > index)
+                                                        {
+                                                            var selectorId = self.options.tree.order[i];
+                                                            delete self.currentAttributes[selectorId];
+                                                            if (controls[selectorId])
+                                                            {
+                                                                controls[selectorId].destroy();
+                                                                delete controls[selectorId];
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (last)
+                                                    {
+                                                        // find the match
+                                                        var val = null;
+
+                                                        for (var i = 0; i < self.options.tree.data.length; i++)
+                                                        {
+                                                            var match = true;
+
+                                                            var attrs = self.options.tree.data[i].attributes;
+                                                            for (var k in self.currentAttributes)
+                                                            {
+                                                                if (attrs[k] !== self.currentAttributes[k])
+                                                                {
+                                                                    match = false;
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                            if (match)
+                                                            {
+                                                                val = self.options.tree.data[i].value;
+                                                            }
+                                                        }
+
+                                                        if (val)
+                                                        {
+                                                            self.setValue(val);
+                                                        }
+                                                    }
+
+                                                    self.refreshOptionTreeControls();
+                                                });
+
+                                                // show by default
+                                                control.show();
+
+                                                done();
+                                            }
+                                        });
+                                    }
+                                }(i, selectorId, selector, self.controls, self.optionTreeHolder, last);
+
+                                fns.push(fn);
+
+                                location += "~" + selectorId + "=" + self.currentAttributes[selectorId];
+                            }
+
+                            displayCount++;
+                        }
+                        else
+                        {
+                            if (self.controls[selectorId])
+                            {
+                                self.controls[selectorId].destroy();
+                                delete self.controls[selectorId];
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (self.controls[selectorId])
+                        {
+                            self.controls[selectorId].destroy();
+                            delete self.controls[selectorId];
+                        }
+                    }
+                }
+
+                i++;
+            }
+            while (i < self.options.tree.order.length);
+
+            Alpaca.series(fns, function() {
+
+                if (callback)
+                {
+                    callback();
+                }
+
+            });
+
+        },
+
+        /**
+         * @see Alpaca.Fields.ObjectField#getType
+         */
+        getType: function() {
+            return "any";
+        }
+
+        /* builder_helpers */
+        ,
+
+        /**
+         * @see Alpaca.Fields.ObjectField#getTitle
+         */
+        getTitle: function() {
+            return "Option Tree";
+        },
+
+        /**
+         * @see Alpaca.Fields.ObjectField#getDescription
+         */
+        getDescription: function() {
+            return "Option Tree";
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.ObjectField#getSchemaOfOptions
+         */
+        getSchemaOfOptions: function() {
+            return Alpaca.merge(this.base(), {
+                "properties": {
+                    "tree": {
+                        "type": "object",
+                        "properties": {
+                            "options": {
+                                "type": "object"
+                            },
+                            "order": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "any"
+                                        },
+                                        "attributes": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            },
+                            "horizontal": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                }
+            });
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.ObjectField#getOptionsForOptions
+         */
+        getOptionsForOptions: function() {
+            return Alpaca.merge(this.base(), {
+                "fields": {
+                }
+            });
+        }
+
+        /* end_builder_helpers */
+    });
+
+    Alpaca.registerFieldClass("optiontree", Alpaca.Fields.OptionTreeField);
 
 })(jQuery);
 
@@ -26701,6 +27759,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 self.options.animate = false;
             }
 
+            // assume toolbar sticky if not otherwise specified
+            if (typeof(this.options.toolbarSticky) === "undefined")
+            {
+                this.options.toolbarSticky = true;
+            }
+
             this.base();
 
             if (!this.options.items.type)
@@ -26740,6 +27804,73 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.options.showActionsColumn = false;
                 }
             }
+
+            // data tables columns
+            this.options.datatables.columns = [];
+
+            // initialize data tables to detect alpaca field types and perform alpaca field sorting and filtering
+            if ($.fn.dataTableExt && !$.fn.DataTable.ext.type.search["alpaca"])
+            {
+                $.fn.DataTable.ext.order["alpaca"] = function (settings, col) {
+
+                    return this.api().column( col, {order:'index'} ).nodes().map( function ( td, i ) {
+                        var alpacaId = $(td).children().attr("data-alpaca-field-id");
+                        return Alpaca.fieldInstances[alpacaId].getValue();
+                    } );
+
+                };
+
+                // this is a kind of hacky function at the moment, trying to do filtering that takes into account
+                // alpaca field values
+                //
+                // according to data tables authors, need to wait for next release for refactoring of filtering
+                // logic in data tables to really take control of this and do it right
+                // this "sort of" works for now
+                //
+                $.fn.dataTableExt.afnFiltering.push(function(settings, fields, fieldIndex, data, dataIndex) {
+
+                    var text = $(settings.nTableWrapper).find(".dataTables_filter input[type='search']").val();
+
+                    if (!text) {
+                        return true;
+                    }
+
+                    text = "" + text;
+
+                    text = $.trim(text);
+                    text = text.toLowerCase();
+
+                    var match = false;
+
+                    for (var i = 0; i < data.length; i++)
+                    {
+                        var dataValue = data[i];
+                        if (dataValue)
+                        {
+                            var z = dataValue.indexOf("data-alpaca-field-id=");
+                            if (z > -1)
+                            {
+                                var alpacaId = $(dataValue).attr("data-alpaca-field-id");
+
+                                var alpacaValue = Alpaca.fieldInstances[alpacaId].getValue();
+                                if (alpacaValue)
+                                {
+                                    alpacaValue = "" + alpacaValue;
+                                    alpacaValue = alpacaValue.toLowerCase();
+
+                                    if (alpacaValue.indexOf(text) > -1)
+                                    {
+                                        match = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return match;
+                });
+            }
         },
 
         /**
@@ -26747,6 +27878,43 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         getFieldType: function() {
             return "table";
+        },
+
+        prepareContainerModel: function(callback)
+        {
+            var self = this;
+
+            self.base(function(model) {
+
+                // build a separate "items" array that we'll use to build out the table header
+                model.headers = [];
+                if (self.schema.items && self.schema.items.properties)
+                {
+                    for (var k in self.schema.items.properties)
+                    {
+                        var header = {};
+                        header.id = k;
+                        header.title = self.schema.items.properties[k].title;
+                        header.hidden = false;
+                        if (self.options.items && self.options.items.fields && self.options.items.fields[k])
+                        {
+                            if (self.options.items.fields[k].label)
+                            {
+                                header.title = self.options.items.fields[k].label;
+                            }
+
+                            if (self.options.items.fields[k].type === "hidden")
+                            {
+                                header.hidden = true;
+                            }
+                        }
+
+                        model.headers.push(header);
+                    }
+                }
+
+                callback(model);
+            });
         },
 
         /**
@@ -26776,9 +27944,52 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 {
                     if ($.fn.DataTable)
                     {
+                        // mix in fields from the items
+                        for (var k in self.schema.items.properties)
+                        {
+                            self.options.datatables.columns.push({
+                                "orderable": true,
+                                "orderDataType": "alpaca"
+                            });
+                        }
+
+                        // if we have an actions column enabled, then turn off sorting for the actions column (assumed to be last)
+                        if (self.options.showActionsColumn)
+                        {
+                            self.options.datatables.columns.push({
+                                "orderable": false,
+                                "name": "actions"
+                            });
+                        }
+
                         $(this.container).find("table").DataTable(self.options.datatables);
                     }
                 }
+
+                // walk through headers and allow for callback-based config
+                $(table).find("thead > tr > th[data-header-id]").each(function() {
+
+                    var key = $(this).attr("data-header-id");
+
+                    var schema = self.schema.items.properties[key];
+                    var options = null;
+                    if (self.options.items.fields && self.options.items.fields[key]) {
+                        options = self.options.items.fields[key];
+                    }
+
+                    // CALLBACK: "tableHeaderRequired" or "tableHeaderOptional"
+                    if (schema.required || (options && options.required))
+                    {
+                        // CALLBACK: "tableHeaderRequired"
+                        self.fireCallback("tableHeaderRequired", schema, options, this);
+                    }
+                    else
+                    {
+                        // CALLBACK: "tableHeaderOptional"
+                        self.fireCallback("tableHeaderOptional", schema, options, this);
+                    }
+
+                });
 
                 callback();
 
@@ -26964,6 +28175,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 model.options.showActionsColumn = self.parent.options.showActionsColumn;
 
+                // walk all items and mark hiddens so that the template can easily pick this up
+                // hiddens are applied the "alpaca-table-column-hidden" css class so that they can be hidden
+                for (var i = 0; i < model.items.length; i++)
+                {
+                    if (model.items[i].options.type === "hidden")
+                    {
+                        model.items[i].hidden = true;
+                    }
+                }
+
                 callback(model);
             });
         },
@@ -26975,11 +28196,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.base(model, function() {
 
-                // apply "data-search" to the TD elements
+                // apply data-type="alpaca" to each TD
                 var tds = $(this.container).find("td");
                 for (var i = 0; i < self.children.length; i++)
                 {
-                    $(tds[i]).attr("data-filter", "abc");//self.children[i].getValue());
+                    $(tds[i]).attr("data-type", "alpaca");
                 }
 
                 callback();
@@ -27058,7 +28279,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         /**
          * @see Alpaca.Fields.TextField#getValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             var val = this.base();
 
@@ -27249,58 +28470,147 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
              */
             setup: function()
             {
-                var self=this;
+                var self = this;
 
-                if (!this.data)  {
+                if (!this.data)
+                {
                     this.data = "";
                 }
 
-                var standardToolbar="insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image";
-                if (!self.options.toolbar) {
-                    self.options.toolbar = standardToolbar;
+                if (!self.options.toolbar)
+                {
+                    self.options.toolbar = "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image";
                 }
 
                 this.base();
             },
 
-            getValue:function()
+            setValue: function(value)
             {
                 var self = this;
 
-                var rteFieldID = self.control[0].id;
-                var rteRef = tinymce.get(rteFieldID);
-                var returnVal = "";
+                // be sure to call into base method
+                this.base(value);
 
-                //when page intially loads and tinyMCE not yet initialized, this check prevents an error
-                if (!rteRef)
+                if (self.editor)
                 {
-                    returnVal = rteRef.getContent()
+                    self.editor.setContent(value);
+                }
+            },
+
+            /**
+             * @see Alpaca.Fields.ControlField#getControlValue
+             */
+            getControlValue:function()
+            {
+                var self = this;
+
+                var value = null;
+
+                if (self.editor)
+                {
+                    value = self.editor.getContent()
                 }
 
-                return returnVal;
+                return value;
+            },
+
+            initControlEvents: function()
+            {
+                var self = this;
+
+                setTimeout(function() {
+
+                    if (self.editor) {
+
+                        // click event
+                        self.editor.on("click", function (e) {
+                            self.onClick.call(self, e);
+                            self.trigger("click", e);
+                        });
+
+                        // change event
+                        self.editor.on("change", function (e) {
+                            self.onChange();
+                            self.triggerWithPropagation("change", e);
+                        });
+
+                        // blur event
+                        self.editor.on('blur', function (e) {
+                            self.onBlur();
+                            self.trigger("blur", e);
+                        });
+
+                        // focus event
+                        self.editor.on("focus", function (e) {
+                            self.onFocus.call(self, e);
+                            self.trigger("focus", e);
+                        });
+
+                        // keypress event
+                        self.editor.on("keypress", function (e) {
+                            self.onKeyPress.call(self, e);
+                            self.trigger("keypress", e);
+                        });
+
+                        // keyup event
+                        self.editor.on("keyup", function (e) {
+                            self.onKeyUp.call(self, e);
+                            self.trigger("keyup", e);
+                        });
+
+                        // keydown event
+                        self.editor.on("keydown", function (e) {
+                            self.onKeyDown.call(self, e);
+                            self.trigger("keydown", e);
+                        });
+                    }
+
+                }, 525);
             },
 
             afterRenderControl: function(model, callback)
             {
-                //"insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
                 var self = this;
                 this.base(model, function() {
 
-                    if (!this.data) {
-                        if (!self.isDisplayOnly() && self.control) {
-                            var rteFieldID = self.control[0].id;
+                    if (!self.isDisplayOnly() && self.control && typeof(tinyMCE) !== "undefined")
+                    {
+                        var rteFieldID = self.control[0].id;
 
-                            setTimeout(function () {
-                                tinyMCE.init({
-                                    selector: "#" + rteFieldID,
-                                    toolbar: self.options.toolbar
-                                });
-                            }, 250); //There may be a better/more proper way to wait to be able to call tinymce, but calling it in a setTimeout seems to be reliable
-                        }
+                        setTimeout(function () {
+
+                            tinyMCE.init({
+                                init_instance_callback: function(editor) {
+                                    self.editor = editor;
+
+                                    callback();
+                                },
+                                selector: "#" + rteFieldID,
+                                toolbar: self.options.toolbar
+                            });
+
+                        }, 500);
                     }
-
-                    callback();
                 });
+            },
+
+            /**
+             * @see Alpaca.Field#destroy
+             */
+            destroy: function()
+            {
+                var self = this;
+
+                // destroy the plugin instance
+                if (self.editor)
+                {
+                    self.editor.remove();
+                    self.editor = null;
+                }
+
+                // call up to base method
+                this.base();
             },
 
 
@@ -27411,6 +28721,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         model.size = formatFileSize(model.size);
                         model.buttons = self.options.buttons;
                         model.view = self.view;
+                        model.fileIndex = i;
 
                         var row = Alpaca.tmpl(self.view.getTemplateDescriptor(templateId), model, self);
 
@@ -27428,13 +28739,24 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                         self.handleWrapRow(this, options);
 
-                        // this event gets fired when the AJAX has been handled to delete the remote resource
-                        $(this).find("button.delete").on("destroyed", function() {
+                        var row = $(this);
+
+                        // this event gets fired when fileimpl has cleaned up the DOM element
+                        // we handle Ajax related stuff on our own here
+                        //$(this).find("button.delete").on("destroyed", function() {
+                        $(this).find("button.delete").on("click", function() {
+
+                            var button = $(row).find("button.delete");
+
+                            var fileIndex = $(button).attr("data-file-index");
+                            var file = files[fileIndex];
+
+                            self.onFileDelete.call(self, row, button, file);
+
+                            self.triggerWithPropagation("change");
                             setTimeout(function() {
                                 self.refreshUIState();
-                                self.onFileDelete(row);
-                                self.triggerWithPropagation("change");
-                            }, 250);
+                            }, 200);
                         });
 
                     });
@@ -27460,6 +28782,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.base();
 
+            // disable bottom control buttons (we have a conflict over the 'buttons' namespace)
+            self.options.renderButtons = false;
+
             if (!self.options.buttons)
             {
                 self.options.buttons = [];
@@ -27473,17 +28798,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 });
             }
 
-            if (typeof(self.options.multiple) == "undefined")
+            if (typeof(self.options.multiple) === "undefined")
             {
                 self.options.multiple = false;
             }
 
-            if (typeof(self.options.showUploadPreview) == "undefined")
+            if (typeof(self.options.showUploadPreview) === "undefined")
             {
                 self.options.showUploadPreview = true;
             }
 
-            if (typeof(self.options.showHeaders) == "undefined")
+            if (typeof(self.options.showHeaders) === "undefined")
             {
                 self.options.showHeaders = true;
             }
@@ -27492,6 +28817,164 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             {
                 self.data = [];
             }
+
+            // upload
+            if (!self.options.upload)
+            {
+                self.options.upload = {};
+            }
+
+            // max number of files
+            if (typeof(self.options.maxNumberOfFiles) === "undefined")
+            {
+                if (self.options.upload.maxNumberOfFiles)
+                {
+                    self.options.maxNumberOfFiles = self.options.upload.maxNumberOfFiles;
+                    if (self.options.maxNumberOfFiles === 1)
+                    {
+                        self.options.multiple = false;
+                    }
+                    else if (self.options.maxNumberOfFiles > 1)
+                    {
+                        self.options.multiple = true;
+                    }
+                }
+                else
+                {
+                    self.options.maxNumberOfFiles = 1;
+                    if (typeof(self.options.multiple) === "boolean" && self.options.multiple)
+                    {
+                        self.options.maxNumberOfFiles = -1;
+                    }
+                }
+
+                // copy setting into upload
+                if (self.options.maxNumberOfFiles)
+                {
+                    self.options.upload.maxNumberOfFiles = self.options.maxNumberOfFiles;
+                }
+
+            }
+
+            // max file size
+            if (typeof(self.options.maxFileSize) === "undefined")
+            {
+                if (self.options.upload.maxFileSize)
+                {
+                    self.options.maxFileSize = self.options.upload.maxFileSize;
+                }
+                else
+                {
+                    self.options.maxFileSize = -1; // no limit
+                }
+
+                // copy setting into upload
+                if (self.options.maxFileSize)
+                {
+                    self.options.upload.maxFileSize = self.options.maxFileSize;
+                }
+            }
+
+            // file types
+            if (typeof(self.options.fileTypes) === "undefined")
+            {
+                if (self.options.upload.acceptFileTypes)
+                {
+                    self.options.fileTypes = self.options.upload.acceptFileTypes;
+                }
+                else
+                {
+                    self.options.fileTypes = null; // no restrictions
+                }
+
+                // copy setting into upload
+                if (self.options.fileTypes)
+                {
+                    self.options.upload.acceptFileTypes = self.options.fileTypes;
+                }
+            }
+
+            // error handler
+            if (!self.options.errorHandler)
+            {
+                self.options.errorHandler = function(messages)
+                {
+                    alert(messages.join("\n"));
+                };
+            }
+
+            // if Alpaca is configured for CSRF support and a CSRF cookie or token is available,
+            // then apply it to the headers that are sent over the wire via the underlying ajax
+            // for the file upload control
+
+            // if we have a CSRF token, apply it to the headers
+            var csrfToken = self.determineCsrfToken();
+            if (csrfToken)
+            {
+                if (!self.options.upload) {
+                    self.options.upload = {};
+                }
+
+                if (!self.options.upload.headers) {
+                    self.options.upload.headers = {};
+                }
+
+                self.options.upload.headers[Alpaca.CSRF_HEADER_NAME] = csrfToken;
+            }
+
+        },
+
+        determineCsrfToken: function()
+        {
+            // is there a direct token specified?
+            var csrfToken = Alpaca.CSRF_TOKEN;
+            if (!csrfToken)
+            {
+                // is there a cookie that we can pull the value from?
+                for (var t = 0; t < Alpaca.CSRF_COOKIE_NAMES.length; t++)
+                {
+                    var cookieName = Alpaca.CSRF_COOKIE_NAMES[t];
+
+                    var cookieValue = Alpaca.readCookie(cookieName);
+                    if (cookieValue)
+                    {
+                        csrfToken = cookieValue;
+                        break;
+                    }
+                }
+            }
+
+            return csrfToken;
+        },
+
+        prepareControlModel: function(callback)
+        {
+            var self = this;
+
+            self.base(function(model) {
+
+                model.chooseButtonLabel = self.options.chooseButtonLabel;
+                if (!model.chooseButtonLabel)
+                {
+                    model.chooseButtonLabel = self.getMessage("chooseFiles");
+                    if (self.options.maxNumberOfFiles === 1)
+                    {
+                        model.chooseButtonLabel = self.getMessage("chooseFile");
+                    }
+                }
+
+                model.dropZoneMessage = self.options.dropZoneMessage;
+                if (!model.dropZoneMessage)
+                {
+                    model.dropZoneMessage = self.getMessage("dropZoneSingle");
+                    if (model.maxNumberOfFiles === 1)
+                    {
+                        model.dropZoneMessage = self.getMessage("dropZoneMultiple");
+                    }
+                }
+
+                callback(model);
+            });
         },
 
         afterRenderControl: function(model, callback)
@@ -27501,6 +28984,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.base(model, function() {
 
                 self.handlePostRender(function() {
+
+                    // if we're in display-only mode, we hide a bunch of things
+                    if (self.isDisplayOnly())
+                    {
+                        $(self.control).find("button").hide();
+                        $(self.control).find(".btn").hide();
+                        $(self.control).find(".alpaca-fileupload-chooserow").hide();
+                        $(self.control).find(".dropzone-message").hide();
+                    }
+
                     callback();
                 });
 
@@ -27587,13 +29080,74 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             };
 
+            // some limit checks
+            fileUploadConfig["add"] = function(e, data) {
+
+                var uploadErrors = [];
+
+                var i = 0;
+                do
+                {
+                    var bad = false;
+
+                    if (i < data.originalFiles.length)
+                    {
+                        // file types
+                        if (self.options.fileTypes)
+                        {
+                            var re = self.options.fileTypes;
+                            if (typeof(self.options.fileTypes) === "string")
+                            {
+                                re = new RegExp(self.options.fileTypes);
+                            }
+
+                            if (!re.test(data.originalFiles[i]["type"]))
+                            {
+                                uploadErrors.push('Not an accepted file type: ' + data.originalFiles[i]["type"]);
+                                bad = true;
+                            }
+                        }
+
+                        // size
+                        if (self.options.maxFileSize > -1)
+                        {
+                            if (data.originalFiles[i].size > self.options.maxFileSize) {
+                                uploadErrors.push('Filesize is too big: ' + data.originalFiles[i].size);
+                                bad = true;
+                            }
+                        }
+                    }
+
+                    if (bad)
+                    {
+                        //data.originalFiles.splice(i, 1);
+                        //data.files.splice(i, 1);
+                        i++;
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+                while (i < data.originalFiles.length);
+
+                if (uploadErrors.length > 0)
+                {
+                    self.options.errorHandler(uploadErrors);
+                }
+                else
+                {
+                    data.submit();
+                }
+            };
+
             // allow for extension
             self.applyConfiguration(fileUploadConfig);
 
             // instantiate the control
             var fileUpload = self.fileUpload = $(el).find('.alpaca-fileupload-input').fileupload(fileUploadConfig);
 
-            // When file upload of a file competes, we offer the chance to adjust the data ahead of FileUpload
+            // When file upload of a file completes, we offer the chance to adjust the data ahead of FileUpload
             // getting it.  This is useful for cases where you can't change the server side JSON but could do
             // a little bit of magic in the client.
             fileUpload.bindFirst("fileuploaddone", function(e, data) {
@@ -27676,22 +29230,43 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 var f = function(i)
                 {
-                    if (i == data.files.length) // jshint ignore:line
+                    if (i === data.files.length) // jshint ignore:line
                     {
-                        // done
                         self.setValue(array);
                         return;
                     }
 
-                    self.convertFileToDescriptor(data.files[i], function(err, descriptor) {
+                    self.convertFileToDescriptor(data.files[i], function (err, descriptor) {
+
                         if (descriptor)
                         {
                             array.push(descriptor);
                         }
-                        f(i+1);
+
+                        f(i + 1);
                     });
+
                 };
                 f(0);
+            });
+
+            /**
+             * When file uploads fail, alert...
+             */
+            fileUpload.bind("fileuploadfail", function(e, data) {
+
+                if (data.errorThrown)
+                {
+                    self.onUploadFail(data);
+                }
+            });
+
+
+            /**
+             * Whether success or fail, we handle the results.
+             */
+            fileUpload.bind("fileuploadalways", function(e, data) {
+                self.refreshUIState();
             });
 
             // allow for extension
@@ -27945,15 +29520,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         afterPreload: function(fileUpload, el, files, callback)
         {
+            var self = this;
+
+            self.refreshUIState();
+
             callback();
         },
 
         /**
-         * @override
-         *
-         * Retrieves an array of descriptors.
+         * @see Alpaca.Fields.ControlField#getControlValue
          */
-        getValue: function()
+        getControlValue: function()
         {
             return this.data;
         },
@@ -28000,6 +29577,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                     });
 
+                    // refresh validation state
+                    self.refreshValidationState();
+
                     callback();
 
                     return;
@@ -28030,35 +29610,101 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var fileUpload = self.plugin();
             if (fileUpload)
             {
-                var maxNumberOfFiles = 99999;
-                if (self.options.upload && typeof(self.options.upload.maxNumberOfFiles) != "undefined")
-                {
-                    maxNumberOfFiles = self.options.upload.maxNumberOfFiles;
-                }
+                var maxNumberOfFiles = self.options.maxNumberOfFiles;
 
                 if (fileUpload.options.getNumberOfFiles && fileUpload.options.getNumberOfFiles() >= maxNumberOfFiles)
                 {
-                    // disable select files button
-                    $(self.control).find("span.btn.fileinput-button").prop("disabled", true);
-                    $(self.control).find("span.btn.fileinput-button").attr("disabled", "disabled");
-
-                    // hide dropzone message
-                    $(self.control).find(".fileupload-active-zone p.dropzone-message").css("display", "none");
+                    self.refreshButtons(false);
                 }
                 else
                 {
-                    // enabled
-                    $(self.control).find("span.btn.fileinput-button").prop("disabled", false);
-                    $(self.control).find("span.btn.fileinput-button").attr("disabled", null);
-
-                    // show dropzone message
-                    $(self.control).find(".fileupload-active-zone p.dropzone-message").css("display", "block");
+                    self.refreshButtons(true);
                 }
             }
         },
 
-        onFileDelete: function(domEl)
+        refreshButtons: function(enabled)
         {
+            var self = this;
+
+            // disable select files button
+            $(self.control).find(".btn.fileinput-button").prop("disabled", true);
+            $(self.control).find(".btn.fileinput-button").attr("disabled", "disabled");
+
+            // hide dropzone message
+            $(self.control).find(".fileupload-active-zone p.dropzone-message").css("display", "none");
+
+            if (enabled)
+            {
+                // enable select files button
+                $(self.control).find(".btn.fileinput-button").prop("disabled", false);
+                $(self.control).find(".btn.fileinput-button").attr("disabled", null);
+
+                // show dropzone message
+                $(self.control).find(".fileupload-active-zone p.dropzone-message").css("display", "block");
+            }
+        },
+
+        onFileDelete: function(rowEl, buttonEl, file)
+        {
+            var self = this;
+
+            var deleteUrl = file.deleteUrl;
+            var deleteMethod = file.deleteType;
+
+            var c = {
+                "method": deleteMethod,
+                "url": deleteUrl,
+                "headers": {}
+            };
+
+            var csrfToken = self.determineCsrfToken();
+            if (csrfToken)
+            {
+                c.headers[Alpaca.CSRF_HEADER_NAME] = csrfToken;
+            }
+
+            $.ajax(c);
+        },
+
+        onUploadFail: function(data)
+        {
+            var self = this;
+
+            for (var i = 0; i < data.files.length; i++)
+            {
+                data.files[i].error = data.errorThrown;
+            }
+
+            if (self.options.uploadFailHandler)
+            {
+                self.options.uploadFailHandler.call(self, data);
+            }
+        },
+
+        /**
+         * @see Alpaca.Field#disable
+         */
+        disable: function()
+        {
+            // disable select button
+            $(this.field).find(".fileinput-button").prop("disabled", true);
+            $(this.field).find(".fileinput-button").attr("disabled", "disabled");
+
+            // hide the upload well
+            $(this.field).find(".alpaca-fileupload-well").css("visibility", "hidden");
+        },
+
+        /**
+         * @see Alpaca.Field#enable
+         */
+        enable: function()
+        {
+            $(this.field).find(".fileinput-button").prop("disabled", false);
+            $(this.field).find(".fileinput-button").removeAttr("disabled");
+
+            // show the upload well
+            $(this.field).find(".alpaca-fileupload-well").css("visibility", "visible");
         },
 
         /* builder_helpers */
@@ -28082,12 +29728,70 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
          */
         getType: function() {
             return "array";
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.TextField#getSchemaOfSchema
+         */
+        getSchemaOfOptions: function() {
+            return Alpaca.merge(this.base(), {
+                "properties": {
+                    "maxNumberOfFiles": {
+                        "title": "Maximum Number of Files",
+                        "description": "The maximum number of files to allow to be uploaded.  If greater than zero, the maximum number will be constrained.  If -1, then no limit is imposed.",
+                        "type": "number",
+                        "default": 1
+                    },
+                    "maxFileSize": {
+                        "title": "Maximum File Size (in bytes)",
+                        "description": "The maximum file size allowed per upload.  If greater than zero, the maximum file size will be limited to the given size in bytes.  If -1, then no limit is imposed.",
+                        "type": "number",
+                        "default": -1
+                    },
+                    "fileTypes": {
+                        "title": "File Types",
+                        "description": "A regular expression limiting the file types that can be uploaded based on filename",
+                        "type": "string"
+                    },
+                    "multiple": {
+                        "title": "Multiple",
+                        "description": "Whether to allow multiple file uploads.  If maxNumberOfFiles is not specified, multiple will toggle between 1 and unlimited.",
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "showUploadPreview": {
+                        "title": "Show Upload Preview",
+                        "description": "Whether to show thumbnails for uploaded assets (requires preview support)",
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "errorHandler": {
+                        "title": "Error Handler",
+                        "description": "Optional function handler to be called when there is an error uploading one or more files.  This handler is typically used to instantiate a modal or other UI element to inform the end user.",
+                        "type": "function"
+                    },
+                    "uploadFailHandler": {
+                        "title": "Upload Fail Handler",
+                        "description": "Optional function handler to be called when one or more files fails to upload.  This function is responsible for parsing the underlying xHR request and populating the error message state.",
+                        "type": "function"
+                    }
+                }
+            });
         }
 
         /* end_builder_helpers */
     });
 
     Alpaca.registerFieldClass("upload", Alpaca.Fields.UploadField);
+
+    Alpaca.registerMessages({
+        "chooseFile": "Choose file...",
+        "chooseFiles": "Choose files...",
+        "dropZoneSingle": "Click the Choose button or Drag and Drop a file here to upload...",
+        "dropZoneMultiple": "Click the Choose button or Drag and Drop files here to upload..."
+    });
+
 
     // https://github.com/private-face/jquery.bind-first/blob/master/dev/jquery.bind-first.js
     // jquery.bind-first.js
@@ -28158,6 +29862,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
      * @lends Alpaca.Fields.UpperCaseField.prototype
      */
     {
+
         /**
          * @see Alpaca.Fields.TextField#getFieldType
          */
@@ -28166,11 +29871,28 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         /**
+         * @see Alpaca.Fields.TextField#setup
+         */
+        setup: function()
+        {
+            var self = this;
+
+            this.base();
+
+            if (this.data) {
+                this.data = this.data.toUpperCase();
+            }
+        },
+
+        /**
          * @see Alpaca.Fields.TextField#setValue
          */
         setValue: function(val)
         {
-            var upperValue = val.toUpperCase();
+            var upperValue = null;
+            if (val && Alpaca.isString(val)) {
+                upperValue = val.toUpperCase();
+            }
 
             if (upperValue != this.getValue()) // jshint ignore:line
             {
@@ -28244,7 +29966,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.base();
 
-            this.schema.pattern = Alpaca.regexps.url;
+            if (typeof(this.options.allowIntranet) === "undefined")
+            {
+                this.options.allowIntranet = false;
+            }
+
+            if (this.options.allowIntranet)
+            {
+                this.schema.pattern = Alpaca.regexps["intranet-url"];
+            }
+            else
+            {
+                this.schema.pattern = Alpaca.regexps.url;
+            }
             this.schema.format = "uri";
         },
 
@@ -28266,6 +30000,37 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         /* builder_helpers */
         ,
+
+        /**
+         * @private
+         * @see Alpaca.Fields.TextField#getSchemaOfOptions
+         */
+        getSchemaOfOptions: function() {
+
+            return Alpaca.merge(this.base(), {
+                "properties": {
+                    "allowIntranet": {
+                        "title": "Allow intranet",
+                        "description": "Allows URLs with unqualified hostnames"
+                    }
+                }
+            });
+
+        },
+
+        /**
+         * @private
+         * @see Alpaca.Fields.TextField#getOptionsForOptions
+         */
+        getOptionsForOptions: function() {
+            return Alpaca.merge(this.base(), {
+                "fields": {
+                    "allowIntranet": {
+                        "type": "checkbox"
+                    }
+                }
+            });
+        },
 
         /**
          * @see Alpaca.Fields.TextField#getTitle
@@ -29613,6 +31378,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         }
     };
 
+    // table-control callbacks
+    callbacks["tableHeaderRequired"] = function(schema, options, domEl)
+    {
+        // required fields get a little star in their label
+        $('<span class="alpaca-icon-required glyphicon glyphicon-star"></span>').prependTo(domEl);
+
+    };
+    callbacks["tableHeaderOptional"] = function(schema, options, domEl)
+    {
+    };
+
     Alpaca.registerView({
         "id": "bootstrap-display",
         "parent": "web-display",
@@ -29712,6 +31488,12 @@ module.exports = BaseView.extend(require('./mixins/links.js'), {
     addclass: "stack-bottomright",
     stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
     buttons: { sticker: false }
+  },
+
+  afterInit: function() {
+    // Show or hide spinner on loading events
+    this.listenTo(this.app, 'loadingStart', this.spinStart, this);
+    this.listenTo(this.app, 'loadingStop', this.spinStop, this);
   },
 
   display: function(view) {
@@ -29949,138 +31731,41 @@ require('brace/mode/html');
 require('brace/theme/textmate');
 require('brace/theme/chrome');
 
+var setSourceHeight = function() {
+  logger.log($('#builder').parent().length > 0);
+  if ( $('#builder').parent().length > 0 ) {
+    var top = $('#builder').parent().offset().top,
+    height = $('body').height() - $('#builder').parent().height(),
+    bottom = height - top;
+    logger.debug(top, height, bottom);
+    $('#builder').height(
+      $(window).height() - ( top + bottom )
+    );
+  }
+};
+
 var setup = function(formData) {
   var data = formData.data,
       schema = formData.schema,
-      options = formData.options;
-
-  var prettyJSON = function(obj) {
-    return JSON.stringify(obj , null, "  ");
-  };
-
-  var sourceRefresh = function(form) {
-    console.log("form", form);
-    var config,
-        cursor = editor1.getCursorPosition();
-    try {
-      config = JSON.parse(editor1.getValue());
-    } catch (ex) {
-      return;
-    }
-    config.data = form.getValue();
-    editor1.setValue(prettyJSON(config), -1);
-
-    setTimeout(function() {
-      editor1.gotoLine(cursor.row, cursor.column);
-    }, 50);
-  };
-
-  var setupEditor = function(id, json) {
-    var text = "";
-    if (json) { text = prettyJSON(json); }
-
-    var editor = ace.edit(id);
-    editor.setTheme("ace/theme/textmate");
-    editor.getSession().setMode("ace/mode/javascript");
-    editor.renderer.setHScrollBarAlwaysVisible(false);
-    editor.setShowPrintMargin(false);
-    editor.setValue(text, -1);
-
-    return editor;
-  };
-
-  var setSourceHeight = function() {
-    logger.log($('#builder').parent().length > 0);
-    if ( $('#builder').parent().length > 0 ) {
-      var top = $('#builder').parent().offset().top,
-          height = $('body').height() - $('#builder').parent().height(),
-          bottom = height - top;
-      logger.debug(top, height, bottom);
-      $('#builder').height(
-        $(window).height() - ( top + bottom )
-      );
-    }
-  };
+      options = formData.options,
+      editor, mainPreviewField;
 
   setSourceHeight();
-  var editor1 = setupEditor("schema", formData);
-  //$(window).resize(setSourceHeight);
 
-  var mainViewField = null;
-  var mainPreviewField = null;
-  var mainDesignerField = null;
-
-  var doRefresh = function(el, disableErrorHandling, cb) {
-    try {
-      formData = JSON.parse(editor1.getValue());
-      schema = formData.schema;
-      options = formData.options;
-      data = formData.data;
-    }
-    catch (e) { }
-
-    if (schema) {
-      var config = { "schema": schema };
-      if (options) { config.options = options; }
-      if (data) { config.data = data; }
-      if (!config.options) { config.options = {}; }
-
-      config.options.focus = false;
-
-      if ( cb ) {
-        config.postRender = function(form) { cb(null, form); };
-      }
-      config.error = function(err) {
-        Alpaca.defaultErrorCallback(err);
-        cb(err);
-      };
-
-      if (disableErrorHandling) {
-        Alpaca.defaultErrorCallback = function(error) {
-          logger.error(error);
-          $('.message')
-            .html('<div class="alert alert-danger" role="alert">' + error.message + '</div>');
-          logger.error("Alpaca encountered an error while previewing form -> " + error.message);
-        };
-      } else {
-        Alpaca.defaultErrorCallback = Alpaca.DEFAULT_ERROR_CALLBACK;
-      }
-      $('.message').empty();
-      $(el).alpaca(config);
-    }
-  };
-
-  var refreshPreview = function(callback) {
-    if (mainPreviewField) {
-      mainPreviewField.destroy();
-      mainPreviewField = null;
-    }
-
-    doRefresh($("#previewDiv"), false, function(err, form) {
-      if (!err) {
-        mainPreviewField = form;
-
-        $("#previewDiv :input[name]").change(function() {
-          sourceRefresh(form);
-        });
-      }
-
-      if (callback) { callback(); }
-    });
-  };
-
-  var refreshCode = function(callback) {
-    var json = { "schema": schema };
-    if (options) { json.options = options; }
-    if (data) { json.data = data; }
-
-    if (callback) { callback(); }
-  };
+  editor = ace.edit('schema');
+  editor.setTheme("ace/theme/textmate");
+  editor.getSession().setMode("ace/mode/javascript");
+  editor.renderer.setHScrollBarAlwaysVisible(false);
+  editor.setShowPrintMargin(false);
+  editor.setValue( JSON.stringify( formData , null, "  " ), -1 );
 
   var updatePreview = function() {
     logger.debug('Updating preview');
     try {
-      JSON.parse(editor1.getValue());
+      formData = JSON.parse(editor.getValue());
+      schema = formData.schema;
+      options = formData.options || {};
+      data = formData.data;
     } catch (ex) {
       logger.error("Can't update preview, JSON is bad");
       return;
@@ -30091,12 +31776,31 @@ var setup = function(formData) {
       mainPreviewField.destroy();
       mainPreviewField = null;
     }
-    doRefresh($("#previewDiv"), true);
+
+    var config = {
+      schema: schema,
+      options: options,
+      postRender: function(form) {
+        logger.debug('post render');
+        mainPreviewField = form;
+        $('.message').empty();
+      },
+      error: function(err) {
+        Alpaca.defaultErrorCallback(err);
+        $('.message')
+          .html('<div class="alert alert-danger" role="alert">' + err.message + '</div>');
+        logger.error("Alpaca encountered an error while previewing form -> " + err.message);
+      }
+    };
+
+    if (data) { config.data = data; }
+
+    $('#previewDiv').alpaca(config);
   };
 
   var debouncedUpdatePreview = _.debounce(updatePreview, 500);
 
-  editor1.on("change", function() {
+  editor.on("change", function() {
     logger.debug('editor content changed');
     debouncedUpdatePreview();
   });
@@ -30104,11 +31808,36 @@ var setup = function(formData) {
   updatePreview();
 };
 
-module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
+var EditBlueprint = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint.ejs'),
+  events: {
+    'change :input': 'stopListeningForChanges'
+  },
 
   afterInit: function() {
-    this.listenTo(this.model, 'change', this.render);
+    this.listenForChanges();
+  },
+
+  listenForChanges: function() {
+    if ( !this.model.isNew() ) {
+      this.listenTo(this.app.listener,
+                    'change:blueprint:' + this.model.id,
+                    this.updateStatus, this);
+    }
+  },
+
+  stopListeningForChanges: function() {
+    this.stopListening(this.app.listener);
+  },
+
+  updateStatus: function(status) {
+    logger.debug('Update blueprint status: ' + status);
+    this.model.set('status', status);
+    this.render();
+  },
+
+  beforeRender: function() {
+    this.stopListeningForChanges();
   },
 
   afterRender: function() {
@@ -30118,11 +31847,16 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
         event.preventDefault();
       }
     });
+
     if ( !this.model.isNew() ) {
       setup(this.model.get('config').form);
     }
+
+    this.listenForChanges();
   }
 } );
+
+module.exports = EditBlueprint;
 
 },{"../logger":4,"../models":5,"../templates/blueprint.ejs":8,"../vendor/alpaca":18,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"brace":33,"brace/mode/html":34,"brace/mode/javascript":35,"brace/theme/chrome":37,"brace/theme/textmate":38,"jquery":84,"underscore":156}],24:[function(require,module,exports){
 "use strict";
@@ -30146,12 +31880,33 @@ function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
 
-module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
+var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
+  events: {
+    'change :input': 'stopListeningForChanges'
+  },
 
   afterInit: function(options) {
     this.copyProject = options.copyProject ? true : false;
-    this.listenTo(this.model, 'change', this.render);
+    this.listenForChanges();
+  },
+
+  listenForChanges: function() {
+    if ( !this.model.isNew() ) {
+      this.listenTo(this.app.listener,
+                    'change:project:' + this.model.id,
+                    this.updateStatus, this);
+    }
+  },
+
+  stopListeningForChanges: function() {
+    this.stopListening(this.app.listener);
+  },
+
+  updateStatus: function(status) {
+    logger.debug('Update project status: ' + status);
+    this.model.set('status', status);
+    this.render();
   },
 
   templateData: function() {
@@ -30162,6 +31917,14 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       query: this.query,
       copyProject: this.copyProject
     };
+  },
+
+  beforeRender: function() {
+    this.stopListeningForChanges();
+  },
+
+  beforeSubmit: function() {
+    this.stopListeningForChanges();
   },
 
   afterRender: function() {
@@ -30186,24 +31949,32 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       );
     }
 
-    if ( this.model.hasStatus('broken') && this.model.has('error_message') ) {
-      this.app.view.alert(
-        this.model.get('error_message'), 'error', true);
-    }
-
     promises.push( new Promise( function(resolve, reject) {
       view.renderForm(resolve, reject);
     } ) );
 
-    return Promise.all(promises);
+    return Promise.all(promises)
+      .then(function() {
+        view.listenForChanges();
+      });
+  },
+
+  afterSubmit: function() {
+    this.listenForChanges();
+
+    if (this.model.hasStatus('building')){
+      this.app.view.alert(
+        'Building... This might take a moment.', 'notice', false, 16000);
+    }
   },
 
   renderForm: function(resolve, reject) {
-    var $form = this.$el.find('#projectForm'),
+    var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes, newProject;
 
-    $($form).keypress(function(event){
+    // Prevent return or enter from submitting the form
+    $form.keypress(function(event){
       var field_type = event.originalEvent.srcElement.type;
       if (event.keyCode === 10 || event.keyCode === 13){
         if(field_type !== 'textarea'){
@@ -30287,14 +32058,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
                 var slugPattern = /^[0-9a-z\-_]{0,60}$/;
                 var slug = this.getValue();
                 if ( slugPattern.test(slug) ){
-                  callback({
-                    "status": true
-                  });
+                  callback({ "status": true });
                 } else if (slugPattern.test(slug.substring(0,60))){
                   this.setValue(slug.substr(0,60));
-                  callback({
-                    "status": true
-                  });
+                  callback({ "status": true });
                 } else {
                   callback({
                     "status": false,
@@ -30376,7 +32143,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var data = $form.alpaca('get').getValue();
     return {
       title: data['title'],
-      slug:  data['slug'],
+      slug:  data['theme'] + '-' +data['slug'],
       theme: data['theme'],
       data:  data,
       blueprint_id: this.model.blueprint.get('id')
@@ -30397,6 +32164,8 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   }
 } );
 
+module.exports = EditProject;
+
 },{"../helpers":2,"../logger":4,"../models":5,"../templates/project.ejs":14,"../templates/project_buttons.ejs":15,"./BaseView":21,"./mixins/actions":27,"./mixins/form":28,"backbone":31,"brace/mode/html":34,"brace/mode/javascript":35,"brace/theme/chrome":37,"brace/theme/textmate":38,"eonasdan-bootstrap-datetimepicker":43,"jquery":84,"underscore":156,"underscore.string/slugify":132}],25:[function(require,module,exports){
 "use strict";
 
@@ -30410,7 +32179,21 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   template: require('../templates/blueprint_list.ejs'),
 
   afterInit: function() {
-    this.listenTo(this.collection, 'update', this.render);
+    this.listenForChanges();
+  },
+
+  listenForChanges: function() {
+    this.listenTo(this.app.listener, 'change:blueprint',
+                  this.updateStatus, this);
+  },
+
+  stopListeningForChanges: function() {
+    this.stopListening(this.app.listener);
+  },
+
+  updateStatus: function(data) {
+    this.collection.get(data.id).set('status', data.status);
+    this.render();
   },
 
   handleUpdateAction: function(eve) {
@@ -30441,7 +32224,21 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   template: require('../templates/project_list.ejs'),
 
   afterInit: function() {
-    this.listenTo(this.collection, 'update', this.render);
+    this.listenForChanges();
+  },
+
+  listenForChanges: function() {
+    this.listenTo(this.app.listener, 'change:project',
+                  this.updateStatus, this);
+  },
+
+  stopListeningForChanges: function() {
+    this.stopListening(this.app.listener);
+  },
+
+  updateStatus: function(data) {
+    this.collection.get(data.id).set('status', data.status);
+    this.render();
   }
 } );
 
