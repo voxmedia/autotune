@@ -10,7 +10,21 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   template: require('../templates/blueprint_list.ejs'),
 
   afterInit: function() {
-    this.listenTo(this.collection, 'update', this.render);
+    this.listenForChanges();
+  },
+
+  listenForChanges: function() {
+    this.listenTo(this.app.listener, 'change:blueprint',
+                  this.updateStatus, this);
+  },
+
+  stopListeningForChanges: function() {
+    this.stopListening(this.app.listener);
+  },
+
+  updateStatus: function(data) {
+    this.collection.get(data.id).set('status', data.status);
+    this.render();
   },
 
   handleUpdateAction: function(eve) {

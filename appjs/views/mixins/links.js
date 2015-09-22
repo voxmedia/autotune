@@ -17,8 +17,7 @@ module.exports = {
       eve.preventDefault();
       eve.stopPropagation();
       Backbone.history.navigate(
-        $(eve.currentTarget).attr('href'),
-        {trigger: true});
+        $(eve.currentTarget).attr('href'), { trigger: true });
     }
   }
 };

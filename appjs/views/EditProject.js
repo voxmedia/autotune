@@ -19,12 +19,33 @@ function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
 
-module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
+var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
+  events: {
+    'change :input': 'stopListeningForChanges'
+  },
 
   afterInit: function(options) {
     this.copyProject = options.copyProject ? true : false;
-    this.listenTo(this.model, 'change', this.render);
+    this.listenForChanges();
+  },
+
+  listenForChanges: function() {
+    if ( !this.model.isNew() ) {
+      this.listenTo(this.app.listener,
+                    'change:project:' + this.model.id,
+                    this.updateStatus, this);
+    }
+  },
+
+  stopListeningForChanges: function() {
+    this.stopListening(this.app.listener);
+  },
+
+  updateStatus: function(status) {
+    logger.debug('Update project status: ' + status);
+    this.model.set('status', status);
+    this.render();
   },
 
   templateData: function() {
@@ -35,6 +56,14 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       query: this.query,
       copyProject: this.copyProject
     };
+  },
+
+  beforeRender: function() {
+    this.stopListeningForChanges();
+  },
+
+  beforeSubmit: function() {
+    this.stopListeningForChanges();
   },
 
   afterRender: function() {
@@ -59,24 +88,32 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
       );
     }
 
-    if ( this.model.hasStatus('broken') && this.model.has('error_message') ) {
-      this.app.view.alert(
-        this.model.get('error_message'), 'error', true);
-    }
-
     promises.push( new Promise( function(resolve, reject) {
       view.renderForm(resolve, reject);
     } ) );
 
-    return Promise.all(promises);
+    return Promise.all(promises)
+      .then(function() {
+        view.listenForChanges();
+      });
+  },
+
+  afterSubmit: function() {
+    this.listenForChanges();
+
+    if (this.model.hasStatus('building')){
+      this.app.view.alert(
+        'Building... This might take a moment.', 'notice', false, 16000);
+    }
   },
 
   renderForm: function(resolve, reject) {
-    var $form = this.$el.find('#projectForm'),
+    var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes, newProject;
 
-    $($form).keypress(function(event){
+    // Prevent return or enter from submitting the form
+    $form.keypress(function(event){
       var field_type = event.originalEvent.srcElement.type;
       if (event.keyCode === 10 || event.keyCode === 13){
         if(field_type !== 'textarea'){
@@ -160,14 +197,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
                 var slugPattern = /^[0-9a-z\-_]{0,60}$/;
                 var slug = this.getValue();
                 if ( slugPattern.test(slug) ){
-                  callback({
-                    "status": true
-                  });
+                  callback({ "status": true });
                 } else if (slugPattern.test(slug.substring(0,60))){
                   this.setValue(slug.substr(0,60));
-                  callback({
-                    "status": true
-                  });
+                  callback({ "status": true });
                 } else {
                   callback({
                     "status": false,
@@ -249,7 +282,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     var data = $form.alpaca('get').getValue();
     return {
       title: data['title'],
-      slug:  data['slug'],
+      slug:  data['theme'] + '-' +data['slug'],
       theme: data['theme'],
       data:  data,
       blueprint_id: this.model.blueprint.get('id')
@@ -269,3 +302,5 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     return valid;
   }
 } );
+
+module.exports = EditProject;

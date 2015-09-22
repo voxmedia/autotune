@@ -85,12 +85,16 @@ _.extend(Listener.prototype, Backbone.Events, {
 
   handleChange: function(evt) {
     if ( this.paused ) { return; }
+    var data = JSON.parse(evt.data);
 
-    var data = JSON.parse(evt.data),
-        eventName = 'change:' + data.type,
-        eventData = _.pick(data, 'id', 'status');
-    logger.debug(eventName, eventData);
-    this.trigger(eventName, eventData);
+    logger.debug('change', data);
+
+    this.trigger('change',
+                 _.pick(data, 'type', 'id', 'status'));
+    this.trigger(['change', data.type].join(':'),
+                 _.pick(data, 'id', 'status'));
+    this.trigger(['change', data.type, data.id].join(':'),
+                 data.status);
   },
 
   handleError: function(evt) {

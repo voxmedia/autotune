@@ -16,7 +16,7 @@ module.exports = {
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
-    var inst, view = this,
+    var inst, view = this, app = this.app,
         $btn = $(eve.currentTarget),
         action = $btn.data('action'),
         action_confirm = $btn.data('action-confirm'),
@@ -42,17 +42,16 @@ module.exports = {
 
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
-        view.app.view.alert(action_message, 'success', false, 4000);
+        app.view.alert(action_message, 'success', false, 4000);
 
         if (action.indexOf('build') > -1){
-          view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
+          app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
         }
 
         if ( next === 'show' ) {
-          Backbone.history.navigate( view.model.url(), {trigger: true} );
+          Backbone.history.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
           view.render();
-          Backbone.history.loadUrl();
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
         }
@@ -60,7 +59,7 @@ module.exports = {
         view.handleRequestError( error );
       }).then(function() {
         if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
-        view.app.trigger( 'loadingStop' );
+        app.trigger( 'loadingStop' );
       });
   },
 

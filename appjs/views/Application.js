@@ -24,6 +24,12 @@ module.exports = BaseView.extend(require('./mixins/links.js'), {
     buttons: { sticker: false }
   },
 
+  afterInit: function() {
+    // Show or hide spinner on loading events
+    this.listenTo(this.app, 'loadingStart', this.spinStart, this);
+    this.listenTo(this.app, 'loadingStop', this.spinStop, this);
+  },
+
   display: function(view) {
     if ( this.currentView ) { this.currentView.unload(this); }
     this.currentView = view;

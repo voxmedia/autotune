@@ -22,6 +22,9 @@ var $ = require('jquery'),
 // required to make Backbone work in browserify
 Backbone.$ = $;
 
+// Cause there doesn't seem to be a better way to set defaults for Alpaca
+Alpaca.RuntimeView.prototype.toolbarSticky = true;
+
 /**
  * Autotune admin UI
  * @constructor
@@ -48,10 +51,9 @@ function App(config) {
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
 
+  // Initialize server event listener
   this.listener = new Listener();
-  this.listener.on('change:blueprint', this.handleBlueprintChange, this);
-  this.listener.on('change:project',   this.handleProjectChange, this);
-  this.listener.on('stop',             this.handleListenerStop, this);
+  this.listenTo(this.listener, 'stop', this.handleListenerStop, this);
   this.listener.start();
 
   this.config = config;
@@ -61,18 +63,14 @@ function App(config) {
   // Initialize top-level view
   this.view = new views.Application({ app: this });
 
-  // Show or hide spinner on loading events
-  this.on('loadingStart', function() { this.view.spinStart(); }, this);
-  this.on('loadingStop', function() { this.view.spinStop(); }, this);
-
   // Initialize routing
   this.router = new Router({ app: this });
 
   // Start the app once the top-level view is rendered
-  var view = this.view;
+  var view = this.view, app = this;
   this.view.render().then(function() {
     $('body').prepend(view.$el);
-    view.app.trigger( 'loadingStart' );
+    app.trigger( 'loadingStart' );
     Backbone.history.start({ pushState: true });
   });
 
@@ -122,39 +120,8 @@ _.extend(App.prototype, Backbone.Events, {
   },
 
   /**
-   * Handle updating a blueprint
+   * Do something when the listener shuts down
    **/
-  handleBlueprintChange: function(data) {
-    var inst = this.blueprints.get(data.id);
-    if ( !inst ) { return; }
-    switch (data.status) {
-      case 'new':
-      case 'testing':
-      case 'broken':
-        inst.fetch();
-        break;
-      default:
-        inst.set('status', data.status);
-    }
-  },
-
-  /**
-   * Handle updating a blueprint
-   **/
-  handleProjectChange: function(data) {
-    var inst = this.projects.get(data.id);
-    if ( !inst ) { return; }
-    switch (data.status) {
-      case 'new':
-      case 'built':
-      case 'broken':
-        inst.fetch();
-        break;
-      default:
-        inst.set('status', data.status);
-    }
-  },
-
   handleListenerStop: function() {
     this.view.alert('Reload to see changes', 'notice', true);
   }
@@ -170,4 +137,5 @@ if ( typeof(window) !== 'undefined' ) {
   window.$ = $;
   window._ = _;
   window.moment = moment;
+  window.Alpaca = Alpaca;
 }

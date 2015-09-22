@@ -11,8 +11,7 @@ var $ = require('jquery'),
 module.exports = {
   events: {
     'submit form': 'handleForm',
-    'change select[data-auto-submit=true]': 'submitForm',
-    'change :input': 'handleFormChange'
+    'change select[data-auto-submit=true]': 'submitForm'
   },
 
   handleForm: function(eve) {
@@ -22,7 +21,7 @@ module.exports = {
     this.app.trigger('loadingStart');
     logger.debug('handleForm');
 
-    var inst, Model, view = this,
+    var inst, Model, view = this, app = this.app,
         $form = $(eve.currentTarget),
         values = this.formValues($form),
         model_class = $form.data('model'),
@@ -59,33 +58,36 @@ module.exports = {
         logger.debug('form is valid, saving...');
 
         return inst.save();
-      }).then(function(data) {
+      }).then(function() {
         logger.debug('form finished saving');
 
         if ( action === 'new' ) {
-          view.app.view.alert('New '+model_class+' saved', 'success', false, 4000);
+          app.view.success('New '+model_class+' saved');
         } else {
-          view.app.view.alert(model_class+' updates saved', 'success', false, 4000);
+          app.view.success(model_class+' updates saved');
         }
 
-        if ( next === 'show' ) {
-          var redirectURL = view.model.url();
-          Backbone.history.navigate(redirectURL, {trigger: true});
+        return view.hook('afterSubmit');
+      }).then(function() {
+        logger.debug('next: '+next);
+        if ( next === 'show' && action === 'new' ) {
+          Backbone.history.navigate(inst.url(), {trigger: true});
+        } else if ( next === 'show' ) {
+          view.render();
         } else if ( next ) {
           Backbone.history.navigate(next, {trigger: true});
-        }
-
-        if (view.model.hasStatus('building')){
-          view.app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
+        } else {
+          view.render();
         }
       }).catch(function(error) {
+        app.trigger('loadingStop');
+        $form.find('[type=submit]').button('reset');
+
         if ( _.isString( error ) ) {
-          view.app.view.error( error );
+          app.view.error( error );
         } else {
           view.handleRequestError(error);
         }
-      }).then(function() {
-        $form.find('[type=submit]').button('reset');
       });
   },
 
@@ -103,10 +105,5 @@ module.exports = {
 
   submitForm: function(eve) {
     $(eve.currentTarget).parents('form').submit();
-  },
-
-  handleFormChange: function(evt) {
-    this.app.listener.pause();
-    $('#viewBtn, #previewBtn, #deleteBtn, #publishBtn').attr('disabled', 'disabled');
   }
 };

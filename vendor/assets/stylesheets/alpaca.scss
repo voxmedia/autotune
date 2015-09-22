@@ -378,6 +378,14 @@
 
 
 
+/** ************************************** **/
+/** CK EDITOR                             **/
+/** ************************************** **/
+
+.alpaca-field-ckeditor.alpaca-invalid > .cke
+{
+    border-color: #f04124;
+}
 
 .has-error .multiselect
 {
@@ -385,6 +393,46 @@
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }
+
+
+/** ************************************** **/
+/** OPTIONTREE                             **/
+/** ************************************** **/
+
+.alpaca-field-optiontree {
+
+}
+
+.alpaca-field-optiontree .optiontree {
+
+}
+
+.alpaca-field-optiontree .optiontree .optiontree-selector {
+
+}
+
+.alpaca-field-optiontree.optiontree-horizontal {
+
+}
+
+.alpaca-field-optiontree.optiontree-horizontal .optiontree {
+    display: inline-block;
+}
+
+.alpaca-field-optiontree.optiontree-horizontal .optiontree .optiontree-selector {
+    display: inline-block;
+    padding-left: 4px;
+}
+
+.alpaca-field-optiontree.optiontree-horizontal input {
+    display: inline-block;
+    width: auto;
+}
+
+.alpaca-field-optiontree.optiontree-horizontal label {
+    display: block;
+}
+
 
 
 
@@ -446,6 +494,34 @@
     width: auto;
 }
 
+.alpaca-table-column-hidden
+{
+    display: none;
+}
+
+.alpaca-field-radio.disabled .alpaca-control.radio
+{
+    color: grey;
+}
+
+.alpaca-field-radio.disabled .alpaca-control.radio label
+{
+    cursor: inherit;
+}
+
+
+.alpaca-control.radio
+{
+    min-height: inherit;
+    height: inherit;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.alpaca-control.radio label
+{
+    line-height: 20px;
+}
 .alpaca-container-label
 {
     margin-top: 20px;
@@ -463,7 +539,7 @@ legend.alpaca-container-label
 
 .alpaca-array-actionbar
 {
-    height: 40px;
+    /*height: 40px;*/
 }
 
 .alpaca-array-actionbar.alpaca-array-actionbar-top
@@ -517,6 +593,11 @@ legend.alpaca-container-label
     padding: 10px;
 }
 */
+
+.alpaca-control-buttons-container
+{
+    margin-top: 10px;
+}
 
 .alpaca-container-item > .alpaca-container > .alpaca-field-object
 {
@@ -584,6 +665,7 @@ legend.alpaca-container-label
 
 
 
+
 /** FIElDS **/
 .alpaca-field.alpaca-field-upload .fileupload-active-zone
 {
@@ -593,6 +675,25 @@ legend.alpaca-container-label
 .alpaca-field.alpaca-field-upload .template-download TD.error
 {
     color: red;
+    word-break: break-all;
+}
+.alpaca-field.alpaca-field-upload .template-download TD.error .label
+{
+    color: red;
+    font-size: 16px;
+    text-align: left;
+}
+
+.alpaca-field.alpaca-field-upload .template-upload TD.error
+{
+    color: red;
+    word-break: break-all;
+}
+.alpaca-field.alpaca-field-upload .template-upload TD.error .label
+{
+    color: red;
+    font-size: 16px;
+    text-align: left;
 }
 
 .alpaca-field.alpaca-field-address .alpaca-field-address-mapcanvas
