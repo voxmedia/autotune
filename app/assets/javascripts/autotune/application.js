@@ -967,7 +967,7 @@ __p+='\n      <li role="presentation" class="disabled"><a>Form Builder</a></li>\
  } else { 
 __p+='\n      <li role="presentation"><a\n          href="#builder" aria-controls="builder"\n          role="tab" data-toggle="tab">Form Builder</a></li>\n      ';
  } 
-__p+='\n    </ul>\n\n    <!-- Tab panes -->\n    <div class="tab-content">\n      <div role="tabpanel" class="tab-pane active" id="edit">\n        <div class="row">\n          <div class="col-md-6">\n            <form id="new-blueprint" role="form"\n                  data-next="show" data-model="Blueprint"\n                  ';
+__p+='\n    </ul>\n\n    <!-- Tab panes -->\n    <div class="tab-content">\n      <div role="tabpanel" class="tab-pane active" id="edit">\n        <div class="row">\n          <div class="col-sm-6">\n            <form id="new-blueprint" role="form"\n                  data-next="show" data-model="Blueprint"\n                  ';
  if(model.isNew()) { 
 __p+='\n                  data-action="new"\n                  ';
  } else { 
@@ -1023,7 +1023,7 @@ __p+='\n                      data-action-message="Project deleted"\n           
 ((__t=(model.get('slug') ))==null?'':__t)+
 '">Delete</button>\n              ';
  } 
-__p+='\n            </form>\n          </div>\n          <div class="col-md-6">\n            ';
+__p+='\n            </form>\n          </div>\n          <div class="col-sm-6">\n            ';
  if ( !model.isNew() ) { 
 __p+='\n            <img src="'+
 ((__t=(model.get('thumb_url') ))==null?'':__t)+
@@ -1061,7 +1061,7 @@ __p+='</div>';
  } 
 __p+='\n<div class="row m-blueprint-chooser">\n  ';
  } 
-__p+='\n  <div class="col-md-4">\n    <div class="thumbnail" style="background-image:url(\''+
+__p+='\n  <div class="col-sm-4">\n    <div class="thumbnail" style="background-image:url(\''+
 ((__t=(blueprint.get('thumb_url') ))==null?'':__t)+
 '\');">\n      <h4>'+
 ((__t=(blueprint.get('title') ))==null?'':__t)+
@@ -1312,11 +1312,11 @@ __p+='\n    ';
  } 
 __p+='\n  </ul>\n\n  <!-- Tab panes -->\n  <div class="tab-content">\n    <div role="tabpanel" class="tab-pane active" id="edit">\n      ';
  if ( model.hasInstructions() ) { 
-__p+='\n      <div class="row">\n        <div class="col-md-8">\n      ';
+__p+='\n      <div class="row">\n        <div class="col-sm-8">\n      ';
  } 
 __p+='\n        <div id="projectForm"></div>\n      ';
  if ( model.hasInstructions() ) { 
-__p+='\n        </div>\n        <div class="col-md-4">'+
+__p+='\n        </div>\n        <div class="col-sm-4">'+
 ((__t=(model.instructions() ))==null?'':__t)+
 '</div>\n      </div>\n      ';
  } 
@@ -32141,13 +32141,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   formValues: function($form) {
     var data = $form.alpaca('get').getValue();
-    return {
+    var vals = {
       title: data['title'],
-      slug:  data['theme'] + '-' +data['slug'],
       theme: data['theme'],
       data:  data,
       blueprint_id: this.model.blueprint.get('id')
     };
+
+    if ( data.slug ) {
+      vals.slug = data['theme'] + '-' + data['slug'];
+    }
+
+    return vals;
   },
 
   formValidate: function(inst, $form) {

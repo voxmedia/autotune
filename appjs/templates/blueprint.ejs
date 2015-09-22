@@ -37,7 +37,7 @@
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="edit">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-sm-6">
             <form id="new-blueprint" role="form"
                   data-next="show" data-model="Blueprint"
                   <% if(model.isNew()) { %>
@@ -98,7 +98,7 @@
               <% } %>
             </form>
           </div>
-          <div class="col-md-6">
+          <div class="col-sm-6">
             <% if ( !model.isNew() ) { %>
             <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
             <p><strong>Type:</strong> <%=model.get('type') %></p>

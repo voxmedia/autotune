@@ -280,13 +280,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   formValues: function($form) {
     var data = $form.alpaca('get').getValue();
-    return {
+    var vals = {
       title: data['title'],
-      slug:  data['theme'] + '-' +data['slug'],
       theme: data['theme'],
       data:  data,
       blueprint_id: this.model.blueprint.get('id')
     };
+
+    if ( data.slug ) {
+      vals.slug = data['theme'] + '-' + data['slug'];
+    }
+
+    return vals;
   },
 
   formValidate: function(inst, $form) {
