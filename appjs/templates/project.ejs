@@ -30,8 +30,13 @@
       <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
     </p>
     <% } %>
-  </div>
 
+    <% if ( model.hasStatus('broken') && model.has('error_message') ) { %>
+    <p class="text-danger">
+     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
+      <%=model.get('error_message') %></p>
+    <% } %>
+  </div>
 </div>
 
 <div role="tabpanel">

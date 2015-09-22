@@ -43,6 +43,12 @@
   <p class="text-danger">
      <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
     </p>
+    <% if ( model.has('error_message') ) { %>
+    <p class="text-danger">
+     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
+     <%=model.get('error_message') %></p>
+    <% } %>
+  </div>
   <% } else if ( model.hasStatus('building') ) { %>
   <p class="text-warning">
     <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span>
