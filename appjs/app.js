@@ -11,7 +11,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     bootstrap = require('bootstrap'),
     moment = require('moment'),
-    Alpaca = require('./vendor/alpaca'),
+    Alpaca = require('./alpaca_patches'),
     // Load our components and run the app
     Router = require('./router'),
     Listener = require('./listener'),
@@ -21,9 +21,6 @@ var $ = require('jquery'),
 
 // required to make Backbone work in browserify
 Backbone.$ = $;
-
-// Cause there doesn't seem to be a better way to set defaults for Alpaca
-Alpaca.RuntimeView.prototype.toolbarSticky = true;
 
 /**
  * Autotune admin UI

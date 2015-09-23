@@ -146,6 +146,53 @@ exports.Project = Backbone.Model.extend({
   },
 
   /**
+   * Get the blueprint config.
+   * @returns {object} The blueprint config
+   **/
+  getConfig: function() {
+    if ( this.has('blueprint_config') ) {
+      return this.get('blueprint_config');
+    } else if ( this.blueprint && this.blueprint.has('config') ) {
+      return this.blueprint.get('config');
+    } else {
+      throw 'This blueprint does not have a form!';
+    }
+  },
+
+  /**
+   * Do we have a config?
+   * @returns {boolean}
+   **/
+  hasConfig: function() {
+    return this.has('blueprint_config') ||
+      (this.blueprint && this.blueprint.has('config'));
+  },
+
+  /**
+   * Get the alpaca form config.
+   * @returns {object} Data for Alpaca form
+   **/
+  getFormConfig: function() {
+    if ( this.hasConfig() ) {
+      return this.getConfig().form;
+    } else {
+      return null;
+    }
+  },
+
+  /**
+   * Get the themes.
+   * @returns {array} Theme models
+   **/
+  getThemes: function() {
+    if ( this.hasConfig() ) {
+      return this.getConfig().themes || ['generic'];
+    } else {
+      return ['generic'];
+    }
+  },
+
+  /**
    * Does this project have any of these statuses?
    * @param {string} status Check for this status
    * @returns {boolean}
