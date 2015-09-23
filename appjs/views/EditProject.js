@@ -239,8 +239,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             var attrs = themes[i]['attributes'];
             social_len[attrs['value']] = attrs['meta']['social_chars'];
           }
-          logger.debug(social_len);
-
+          
           var sel_theme = control.childrenByPropertyId["theme"],
              social = control.childrenByPropertyId["tweet_text"];
 
