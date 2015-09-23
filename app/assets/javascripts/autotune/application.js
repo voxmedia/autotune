@@ -32040,15 +32040,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               return _.contains(config_themes, theme.get('value'));
             }
           }),
-          social_chars = {
-            "sbnation": 8,
-            "theverge": 5,
-            "polygon": 7,
-            "racked": 6,
-            "eater": 5,
-            "vox": 9,
-            "custom": 0
-          },
+          // social_chars = {
+          //   "sbnation": 8,
+          //   "theverge": 5,
+          //   "polygon": 7,
+          //   "racked": 6,
+          //   "eater": 5,
+          //   "vox": 9,
+          //   "custom": 0
+          // },
           schema_properties = {
             "title": {
               "title": "Title",
@@ -32136,14 +32136,22 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         "postRender": _.bind(function(control) {
           this.alpaca = control;
 
-          var theme = control.childrenByPropertyId["theme"],
+          var social_len = {};
+          for(var i in themes){
+            var attrs = themes[i]['attributes'];
+            social_len[attrs['value']] = attrs['meta']['social_chars'];
+          }
+          logger.debug(social_len);
+
+          var sel_theme = control.childrenByPropertyId["theme"],
              social = control.childrenByPropertyId["tweet_text"];
 
-          social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+          social.schema.maxLength = 140-(26+social_len[sel_theme.getValue()]);
           social.updateMaxLengthIndicator();
 
-          $(theme).on('change', function(){
-            social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+          sel_theme.on('change', function(){
+            // logger.debug('sel theme', );
+            social.schema.maxLength = 140-(26+social_len[sel_theme.getValue()]);
             social.updateMaxLengthIndicator();
           });
 
