@@ -17,7 +17,8 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'app/assets/javascripts/autotune/application.js': ['appjs/app.js']
+          'app/assets/javascripts/autotune/application.js': ['appjs/app.js'],
+          'app/assets/javascripts/autotune/test.js': ['testjs/test.js']
         }
       }
     },
@@ -35,6 +36,12 @@ module.exports = function(grunt) {
           ignores: ['appjs/vendor/*']
         },
         src: ['appjs/**/*.js']
+      },
+      test: {
+        options: {
+          jshintrc: 'testjs/.jshintrc'
+        },
+        src: ['testjs/**/*.js']
       }
     },
     watch: {
@@ -45,6 +52,10 @@ module.exports = function(grunt) {
       lib: {
         files: ['appjs/*.js', 'appjs/**/*.js', 'appjs/**/*.ejs'],
         tasks: ['jshint:lib', 'browserify']
+      },
+      test: {
+        files: ['testjs/test.js', 'testjs/**/*.js'],
+        tasks: ['jshint:test', 'browserify']
       }
     },
     notify_hooks: {
@@ -65,4 +76,5 @@ module.exports = function(grunt) {
   // Default task.
   grunt.registerTask('default', ['jshint', 'browserify']);
 
+  grunt.loadTasks('./testjs/task');
 };
