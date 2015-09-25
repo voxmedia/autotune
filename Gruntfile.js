@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       dist: {
         files: {
           'app/assets/javascripts/autotune/application.js': ['appjs/app.js'],
-          'app/assets/javascripts/autotune/test.js': ['testjs/test.js']
+          'app/assets/javascripts/autotune/tests.js': ['testjs/test.js']
         }
       }
     },
@@ -55,7 +55,7 @@ module.exports = function(grunt) {
       },
       test: {
         files: ['testjs/test.js', 'testjs/**/*.js'],
-        tasks: ['jshint:test', 'browserify']
+        tasks: ['jshint:test', 'test', 'browserify']
       }
     },
     notify_hooks: {
@@ -74,7 +74,25 @@ module.exports = function(grunt) {
   grunt.task.run('notify_hooks');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'browserify']);
+  grunt.registerTask('default', ['jshint', 'test', 'browserify']);
 
-  grunt.loadTasks('./testjs/task');
+  // Testing
+  grunt.registerTask('test', 'Run tests', function() {
+    var done = this.async(),
+        spawn = require('child_process').spawn,
+        prova = require.resolve('prova/bin/prova');
+
+    var runner = spawn(prova, ['testjs/**/*.js']);
+
+    runner.stderr.pipe(process.stderr, { end: false });
+    runner.stdout.pipe(process.stdout, { end: false });
+
+    runner.on('close', function(code) {
+      if (code !== 0) {
+        done(new Error('Javascript tests failed'));
+      } else {
+        done();
+      }
+    });
+  });
 };
