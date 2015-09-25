@@ -3,7 +3,6 @@
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    Datepicker = require('eonasdan-bootstrap-datetimepicker'),
     models = require('../models'),
     helpers = require('../helpers'),
     logger = require('../logger'),

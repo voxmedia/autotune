@@ -29,6 +29,7 @@ var $ = require('jquery'),
     bootstrap = require('bootstrap'),
     moment = require('moment'),
     Alpaca = require('./alpaca_patches'),
+    Datepicker = require('eonasdan-bootstrap-datetimepicker'),
     // Load our components and run the app
     Router = require('./router'),
     Listener = require('./listener'),
@@ -154,7 +155,7 @@ if ( typeof(window) !== 'undefined' ) {
   window.Alpaca = Alpaca;
 }
 
-},{"./alpaca_patches":1,"./listener":4,"./logger":5,"./models":6,"./router":7,"./views":20,"backbone":32,"bootstrap":33,"jquery":85,"moment":88,"underscore":157}],3:[function(require,module,exports){
+},{"./alpaca_patches":1,"./listener":4,"./logger":5,"./models":6,"./router":7,"./views":20,"backbone":32,"bootstrap":33,"eonasdan-bootstrap-datetimepicker":44,"jquery":85,"moment":88,"underscore":157}],3:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),
@@ -31953,7 +31954,6 @@ module.exports = EditBlueprint;
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    Datepicker = require('eonasdan-bootstrap-datetimepicker'),
     models = require('../models'),
     helpers = require('../helpers'),
     logger = require('../logger'),
@@ -32260,7 +32260,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
 module.exports = EditProject;
 
-},{"../helpers":3,"../logger":5,"../models":6,"../templates/project.ejs":15,"../templates/project_buttons.ejs":16,"./BaseView":22,"./mixins/actions":28,"./mixins/form":29,"backbone":32,"brace/mode/html":35,"brace/mode/javascript":36,"brace/theme/chrome":38,"brace/theme/textmate":39,"eonasdan-bootstrap-datetimepicker":44,"jquery":85,"underscore":157,"underscore.string/slugify":133}],26:[function(require,module,exports){
+},{"../helpers":3,"../logger":5,"../models":6,"../templates/project.ejs":15,"../templates/project_buttons.ejs":16,"./BaseView":22,"./mixins/actions":28,"./mixins/form":29,"backbone":32,"brace/mode/html":35,"brace/mode/javascript":36,"brace/theme/chrome":38,"brace/theme/textmate":39,"jquery":85,"underscore":157,"underscore.string/slugify":133}],26:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery'),

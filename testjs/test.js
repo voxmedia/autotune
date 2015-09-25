@@ -1,1 +1,1 @@
-var tape = require('prova');
+var test = require('prova');
