@@ -3,11 +3,12 @@
 var $ = require('jquery'),
     _ = require('underscore'),
     querystring = require('querystring'),
-    escape = require('escape-html');
+    escape = require('escape-html'),
+    _string = require('underscore.string');
 
 module.exports = {
   render: function(template, templateObj) {
-    templateObj = _.extend(templateObj || {}, this, require('underscore.string'));
+    templateObj = _.extend(templateObj || {}, this, _string);
 
     return template(templateObj);
   },
@@ -17,10 +18,10 @@ module.exports = {
   },
 
   hasObjects: function() {
-    if (this.collection.models.length > 0) {
+    if (this.collection) {
       return this.collection.models.length > 0;
     } else {
-      return this.collection.models.length > 0;
+      return false;
     }
   },
 

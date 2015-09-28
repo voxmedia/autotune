@@ -5,7 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     logger = require('../logger'),
-    BaseView = require('./BaseView'),
+    BaseView = require('./base_view'),
     Alpaca = require('../vendor/alpaca'),
     ace = require('brace');
 

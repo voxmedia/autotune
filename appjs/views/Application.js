@@ -4,17 +4,16 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     PNotify = require('pnotify'),
-    models = require('../models'),
     logger = require('../logger'),
     helpers = require('../helpers'),
-    BaseView = require('./BaseView');
+    BaseView = require('./base_view');
 
 // Set PNotify to use bootstrap
 PNotify.prototype.options.styling = "bootstrap3";
 // Load PNotify buttons component
 require('pnotify/src/pnotify.buttons');
 
-module.exports = BaseView.extend(require('./mixins/links.js'), {
+var Application = BaseView.extend(require('./mixins/links.js'), {
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
   notifications: [],
@@ -118,3 +117,5 @@ module.exports = BaseView.extend(require('./mixins/links.js'), {
     return this;
   }
 });
+
+module.exports = Application;

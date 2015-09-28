@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       dist: {
         files: {
           'app/assets/javascripts/autotune/application.js': ['appjs/app.js'],
-          'app/assets/javascripts/autotune/tests.js': ['testjs/test.js']
+          'app/assets/javascripts/autotune/tests.js': ['testjs/*/test_*.js']
         }
       }
     },
@@ -55,7 +55,7 @@ module.exports = function(grunt) {
       },
       test: {
         files: ['testjs/test.js', 'testjs/**/*.js'],
-        tasks: ['jshint:test', 'test', 'browserify']
+        tasks: ['jshint:lib', 'jshint:test', 'test', 'browserify']
       }
     },
     notify_hooks: {
@@ -82,7 +82,7 @@ module.exports = function(grunt) {
         spawn = require('child_process').spawn,
         prova = require.resolve('prova/bin/prova');
 
-    var runner = spawn(prova, ['testjs/**/*.js']);
+    var runner = spawn(prova, ['testjs/*/test_*.js']);
 
     runner.stderr.pipe(process.stderr, { end: false });
     runner.stdout.pipe(process.stdout, { end: false });

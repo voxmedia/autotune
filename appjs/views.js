@@ -1,10 +1,10 @@
 "use strict";
 
 module.exports = {
-  ListBlueprints: require('./views/ListBlueprints'),
-  EditBlueprint: require('./views/EditBlueprint'),
-  ChooseBlueprint: require('./views/ChooseBlueprint'),
-  ListProjects: require('./views/ListProjects'),
-  EditProject: require('./views/EditProject'),
-  Application: require('./views/Application')
+  ListBlueprints: require('./views/list_blueprints'),
+  EditBlueprint: require('./views/edit_blueprint'),
+  ChooseBlueprint: require('./views/choose_blueprint'),
+  ListProjects: require('./views/list_projects'),
+  EditProject: require('./views/edit_project'),
+  Application: require('./views/application')
 };

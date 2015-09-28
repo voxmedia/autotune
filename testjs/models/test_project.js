@@ -1,5 +1,5 @@
 var test = require('prova'),
-    helpers = require('../../appjs/helpers');
+    Project = require('../../appjs/models/project');
 
 //test('timing test', function (t) {
   //t.plan(2);
