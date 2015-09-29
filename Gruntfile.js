@@ -79,20 +79,50 @@ module.exports = function(grunt) {
   // Testing
   grunt.registerTask('test', 'Run tests', function() {
     var done = this.async(),
+        path = require('path'),
         spawn = require('child_process').spawn,
-        prova = require.resolve('prova/bin/prova');
+        prova = require.resolve('prova/bin/prova'),
+        rails, runner, timeout;
 
-    var runner = spawn(prova, ['testjs/*/test_*.js']);
+    grunt.log.writeln('Starting rails API');
+    // Run the rails dummy app to provide the API
+    rails = spawn('bundle',
+                      ['exec', 'rails', 's', '-e', 'test'],
+                      {cwd: path.normalize('./test/dummy')});
 
-    runner.stderr.pipe(process.stderr, { end: false });
-    runner.stdout.pipe(process.stdout, { end: false });
+    // Capture rails error output and send to the terminal
+    //rails.stderr.pipe(process.stderr, { end: false });
 
-    runner.on('close', function(code) {
+    rails.on('close', function(code) {
       if (code !== 0) {
-        done(new Error('Javascript tests failed'));
-      } else {
-        done();
+        if ( timeout ) {
+          clearTimeout(timeout);
+          done(new Error('Rails failed to start'));
+        } else if ( runner ) {
+          runner.kill('SIGINT');
+        }
       }
     });
+
+    timeout = setTimeout(function() {
+      grunt.log.writeln('Running tests');
+      timeout = false;
+      // Use prova to run the tests
+      runner = spawn(prova, ['testjs/*/test_*.js']);
+
+      // Capture prova output and send to the terminal
+      runner.stderr.pipe(process.stderr, { end: false });
+      runner.stdout.pipe(process.stdout, { end: false });
+
+      runner.on('close', function(code) {
+        // When tests complete, stop the rails server
+        rails.kill('SIGINT');
+        if (code !== 0) {
+          done(new Error('Javascript tests failed'));
+        } else {
+          done();
+        }
+      });
+    }, 8000);
   });
 };

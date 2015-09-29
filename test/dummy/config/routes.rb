@@ -1,4 +1,3 @@
 Rails.application.routes.draw do
-
-  mount Autotune::Engine => "/autotune"
+  mount Autotune::Engine => '/'
 end
