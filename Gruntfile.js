@@ -82,13 +82,20 @@ module.exports = function(grunt) {
         path = require('path'),
         spawn = require('child_process').spawn,
         prova = require.resolve('prova/bin/prova'),
-        rails, runner, timeout;
+        rails, rake, runner, timeout;
 
     grunt.log.writeln('Starting rails API');
+
+    // reset the rails test db
+    process.env['RAILS_ENV'] = 'test';
+    rake = spawn('bundle', ['exec', 'rake', 'db:drop', 'db:create', 'db:fixtures:load']);
+    rake.stderr.pipe(process.stderr, { end: false });
+    rake.stdout.pipe(process.stdout, { end: false });
+
     // Run the rails dummy app to provide the API
     rails = spawn('bundle',
-                      ['exec', 'rails', 's', '-e', 'test'],
-                      {cwd: path.normalize('./test/dummy')});
+                  ['exec', 'rails', 's', '-e', 'test'],
+                  {cwd: path.normalize('./test/dummy')});
 
     // Capture rails error output and send to the terminal
     //rails.stderr.pipe(process.stderr, { end: false });
