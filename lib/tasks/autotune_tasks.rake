@@ -69,6 +69,7 @@ namespace :autotune do
           :roles => :superuser
         }
       })
+    puts u.as_json
   end
 
 end
