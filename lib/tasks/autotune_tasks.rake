@@ -63,7 +63,7 @@ namespace :autotune do
 
   desc 'Create machine user'
   task :create_superuser => :environment do
-    u = Autotune::User.create({
+    u = Autotune::User.find_or_create_by({
         :name => 'autobot',
         :meta => {
           :roles => :superuser
