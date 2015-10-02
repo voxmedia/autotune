@@ -60,4 +60,15 @@ namespace :autotune do
       puts proj.slug if proj.blueprint.version != proj.blueprint_version
     end
   end
+
+  desc 'Create machine user'
+  task :create_superuser => :environment do
+    u = Autotune::User.create({
+        :name => 'autobot',
+        :meta => {
+          :roles => :superuser
+        }
+      })
+    puts u.as_json
+  end
 end
