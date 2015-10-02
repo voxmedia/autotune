@@ -64,11 +64,12 @@ namespace :autotune do
   desc 'Create machine user'
   task :create_superuser => :environment do
     u = Autotune::User.find_or_create_by({
-        :name => 'autobot',
-        :meta => {
-          :roles => :superuser
-        }
+        :name => 'autobot'
       })
+    u.attributes = {
+      :meta => { 'roles' => [:superuser] }
+    }
+    u.save!
     puts u.as_json
   end
 end
