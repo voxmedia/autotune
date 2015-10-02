@@ -1,13 +1,14 @@
 var test = require('prova'),
     Project = require('../../appjs/models/project');
 
-//test('timing test', function (t) {
-  //t.plan(2);
+require('../test_helper');
 
-  //t.equal(typeof Date.now, 'function');
-  //var start = Date.now();
+test('get project', function(t) {
+  t.plan(1);
 
-  //setTimeout(function () {
-    //t.equal(Date.now() - start, 104);
-  //}, 100);
-//});
+  var p = new Project({id: 'example-build-one'});
+  p.fetch().then(function() {
+    t.equal(p.get('slug'),
+            'example-build-one', 'Valid slug');
+  }, t.fail);
+});

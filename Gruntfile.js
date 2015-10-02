@@ -18,7 +18,6 @@ module.exports = function(grunt) {
       dist: {
         files: {
           'app/assets/javascripts/autotune/application.js': ['appjs/app.js'],
-          'app/assets/javascripts/autotune/tests.js': ['testjs/*/test_*.js']
         }
       }
     },
@@ -55,7 +54,7 @@ module.exports = function(grunt) {
       },
       test: {
         files: ['testjs/test.js', 'testjs/**/*.js'],
-        tasks: ['jshint:lib', 'jshint:test', 'test', 'browserify']
+        tasks: ['jshint:lib', 'jshint:test', 'test']
       }
     },
     notify_hooks: {
@@ -74,7 +73,7 @@ module.exports = function(grunt) {
   grunt.task.run('notify_hooks');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'test', 'browserify']);
+  grunt.registerTask('default', ['jshint', 'browserify']);
 
   // Testing
   grunt.registerTask('test', 'Run tests', function() {
@@ -94,7 +93,7 @@ module.exports = function(grunt) {
 
     // Run the rails dummy app to provide the API
     rails = spawn('bundle',
-                  ['exec', 'rails', 's', '-e', 'test'],
+                  ['exec', 'rails', 's', '-p', '3001', '-e', 'test'],
                   {cwd: path.normalize('./test/dummy')});
 
     // Capture rails error output and send to the terminal
@@ -115,7 +114,7 @@ module.exports = function(grunt) {
       grunt.log.writeln('Running tests');
       timeout = false;
       // Use prova to run the tests
-      runner = spawn(prova, ['testjs/*/test_*.js']);
+      runner = spawn(prova, ['-b', '-l', 'chrome', '-y', '/api=http://localhost:3001', 'testjs/*/test_*.js']);
 
       // Capture prova output and send to the terminal
       runner.stderr.pipe(process.stderr, { end: false });
