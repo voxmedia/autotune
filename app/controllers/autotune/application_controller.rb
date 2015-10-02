@@ -5,7 +5,9 @@ module Autotune
     # For APIs, you may want to use :null_session instead.
     # protect_from_forgery with: :exception
 
-    before_action :require_login
+    before_action :require_login, :except => [:cors_preflight_check]
+
+    after_action :cors_set_access_control_headers
 
     helper_method :current_user, :signed_in?, :omniauth_path, :login_path, :role?
 
@@ -29,6 +31,20 @@ module Autotune
           model.new
         end
       end
+    end
+
+    # For all responses, return the CORS access control headers.
+    def cors_set_access_control_headers
+      headers['Access-Control-Allow-Origin'] = '*'
+      headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+      headers['Access-Control-Allow-Headers'] = 'accept, authorization'
+      headers['Access-Control-Max-Age'] = '1728000'
+    end
+
+    # If this is a preflight OPTIONS request, return a blank response
+    # (control headers will be included).
+    def cors_preflight_check
+      render :text => '', :content_type => 'text/plain'
     end
 
     protected

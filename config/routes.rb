@@ -95,4 +95,7 @@ Autotune::Engine.routes.draw do
   constraints resque_web_constraint do
     mount Resque::Server.new, :at => '/resque'
   end
+
+  match '*all' => 'application#cors_preflight_check',
+        :via => [:options]
 end

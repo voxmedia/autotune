@@ -54,7 +54,7 @@ module.exports = function(grunt) {
       },
       test: {
         files: ['testjs/test.js', 'testjs/**/*.js'],
-        tasks: ['jshint:lib', 'jshint:test', 'test']
+        tasks: ['jshint:lib', 'jshint:test']
       }
     },
     notify_hooks: {
@@ -87,9 +87,9 @@ module.exports = function(grunt) {
 
     // reset the rails test db
     process.env['RAILS_ENV'] = 'test';
-    rake = spawn('bundle', ['exec', 'rake', 'db:drop', 'db:create', 'db:fixtures:load']);
+    rake = spawn('bundle', ['exec', 'rake', 'db:drop', 'db:create', 'db:migrate', 'db:fixtures:load']);
     rake.stderr.pipe(process.stderr, { end: false });
-    rake.stdout.pipe(process.stdout, { end: false });
+    //rake.stdout.pipe(process.stdout, { end: false });
 
     // Run the rails dummy app to provide the API
     rails = spawn('bundle',
@@ -97,7 +97,8 @@ module.exports = function(grunt) {
                   {cwd: path.normalize('./test/dummy')});
 
     // Capture rails error output and send to the terminal
-    //rails.stderr.pipe(process.stderr, { end: false });
+    rails.stderr.pipe(process.stderr, { end: false });
+    rails.stdout.pipe(process.stdout, { end: false });
 
     rails.on('close', function(code) {
       if (code !== 0) {
@@ -114,7 +115,7 @@ module.exports = function(grunt) {
       grunt.log.writeln('Running tests');
       timeout = false;
       // Use prova to run the tests
-      runner = spawn(prova, ['-b', '-l', 'chrome', '-y', '/api=http://localhost:3001', 'testjs/*/test_*.js']);
+      runner = spawn(prova, ['-b', '-y', '/api=http://localhost:3001', 'testjs/*/test_*.js']);
 
       // Capture prova output and send to the terminal
       runner.stderr.pipe(process.stderr, { end: false });
