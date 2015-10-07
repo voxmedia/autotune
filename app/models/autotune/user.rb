@@ -28,7 +28,7 @@ module Autotune
       return if roles.nil?
       a = Authorization.new(
         auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
-      if auth_hash['info']['email'].empty?
+      if auth_hash['info'].blank? || auth_hash['info']['email'].blank?
         a.user = User.new
       else
         a.user = User.find_or_initialize_by(:email => auth_hash['info']['email'])
