@@ -72,7 +72,7 @@ module Autotune
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self, :update => true),
         BuildJob.new(self)
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -84,7 +84,7 @@ module Autotune
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self)
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -96,7 +96,7 @@ module Autotune
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self, :target => 'publish')
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
