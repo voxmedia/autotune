@@ -26,7 +26,7 @@ module Autotune
 
     after_initialize do
       self.status ||= 'new'
-      self.meta   ||= {}
+      self.meta ||= {}
     end
 
     before_validation do
@@ -37,7 +37,7 @@ module Autotune
 
       # Make sure we stash version and config
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
-      self.blueprint_config  ||= blueprint.config unless blueprint.nil?
+      self.blueprint_config ||= blueprint.config unless blueprint.nil?
     end
 
     def draft?
@@ -65,7 +65,7 @@ module Autotune
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self, :update => true),
         BuildJob.new(self)
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -77,7 +77,7 @@ module Autotune
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self)
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -89,7 +89,7 @@ module Autotune
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self, :target => 'publish')
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
