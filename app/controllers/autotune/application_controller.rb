@@ -7,7 +7,7 @@ module Autotune
 
     before_action :require_login, :except => [:cors_preflight_check]
 
-    after_action :cors_set_access_control_headers
+    before_action :cors_set_access_control_headers
 
     helper_method :current_user, :signed_in?, :omniauth_path, :login_path, :role?
 
@@ -127,9 +127,16 @@ module Autotune
     end
 
     def respond_to_html
-      return if request.format == 'application/json'
-      respond_to do |format|
-        format.html { render 'index' }
+      # It appears Rails automatically assumes you want HTML if html or */*
+      # is anywhere in the Accept header. Rails This is not how the Accept header is
+      # supposed to work.
+      if Mime[:json].in?(request.accepts)
+        # We'll be lazy and assume the client wants JSON if application/json
+        # appears in the Accept header. Then we have to rewrite the Accept
+        # so Rails can't ignore the format
+        request.format = :json
+      else
+        render 'index'
       end
     end
 
