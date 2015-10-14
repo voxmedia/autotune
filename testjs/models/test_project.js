@@ -1,6 +1,4 @@
-require('../test_helper');
-
-var test = require('prova'),
+var test = require('../test_helper'),
     Project = require('../../appjs/models/project');
 
 test('get project', function(t) {

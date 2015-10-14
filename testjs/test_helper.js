@@ -12,10 +12,12 @@ Backbone.sync = function (method, model, options) {
    * This works because the options object gets sent as the jQuery ajax options, which
    * includes the `url` property
    */
-  options.url = 'http://localhost:3001' + (_.isFunction(model.url) ? model.url() : model.url);
+  options.url = 'http://localhost:3033' + (_.isFunction(model.url) ? model.url() : model.url);
   options.headers = options.headers || {};
   options.headers['Authorization'] = 'API-KEY auth=u1H4xLSckbnJSYiM5VE0';
 
   // Call the stored original Backbone.sync method with the new url property
   return backboneSync(method, model, options);
 };
+
+module.exports = require('tape-catch');

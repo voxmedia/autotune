@@ -1,5 +1,5 @@
-//var test = require('prova'),
-    //EditProject = require('../../appjs/views/EditProject');
+var test = require('../test_helper'),
+    EditProject = require('../../appjs/views/edit_project');
 
 //test('timing test', function (t) {
   //t.plan(2);

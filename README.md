@@ -23,6 +23,30 @@ See project [wiki](https://github.com/voxmedia/autotune/wiki) for documentation 
 - [Reporting bugs](https://github.com/voxmedia/autotune/wiki/Reporting-bugs)
 - [Contribution guidelines](https://github.com/voxmedia/autotune/wiki/Contribution-guidelines)
 
+## Running tests
+
+Automated tests are broken up into backend Ruby tests and front-end javascript
+tests. To run the backend tests...
+
+```sh
+cd autotune
+bundle install
+bundle exec rake db:migrate RAILS_ENV=test
+bundle exec rake test
+```
+
+And to run the front-end tests
+
+```sh
+cd autotune
+npm install
+./bin/run_test_server &
+npm test
+fg
+# ctrl-c to kill the test server
+```
+
+
 ## Credits
 
 _Architecture and development:_ Ryan Mark

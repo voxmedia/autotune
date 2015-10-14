@@ -7,6 +7,7 @@ var $ = require('jquery'),
     helpers = require('../helpers'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
+    ace = require('brace'),
     slugify = require("underscore.string/slugify");
 
 require('brace/mode/javascript');

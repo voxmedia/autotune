@@ -1,4 +1,4 @@
-var test = require('prova'),
+var test = require('../test_helper'),
     helpers = require('../../appjs/helpers'),
     _ = require('underscore'),
     Backbone = require('backbone');
