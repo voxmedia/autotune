@@ -136,7 +136,9 @@ module Autotune
         # so Rails can't ignore the format
         request.format = :json
       else
-        render 'index'
+        respond_to do |format|
+          format.html { render 'index' }
+        end
       end
     end
 
