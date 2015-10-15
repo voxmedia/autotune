@@ -128,12 +128,11 @@ module Autotune
 
     def respond_to_html
       # It appears Rails automatically assumes you want HTML if html or */*
-      # is anywhere in the Accept header. Rails This is not how the Accept header is
+      # is anywhere in the Accept header. This is not how the Accept header is
       # supposed to work.
       if Mime[:json].in?(request.accepts)
         # We'll be lazy and assume the client wants JSON if application/json
-        # appears in the Accept header. Then we have to rewrite the Accept
-        # so Rails can't ignore the format
+        # appears in the Accept header. Then we have to force the format.
         request.format = :json
       else
         respond_to do |format|
