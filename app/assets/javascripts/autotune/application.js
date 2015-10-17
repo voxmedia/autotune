@@ -32325,8 +32325,11 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   },
 
   updateStatus: function(data) {
-    this.collection.get(data.id).set('status', data.status);
-    this.render();
+    var model = this.collection.get(data.id);
+    if ( model ) {
+      model.set('status', data.status);
+      this.render();
+    }
   },
 
   handleUpdateAction: function(eve) {
