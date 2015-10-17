@@ -27,9 +27,9 @@
   },
   "scripts": {
     "lint": "grunt jshint",
-    "watch": "grunt watch",
-    "build": "browserify --debug ./appjs/app.js > app/assets/javascripts/autotune/application.js",
-    "test": "browserify --debug ./testjs/*/test_*.js | browser-run -b safari | tap-spec"
+    "watch": "watchify --verbose --poll --debug appjs/app.js -o app/assets/javascripts/autotune/application.js",
+    "build": "browserify --debug appjs/app.js > app/assets/javascripts/autotune/application.js",
+    "test": "browserify --debug testjs/*/test_*.js | browser-run -b safari | tap-spec"
   },
   "dependencies": {
     "backbone": "1.2.3",
@@ -53,10 +53,8 @@
   },
   "devDependencies": {
     "browser-run": "^2.6.2",
-    "faucet": "0.0.1",
     "glob": "^5.0.15",
     "grunt": "0.4.5",
-    "grunt-browserify": "3.4.0",
     "grunt-cli": "0.1.13",
     "grunt-contrib-jshint": "0.11.0",
     "grunt-contrib-watch": "0.6.1",
@@ -64,7 +62,8 @@
     "grunt-notify": "0.4.1",
     "tap-spec": "^4.1.0",
     "tape": "^4.2.1",
-    "tape-catch": "^1.0.4"
+    "tape-catch": "^1.0.4",
+    "watchify": "^3.4.0"
   },
   "browser": {
     "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js"
