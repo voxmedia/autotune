@@ -50,6 +50,14 @@ var Blueprint = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
+  /**
+   * Does this project have a form?
+   * @returns {boolean}
+   **/
+  hasForm: function() {
+    return this.has('config') && this.get('config').form !== undefined;
+  },
+
   urlRoot: '/blueprints',
 
   /**

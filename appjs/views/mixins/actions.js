@@ -33,7 +33,14 @@ module.exports = {
     }
 
     if ( model_class && model_id ) {
-      inst = new models[model_class]({id: model_id});
+      if ( this.collection ) {
+        logger.debug('load model from collection');
+        inst = this.collection.get( model_id );
+      }
+
+      if ( !inst ) {
+        inst = new models[model_class]({id: model_id});
+      }
     } else {
       inst = this.model;
     }
@@ -44,20 +51,28 @@ module.exports = {
       .then(function(resp) {
         app.view.alert(action_message, 'success', false, 4000);
 
-        if (action.indexOf('build') > -1){
-          app.view.alert('Building... This might take a moment.', 'notice', false, 16000);
+        switch (action) {
+          case 'build':
+            app.view.alert(
+              'Building... This might take a moment.', 'notice', false, 16000);
+            break;
+          case 'destroy':
+            if ( view.collection ) {
+              logger.debug('Removing '+model_id+' from collection');
+              view.collection.remove(model_id);
+            }
+            break;
         }
 
         if ( next === 'show' ) {
           Backbone.history.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
-          view.render();
+          return view.render();
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
         }
       }).catch(function(error) {
         view.handleRequestError( error );
-      }).then(function() {
         if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
         app.trigger( 'loadingStop' );
       });

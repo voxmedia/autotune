@@ -17,6 +17,12 @@ var ProjectCollection = PageableCollection.extend({
 
   parseState: function (response, queryParams, state, options) {
     return {totalRecords: parseInt(options.xhr.getResponseHeader("X-Total"))};
+  },
+
+  get: function(id_or_slug) {
+    return this.find(function(model) {
+      return model.id === id_or_slug || model.get('slug') === id_or_slug;
+    });
   }
 });
 
