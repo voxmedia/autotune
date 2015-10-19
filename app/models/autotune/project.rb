@@ -13,6 +13,7 @@ module Autotune
     belongs_to :blueprint
     belongs_to :user
     belongs_to :theme
+    has_many :logs
 
     validates :title, :blueprint, :user, :theme, :presence => true
     validates :status,

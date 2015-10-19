@@ -15,6 +15,10 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
+      # Setup a new log model to track the duration of this job, and its output
+      log = Log.new(
+        :name => 'build', :project => project, :blueprint => project.blueprint)
+
       # Reset any previous error messages:
       project.meta.delete('error_message')
 
@@ -25,14 +29,6 @@ module Autotune
       # Make sure the repo exists and is up to date (if necessary)
       raise 'Missing files!' unless repo.exist?
 
-      # Setup a new logger that logs to a string. The resulting log will
-      # be saved to the output field of the project.
-      out = StringIO.new
-      outlogger = Logger.new out
-      outlogger.formatter = proc do |severity, datetime, _progname, msg|
-        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
-      end
-
       # Add a few extras to the build data
       build_data = project.data.deep_dup
       build_data.update(
@@ -42,14 +38,14 @@ module Autotune
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
-        target.to_sym, project, :logger => outlogger)
+        target.to_sym, project, :logger => log.logger)
 
       # Run the before build deployer hook
       deployer.before_build(build_data, repo.env)
 
       # Run the build
       repo.working_dir do
-        outlogger.info(repo.cmd(
+        log.logger.info(repo.cmd(
           BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
       end
 
@@ -69,7 +65,7 @@ module Autotune
           end
         rescue ::WorkDir::CommandError => exc
           logger.error(exc.message)
-          outlogger.warn(exc.message)
+          log.logger.warn(exc.message)
         end
       end
 
@@ -84,15 +80,13 @@ module Autotune
         msg = exc.message + "\n" + exc.backtrace.join("\n")
       end
       logger.error(msg)
-      outlogger.error(msg)
+      log.logger.error(msg)
       project.status = 'broken'
       raise
     ensure
       # Always make sure to save the log and the project
-      out.rewind
-      project.output = out.read
+      log.save!
       project.save!
-      outlogger.close
     end
 
     private
