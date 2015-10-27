@@ -48,28 +48,34 @@
         role="tab" data-toggle="tab">Project info</a></li>
     <% if ( model.isPublished() ) { %>
       <% if ( model.hasType( 'graphic' ) ) { %>
-    <li role="presentation"><a
-        href="#embed" aria-controls="embed"
-        role="tab" data-toggle="tab">Embed</a></li>
+        <li role="presentation"><a
+            href="#live-preview" aria-controls="live-preview"
+            role="tab" data-toggle="tab">Preview</a></li>
+        <li role="presentation"><a
+            href="#embed" aria-controls="embed"
+            role="tab" data-toggle="tab">Embed</a></li>
       <% } %>
-    <li role="presentation"><a
-        href="#screenshots" aria-controls="screenshots"
-        role="tab" data-toggle="tab">Screenshots</a></li>
     <% } else { %>
       <% if ( model.hasType( 'graphic' ) ) { %>
-    <li role="presentation" class="disabled"><a>Embed</a></li>
+        <% if ( model.isNew() ) { %>
+          <li role="presentation" class="disabled"><a>Preview</a></li>
+        <% } else { %>
+          <li role="presentation"><a
+              href="#live-preview" aria-controls="live-preview"
+              role="tab" data-toggle="tab">Preview</a></li>
+        <% } %>
+        <li role="presentation" class="disabled"><a>Embed</a></li>
       <% } %>
-    <li role="presentation" class="disabled"><a>Screenshots</a></li>
     <% } %>
     <% if ( hasRole('superuser') ) { %>
-      <% if ( model.isNew() ) { %>
+    <% if ( model.isNew() ) { %>
       <li role="presentation" class="disabled"><a>Developer</a></li>
-      <% } else { %>
+    <% } else { %>
       <li role="presentation"><a
           href="#developer" aria-controls="data"
           role="tab" data-toggle="tab">Developer</a></li>
-      <% } %>
     <% } %>
+  <% } %>
   </ul>
 
   <!-- Tab panes -->
@@ -88,8 +94,7 @@
     </div>
     <% if ( model.hasType( 'graphic' ) ) { %>
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
-    <% } %>
-    <div role="tabpanel" class="tab-pane" id="screenshots">
+    <div role="tabpanel" class="tab-pane" id="live-preview">
 
       <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>
@@ -97,19 +102,8 @@
         <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>
       </ul>
 
-      <div class="tab-content">
-        <div id="large-ss" class="tab-pane active">
-          <img path="screenshots/screenshot_l.png" />
-        </div>
-        <div id="medium-ss" class="tab-pane">
-          <img path="screenshots/screenshot_m.png" />
-        </div>
-        <div id="small-ss" class="tab-pane">
-          <img path="screenshots/screenshot_s.png" />
-        </div>
-      </div>
-
     </div>
+    <% } %>
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">
       <p>Status:
