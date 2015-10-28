@@ -8,6 +8,7 @@ var $ = require('jquery'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
     ace = require('brace'),
+    pym = require('pym.js'),
     slugify = require("underscore.string/slugify");
 
 require('brace/mode/javascript');
@@ -68,6 +69,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
+    var pymParent = new pym.Parent(this.model.attributes.slug+'__graphic', this.model.attributes.preview_url, {xdomain: '.*\.voxmedia\.com'});
+    logger.debug(this.model, 'model');
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),
@@ -78,10 +81,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         .then( function(data) {
           data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
           view.$( '#embed textarea' ).text( data );
-          $.each(view.$( '#screenshots img' ), function(){
-            $(this).attr( 'src', prefix + '/' + $(this).attr('path') );
-            $(this).removeAttr( 'path' );
-          });
         }).catch(function(error) {
           logger.error(error);
         })
