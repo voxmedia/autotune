@@ -56,13 +56,13 @@
             role="tab" data-toggle="tab">Embed</a></li>
       <% } %>
     <% } else { %>
-      <% if ( model.hasType( 'graphic' ) ) { %>
-        <% if ( model.isNew() ) { %>
-          <li role="presentation" class="disabled"><a>Preview</a></li>
-        <% } else { %>
+      <% if ( model.isDraft() ) { %>
+        <% if ( model.hasType( 'graphic' ) ) { %>
           <li role="presentation"><a
               href="#live-preview" aria-controls="live-preview"
               role="tab" data-toggle="tab">Preview</a></li>
+        <% } else { %>
+          <li role="presentation" class="disabled"><a>Preview</a></li>
         <% } %>
         <li role="presentation" class="disabled"><a>Embed</a></li>
       <% } %>
