@@ -18,7 +18,7 @@ module Autotune
       @buffer = StringIO.new
       @logger = Logger.new(@buffer)
       @logger.formatter = proc do |severity, datetime, _progname, msg|
-        "#{duration(datetime)}μs\t#{severity}\t#{msg}\n"
+        "#{duration(datetime)}µs\t#{severity}\t#{msg}\n"
       end
       @logger
     end

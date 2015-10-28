@@ -11,9 +11,11 @@ module Autotune
 
     # do the deed
     def perform(blueprint, status: nil, update: false)
+      log = Log.new(:label => 'sync-blueprint', :blueprint => blueprint)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
+      repo.logger = log.logger
 
       if repo.exist?
         if update
@@ -46,8 +48,10 @@ module Autotune
       blueprint.version = repo.version
 
       # Stash the thumbnail
-      if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
-        deployer = Autotune.new_deployer(:media, blueprint)
+      if blueprint.config['thumbnail'] &&
+         repo.exist?(blueprint.config['thumbnail'])
+        deployer = Autotune.new_deployer(
+          :media, blueprint, :logger => log.logger)
         deployer.deploy_file(
           blueprint.working_dir,
           blueprint.config['thumbnail'])
@@ -63,8 +67,12 @@ module Autotune
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
-      blueprint.update!(:status => 'broken')
+      log.error(exc)
+      blueprint.status = 'broken'
       raise
+    ensure
+      log.save!
+      blueprint.save!
     end
   end
 end

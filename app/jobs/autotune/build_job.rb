@@ -15,9 +15,8 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
-      # Setup a new log model to track the duration of this job, and its output
-      log = Log.new(
-        :name => 'build', :project => project, :blueprint => project.blueprint)
+      # Setup a new log model to track the duration of this job and its output
+      log = Log.new(:label => 'build', :project => project)
 
       # Reset any previous error messages:
       project.meta.delete('error_message')
@@ -25,6 +24,7 @@ module Autotune
       # Create a new repo object based on the projects working dir
       repo = WorkDir.repo(project.working_dir,
                           Rails.configuration.autotune.build_environment)
+      repo.logger = log.logger
 
       # Make sure the repo exists and is up to date (if necessary)
       raise 'Missing files!' unless repo.exist?
@@ -45,8 +45,7 @@ module Autotune
 
       # Run the build
       repo.working_dir do
-        log.logger.info(repo.cmd(
-          BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+        repo.cmd(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json)
       end
 
       # Upload build
@@ -54,6 +53,7 @@ module Autotune
 
       # Create screenshots (has to happen after upload)
       phantom = WorkDir.phantom(project.deploy_dir)
+      phantom.logger = log.logger
       if phantom.phantomjs? && !Rails.env.test?
         begin
           url = deployer.url_for('/')

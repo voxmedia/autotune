@@ -24,7 +24,10 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
     b.reload
 
     assert_equal 'built', b.status
-    assert_match(/Build data:/, b.output)
+
+    assert b.logs.count, 2
+
+    assert_match(/Build data:/, b.logs.first.content)
 
     assert File.exist?(Rails.root.join('public', 'preview', b.slug, 'index.html')),
            'Built file should be deployed to public/preview'

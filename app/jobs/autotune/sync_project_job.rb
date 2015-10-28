@@ -10,10 +10,14 @@ module Autotune
     end
 
     def perform(project, update: false)
+      # Setup a new log model to track the duration of this job and its output
+      log = Log.new(:label => 'sync-project', :project => project)
+
       # Create a new repo object based on the blueprints working dir
       blueprint_dir = WorkDir.repo(
         project.blueprint.working_dir,
         Rails.configuration.autotune.setup_environment)
+      blueprint_dir.logger = log.logger
 
       # Make sure the blueprint exists
       raise 'Missing files!' unless blueprint_dir.exist?
@@ -22,6 +26,7 @@ module Autotune
       project_dir = WorkDir.repo(
         project.working_dir,
         Rails.configuration.autotune.setup_environment)
+      project_dir.logger = log.logger
 
       if project_dir.exist? && update
         # Update the project files. Because of issue #218, due to
@@ -43,18 +48,21 @@ module Autotune
         # Make sure the environment is correct for this version
         project_dir.setup_environment
         # update the status
-        project.update!(
-          :status => 'updated',
-          :blueprint_config => project_dir.read(BLUEPRINT_CONFIG_FILENAME))
-      else
-        # update the status
-        project.update!(:status => 'updated')
+        project.blueprint_config = project_dir.read(BLUEPRINT_CONFIG_FILENAME)
       end
+
+      # update the status
+      project.status = 'updated'
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
-      project.update!(:status => 'broken')
+      log.error(exc)
+      project.status = 'broken'
       raise
+    ensure
+      # Always make sure to save the log and the project
+      log.save!
+      project.save!
     end
   end
 end

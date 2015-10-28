@@ -12,6 +12,7 @@ module WorkDir
     def initialize(path, env = {})
       @working_dir = path.to_s
       @env = ENV.select { |k, _| WorkDir::ALLOWED_ENV.include? k }
+      @env['SHELL'] = '/bin/bash'
       @env.update env
     end
 
@@ -93,10 +94,11 @@ module WorkDir
     # Wrapper around Open3.capture2e
     def cmd(*args, **opts, &block)
       opts[:unsetenv_others] = true unless opts.keys.include? :unsetenv_others
-      logger.debug((@env.map { |k, v| "#{k}=#{v}" } + args).join(' '))
       out, status = Open3.capture2e(@env, *args, **opts, &block)
+      message = "#{Dir.pwd} $ #{args.join(' ')}\n#{out}"
+      logger.debug(message)
       return out if status.success?
-      raise CommandError, "#{args.join(' ')}\n#{out}"
+      raise CommandError, message
     end
 
     # expand a local path for this working directory
