@@ -3,6 +3,7 @@
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
+    pym = require('pym.js'),
     models = require('./models'),
     views = require('./views'),
     logger = require('./logger'),
@@ -218,7 +219,7 @@ module.exports = Backbone.Router.extend({
       }
     }).then(function() {
       old_attributes = _.clone(project.attributes);
-      
+
       new_attributes.blueprint_config = old_attributes.blueprint_config;
       new_attributes.blueprint_id = old_attributes.blueprint_id;
       new_attributes.blueprint_title = old_attributes.blueprint_title;
