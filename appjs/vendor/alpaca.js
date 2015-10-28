@@ -19523,7 +19523,7 @@ this["HandlebarsPrecompiled"]["bootstrap-edit"]["message"] = Handlebars.template
     Alpaca.registerDefaultSchemaFieldMapping("array", "array");
 
     Alpaca.registerMessages({
-        "addItemButtonLabel": "Add New Item",
+        "addItemButtonLabel": "Add New",
         "addButtonLabel": "Add",
         "removeButtonLabel": "Remove",
         "upButtonLabel": "Up",
