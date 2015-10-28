@@ -1,12 +1,12 @@
 class CreateAutotuneLogs < ActiveRecord::Migration
   def change
     create_table :autotune_logs do |t|
-      t.string :name, :index => true
+      t.string :label, :index => true
       t.text :content
-      t.integer :time
+      t.integer :time, :index => true
       t.integer :project_id, :index => true
       t.integer :blueprint_id, :index => true
-      t.datetime :created_at
+      t.datetime :created_at, :index => true
       t.boolean :success, :default => true
     end
 

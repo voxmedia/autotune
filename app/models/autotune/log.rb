@@ -7,37 +7,44 @@ module Autotune
     belongs_to :project
 
     default_scope { order('created_at DESC') }
-    validates :content, :created_at, :blueprint, :time, :name, :success,
+    validates :content, :created_at, :blueprint, :time, :label, :success,
               :presence => true
 
-    attr_reader :logger
+    delegate :error, :warning, :debug, :fatal, :info, :unknown,
+             :to => :logger
 
     after_initialize :if => :new_record? do
-      @created_at = Time.zone.now
+      self.created_at = Time.zone.now
       @buffer = StringIO.new
       @logger = Logger.new(@buffer)
       @logger.formatter = proc do |severity, datetime, _progname, msg|
-        "#{duration(datetime)}ms\t#{severity}\t#{msg}\n"
+        "#{duration(datetime)}μs\t#{severity}\t#{msg}\n"
       end
       @logger
     end
 
     before_validation :if => :new_record? do
+      self.blueprint = project.blueprint if project.present?
       self.time = duration
       self.content = @buffer.string
     end
 
     after_save do
-      @logger.close
-      @buffer.close
+      @logger.close if @logger
       @logger = nil
       @buffer = nil
     end
 
+    def logger
+      raise 'Log entries cannot be changed after creation' if persisted?
+      @logger
+    end
+
     private
 
-    def duration(til = Time.zone.now)
-      ((til - @created_at) * 1000).to_i
+    def duration(til = nil)
+      til ||= Time.zone.now
+      ((til.to_f - created_at.to_f) * (10**6)).to_i
     end
   end
 end
