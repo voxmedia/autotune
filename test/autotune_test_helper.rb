@@ -40,7 +40,7 @@ class ActiveSupport::TestCase
   end
 
   def repo_url
-    'https://github.com/voxmedia/autotune-example-blueprint.git'
+    File.expand_path('../repos/autotune-example-blueprint.git', __FILE__).to_s
   end
 end
 
