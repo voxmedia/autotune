@@ -3,7 +3,6 @@
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    pym = require('pym.js'),
     models = require('../models'),
     logger = require('../logger'),
     helpers = require('../helpers');

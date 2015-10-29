@@ -3,8 +3,7 @@
 var Backbone = require('backbone'),
     _ = require('underscore'),
     moment = require('moment'),
-    markdown = require('markdown').markdown,
-    pym = require('pym.js');
+    markdown = require('markdown').markdown;
 
 var Project = Backbone.Model.extend({
   urlRoot: '/projects',

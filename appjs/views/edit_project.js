@@ -69,8 +69,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
-    var pymParent = new pym.Parent(this.model.attributes.slug+'__graphic', this.model.attributes.preview_url, {xdomain: '.*\.voxmedia\.com'});
-    logger.debug(this.model, 'model');
+    if ( !this.model.isNew() ){
+      var pymParent = new pym.Parent(this.model.attributes.slug+'__graphic', this.model.attributes.preview_url);
+      view.pymParent = pymParent;
+    }
+    logger.debug(view, 'model');
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),

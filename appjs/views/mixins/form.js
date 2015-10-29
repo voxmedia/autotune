@@ -4,7 +4,6 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     camelize = require('underscore.string/camelize'),
-    pym = require('pym.js'),
     models = require('../../models'),
     logger = require('../../logger'),
     helpers = require('../../helpers');
