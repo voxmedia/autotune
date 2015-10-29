@@ -9,7 +9,6 @@
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    pym = require('pym.js'),
     bootstrap = require('bootstrap'),
     moment = require('moment'),
     Alpaca = require('./alpaca_patches'),
