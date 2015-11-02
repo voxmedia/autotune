@@ -70,11 +70,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    if ( !this.model.isNew() ){
+    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
       var pymParent = new pym.Parent(this.model.get('slug')+'__graphic', this.model.get('preview_url'));
     }
 
-    logger.debug(view, 'model');
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),

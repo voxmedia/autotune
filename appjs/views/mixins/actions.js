@@ -44,6 +44,7 @@ module.exports = {
     } else {
       inst = this.model;
     }
+    logger.debug(inst);
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
@@ -68,6 +69,8 @@ module.exports = {
           Backbone.history.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
           return view.render();
+        } else if ( next === 'resize' ) {
+          Backbone.history.navigate( inst.url(), {trigger: false} );
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
         }

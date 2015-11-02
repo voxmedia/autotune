@@ -266,6 +266,11 @@ var Project = Backbone.Model.extend({
     return this.getBuildUrl('preview', preferredProto);
   },
 
+  getPreviewSize: function() {
+    console.log('getting preview size');
+    // return this.getBuildUrl('preview', preferredProto);
+  },
+
   /**
    * Get the url to the published project.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
