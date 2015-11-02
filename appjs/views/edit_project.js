@@ -71,7 +71,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var view = this, promises = [];
 
     if ( !this.model.isNew() ){
-      var pymParent = new pym.Parent(this.model.get('slug')+'__graphic', this.model.get('preview_url')+'/');
+      var pymParent = new pym.Parent(this.model.get('slug')+'__graphic', this.model.get('preview_url'));
     }
 
     logger.debug(view, 'model');
