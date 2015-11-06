@@ -96,33 +96,32 @@
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
     <div role="tabpanel" class="tab-pane" id="live-preview">
 
-      <ul class="nav nav-pills">
-        <button type="button" data-action="get-preview-size" id="large-view"
-          class="btn btn-default"
-          data-action-message="clicked"
+      <ul class="nav nav-pills" style="margin-bottom: 15px;">
+        <button type="button" data-action="get-preview-size" id="small-view"
+          class="btn btn-default resize"
           data-model="Project"
-          data-action-next="reload"
+          data-action-next="resize"
           data-model-id="<%=model.get('slug') %>">
-          Large
+          Small
         </button>
         <button type="button" data-action="get-preview-size" id="medium-view"
-          class="btn btn-default"
+          class="btn btn-default resize"
           data-model="Project"
           data-action-next="resize"
           data-model-id="<%=model.get('slug') %>">
           Medium
         </button>
-        <button type="button" data-action="get-preview-size" id="small-view"
-          class="btn btn-default"
+        <button type="button" data-action="get-preview-size" id="large-view"
+          class="btn btn-default resize"
           data-action-message="clicked"
           data-model="Project"
-          data-action-next="reload"
+          data-action-next="resize"
           data-model-id="<%=model.get('slug') %>">
-          Small
+          Large
         </button>
       </ul>
 
-      <div id="<%= model.get( 'slug' ) %>__graphic"></div>
+      <div class="preview-frame" id="<%= model.get( 'slug' ) %>__graphic" style="border: 2px dashed #ccc;"></div>
 
 
       <div class="tab-content">

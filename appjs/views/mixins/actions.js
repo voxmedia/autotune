@@ -28,7 +28,7 @@ module.exports = {
     logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
     this.app.trigger('loadingStart');
-    if ( $btn.hasClass('btn') ) {
+    if ( $btn.hasClass('btn') && !$btn.hasClass('resize') ) {
       $btn.button('loading');
     }
 
@@ -70,7 +70,15 @@ module.exports = {
         } else if ( next === 'reload' ) {
           return view.render();
         } else if ( next === 'resize' ) {
-          Backbone.history.navigate( inst.url(), {trigger: false} );
+          var width = '100%';
+          if ($btn.attr('id') === 'medium-view') {
+            width = '500px';
+          } else if ($btn.attr('id') === 'small-view') {
+            width = '320px';
+          }
+          $('.preview-frame').css({'max-width': width, 'margin': 'auto'});
+          app.trigger( 'loadingStop' );
+          return view;
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
         }
