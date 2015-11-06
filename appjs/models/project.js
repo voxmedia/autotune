@@ -267,8 +267,8 @@ var Project = Backbone.Model.extend({
   },
 
   getPreviewSize: function() {
-    console.log('getting preview size');
-    // return this.getBuildUrl('preview', preferredProto);
+    console.log('getting preview size', this);
+    // $('#live-preview').css({'max-width': '500px', 'margin': 'auto'});
   },
 
   /**
