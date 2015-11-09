@@ -68,6 +68,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
+
+    if ( this.app.hasRole('superuser') ) {
+      this.editor = ace.edit('blueprint-data');
+      this.editor.setShowPrintMargin(false);
+      this.editor.setReadOnly(true);
+      this.editor.setTheme("ace/theme/textmate");
+      this.editor.setWrapBehavioursEnabled(true);
+
+      var session = this.editor.getSession();
+      session.setMode("ace/mode/javascript");
+      session.setUseWrapMode(true);
+
+      this.editor.renderer.setHScrollBarAlwaysVisible(false);
+
+      this.editor.setValue( JSON.stringify( this.model.buildData(), null, "  " ), -1 );
+    }
+
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           prefix = this.model.getPublishUrl(proto),

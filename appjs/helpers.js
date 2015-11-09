@@ -26,7 +26,7 @@ module.exports = {
   },
 
   hasRole: function(role) {
-    return _.contains(this.app.user.get('meta').roles, role);
+    return this.app.hasRole(role);
   },
 
   /***********

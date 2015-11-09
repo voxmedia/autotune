@@ -122,6 +122,15 @@ _.extend(App.prototype, Backbone.Events, {
    **/
   handleListenerStop: function() {
     this.view.alert('Reload to see changes', 'notice', true);
+  },
+
+  /**
+   * Check if the user has a certian role
+   * @param {string} role - Role name
+   * @returns {boolean}
+   **/
+  hasRole: function(role) {
+    return _.contains(this.user.get('meta').roles, role);
   }
 });
 
