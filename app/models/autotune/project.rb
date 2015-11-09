@@ -26,7 +26,7 @@ module Autotune
 
     after_initialize do
       self.status ||= 'new'
-      self.meta   ||= {}
+      self.meta ||= {}
     end
 
     before_validation do
@@ -35,9 +35,16 @@ module Autotune
         self.slug = self.class.unique_slug(theme.value + '-' + slug_sans_theme, id)
       end
 
+      # Truncate output field so we can save without error
+      output_limit = self.class.columns_hash['output'].limit
+      if output_limit && output.present? && output.length > output_limit
+        self.output = output.truncate(
+          output_limit, :omission => '... (truncated)')
+      end
+
       # Make sure we stash version and config
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
-      self.blueprint_config  ||= blueprint.config unless blueprint.nil?
+      self.blueprint_config ||= blueprint.config unless blueprint.nil?
     end
 
     def draft?

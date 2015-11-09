@@ -210,5 +210,31 @@ module Autotune
         :repo_url => repo_url + '#7')
       assert_equal 'new-blueprint-6', b.slug
     end
+
+    test 'too much output' do
+      output_limit = Autotune::Project.columns_hash['output'].limit
+      skip('unknown output field limit') unless output_limit
+
+      project = autotune_projects(:example_one)
+
+      # generate 64k of output
+      output = 65.kilobytes.times.map { ('a'..'z').to_a[rand(26)] }.join
+
+      project.output = output
+
+      begin
+        project.save!
+      rescue ActiveRecord::StatementInvalid
+        flunk 'Failed to save project (sparing you a huge screen of junk)'
+      end
+
+      assert_operator project.output.length, :<=, output_limit
+
+      # check for a message at the end of the truncated output
+      msg = '(truncated)'
+
+      assert_equal project.output[(msg.length * -1)..-1], msg,
+                   'missing truncate message'
+    end
   end
 end
