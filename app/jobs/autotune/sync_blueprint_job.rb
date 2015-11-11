@@ -15,12 +15,18 @@ module Autotune
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
 
-      if repo.exist? && update
-        # Update the repo
-        repo.update
-      elsif repo.exist?
-        # if we're not updating, bail if we have the files
-        return
+      if repo.exist?
+        if update
+          # Update the repo
+          repo.update
+        elsif blueprint.status.in?(%w(testing ready))
+          # if we're not updating, bail if we have the files
+          return
+        elsif !update
+          # we're not updating, but the blueprint is broken, so set it up
+          repo.branch = blueprint.version
+          repo.update
+        end
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
@@ -48,7 +54,11 @@ module Autotune
       end
 
       # Blueprint is now ready for testing
-      blueprint.status = status if status
+      if status
+        blueprint.status = status
+      elsif blueprint.status != 'ready'
+        blueprint.status = 'testing'
+      end
       blueprint.save!
     rescue => exc
       # If the command failed, raise a red flag
