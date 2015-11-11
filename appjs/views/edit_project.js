@@ -44,8 +44,16 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   updateStatus: function(status) {
     logger.debug('Update project status: ' + status);
-    this.model.set('status', status);
-    this.render();
+
+    var view = this;
+    Promise
+      .resolve(this.model.fetch())
+      .then(function() {
+        return view.render();
+      }).catch(function(jqXHR) {
+        view.app.view.displayError(
+          jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+      });
   },
 
   templateData: function() {

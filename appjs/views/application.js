@@ -16,7 +16,6 @@ require('pnotify/src/pnotify.buttons');
 var Application = BaseView.extend(require('./mixins/links.js'), {
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
-  notifications: [],
   alertDefaults: {
     addclass: "stack-bottomright",
     stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
@@ -42,14 +41,17 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     this.$('#main').empty().append(
       helpers.render( require('../templates/not_found.ejs') ));
   },
+
   display403: function() {
     this.$('#main').empty().append(
       helpers.render( require('../templates/not_allowed.ejs') ));
   },
+
   display500: function(status, message) {
     this.$('#main').empty().append(
       helpers.render( require('../templates/error.ejs'), {status: status, message: message} ));
   },
+
   displayError: function(code, status, message) {
     if (code === 404) {
       this.display404();
@@ -91,30 +93,25 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   },
 
   alert: function(message, level, permanent, wait) {
-    var opts = _.defaults({
-      text: message,
-      type: level || 'info',
-      delay: wait || 8000
-    }, this.alertDefaults);
+    var noti,
+        opts = _.defaults({
+          text: message,
+          type: level || 'info',
+          delay: wait || 8000
+        }, this.alertDefaults);
 
     if ( permanent ) {
       _.extend(opts, {
-        buttons: { close: false, sticker: false },
+        buttons: { closer: false, sticker: false },
         hide: false
       });
-      this.notifications.push( new PNotify(opts) );
-    } else {
-      new PNotify(opts);
     }
-    return this;
+
+    return new PNotify(opts);
   },
 
-  clearError: function() {
-    _.each(this.notifications, function(n) {
-      if ( n.remove ) { n.remove(); }
-    });
-    this.notifications = [];
-    return this;
+  clearAlerts: function() {
+    return PNotify.removeAll();
   }
 });
 

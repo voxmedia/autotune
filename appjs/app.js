@@ -51,7 +51,9 @@ function App(config) {
 
   // Initialize server event listener
   this.listener = new Listener();
-  this.listenTo(this.listener, 'stop', this.handleListenerStop, this);
+  this.listenTo(this.listener, 'stop', this.handleListenerStop);
+  this.listenTo(this.listener, 'error', this.handleListenerStop);
+  this.listenTo(this.listener, 'open', this.handleListenerStart);
   this.listener.start();
 
   this.config = config;
@@ -121,7 +123,20 @@ _.extend(App.prototype, Backbone.Events, {
    * Do something when the listener shuts down
    **/
   handleListenerStop: function() {
-    this.view.alert('Reload to see changes', 'notice', true);
+    if ( !this.reloadNotification ) {
+      this.reloadNotification = this.view.alert(
+        'Reload to see changes', 'notice', true);
+    }
+  },
+
+  /**
+   * Do something when the listener starts
+   **/
+  handleListenerStart: function() {
+    if ( this.reloadNotification ) {
+      this.reloadNotification.remove();
+      this.reloadNotification = null;
+    }
   },
 
   /**
