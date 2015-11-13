@@ -113,11 +113,17 @@
         </button>
         <button type="button" data-action="get-preview-size" id="large-view"
           class="btn btn-default resize"
-          data-action-message="clicked"
           data-model="Project"
           data-action-next="resize"
           data-model-id="<%=model.get('slug') %>">
           Large
+        </button>
+        <button type="button" data-action="get-preview-size" id="fluid-view"
+          class="btn btn-default resize active"
+          data-model="Project"
+          data-action-next="resize"
+          data-model-id="<%=model.get('slug') %>">
+          Fluid (100%)
         </button>
       </ul>
 
