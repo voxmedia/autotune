@@ -50,7 +50,9 @@ module.exports = {
 
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
-        app.view.alert(action_message, 'success', false, 4000);
+        if(action_message){
+          app.view.alert(action_message, 'success', false, 4000);
+        }
 
         switch (action) {
           case 'build':
@@ -71,11 +73,15 @@ module.exports = {
           return view.render();
         } else if ( next === 'resize' ) {
           var width = '100%';
-          if ($btn.attr('id') === 'medium-view') {
+          if ($btn.attr('id') === 'large-view') {
+            width = '720px';
+          } else if ($btn.attr('id') === 'medium-view') {
             width = '500px';
           } else if ($btn.attr('id') === 'small-view') {
             width = '320px';
           }
+          $('.nav.nav-pills button').removeClass('active');
+          $btn.addClass('active');
           $('.preview-frame').css({'max-width': width, 'margin': 'auto'});
           app.trigger( 'loadingStop' );
           return view;
