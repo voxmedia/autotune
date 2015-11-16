@@ -160,8 +160,7 @@ module Autotune
       if @project.valid?
         @project.save
         @project.build
-        # commenting render out throws an error but does push the updated data into the iframed project
-        # render :show
+        render :show
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end

@@ -282,14 +282,22 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       $form.alpaca(opts);
     }
+    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
+      $form.keypress(function(event){
+        // setTimeout isn't a good solution, but it is a start
+        setTimeout(function(){
+          var data = $form.alpaca('get').getValue();
+          logger.debug(event, data);
+          pymParent.sendMessage('updateData', JSON.stringify(data));
+        }, 500);
+      });
+    }
   },
 
   formValues: function($form) {
     var data = $form.alpaca('get').getValue();
     logger.debug('!!!!! form values', data);
-    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
-      pymParent.sendMessage('updateData', JSON.stringify(data));
-    }
+
     var vals = {
       title: data['title'],
       theme: data['theme'],
