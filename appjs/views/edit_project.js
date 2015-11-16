@@ -286,6 +286,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   formValues: function($form) {
     var data = $form.alpaca('get').getValue();
+    logger.debug('!!!!! form values', data);
+    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
+      pymParent.sendMessage('updateData', JSON.stringify(data));
+    }
     var vals = {
       title: data['title'],
       theme: data['theme'],
@@ -309,9 +313,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     } else {
       $form.find('#resolve-message').removeClass('hidden');
       $form.find('#validation-error').addClass('hidden');
-    }
-    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
-      pymParent.sendMessage('updateData', 'data goes here from autotune');
     }
     return valid;
   }
