@@ -1,5 +1,7 @@
 "use strict";
 
+// how is this mapped to the save button for the form only?
+
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
@@ -12,7 +14,8 @@ var $ = require('jquery'),
 module.exports = {
   events: {
     'submit form': 'handleForm',
-    'change select[data-auto-submit=true]': 'submitForm'
+    'change select[data-auto-submit=true]': 'submitForm',
+    'click button[save-project=true]': 'handleForm'
   },
 
   handleForm: function(eve) {

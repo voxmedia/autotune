@@ -114,6 +114,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   renderForm: function(resolve, reject) {
+    logger.debug('debugging this', this);
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         form_config, config_themes, newProject;

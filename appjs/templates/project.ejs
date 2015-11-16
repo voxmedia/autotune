@@ -86,6 +86,7 @@
         <div class="col-sm-8">
       <% } %>
         <div id="projectForm"></div>
+        <!-- how is it pulling in the project buttons here? -->
       <% if ( model.hasInstructions() ) { %>
         </div>
         <div class="col-sm-4"><%=model.instructions() %></div>
@@ -125,6 +126,11 @@
           data-model-id="<%=model.get('slug') %>">
           Fluid (100%)
         </button>
+        <!-- Needs to get form to submit - can't do it from this tab -->
+        <button type="submit" class="btn btn-default"
+                save-project="true"
+                data-model="Project"
+                data-model-id="<%=model.get('slug') %>">Save</button>
       </ul>
 
       <div class="preview-frame" id="<%= model.get( 'slug' ) %>__graphic" style="border: 2px dashed #ccc;"></div>
