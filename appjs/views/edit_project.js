@@ -9,7 +9,8 @@ var $ = require('jquery'),
     BaseView = require('./base_view'),
     ace = require('brace'),
     pym = require('pym.js'),
-    slugify = require("underscore.string/slugify");
+    slugify = require("underscore.string/slugify"),
+    pymParent;
 
 require('brace/mode/javascript');
 require('brace/mode/html');
@@ -71,7 +72,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var view = this, promises = [];
 
     if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
-      var pymParent = new pym.Parent(this.model.get('slug')+'__graphic', this.model.get('preview_url'));
+      pymParent = new pym.Parent(this.model.get('slug')+'__graphic', this.model.get('preview_url'));
+      // pymParent.onMessage('receivedMessage', function() {
+      //   logger.debug('received a message WOOOOOO');
+      //   // pymParent.sendMessage('setShareUrl', 'data goes here');
+      // });
     }
 
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
@@ -102,7 +107,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterSubmit: function() {
     this.listenForChanges();
-
     if (this.model.hasStatus('building')){
       this.app.view.alert(
         'Building... This might take a moment.', 'notice', false, 16000);
@@ -305,6 +309,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     } else {
       $form.find('#resolve-message').removeClass('hidden');
       $form.find('#validation-error').addClass('hidden');
+    }
+    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
+      pymParent.sendMessage('updateData', 'data goes here from autotune');
     }
     return valid;
   }

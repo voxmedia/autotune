@@ -6,6 +6,7 @@ var $ = require('jquery'),
     camelize = require('underscore.string/camelize'),
     models = require('../../models'),
     logger = require('../../logger'),
+    pym = require('pym.js'),
     helpers = require('../../helpers');
 
 module.exports = {
