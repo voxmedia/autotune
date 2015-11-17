@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150730183825) do
+ActiveRecord::Schema.define(version: 20151117175334) do
 
   create_table "autotune_authorizations", force: :cascade do |t|
     t.integer  "user_id"
@@ -67,11 +67,11 @@ ActiveRecord::Schema.define(version: 20150730183825) do
     t.string   "status"
     t.string   "title"
     t.string   "blueprint_version"
-    t.text     "data"
+    t.text     "data",              limit: 131072
     t.text     "output"
     t.integer  "blueprint_id"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.integer  "user_id"
     t.text     "blueprint_config"
     t.datetime "published_at"
