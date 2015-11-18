@@ -275,7 +275,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
             social.updateMaxLengthIndicator();
 
-            if ( theme && social.type !== 'hidden' ) {
+            if ( theme && theme.type !== 'hidden' ) {
               $(theme).on('change', function(){
                 social.schema.maxLength = 140 - (
                   26 + social_chars[ theme.getValue() ] );
