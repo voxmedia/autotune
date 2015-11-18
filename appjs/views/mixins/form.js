@@ -14,8 +14,7 @@ var $ = require('jquery'),
 module.exports = {
   events: {
     'submit form': 'handleForm',
-    'change select[data-auto-submit=true]': 'submitForm',
-    'click button[save-project=true]': 'handleForm'
+    'change select[data-auto-submit=true]': 'submitForm'
   },
 
   handleForm: function(eve) {
