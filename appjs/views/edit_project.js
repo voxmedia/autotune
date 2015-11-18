@@ -271,13 +271,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           var theme = control.childrenByPropertyId["theme"],
              social = control.childrenByPropertyId["tweet_text"];
 
-          social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
-          social.updateMaxLengthIndicator();
-
-          $(theme).on('change', function(){
+          if ( social && social.type !== 'hidden' ) {
             social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
             social.updateMaxLengthIndicator();
-          });
+
+            if ( theme && social.type !== 'hidden' ) {
+              $(theme).on('change', function(){
+                social.schema.maxLength = 140 - (
+                  26 + social_chars[ theme.getValue() ] );
+                social.updateMaxLengthIndicator();
+              });
+            }
+          }
 
           this.alpaca.childrenByPropertyId["slug"].setValue(
             this.model.get('slug_sans_theme') );
