@@ -117,6 +117,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     logger.debug('debugging this', this);
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
+        orig_this = this,
         form_config, config_themes, newProject;
 
     // Prevent return or enter from submitting the form
@@ -288,7 +289,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         // setTimeout isn't a good solution, but it is a start
         setTimeout(function(){
           var data = $form.alpaca('get').getValue();
-          logger.debug(event, data);
+          logger.debug(orig_this, event, data);
+          // This builds the project, but doesn't seem to update any of the data
+          orig_this.model.set(data);
+          orig_this.model.save();
           pymParent.sendMessage('updateData', JSON.stringify(data));
         }, 500);
       });

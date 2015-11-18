@@ -38,6 +38,7 @@ module.exports = {
       inst = new models[model_class]();
     } else if(_.isObject(this.model) && action === 'edit') {
       inst = this.model;
+      logger.debug(this, inst);
     } else if ($form.attr('method').toLowerCase() === 'get') {
       // if the method attr is `get` then we can navigate to that new
       // url and avoid any posting
@@ -59,7 +60,6 @@ module.exports = {
         }
 
         logger.debug('form is valid, saving...');
-
         return inst.save();
       }).then(function() {
         logger.debug('form finished saving');

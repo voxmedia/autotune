@@ -267,6 +267,7 @@ var Project = Backbone.Model.extend({
   },
 
   getPreviewSize: function() {
+    console.log(this.model);
     console.log('getting preview size', this);
   },
 
