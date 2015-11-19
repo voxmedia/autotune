@@ -288,15 +288,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       logger.debug('*** THIS IS ALIVE');
 
       $form.keypress(function(event){
+        var data;
         // setTimeout isn't a good solution, but it is a start
         setTimeout(function(){
-          var data = $form.alpaca('get').getValue();
-          logger.debug(orig_this, event, data);
-          // This builds the project, but doesn't seem to update any of the data
+          data = $form.alpaca('get').getValue();
           orig_this.model.set(data);
-          orig_this.model.save();
+          logger.debug('%%%', orig_this.model, data, orig_this.model.formData());
+          // Check whether the current and preceived form data are the same
+          logger.debug(_.isEqual(data, orig_this.model.formData()));
           pymParent.sendMessage('updateData', JSON.stringify(data));
         }, 500);
+
+        // setTimeout(function(){
+        //   return orig_this.model.save();
+        // }, 3000);
+
       });
     }
   },

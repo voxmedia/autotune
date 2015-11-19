@@ -133,20 +133,9 @@
                 data-model-id="<%=model.get('slug') %>">Save</button>
       </ul>
 
+      <%- JSON.stringify(model.formData()) %>
+
       <div class="preview-frame" id="<%= model.get( 'slug' ) %>__graphic" style="border: 2px dashed #ccc;"></div>
-
-
-      <div class="tab-content">
-        <div id="large-ss" class="tab-pane active">
-
-        </div>
-        <div id="medium-ss" class="tab-pane">
-
-        </div>
-        <div id="small-ss" class="tab-pane">
-
-        </div>
-      </div>
 
     </div>
     <% } %>
