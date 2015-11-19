@@ -25,6 +25,7 @@ module Autotune
     after_initialize do
       self.status ||= 'new'
       self.type   ||= 'app'
+      self.preview_type ||= 'static'
       self.config ||= {}
     end
 

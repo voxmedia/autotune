@@ -284,7 +284,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       $form.alpaca(opts);
     }
-    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
+    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' && this.model.blueprint.get('preview_type') === 'live' ){
+      logger.debug('*** THIS IS ALIVE');
+
       $form.keypress(function(event){
         // setTimeout isn't a good solution, but it is a start
         setTimeout(function(){
