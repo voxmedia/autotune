@@ -41,10 +41,13 @@ module Autotune
 
     # Get the url to a file
     def url_for(path)
-      base = asset?(path) ? project_asset_url : project_url
-      ret = [base, path].join('/')
-      ret += '/' if File.extname(path).empty?
-      ret
+      if path == '/' || path.blank?
+        project_url
+      elsif asset?(path)
+        [project_asset_url, path].join('/')
+      else
+        [project_url, path].join('/')
+      end
     end
 
     def deploy_path

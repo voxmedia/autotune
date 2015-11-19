@@ -107,11 +107,11 @@ module Autotune
     end
 
     def preview_url
-      @preview_url ||= deployer(:preview).project_url
+      @preview_url ||= deployer(:preview).url_for('/')
     end
 
     def publish_url
-      @publish_url ||= deployer(:publish).project_url
+      @publish_url ||= deployer(:publish).url_for('/')
     end
 
     def slug_sans_theme
