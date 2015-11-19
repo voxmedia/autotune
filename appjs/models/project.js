@@ -260,37 +260,54 @@ var Project = Backbone.Model.extend({
   /**
    * Get the url of the preview.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @param {string} path - include this path in the URL
    * @returns {string} url
    **/
-  getPreviewUrl: function(preferredProto) {
-    return this.getBuildUrl('preview', preferredProto);
+  getPreviewUrl: function(preferredProto, path) {
+    return this.getBuildUrl('preview', preferredProto, path);
   },
 
   /**
    * Get the url to the published project.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @param {string} path - include this path in the URL
    * @returns {string} url
    **/
-  getPublishUrl: function(preferredProto) {
-    return this.getBuildUrl('publish', preferredProto);
+  getPublishUrl: function(preferredProto, path) {
+    return this.getBuildUrl('publish', preferredProto, path);
   },
 
   /**
    * Get the url for one of the built projects (preview or publish).
    * @param {string} type - Type of the url (preview, publish)
    * @param {string} preferredProto - Protocol to use if possible (http, https)
+   * @param {string} path - include this path in the URL
    * @returns {string} url
    **/
-  getBuildUrl: function(type, preferredProto) {
+  getBuildUrl: function(type, preferredProto, path) {
     var key = ( type === 'publish' ) ? 'publish_url' : 'preview_url';
+
     if ( !this.has(key) ) { return ''; }
+
     var base = this.get(key);
-    if ( base.match(/^http/) ) {
-      return base;
-    } else if ( base.match(/^\/\//) ) {
-      return preferredProto + ':' + base;
+    if ( base.match(/^\/\//) ) {
+      base = preferredProto + ':' + base;
+    }
+
+    if ( !path ) { return base; }
+
+    if ( base.substr(-1) === '/' ) {
+      if ( path[0] === '/' ) {
+        return base + path.substr(1);
+      } else {
+        return base + path;
+      }
     } else {
-      return base;
+      if ( path[0] === '/' ) {
+        return base + path;
+      } else {
+        return base + '/' + path;
+      }
     }
   }
 });
