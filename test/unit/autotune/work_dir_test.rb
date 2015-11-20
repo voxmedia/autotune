@@ -2,7 +2,7 @@ require 'test_helper'
 require 'work_dir'
 
 # Test the WorkDir classes; Repo and Snapshot
-class Autotune::WorkDirTest < ActionDispatch::IntegrationTest
+class Autotune::WorkDirTest < ActiveSupport::TestCase
   test 'setup repo' do
     in_tmpdir do |dir|
       r = WorkDir.repo dir
