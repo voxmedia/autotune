@@ -41,7 +41,7 @@ module Autotune
 
     # Get the url to a file
     def url_for(path)
-      path = path[1..-1] if path[0] == '/'
+      path = path[1..-1] if path.present? && path[0] == '/'
       if path == '/' || path.blank?
         project_url
       elsif asset?(path)

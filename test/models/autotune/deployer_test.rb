@@ -36,6 +36,10 @@ module Autotune
         :connect => 'foo://test',
         :project => p)
 
+      assert_equal d.url_for(''),
+                   '//example.com/example-build-one'
+      assert_equal d.url_for(nil),
+                   '//example.com/example-build-one'
       assert_equal d.url_for('/'),
                    '//example.com/example-build-one'
       assert_equal d.url_for('/foo'),
