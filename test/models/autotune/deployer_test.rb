@@ -71,5 +71,27 @@ module Autotune
       assert_raises(NotImplementedError) { d.after_delete }
       assert_raises(NotImplementedError) { d.after_move }
     end
+
+    test 'files' do
+      skip
+      in_tmpdir do |path|
+        p = autotune_projects(:example_one)
+        d = Deployers::File.new(
+          :base_url => '//example.com',
+          :connect => "file://#{path}",
+          :project => p)
+      end
+    end
+
+    test 's3' do
+      skip
+    end
+
+    def in_tmpdir
+      path = File.expand_path "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/"
+      yield path
+    ensure
+      FileUtils.rm_rf(path) if File.exist?(path)
+    end
   end
 end
