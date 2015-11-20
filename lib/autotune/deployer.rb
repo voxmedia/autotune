@@ -41,10 +41,11 @@ module Autotune
 
     # Get the url to a file
     def url_for(path)
-      path = path[1..-1] if path.present? && path[0] == '/'
-      if path == '/' || path.blank?
-        project_url
-      elsif asset?(path)
+      return project_url if path == '/' || path.blank?
+
+      path = path[1..-1] if path[0] == '/'
+
+      if asset?(path)
         [project_asset_url, path].join('/')
       else
         [project_url, path].join('/')
