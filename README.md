@@ -14,7 +14,7 @@ See project [wiki](https://github.com/voxmedia/autotune/wiki) for documentation 
 
 - [Getting started](https://github.com/voxmedia/autotune/wiki/getting-started)
 - [Setup](https://github.com/voxmedia/autotune/wiki/setup)
-- [How does it work?](https://github.com/voxmedia/autotune/wiki/How-does-it-work?)
+- [How does it work?](https://github.com/voxmedia/autotune/wiki/How-does-it-work%3F)
 - [Blueprints](https://github.com/voxmedia/autotune/wiki/Getting-started#blueprints)
   - [Using an existing blueprint](https://github.com/voxmedia/autotune/wiki/Using-a-blueprint)
   - [Creating a new blueprint](https://github.com/voxmedia/autotune/wiki/How-to-create-a-blueprint)
