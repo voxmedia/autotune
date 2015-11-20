@@ -297,6 +297,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           // Check whether the current and preceived form data are the same
           logger.debug(_.isEqual(data, orig_this.model.formData()));
           pymParent.sendMessage('updateData', JSON.stringify(data));
+          orig_this.render();
         }, 500);
 
         // setTimeout(function(){
