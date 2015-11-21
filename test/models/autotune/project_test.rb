@@ -212,8 +212,7 @@ module Autotune
     end
 
     test 'too much output' do
-      output_limit = Autotune::Project.columns_hash['output'].limit
-      skip('unknown output field limit') unless output_limit
+      output_limit = Autotune::Project.columns_hash['output'].limit || 64.kilobytes
 
       project = autotune_projects(:example_one)
 
