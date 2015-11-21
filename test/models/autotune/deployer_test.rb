@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'work_dir'
 
 module Autotune
   # test taggy stuff
@@ -76,14 +77,54 @@ module Autotune
       assert_raises(NotImplementedError) { d.after_move }
     end
 
-    test 'files' do
-      skip
+    test 'file deployer' do
       in_tmpdir do |path|
         p = autotune_projects(:example_one)
         d = Deployers::File.new(
           :base_url => '//example.com',
           :connect => "file://#{path}",
           :project => p)
+
+        wd = WorkDir.repo(p.working_dir)
+        FileUtils.mkdir_p(wd.expand 'build')
+        open(wd.expand('build/index.html'), 'w') do |fp|
+          fp.write('<h1>Hello World!</h1>')
+        end
+        open(wd.expand('build/app.css'), 'w') do |fp|
+          fp.write('h1 { font-size: 100px }')
+        end
+        assert File.exist?(wd.expand 'build/index.html'), 'File should exist'
+        assert File.exist?(wd.expand 'build/app.css'), 'File should exist'
+
+        d.deploy(wd.expand 'build')
+
+        assert File.exist?(File.join(path, p.slug, 'index.html')),
+               'File should exist'
+        assert File.exist?(File.join(path, p.slug, 'app.css')),
+               'File should exist'
+
+        open(wd.expand('thumb.svg'), 'w') do |fp|
+          fp.write('<svg><circle /></svg>')
+        end
+
+        d.deploy_file(p.working_dir, 'thumb.svg')
+
+        assert File.exist?(File.join(path, p.slug, 'thumb.svg')),
+               'File should exist'
+
+        skip
+        p.slug = 'foo-bar'
+        d.after_move
+
+        refute File.exist?(File.join(path, 'example-build-one', 'index.html')),
+               'File should not exist'
+        assert File.exist?(File.join(path, 'foo-bar', 'index.html')),
+               'File should exist'
+
+        d.after_delete
+
+        refute File.exist?(File.join(path, 'foo-bar', 'index.html')),
+               'File should not exist'
       end
     end
 
