@@ -14,6 +14,7 @@ module Autotune
     belongs_to :user
     belongs_to :theme
 
+    validates_length_of :output, :maximum => 64.kilobytes - 1
     validates :title, :blueprint, :user, :theme, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
@@ -37,8 +38,8 @@ module Autotune
 
       # Truncate output field so we can save without error
       omission = '... (truncated)'
-      output_limit = self.class.columns_hash['output'].limit || 64.kilobytes - 1
-      if output_limit && output.present? && output.length > output_limit
+      output_limit = 60.kilobytes
+      if output.present? && output.length > output_limit
         # Don't trust String#truncate
         self.output = output[0, output_limit - omission.length] + omission
       end

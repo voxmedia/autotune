@@ -89,9 +89,9 @@ module Autotune
       raise
     ensure
       # Always make sure to save the log and the project
+      outlogger.close
       project.output = out.try(:string)
       project.save!
-      outlogger.close
     end
 
     private

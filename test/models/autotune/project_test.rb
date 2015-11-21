@@ -216,12 +216,19 @@ module Autotune
 
       project = autotune_projects(:example_one)
 
-      # generate 64k of output
+      # generate >64K of output
       options = ('a'..'z').to_a + (1..12).to_a
-      options += %w(<b> </b> <div> </div> & < > \n)
+      options += %w(<b> </b> <div> </div> & < > <br> \n \" " \' \\\\\\' ` &amp; &lt; &gt;) + ["\n", ' '] + ["'"] * 10
       output = 65.kilobytes.times.map { options[rand(options.length)] }.join
 
+      project.status = 'broken'
+      project.output = output[0, 200]
+      assert project.valid?
+      assert project.save
+
       project.output = output
+
+      assert_equal project.output, output
 
       begin
         project.save!
@@ -230,12 +237,13 @@ module Autotune
       end
 
       assert_operator project.output.length, :<=, output_limit
+      assert_operator project.output.length, :<, output.length
 
       # check for a message at the end of the truncated output
       msg = '(truncated)'
 
-      assert_equal project.output[(msg.length * -1)..-1], msg,
-                   'missing truncate message'
+      assert_operator project.output, :end_with?, msg,
+                      'missing truncate message'
     end
   end
 end
