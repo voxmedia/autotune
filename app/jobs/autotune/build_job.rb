@@ -15,6 +15,14 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
+      # Setup a new logger that logs to a string. The resulting log will
+      # be saved to the output field of the project.
+      out = StringIO.new
+      outlogger = Logger.new out
+      outlogger.formatter = proc do |severity, datetime, _progname, msg|
+        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
+      end
+
       # Reset any previous error messages:
       project.meta.delete('error_message')
 
@@ -24,14 +32,6 @@ module Autotune
 
       # Make sure the repo exists and is up to date (if necessary)
       raise 'Missing files!' unless repo.exist?
-
-      # Setup a new logger that logs to a string. The resulting log will
-      # be saved to the output field of the project.
-      out = StringIO.new
-      outlogger = Logger.new out
-      outlogger.formatter = proc do |severity, datetime, _progname, msg|
-        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
-      end
 
       # Add a few extras to the build data
       build_data = project.data.deep_dup
@@ -89,8 +89,7 @@ module Autotune
       raise
     ensure
       # Always make sure to save the log and the project
-      out.rewind
-      project.output = out.read
+      project.output = out.try(:string)
       project.save!
       outlogger.close
     end
