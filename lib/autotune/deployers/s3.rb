@@ -23,12 +23,10 @@ module Autotune
 
       # Get the url to a file
       def url_for(path)
-        if path == '/' || path.blank?
-          project_url + '/'
-        elsif asset?(path)
-          [project_asset_url, path].join('/')
+        if asset?(path)
+          super
         else
-          [project_url, path].join('/') + '/'
+          super + '/'
         end
       end
     end

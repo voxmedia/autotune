@@ -73,8 +73,8 @@ module Autotune
 
       assert_raises(NotImplementedError) { d.deploy('/tmp/foo') }
       assert_raises(NotImplementedError) { d.deploy_file('/tmp/foo', 'bar.jpg') }
-      assert_raises(NotImplementedError) { d.after_delete }
-      assert_raises(NotImplementedError) { d.after_move }
+      assert_raises(NotImplementedError) { d.delete! }
+      assert_raises(NotImplementedError) { d.move! }
     end
 
     test 'file deployer' do
@@ -112,24 +112,46 @@ module Autotune
         assert File.exist?(File.join(path, p.slug, 'thumb.svg')),
                'File should exist'
 
-        skip
         p.slug = 'foo-bar'
-        d.after_move
+        d.move!
 
         refute File.exist?(File.join(path, 'example-build-one', 'index.html')),
                'File should not exist'
         assert File.exist?(File.join(path, 'foo-bar', 'index.html')),
                'File should exist'
 
-        d.after_delete
+        d.delete!
 
         refute File.exist?(File.join(path, 'foo-bar', 'index.html')),
                'File should not exist'
       end
     end
 
-    test 's3' do
-      skip
+    test 's3 url generation' do
+      p = autotune_projects(:example_one)
+      d = Deployers::S3.new(
+        :base_url => '//example.com',
+        :connect => 's3://test',
+        :project => p)
+
+      assert_equal d.url_for(''),
+                   '//example.com/example-build-one/'
+      assert_equal d.url_for(nil),
+                   '//example.com/example-build-one/'
+      assert_equal d.url_for('/'),
+                   '//example.com/example-build-one/'
+      assert_equal d.url_for('/foo'),
+                   '//example.com/example-build-one/foo/'
+      assert_equal d.url_for('foo'),
+                   '//example.com/example-build-one/foo/'
+      assert_equal d.url_for('/images/bar.jpg'),
+                   '//example.com/example-build-one/images/bar.jpg'
+      assert_equal d.url_for('images/bar.jpg'),
+                   '//example.com/example-build-one/images/bar.jpg'
+      assert_equal d.url_for('/images/foo.png'),
+                   '//example.com/example-build-one/images/foo.png'
+      assert_equal d.url_for('images/foo.png'),
+                   '//example.com/example-build-one/images/foo.png'
     end
 
     def in_tmpdir
