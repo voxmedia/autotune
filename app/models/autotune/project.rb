@@ -36,10 +36,11 @@ module Autotune
       end
 
       # Truncate output field so we can save without error
-      output_limit = self.class.columns_hash['output'].limit || 64.kilobytes
+      omission = '... (truncated)'
+      output_limit = self.class.columns_hash['output'].limit || 64.kilobytes - 1
       if output_limit && output.present? && output.length > output_limit
-        self.output = output.truncate(
-          output_limit, :omission => '... (truncated)')
+        # Don't trust String#truncate
+        self.output = output[0, output_limit - omission.length] + omission
       end
 
       # Make sure we stash version and config

@@ -212,12 +212,14 @@ module Autotune
     end
 
     test 'too much output' do
-      output_limit = Autotune::Project.columns_hash['output'].limit || 64.kilobytes
+      output_limit = Autotune::Project.columns_hash['output'].limit || 64.kilobytes - 1
 
       project = autotune_projects(:example_one)
 
       # generate 64k of output
-      output = 65.kilobytes.times.map { ('a'..'z').to_a[rand(26)] }.join
+      options = ('a'..'z').to_a + (1..12).to_a
+      options += %w(<b> </b> <div> </div> & < > \n)
+      output = 65.kilobytes.times.map { options[rand(options.length)] }.join
 
       project.output = output
 
