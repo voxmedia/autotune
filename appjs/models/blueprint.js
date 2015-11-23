@@ -50,6 +50,13 @@ var Blueprint = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
+  hasPreviewType: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'preview_type' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
   /**
    * Does this project have a form?
    * @returns {boolean}

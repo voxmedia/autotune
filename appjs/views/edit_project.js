@@ -10,7 +10,8 @@ var $ = require('jquery'),
     ace = require('brace'),
     pym = require('pym.js'),
     slugify = require("underscore.string/slugify"),
-    pymParent;
+    pymParent,
+    data;
 
 require('brace/mode/javascript');
 require('brace/mode/html');
@@ -36,7 +37,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if ( !this.model.isNew() ) {
       this.listenTo(this.app.listener,
                     'change:project:' + this.model.id,
-                    this.updateStatus, this);
+                    this.updateStatus, this.renderForm, this);
     }
   },
 
@@ -114,12 +115,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.$( '#embed textarea' ).text( data );
         }).catch(function(error) {
           logger.error(error);
-        }).then( function() {
-          $.each(view.$( '#screenshots img' ), function(){
-            var src = view.model.getPreviewUrl( proto, $(this).attr( 'path' ) );
-            $(this).attr( 'src', src );
-            $(this).removeAttr( 'path' );
-          });
         })
       );
     }
@@ -318,32 +313,29 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       $form.alpaca(opts);
     }
-    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' && this.model.blueprint.get('preview_type') === 'live' ){
+    if ( !this.model.isNew() && this.model.blueprint.hasType('graphic') && this.model.blueprint.hasPreviewType('live') ){
       logger.debug('*** THIS IS ALIVE');
 
       $form.keypress(function(event){
-        var data;
         // setTimeout isn't a good solution, but it is a start
         setTimeout(function(){
           data = $form.alpaca('get').getValue();
           orig_this.model.set(data);
           logger.debug('%%%', orig_this.model, data, orig_this.model.formData());
+          // logger.debug('THIS', this.app.view.currentView.model);
+          // logger.debug(orig_this.model.get('data'));
           // Check whether the current and preceived form data are the same
           logger.debug(_.isEqual(data, orig_this.model.formData()));
           pymParent.sendMessage('updateData', JSON.stringify(data));
           // orig_this.render();
         }, 500);
 
-        // setTimeout(function(){
-        //   return orig_this.model.save();
-        // }, 3000);
-
       });
     }
   },
 
   formValues: function($form) {
-    var data = $form.alpaca('get').getValue();
+    data = $form.alpaca('get').getValue();
     logger.debug('!!!!! form values', data);
 
     var vals = {

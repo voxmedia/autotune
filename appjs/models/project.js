@@ -119,6 +119,13 @@ var Project = Backbone.Model.extend({
     return _.extend({ 'base_url': this.baseUrl() }, this.formData());
   },
 
+  // this does not do what I want it to do
+  updateBuild: function () {
+    console.log('^^^^^^', this.formData());
+    // this.save();
+    // this.build();
+  },
+
   /**
    * Get the preview or published URL of this project, whichever is more relevent.
    * @returns {string} Preview or publish url
