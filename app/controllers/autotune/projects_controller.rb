@@ -157,12 +157,20 @@ module Autotune
       @project.data.delete('slug')
       @project.data.delete('theme')
 
-      if @project.valid?
-        @project.save
-        @project.build
-        render :show
+      if params.key? :keypress
+        live_preview = Blueprint.where({:preview_type => 'live', :id => @project.blueprint_id})
+        unless live_preview.empty?
+          @project.save
+          render :show
+        end
       else
-        render_error @project.errors.full_messages.join(', '), :bad_request
+        if @project.valid?
+          @project.save
+          @project.build
+          render :show
+        else
+          render_error @project.errors.full_messages.join(', '), :bad_request
+        end
       end
     end
 

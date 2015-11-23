@@ -43,11 +43,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           title: data['title'],
           theme: data['theme'],
           data:  data,
-          blueprint_id: inst.model.blueprint.get('id')
+          blueprint_id: inst.model.blueprint.get('id'),
+          keypress: true
         };
         inst.model.set(vals);
-        inst.model.save();
         pymParent.sendMessage('updateData', JSON.stringify(data));
+        inst.model.save();
       }, 500);
 
       }
