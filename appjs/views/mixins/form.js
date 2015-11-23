@@ -32,6 +32,7 @@ module.exports = {
         action = $form.data('action'),
         next = $form.data('next');
 
+    logger.debug('form form', $form);
     $form.find('[type=submit]').button('loading');
 
     if(model_class && action === 'new') {

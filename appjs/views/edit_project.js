@@ -25,7 +25,32 @@ function pluckAttr(models, attribute) {
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
   events: {
-    'change :input': 'stopListeningForChanges'
+    'change :input': 'stopListeningForChanges',
+    'keypress': 'pressedKey'
+  },
+
+  pressedKey: function(e){
+    var $form = this.$('#projectForm');
+    if ( !this.model.isNew() && this.model.blueprint.hasType('graphic') && this.model.blueprint.hasPreviewType('live') ){
+      logger.debug('*** THIS IS ALIVE');
+      var inst = this;
+      setTimeout(function(){
+        data = $form.alpaca('get').getValue();
+        logger.debug('!!!!! form values', data);
+        logger.debug(inst);
+
+        var vals = {
+          title: data['title'],
+          theme: data['theme'],
+          data:  data,
+          blueprint_id: inst.model.blueprint.get('id')
+        };
+        inst.model.set(vals);
+        inst.model.save();
+        pymParent.sendMessage('updateData', JSON.stringify(data));
+      }, 500);
+
+      }
   },
 
   afterInit: function(options) {
@@ -37,7 +62,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if ( !this.model.isNew() ) {
       this.listenTo(this.app.listener,
                     'change:project:' + this.model.id,
-                    this.updateStatus, this.renderForm, this);
+                    this.updateStatus, this);
     }
   },
 
@@ -313,25 +338,25 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       $form.alpaca(opts);
     }
-    if ( !this.model.isNew() && this.model.blueprint.hasType('graphic') && this.model.blueprint.hasPreviewType('live') ){
-      logger.debug('*** THIS IS ALIVE');
-
-      $form.keypress(function(event){
-        // setTimeout isn't a good solution, but it is a start
-        setTimeout(function(){
-          data = $form.alpaca('get').getValue();
-          orig_this.model.set(data);
-          logger.debug('%%%', orig_this.model, data, orig_this.model.formData());
-          // logger.debug('THIS', this.app.view.currentView.model);
-          // logger.debug(orig_this.model.get('data'));
-          // Check whether the current and preceived form data are the same
-          logger.debug(_.isEqual(data, orig_this.model.formData()));
-          pymParent.sendMessage('updateData', JSON.stringify(data));
-          // orig_this.render();
-        }, 500);
-
-      });
-    }
+    // if ( !this.model.isNew() && this.model.blueprint.hasType('graphic') && this.model.blueprint.hasPreviewType('live') ){
+    //   logger.debug('*** THIS IS ALIVE');
+    //
+    //   $form.keypress(function(event){
+    //     // setTimeout isn't a good solution, but it is a start
+    //     setTimeout(function(){
+    //       data = $form.alpaca('get').getValue();
+    //       orig_this.model.set(data);
+    //       logger.debug('%%%', orig_this.model, data, orig_this.model.formData());
+    //       // logger.debug('THIS', this.app.view.currentView.model);
+    //       // logger.debug(orig_this.model.get('data'));
+    //       // Check whether the current and preceived form data are the same
+    //       logger.debug(_.isEqual(data, orig_this.model.formData()));
+    //       pymParent.sendMessage('updateData', JSON.stringify(data));
+    //       // orig_this.render();
+    //     }, 500);
+    //
+    //   });
+    // }
   },
 
   formValues: function($form) {
