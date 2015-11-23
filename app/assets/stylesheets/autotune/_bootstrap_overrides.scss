@@ -99,6 +99,20 @@ button.alpaca-array-actionbar-action {
   }
 }
 
+.alpaca-field-checkbox {
+  label {
+    display: inline-block;
+  }
+  .checkbox {
+    display: inline-block;
+    label {
+      top: 5px;
+      left: 5px;
+      position: relative;
+    }
+  }
+}
+
 // star for required fields? this is the easeist way to adjust that
 .glyphicon-star:before {
   font-family: $font-family-sans-serif;

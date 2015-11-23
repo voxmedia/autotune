@@ -39,28 +39,53 @@ module Autotune
       raise NotImplementedError
     end
 
-    # Get the url to a file
-    def url_for(path)
-      base = asset?(path) ? project_asset_url : project_url
-      ret = [base, path].join('/')
-      ret += '/' if File.extname(path).empty?
-      ret
+    # Hook to do stuff after a project is deleted
+    def delete!
+      raise NotImplementedError
     end
 
-    def deploy_path
-      d_path = [parts.path, project.slug].join('/')
-      if parts.scheme == 's3'
-        d_path += '/'
+    # Hook to do stuff after a project is moved (slug changed)
+    def move!
+      raise NotImplementedError
+    end
+
+    # Get the url to a file
+    def url_for(path)
+      path = path[1..-1] if path.present? && path[0] == '/'
+      if path == '/' || path.blank?
+        project_url
+      elsif asset?(path)
+        [project_asset_url, path].join('/')
+      else
+        [project_url, path].join('/')
       end
-      d_path
+    end
+
+    # def deploy_path
+    #   d_path = [parts.path, project.slug].join('/')
+    #   if parts.scheme == 's3'
+    #     d_path += '/'
+    #   end
+    #   d_path
+    # end
+    #
+    # def project_url
+    #   proj_url = [base_url, project.slug].join('/')
+    #   if parts.scheme == 's3'
+    #     proj_url += '/'
+    #   end
+    #   proj_url
+    # end
+    def deploy_path
+      [parts.path, project.slug].join('/')
+    end
+
+    def old_deploy_path
+      [parts.path, project.slug_was].join('/') if project.slug_changed?
     end
 
     def project_url
-      proj_url = [base_url, project.slug].join('/')
-      if parts.scheme == 's3'
-        proj_url += '/'
-      end
-      proj_url
+      [base_url, project.slug].join('/')
     end
 
     def project_asset_url

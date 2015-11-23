@@ -20,6 +20,17 @@ module Autotune
           :app_path => deploy_path, :logger => logger)
         deployer.deploy_file!(path)
       end
+
+      # Get the url to a file
+      def url_for(path)
+        if path == '/' || path.blank?
+          project_url + '/'
+        elsif asset?(path)
+          [project_asset_url, path].join('/')
+        else
+          [project_url, path].join('/') + '/'
+        end
+      end
     end
   end
 end

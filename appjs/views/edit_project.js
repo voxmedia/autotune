@@ -46,8 +46,16 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   updateStatus: function(status) {
     logger.debug('Update project status: ' + status);
-    this.model.set('status', status);
-    this.render();
+
+    var view = this;
+    Promise
+      .resolve(this.model.fetch())
+      .then(function() {
+        return view.render();
+      }).catch(function(jqXHR) {
+        view.app.view.displayError(
+          jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+      });
   },
 
   templateData: function() {
@@ -79,10 +87,25 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       // });
     }
 
+    if ( this.app.hasRole('superuser') ) {
+      this.editor = ace.edit('blueprint-data');
+      this.editor.setShowPrintMargin(false);
+      this.editor.setReadOnly(true);
+      this.editor.setTheme("ace/theme/textmate");
+      this.editor.setWrapBehavioursEnabled(true);
+
+      var session = this.editor.getSession();
+      session.setMode("ace/mode/javascript");
+      session.setUseWrapMode(true);
+
+      this.editor.renderer.setHScrollBarAlwaysVisible(false);
+
+      this.editor.setValue( JSON.stringify( this.model.buildData(), null, "  " ), -1 );
+    }
+
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
-          prefix = this.model.getPublishUrl(proto),
-          embedUrl = this.model.getPublishUrl(proto) + 'embed.txt';
+          embedUrl = this.model.getPublishUrl(proto, 'embed.txt');
 
       promises.push( Promise
         .resolve( $.get( embedUrl ) )
@@ -91,6 +114,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.$( '#embed textarea' ).text( data );
         }).catch(function(error) {
           logger.error(error);
+        }).then( function() {
+          $.each(view.$( '#screenshots img' ), function(){
+            var src = view.model.getPreviewUrl( proto, $(this).attr( 'path' ) );
+            $(this).attr( 'src', src );
+            $(this).removeAttr( 'path' );
+          });
         })
       );
     }
@@ -254,13 +283,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           var theme = control.childrenByPropertyId["theme"],
              social = control.childrenByPropertyId["tweet_text"];
 
-          social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
-          social.updateMaxLengthIndicator();
-
-          $(theme).on('change', function(){
+          if ( social && social.type !== 'hidden' ) {
             social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
             social.updateMaxLengthIndicator();
-          });
+
+            if ( theme && theme.type !== 'hidden' ) {
+              $(theme).on('change', function(){
+                social.schema.maxLength = 140 - (
+                  26 + social_chars[ theme.getValue() ] );
+                social.updateMaxLengthIndicator();
+              });
+            }
+          }
 
           this.alpaca.childrenByPropertyId["slug"].setValue(
             this.model.get('slug_sans_theme') );
@@ -297,7 +331,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           // Check whether the current and preceived form data are the same
           logger.debug(_.isEqual(data, orig_this.model.formData()));
           pymParent.sendMessage('updateData', JSON.stringify(data));
-          orig_this.render();
+          // orig_this.render();
         }, 500);
 
         // setTimeout(function(){
