@@ -33,6 +33,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     this.currentView = view;
     this.currentView.load(this);
     logger.debug('displaying view', view, this.$('#main'));
+    if ( window ) { $(window).scrollTop(0); }
     this.$('#main').empty().append(view.$el);
     return this;
   },
