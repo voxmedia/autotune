@@ -124,12 +124,12 @@ module.exports = Backbone.Router.extend({
     if(params) { query = querystring.parse(params); }
 
     if (query.page) {
-      jqxhr = projects.getPage(parseInt(query.page));
+      jqxhr = projects.getPage(parseInt(query.page), {data: query});
     } else {
-      jqxhr = projects.getFirstPage();
+      jqxhr = projects.getFirstPage({data: query});
     }
 
-    Promise.resolve( projects.fetch({data: query}) ).then(function() {
+    Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
         query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
