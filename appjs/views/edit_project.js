@@ -11,6 +11,8 @@ var $ = require('jquery'),
     pym = require('pym.js'),
     slugify = require("underscore.string/slugify"),
     pymParent,
+    saveTimer,
+    saveTimerInterval = 3000,
     data;
 
 require('brace/mode/javascript');
@@ -26,32 +28,38 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   template: require('../templates/project.ejs'),
   events: {
     'change :input': 'stopListeningForChanges',
-    'keypress': 'pressedKey'
+    'keyup': 'keyUp',
+    'keydown': 'keyDown'
   },
 
-  pressedKey: function(e){
-    var $form = this.$('#projectForm');
-    if ( !this.model.isNew() && this.model.blueprint.hasType('graphic') && this.model.blueprint.hasPreviewType('live') ){
-      logger.debug('*** THIS IS ALIVE');
-      var inst = this;
-      setTimeout(function(){
-        data = $form.alpaca('get').getValue();
-        logger.debug('!!!!! form values', data);
-        logger.debug(inst);
+  keyUp: function(e){
+    var $form = this.$('#projectForm'),
+        inst = this;
+    if ( !inst.model.isNew() && inst.model.blueprint.hasType('graphic') && inst.model.blueprint.hasPreviewType('live') ){
+      logger.debug('*** INST IS ALIVE');
+      data = $form.alpaca('get').getValue();
+      logger.debug('!!!!! form values', data);
 
-        var vals = {
-          title: data['title'],
-          theme: data['theme'],
-          data:  data,
-          blueprint_id: inst.model.blueprint.get('id'),
-          keypress: true
-        };
-        inst.model.set(vals);
-        pymParent.sendMessage('updateData', JSON.stringify(data));
-        inst.model.save();
-      }, 500);
+      var vals = {
+        title: data['title'],
+        theme: data['theme'],
+        data:  data,
+        blueprint_id: inst.model.blueprint.get('id'),
+        keypress: true
+      };
+      inst.model.set(vals);
+      pymParent.sendMessage('updateData', JSON.stringify(data));
 
+      // set to save the project after 3 seconds of no typing
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function(){
+                    inst.model.save();
+                  }, saveTimerInterval);
       }
+  },
+
+  keyDown: function(e) {
+    clearTimeout(saveTimer);
   },
 
   afterInit: function(options) {
@@ -61,6 +69,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   listenForChanges: function() {
     if ( !this.model.isNew() ) {
+      // logger.debug('changessss ^^^');
+      // pymParent.sendMessage('updateData', JSON.stringify(this.model.buildData()));
       this.listenTo(this.app.listener,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
@@ -106,8 +116,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    if ( !this.model.isNew() && this.model.blueprint.get('type') === 'graphic' ){
-      pymParent = new pym.Parent(this.model.get('slug')+'__graphic', this.model.get('preview_url'));
+    if ( !view.model.isNew() && view.model.blueprint.get('type') === 'graphic' ){
+      pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
+      logger.debug('### build data --', view.model.buildData());
+      // needs to get a message from the blueprint that says when it's done loading
+      setTimeout(function(){
+        pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
+      }, 2000);
+
       // pymParent.onMessage('receivedMessage', function() {
       //   logger.debug('received a message WOOOOOO');
       //   // pymParent.sendMessage('setShareUrl', 'data goes here');
