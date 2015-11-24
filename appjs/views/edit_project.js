@@ -69,8 +69,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   listenForChanges: function() {
     if ( !this.model.isNew() ) {
-      // logger.debug('changessss ^^^');
-      // pymParent.sendMessage('updateData', JSON.stringify(this.model.buildData()));
       this.listenTo(this.app.listener,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
@@ -116,18 +114,27 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
+    if( view.model.blueprint.hasType('graphic') && view.model.blueprint.hasPreviewType('live')){
+      if(view.copyProject){
+        // this doesn't have a slug, so grab the slug from the copied project
+        logger.debug('cp proj ~~~~', view.model.buildData());
+      }
+      // if(view.copyProject || !view.model.isNew()){
+      //   logger.debug('cp proj ~~~~ or not new');
+      // }
+    }
     if ( !view.model.isNew() && view.model.blueprint.get('type') === 'graphic' ){
       pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
       logger.debug('### build data --', view.model.buildData());
-      // needs to get a message from the blueprint that says when it's done loading
-      setTimeout(function(){
-        pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
-      }, 2000);
-
-      // pymParent.onMessage('receivedMessage', function() {
-      //   logger.debug('received a message WOOOOOO');
-      //   // pymParent.sendMessage('setShareUrl', 'data goes here');
-      // });
+      // only do this the first time
+      var counter = 0;
+      pymParent.onMessage('childLoaded', function() {
+        if (counter === 0){
+          logger.debug('received a message WOOOOOO');
+          pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
+        }
+        counter += 1;
+      });
     }
 
     if ( this.app.hasRole('superuser') ) {
