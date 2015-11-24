@@ -24,18 +24,13 @@ module Autotune
     end
 
     # Hook for adjusting data and files before build
-    def before_build(build_data, env)
+    def before_build(build_data, _env)
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
     end
 
     # Hook to do stuff after a project is deleted
     def delete!
-      raise NotImplementedError
-    end
-
-    # Hook to do stuff after a project is moved (slug changed)
-    def move!
       raise NotImplementedError
     end
 

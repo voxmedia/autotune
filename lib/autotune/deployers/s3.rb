@@ -21,9 +21,17 @@ module Autotune
         deployer.deploy_file!(path)
       end
 
+      # Delete stuff
+      def delete!
+        deployer = S3deploy::Deployer.new(
+          :dist_dir => '', :bucket => parts.host,
+          :app_path => deploy_path, :logger => logger)
+        deployer.delete!
+      end
+
       # Get the url to a file
       def url_for(path)
-        if asset?(path)
+        if path =~ /\.\w{1,8}$/
           super
         else
           super + '/'
