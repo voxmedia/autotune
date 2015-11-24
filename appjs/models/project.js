@@ -1,6 +1,7 @@
 "use strict";
 
 var Backbone = require('backbone'),
+    $ = require('jquery'),
     _ = require('underscore'),
     moment = require('moment'),
     markdown = require('markdown').markdown;

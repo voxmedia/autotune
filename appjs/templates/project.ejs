@@ -25,7 +25,7 @@
            target="_blank" href="<%=model.get('publish_url') %>">Published</a>
       <% } else { %>
         <a data-tooltip="View Draft Preview"
-           target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
+           target="_blank" data-view="view-draft">Draft</a>
       <% } %>
       <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
     </p>
@@ -49,7 +49,7 @@
     <% if ( model.isPublished() ) { %>
       <% if ( model.hasType( 'graphic' ) ) { %>
         <li role="presentation"><a
-            href="#live-preview" aria-controls="live-preview"
+            href="#live-preview" id="draft-preview" aria-controls="live-preview"
             role="tab" data-toggle="tab">Preview</a></li>
         <li role="presentation"><a
             href="#embed" aria-controls="embed"
@@ -59,7 +59,7 @@
       <% if ( model.isDraft() ) { %>
         <% if ( model.hasType( 'graphic' ) ) { %>
           <li role="presentation"><a
-              href="#live-preview" aria-controls="live-preview"
+              href="#live-preview" id="draft-preview" aria-controls="live-preview"
               role="tab" data-toggle="tab">Preview</a></li>
         <% } else { %>
           <li role="presentation" class="disabled"><a>Preview</a></li>

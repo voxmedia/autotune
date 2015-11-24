@@ -63,7 +63,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
+    logger.debug('/// ollie opts', options);
     this.copyProject = options.copyProject ? true : false;
+    if(options.protoSlug){
+      this.protoSlug = options.protoSlug;
+    }
     this.listenForChanges();
   },
 
@@ -117,7 +121,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if( view.model.blueprint.hasType('graphic') && view.model.blueprint.hasPreviewType('live')){
       if(view.copyProject){
         // this doesn't have a slug, so grab the slug from the copied project
-        logger.debug('cp proj ~~~~', view.model.buildData());
+        logger.debug('cp proj ~~~~', view, view.model.buildData());
       }
       // if(view.copyProject || !view.model.isNew()){
       //   logger.debug('cp proj ~~~~ or not new');
@@ -130,7 +134,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       var counter = 0;
       pymParent.onMessage('childLoaded', function() {
         if (counter === 0){
-          logger.debug('received a message WOOOOOO');
           pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
         }
         counter += 1;

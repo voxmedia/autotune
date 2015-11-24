@@ -10,7 +10,16 @@ var $ = require('jquery'),
 
 module.exports = {
   events: {
-    'click button[data-action], a[data-action]': 'handleAction'
+    'click button[data-action], a[data-action]': 'handleAction',
+    'click a[data-view]': 'viewDraft'
+  },
+
+  viewDraft: function(eve){
+    var view = $(eve.currentTarget).data('view');
+    $( "#draft-preview" ).trigger( "click" );
+    if( view === 'preview'){
+      $( window ).scrollTop(0);
+    }
   },
 
   handleAction: function(eve) {

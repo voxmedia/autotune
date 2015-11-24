@@ -5,7 +5,7 @@
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
-     href="<%=model.getPreviewUrl('http') %>">Preview</a>
+     data-view="preview">Preview</a>
   <% } else { %>
   <a class="btn btn-default" target="_blank" id="viewBtn"
      href="<%=model.getPublishUrl('http') %>">View</a>
