@@ -43,8 +43,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   updateStatus: function(status) {
-    logger.debug('Update project status: ' + status);
+    // don't care about the updated step
+    if ( status === 'updated' ) { return; }
 
+    logger.debug('Update project status: ' + status);
+    if (status === 'built'){
+      this.app.view.success('Building complete');
+    }
+
+    // fetch the model, re-render the view and catch errors
     var view = this;
     Promise
       .resolve(this.model.fetch())
@@ -77,6 +84,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
+    // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
       this.editor = ace.edit('blueprint-data');
       this.editor.setShowPrintMargin(false);
