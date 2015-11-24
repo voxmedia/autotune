@@ -110,15 +110,15 @@
         </div>
         <% } else if ( model.hasStatus('building') ) { %>
         <p class="text-warning">
-          <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span>
+          <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> The preview below is out-of-date.</span>
         </p>
-        <% } else if ( model.isDraft() ) { %>
-        <p class="text-warning">
-          <span class="m-status status-info"><i class="icon-info"></i>You are currently editing a draft.</span>
+        <% } else if ( model.hasStatus('built') ) { %>
+        <p class="text-success">
+          <span class="m-status status-info"><i class="icon-info"></i>This draft is up-to-date.</span>
         </p>
-        <p class="text-warning">
+        <!-- <p class="text-warning">
           <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>
-        </p>
+        </p> -->
         <% } else if ( model.hasUnpublishedUpdates() ) { %>
         <p class="text-warning">
           <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
