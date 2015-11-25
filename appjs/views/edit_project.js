@@ -142,13 +142,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       pymParent = new pym.Parent(view.model.get('slug')+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
-      // only do this the first time
-      var counter = 0;
       pymParent.onMessage('childLoaded', function() {
-        if (counter === 0){
-          pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
-        }
-        counter += 1;
+        pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
       });
     }
 
