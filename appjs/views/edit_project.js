@@ -155,7 +155,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         form_config, config_themes, newProject;
 
     if ( this.disableForm ) {
-      $form.append('<div class="alert alert-warning" role="alert">Form is disabled</div>');
+      $form.append(
+        '<div class="alert alert-warning" role="alert">Form is disabled</div>');
       return resolve();
     }
 
@@ -333,10 +334,16 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   formValues: function($form) {
     var control = $form.alpaca('get'), data;
 
+    logger.debug('form values');
+
     if ( control ) {
       data = control.getValue();
     } else {
-      data = JSON.parse(this.editor.getValue());
+      try {
+        data = JSON.parse(this.editor.getValue());
+      } catch (ex) {
+        return {};
+      }
     }
 
     var vals = {
@@ -354,7 +361,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   formValidate: function(inst, $form) {
-    var control = $form.alpaca('get'), valid;
+    var control = $form.alpaca('get'), valid = false;
+
+    logger.debug('form validate');
 
     if ( control ) {
       valid = control.form.isFormValid();
@@ -367,7 +376,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         $form.find('#validation-error').addClass('hidden');
       }
     } else {
-      valid = true;
+      try {
+        JSON.parse(this.editor.getValue());
+        valid = true;
+      } catch (ex) {
+        logger.error("Blueprint raw JSON is bad");
+      }
     }
     return valid;
   }
