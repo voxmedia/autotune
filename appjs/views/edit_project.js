@@ -34,6 +34,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: function(e){
+    // Do we still want to poll form changes for static preview projects?
     // specifically using keyup will get each letter, whereas on form change happens when click off
     var $form = this.$('#projectForm'),
         inst = this;
@@ -135,7 +136,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       // }
     }
     if ( !view.model.isNew() && view.model.blueprint.get('type') === 'graphic' ){
-      pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
+      var preview_url = view.model.get('preview_url');
+      if( view.model.blueprint.hasPreviewType('live') ){
+        preview_url += 'preview/';
+      }
+      pymParent = new pym.Parent(view.model.get('slug')+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
       // only do this the first time
       var counter = 0;
