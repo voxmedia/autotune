@@ -161,9 +161,11 @@ module.exports = Backbone.Router.extend({
     });
   },
 
-  editProject: function(slug) {
+  editProject: function(slug, params) {
     var project = new models.Project({ id: slug }),
-        app = this.app, view;
+        app = this.app, view, query = {};
+
+    if(params) { query = querystring.parse(params); }
 
     Promise.resolve( project.fetch() ).then(function() {
       project.blueprint = new models.Blueprint({
@@ -171,7 +173,9 @@ module.exports = Backbone.Router.extend({
 
       return project.blueprint.fetch();
     }).then(function() {
-      view = new views.EditProject({ model: project, app: app });
+      view = new views.EditProject({
+        model: project, app: app,
+        disableForm: query.hasOwnProperty('disableform') });
       view.render();
 
       app.view
