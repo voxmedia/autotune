@@ -28,33 +28,40 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   template: require('../templates/project.ejs'),
   events: {
     'change :input': 'stopListeningForChanges',
-    'keyup': 'keyUp',
-    'keydown': 'keyDown'
+    'change form': 'pollChange'
+    // 'keyup': 'pollChange',
+    // 'keydown': 'keyDown'
   },
 
-  keyUp: function(e){
+  pollChange: function(e){
+    // specifically using keyup will get each letter, whereas on form change happens when click off
     var $form = this.$('#projectForm'),
         inst = this;
     if ( !inst.model.isNew() && inst.model.blueprint.hasType('graphic') && inst.model.blueprint.hasPreviewType('live') ){
       logger.debug('*** INST IS ALIVE');
       data = $form.alpaca('get').getValue();
       logger.debug('!!!!! form values', data);
+      logger.debug(inst.model.buildData().theme, data.theme);
 
       var vals = {
         title: data['title'],
         theme: data['theme'],
         data:  data,
-        blueprint_id: inst.model.blueprint.get('id'),
-        keypress: true
+        blueprint_id: inst.model.blueprint.get('id')
       };
-      inst.model.set(vals);
+      if(inst.model.buildData().theme === data.theme){
+        vals['skip_build'] = true;
+      }
+
       pymParent.sendMessage('updateData', JSON.stringify(data));
 
+      inst.model.set(vals);
+      inst.model.save();
       // set to save the project after 3 seconds of no typing
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(function(){
-                    inst.model.save();
-                  }, saveTimerInterval);
+      // clearTimeout(saveTimer);
+      // saveTimer = setTimeout(function(){
+      //               inst.model.save();
+      //             }, saveTimerInterval);
       }
   },
 

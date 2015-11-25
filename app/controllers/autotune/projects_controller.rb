@@ -157,7 +157,7 @@ module Autotune
       @project.data.delete('slug')
       @project.data.delete('theme')
 
-      if params.key? :keypress
+      if params.key? :skip_build
         live_preview = Blueprint.where({:preview_type => 'live', :id => @project.blueprint_id})
         unless live_preview.empty?
           @project.save
