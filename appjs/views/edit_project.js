@@ -58,6 +58,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       inst.model.set(vals);
       inst.model.save();
+
+      // how do I update the status without re-rendering the page?
+      if(inst.model.hasUnpublishedUpdates()){
+        logger.debug('yes it does');
+      }
       // set to save the project after 3 seconds of no typing
       // clearTimeout(saveTimer);
       // saveTimer = setTimeout(function(){

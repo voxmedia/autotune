@@ -160,6 +160,7 @@ module Autotune
       if params.key? :skip_build
         live_preview = Blueprint.where({:preview_type => 'live', :id => @project.blueprint_id})
         unless live_preview.empty?
+          @project.data_updated_at = DateTime.current
           @project.save
           render :show
         end
