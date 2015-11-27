@@ -10,11 +10,11 @@ module Autotune
     # We can't just pass in the active model as an argument because it will
     # no longer exist in the database when this job runs. We need to have the
     # model class and the serialized data of the deployable object.
-    def perform(klass, deployable_json)
+    def perform(klass, deployable_json, renamed: false)
       deployable = klass.constantize.new
       deployable.from_json(deployable_json)
       %w(media preview publish).each do |target|
-        deployable.deployer(target).delete!
+        deployable.deployer(target).delete!(:renamed => renamed)
       end
     rescue
       retry_job

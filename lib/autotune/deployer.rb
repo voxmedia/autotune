@@ -30,7 +30,7 @@ module Autotune
     end
 
     # Hook to do stuff after a project is deleted
-    def delete!
+    def delete!(*)
       raise NotImplementedError
     end
 
@@ -49,10 +49,6 @@ module Autotune
 
     def deploy_path
       [parts.path, project.slug].join('/')
-    end
-
-    def old_deploy_path
-      [parts.path, project.slug_was].join('/') if project.slug_changed?
     end
 
     def project_url

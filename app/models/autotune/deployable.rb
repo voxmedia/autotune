@@ -5,6 +5,7 @@ module Autotune
 
     included do
       after_destroy :delete_deployed_files
+      after_save :delete_renamed_files
     end
 
     def deployer(target, **kwargs)
@@ -23,6 +24,13 @@ module Autotune
     end
 
     private
+
+    def delete_renamed_files
+      return if !slug_changed? || slug_was.nil?
+      old_data = as_json.merge(changed_attributes)
+      DeleteDeployedFilesJob.perform_later(
+        self.class.name, old_data.to_json, :renamed => true)
+    end
 
     def delete_deployed_files
       DeleteDeployedFilesJob.perform_later(self.class.name, to_json)

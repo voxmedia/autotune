@@ -18,7 +18,7 @@ module Autotune
       end
 
       # Hook to do stuff after a project is deleted
-      def delete!
+      def delete!(*)
         dir = WorkDir.new(deploy_path)
         dir.destroy if dir.exist?
       end
