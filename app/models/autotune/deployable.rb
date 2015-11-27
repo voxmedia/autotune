@@ -3,6 +3,10 @@ module Autotune
   module Deployable
     extend ActiveSupport::Concern
 
+    included do
+      after_destroy :delete_deployed_files
+    end
+
     def deployer(target, **kwargs)
       @deployers ||= {}
       key = kwargs.any? ? "#{target}:#{kwargs.to_query}" : target
@@ -16,6 +20,12 @@ module Autotune
 
     def full_deploy_dir
       File.join(working_dir, deploy_dir)
+    end
+
+    private
+
+    def delete_deployed_files
+      DeleteDeployedFilesJob.perform_later(self.class.name, to_json)
     end
   end
 end
