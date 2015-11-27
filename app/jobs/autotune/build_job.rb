@@ -54,10 +54,10 @@ module Autotune
       end
 
       # Upload build
-      deployer.deploy(project.deploy_dir)
+      deployer.deploy(project.full_deploy_dir)
 
       # Create screenshots (has to happen after upload)
-      phantom = WorkDir.phantom(project.deploy_dir)
+      phantom = WorkDir.phantom(project.full_deploy_dir)
       if phantom.phantomjs? && !Rails.env.test?
         begin
           url = deployer.url_for('/')
@@ -65,7 +65,7 @@ module Autotune
 
           # Upload screens
           phantom.screenshots.each do |filename|
-            deployer.deploy_file(project.deploy_dir, filename)
+            deployer.deploy_file(project.full_deploy_dir, filename)
           end
         rescue ::WorkDir::CommandError => exc
           logger.error(exc.message)

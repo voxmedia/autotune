@@ -9,5 +9,13 @@ module Autotune
       @deployers[key] ||=
         Autotune.new_deployer(target.to_sym, self, **kwargs)
     end
+
+    def deploy_dir
+      throw NotImplementedError
+    end
+
+    def full_deploy_dir
+      File.join(working_dir, deploy_dir)
+    end
   end
 end

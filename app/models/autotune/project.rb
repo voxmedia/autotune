@@ -105,7 +105,11 @@ module Autotune
     end
 
     def deploy_dir
-      File.join(working_dir, blueprint_config['deploy_dir'] || 'build')
+      if blueprint_config.present? && blueprint_config['deploy_dir']
+        blueprint_config['deploy_dir']
+      else
+        'build'
+      end
     end
 
     def preview_url
