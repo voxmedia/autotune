@@ -26,31 +26,37 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   template: require('../templates/project.ejs'),
   events: {
     'change :input': 'stopListeningForChanges',
-    'change form': 'pollChange'
+    'change form': 'pollChange',
+    'click #savePreview': 'savePreview'
     // 'keyup': 'pollChange',
   },
 
   pollChange: function(e){
-    // Do we still want to poll form changes for static preview projects?
-    // specifically using keyup will get each letter, whereas on form change happens when click off
     var $form = this.$('#projectForm'),
         inst = this;
     if ( !inst.model.isNew() && inst.model.blueprint.hasType('graphic') && inst.model.blueprint.hasPreviewType('live') ){
       logger.debug('*** INST IS ALIVE');
       data = $form.alpaca('get').getValue();
       logger.debug('!!!!! form values', data);
-      logger.debug(inst.model.buildData().theme, data.theme);
-
-      var vals = {
-        title: data['title'],
-        theme: data['theme'],
-        data:  data,
-        blueprint_id: inst.model.blueprint.get('id')
-      };
 
       pymParent.sendMessage('updateData', JSON.stringify(data));
 
       }
+  },
+
+  savePreview: function(){
+    var $form = this.$('#projectForm'),
+        data = $form.alpaca('get').getValue();
+
+        var vals = {
+          title: data['title'],
+          theme: data['theme'],
+          data:  data,
+          blueprint_id: this.model.blueprint.get('id')
+        };
+
+        this.model.set(vals);
+        this.model.save();
   },
 
   afterInit: function(options) {
@@ -133,6 +139,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       pymParent = new pym.Parent(view.model.get('slug')+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
       pymParent.onMessage('childLoaded', function() {
+        // still being triggered more than once
+        // each time a project is loaded, add one to the count
         pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
       });
     }
@@ -376,25 +384,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       $form.alpaca(opts);
     }
-    // if ( !this.model.isNew() && this.model.blueprint.hasType('graphic') && this.model.blueprint.hasPreviewType('live') ){
-    //   logger.debug('*** THIS IS ALIVE');
-    //
-    //   $form.keypress(function(event){
-    //     // setTimeout isn't a good solution, but it is a start
-    //     setTimeout(function(){
-    //       data = $form.alpaca('get').getValue();
-    //       orig_this.model.set(data);
-    //       logger.debug('%%%', orig_this.model, data, orig_this.model.formData());
-    //       // logger.debug('THIS', this.app.view.currentView.model);
-    //       // logger.debug(orig_this.model.get('data'));
-    //       // Check whether the current and preceived form data are the same
-    //       logger.debug(_.isEqual(data, orig_this.model.formData()));
-    //       pymParent.sendMessage('updateData', JSON.stringify(data));
-    //       // orig_this.render();
-    //     }, 500);
-    //
-    //   });
-    // }
   },
 
   formValues: function($form) {

@@ -157,9 +157,9 @@
         </button>
         <!-- Needs to get form to submit - can't do it from this tab -->
         <button type="submit" class="btn btn-default"
-                data-action="build"
+                id="savePreview"
                 data-model="Project"
-                data-model-id="<%=model.get('slug') %>">Save/Build</button>
+                data-model-id="<%=model.get('slug') %>">Save</button>
       </ul>
 
       <div class="preview-frame" id="<%= model.get( 'slug' ) %>__graphic" style="border: 2px dashed #ccc;"></div>
