@@ -12,6 +12,7 @@ module Autotune
     # do the deed
     def perform(blueprint, status: nil, update: false)
       # Create a new repo object based on the blueprints working dir
+      puts 'blueprint work dir', blueprint.working_dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
 
@@ -66,11 +67,11 @@ module Autotune
         build_data = repo.read(blueprint.config['sample_data'])
         build_data.delete('base_url')
         build_data.update(
-          'title' => blueprint.title + ' demo',
-          'slug' => blueprint.slug + '-' + blueprint.version,
+          'title' => blueprint.title,
+          'slug' => blueprint.slug,
           'theme' => 'custom')
 
-        puts 'sample blueprint data',  build_data.as_json
+          # 'slug' => 'custom-' + blueprint.slug + '-' + blueprint.version,
 
         # Get the deployer object
         # probably don't want this to always be preview
@@ -82,17 +83,19 @@ module Autotune
         # Run the before build deployer hook
         deployer.before_build(build_data, repo.env)
 
+        # Result of this is that the blueprint slug ends up being included along with the project slug, which isn't right
+        # I wonder if you do a deep_dup of a blueprint to a project - maybe that would work
+        # build_data['base_url'] = build_data['base_url'] + '/' + build_data['slug']
+        # build_data['asset_base_url'] = build_data['asset_base_url'] + '/' + build_data['slug']
+
         # Run the build
         repo.working_dir do
           outlogger.info(repo.cmd(
             BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
         end
-        puts 'ran build'
 
         # Upload build
-        # this is missing something - not sure exactly what to pass in here
         deployer.deploy(blueprint.full_deploy_dir)
-        puts 'deployed'
         puts 'test.apps.voxmedia.com/at-preview/' + build_data['slug']
       end
 
