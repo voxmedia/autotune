@@ -60,37 +60,41 @@ module Autotune
         blueprint.status = 'testing'
       end
       blueprint.save!
-      #
-      # if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
-      #   # Use this as dummy build data for the moment
-      #   build_data = repo.read(blueprint.config['sample_data'])
-      #   build_data.update(
-      #     'title' => blueprint.title + ' demo',
-      #     'slug' => blueprint.slug + '-' + blueprint.version,
-      #     'theme' => 'custom')
-      #
-      #   # Get the deployer object
-      #   # probably don't want this to always be preview
-      #   out = StringIO.new
-      #   outlogger = Logger.new out
-      #   deployer = Autotune.new_deployer(
-      #     :preview, blueprint, :logger => outlogger)
-      #
-      #   # Run the before build deployer hook
-      #   deployer.before_build(build_data, repo.env)
-      #
-      #   # Run the build
-      #   repo.working_dir do
-      #     outlogger.info(repo.cmd(
-      #       BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
-      #   end
-      #   puts 'ran build'
-      #
-      #   # Upload build
-      #   # this is missing something - not sure exactly what to pass in here
-      #   deployer.deploy(blueprint.deploy_dir)
-      #   puts 'deployed'
-      # end
+
+      if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
+        # Use this as dummy build data for the moment
+        build_data = repo.read(blueprint.config['sample_data'])
+        build_data.delete('base_url')
+        build_data.update(
+          'title' => blueprint.title + ' demo',
+          'slug' => blueprint.slug + '-' + blueprint.version,
+          'theme' => 'custom')
+
+        puts 'sample blueprint data',  build_data.as_json
+
+        # Get the deployer object
+        # probably don't want this to always be preview
+        out = StringIO.new
+        outlogger = Logger.new out
+        deployer = Autotune.new_deployer(
+          :preview, blueprint, :logger => outlogger)
+
+        # Run the before build deployer hook
+        deployer.before_build(build_data, repo.env)
+
+        # Run the build
+        repo.working_dir do
+          outlogger.info(repo.cmd(
+            BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+        end
+        puts 'ran build'
+
+        # Upload build
+        # this is missing something - not sure exactly what to pass in here
+        deployer.deploy(blueprint.full_deploy_dir)
+        puts 'deployed'
+        puts 'test.apps.voxmedia.com/at-preview/' + build_data['slug']
+      end
 
     rescue => exc
       # If the command failed, raise a red flag

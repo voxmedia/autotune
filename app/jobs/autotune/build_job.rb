@@ -39,6 +39,7 @@ module Autotune
         'title' => project.title,
         'slug' => project.slug,
         'theme' => project.theme.value)
+      puts 'project build data', build_data.as_json
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
