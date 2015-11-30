@@ -30,7 +30,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange'
     // 'keyup': 'pollChange',
-    // 'keydown': 'keyDown'
   },
 
   pollChange: function(e){
@@ -50,29 +49,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         data:  data,
         blueprint_id: inst.model.blueprint.get('id')
       };
-      if(inst.model.buildData().theme === data.theme){
-        vals['skip_build'] = true;
-      }
 
       pymParent.sendMessage('updateData', JSON.stringify(data));
 
-      inst.model.set(vals);
-      inst.model.save();
-
-      // how do I update the status without re-rendering the page?
-      if(inst.model.hasUnpublishedUpdates()){
-        logger.debug('yes it does');
       }
-      // set to save the project after 3 seconds of no typing
-      // clearTimeout(saveTimer);
-      // saveTimer = setTimeout(function(){
-      //               inst.model.save();
-      //             }, saveTimerInterval);
-      }
-  },
-
-  keyDown: function(e) {
-    clearTimeout(saveTimer);
   },
 
   afterInit: function(options) {

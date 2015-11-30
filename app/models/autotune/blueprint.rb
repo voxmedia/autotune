@@ -25,7 +25,6 @@ module Autotune
     after_initialize do
       self.status ||= 'new'
       self.type   ||= 'app'
-      self.preview_type ||= 'static'
       self.config ||= {}
     end
 
@@ -100,6 +99,14 @@ module Autotune
       self.tags = config['tags'].map do |t|
         Tag.find_or_create_by(:title => t.humanize)
       end if config.present? && config['tags'].present?
+    end
+
+    def deploy_dir
+      if config.present? && config['deploy_dir']
+        config['deploy_dir']
+      else
+        'build'
+      end
     end
 
     def pub_to_redis

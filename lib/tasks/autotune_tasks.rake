@@ -74,15 +74,4 @@ namespace :autotune do
     puts u.as_json
   end
 
-  desc 'Apply blueprint preview type'
-  task :apply_preview_type => :environment do
-    Autotune::Blueprint.all.each do |b|
-      if b.config.include? "preview_type"
-        b["preview_type"] = b.config["preview_type"]
-        b.save!
-        puts b.as_json
-      end
-    end
-  end
-
 end

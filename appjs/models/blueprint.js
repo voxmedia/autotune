@@ -52,7 +52,7 @@ var Blueprint = Backbone.Model.extend({
 
   hasPreviewType: function() {
     var iteratee = function(m, i) {
-      return m || this.get( 'preview_type' ) === i;
+      return m || this.get('config')['preview_type'] === i;
     };
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
