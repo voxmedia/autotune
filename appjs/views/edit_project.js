@@ -11,8 +11,6 @@ var $ = require('jquery'),
     pym = require('pym.js'),
     slugify = require("underscore.string/slugify"),
     pymParent,
-    saveTimer,
-    saveTimerInterval = 3000,
     data;
 
 require('brace/mode/javascript');
@@ -56,7 +54,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
-    logger.debug('/// ollie opts', options);
+    this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
     if(options.protoSlug){
       this.protoSlug = options.protoSlug;
@@ -77,8 +75,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   updateStatus: function(status) {
-    logger.debug('Update project status: ' + status);
+    // don't care about the updated step
+    if ( status === 'updated' ) { return; }
 
+    logger.debug('Update project status: ' + status);
+    if (status === 'built'){
+      this.app.view.success('Building complete');
+    }
+
+    // fetch the model, re-render the view and catch errors
     var view = this;
     Promise
       .resolve(this.model.fetch())
@@ -132,10 +137,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       });
     }
 
+    // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
       this.editor = ace.edit('blueprint-data');
       this.editor.setShowPrintMargin(false);
-      this.editor.setReadOnly(true);
       this.editor.setTheme("ace/theme/textmate");
       this.editor.setWrapBehavioursEnabled(true);
 
@@ -145,7 +150,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
 
-      this.editor.setValue( JSON.stringify( this.model.buildData(), null, "  " ), -1 );
+      this.editor.setValue(
+        JSON.stringify( this.model.buildData(), null, "  " ), -1 );
+
+      var debouncedStopListeningForChanges = _.once(
+        _.bind(this.stopListeningForChanges, this));
+      this.editor.on("change", function() {
+        logger.debug('editor content changed');
+        debouncedStopListeningForChanges();
+      });
     }
 
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
@@ -187,6 +200,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         button_tmpl = require('../templates/project_buttons.ejs'),
         orig_this = this,
         form_config, config_themes, newProject;
+
+    if ( this.disableForm ) {
+      $form.append(
+        '<div class="alert alert-warning" role="alert">Form is disabled</div>');
+      return resolve();
+    }
 
     // Prevent return or enter from submitting the form
     $form.keypress(function(event){
@@ -379,8 +398,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   formValues: function($form) {
-    data = $form.alpaca('get').getValue();
-    logger.debug('!!!!! form values', data);
+    var control = $form.alpaca('get'), data;
+
+    logger.debug('form values');
+
+    if ( control ) {
+      data = control.getValue();
+    } else {
+      try {
+        data = JSON.parse(this.editor.getValue());
+      } catch (ex) {
+        return {};
+      }
+    }
 
     var vals = {
       title: data['title'],
@@ -389,7 +419,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       blueprint_id: this.model.blueprint.get('id')
     };
 
-    if ( data.slug ) {
+    if ( data.slug && data.slug.indexOf(data['theme']) !== 0 ) {
       vals.slug = data['theme'] + '-' + data['slug'];
     }
 
@@ -397,14 +427,27 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   formValidate: function(inst, $form) {
-    var control = $form.alpaca('get'),
-        valid = control.form.isFormValid();
-    if ( !valid ) {
-      control.form.refreshValidationState(true);
-      $form.find('#validation-error').removeClass('hidden');
+    var control = $form.alpaca('get'), valid = false;
+
+    logger.debug('form validate');
+
+    if ( control ) {
+      valid = control.form.isFormValid();
+
+      if ( !valid ) {
+        control.form.refreshValidationState(true);
+        $form.find('#validation-error').removeClass('hidden');
+      } else {
+        $form.find('#resolve-message').removeClass('hidden');
+        $form.find('#validation-error').addClass('hidden');
+      }
     } else {
-      $form.find('#resolve-message').removeClass('hidden');
-      $form.find('#validation-error').addClass('hidden');
+      try {
+        JSON.parse(this.editor.getValue());
+        valid = true;
+      } catch (ex) {
+        logger.error("Blueprint raw JSON is bad");
+      }
     }
     return valid;
   }

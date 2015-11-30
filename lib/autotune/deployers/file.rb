@@ -16,6 +16,12 @@ module Autotune
         dir = WorkDir.new(source)
         dir.cp(path, [deploy_path, path].join('/'))
       end
+
+      # Hook to do stuff after a project is deleted
+      def delete!(*)
+        dir = WorkDir.new(deploy_path)
+        dir.destroy if dir.exist?
+      end
     end
   end
 end

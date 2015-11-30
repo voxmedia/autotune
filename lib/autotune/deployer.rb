@@ -24,18 +24,13 @@ module Autotune
     end
 
     # Hook for adjusting data and files before build
-    def before_build(build_data, env)
+    def before_build(build_data, _env)
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
     end
 
     # Hook to do stuff after a project is deleted
-    def after_delete
-      raise NotImplementedError
-    end
-
-    # Hook to do stuff after a project is moved (slug changed)
-    def after_move
+    def delete!(*)
       raise NotImplementedError
     end
 
@@ -51,10 +46,11 @@ module Autotune
 
     # Get the url to a file
     def url_for(path)
-      path = path[1..-1] if path.present? && path[0] == '/'
-      if path == '/' || path.blank?
-        project_url
-      elsif asset?(path)
+      return project_url if path == '/' || path.blank?
+
+      path = path[1..-1] if path[0] == '/'
+
+      if asset?(path)
         [project_asset_url, path].join('/')
       else
         [project_url, path].join('/')

@@ -186,7 +186,16 @@
       </p>
 
       <h4>Blueprint data:</h4>
-      <div id="blueprint-data"></div>
+      <form data-model="Project"
+            data-model-id="<%=model.isNew() ? '' : model.id %>"
+            data-action="<%=model.isNew() ? 'new' : 'edit' %>"
+            data-next="show">
+        <p><div id="blueprint-data"></div></p>
+        <p>
+          <button type="submit" class="btn btn-default"
+                  data-loading-text="Saving...">Save raw data</button>
+        </p>
+      </form>
 
       <h4>Output from last build:</h4>
       <pre><%=escape( model.get('output') ) %></pre>

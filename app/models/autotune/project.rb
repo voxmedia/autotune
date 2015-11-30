@@ -14,6 +14,7 @@ module Autotune
     belongs_to :user
     belongs_to :theme
 
+    validates_length_of :output, :maximum => 64.kilobytes - 1
     validates :title, :blueprint, :user, :theme, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
@@ -36,10 +37,11 @@ module Autotune
       end
 
       # Truncate output field so we can save without error
-      output_limit = self.class.columns_hash['output'].limit
-      if output_limit && output.present? && output.length > output_limit
-        self.output = output.truncate(
-          output_limit, :omission => '... (truncated)')
+      omission = '... (truncated)'
+      output_limit = 60.kilobytes
+      if output.present? && output.length > output_limit
+        # Don't trust String#truncate
+        self.output = output[0, output_limit - omission.length] + omission
       end
 
       # Make sure we stash version and config
@@ -103,7 +105,11 @@ module Autotune
     end
 
     def deploy_dir
-      File.join(working_dir, blueprint_config['deploy_dir'] || 'build')
+      if blueprint_config.present? && blueprint_config['deploy_dir']
+        blueprint_config['deploy_dir']
+      else
+        'build'
+      end
     end
 
     def preview_url

@@ -33,7 +33,6 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
-    $(window).scrollTop(0);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.listener.start();
@@ -124,12 +123,12 @@ module.exports = Backbone.Router.extend({
     if(params) { query = querystring.parse(params); }
 
     if (query.page) {
-      jqxhr = projects.getPage(parseInt(query.page));
+      jqxhr = projects.getPage(parseInt(query.page), {data: query});
     } else {
-      jqxhr = projects.getFirstPage();
+      jqxhr = projects.getFirstPage({data: query});
     }
 
-    Promise.resolve( projects.fetch({data: query}) ).then(function() {
+    Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
         query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
@@ -162,9 +161,11 @@ module.exports = Backbone.Router.extend({
     });
   },
 
-  editProject: function(slug) {
+  editProject: function(slug, params) {
     var project = new models.Project({ id: slug }),
-        app = this.app, view;
+        app = this.app, view, query = {};
+
+    if(params) { query = querystring.parse(params); }
 
     Promise.resolve( project.fetch() ).then(function() {
       project.blueprint = new models.Blueprint({
@@ -172,7 +173,9 @@ module.exports = Backbone.Router.extend({
 
       return project.blueprint.fetch();
     }).then(function() {
-      view = new views.EditProject({ model: project, app: app });
+      view = new views.EditProject({
+        model: project, app: app,
+        disableForm: query.hasOwnProperty('disableform') });
       view.render();
 
       app.view

@@ -55,7 +55,6 @@ module.exports = {
         logger.debug('saving values', values);
         inst.set(values);
         if(!view.formValidate(inst, $form)) {
-          $form.find('[type=submit]').button('reset');
           logger.debug('form is not valid');
           throw 'Form is not valid';
         }

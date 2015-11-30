@@ -15,6 +15,14 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
+      # Setup a new logger that logs to a string. The resulting log will
+      # be saved to the output field of the project.
+      out = StringIO.new
+      outlogger = Logger.new out
+      outlogger.formatter = proc do |severity, datetime, _progname, msg|
+        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
+      end
+
       # Reset any previous error messages:
       project.meta.delete('error_message')
 
@@ -24,14 +32,6 @@ module Autotune
 
       # Make sure the repo exists and is up to date (if necessary)
       raise 'Missing files!' unless repo.exist?
-
-      # Setup a new logger that logs to a string. The resulting log will
-      # be saved to the output field of the project.
-      out = StringIO.new
-      outlogger = Logger.new out
-      outlogger.formatter = proc do |severity, datetime, _progname, msg|
-        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
-      end
 
       # Add a few extras to the build data
       build_data = project.data.deep_dup
@@ -54,10 +54,10 @@ module Autotune
       end
 
       # Upload build
-      deployer.deploy(project.deploy_dir)
+      deployer.deploy(project.full_deploy_dir)
 
       # Create screenshots (has to happen after upload)
-      phantom = WorkDir.phantom(project.deploy_dir)
+      phantom = WorkDir.phantom(project.full_deploy_dir)
       if phantom.phantomjs? && !Rails.env.test?
         begin
           url = deployer.url_for('/')
@@ -65,7 +65,7 @@ module Autotune
 
           # Upload screens
           phantom.screenshots.each do |filename|
-            deployer.deploy_file(project.deploy_dir, filename)
+            deployer.deploy_file(project.full_deploy_dir, filename)
           end
         rescue ::WorkDir::CommandError => exc
           logger.error(exc.message)
@@ -89,10 +89,9 @@ module Autotune
       raise
     ensure
       # Always make sure to save the log and the project
-      out.rewind
-      project.output = out.read
-      project.save!
       outlogger.close
+      project.output = out.try(:string)
+      project.save!
     end
 
     private
