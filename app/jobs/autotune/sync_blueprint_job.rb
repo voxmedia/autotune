@@ -15,6 +15,12 @@ module Autotune
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
 
+      puts 'repo', repo
+      puts blueprint.working_dir
+      puts Rails.configuration.autotune.setup_environment
+      puts
+      puts blueprint.as_json
+
       if repo.exist?
         if update
           # Update the repo
@@ -60,6 +66,47 @@ module Autotune
         blueprint.status = 'testing'
       end
       blueprint.save!
+
+      if blueprint.config['live_preview'] == 'live'
+        # Use this as dummy build data for the moment
+        build_data = {
+          "title": "Timeline Test",
+          "slug": "slug-test",
+          "theme": "custom",
+          "customColor": "#282828",
+          "moments": [
+            {
+              "moment": "May 25, 1977",
+              "headline": "Star Wars: A New Hope",
+              "image": "http://imgc.allpostersimages.com/images/P-473-488-90/67/6751/7TAZ100Z/posters/star-wars-episode-iv-new-hope-classic-movie-poster.jpg",
+              "text": "The Imperial Forces -- under orders from cruel Darth Vader (David Prowse) -- hold Princess Leia (Carrie Fisher) hostage, in their efforts to quell the rebellion against the Galactic Empire. Luke Skywalker (Mark Hamill) and Han Solo (Harrison Ford), captain of the Millennium Falcon, work together with the companionable droid duo R2-D2 (Kenny Baker) and C-3PO (Anthony Daniels) to rescue the beautiful princess, help the Rebel Alliance, and restore freedom and justice to the Galaxy."
+            }
+          ]
+        }
+        build_data.update(
+          'title' => blueprint.title + ' demo',
+          'slug' => blueprint.slug + '-' + blueprint.version,
+          'theme' => 'custom')
+
+        # Get the deployer object
+        # probably don't want this to always be preview
+        deployer = Autotune.new_deployer(
+          :preview, blueprint, :logger => outlogger)
+
+        # Run the before build deployer hook
+        deployer.before_build(build_data, repo.env)
+
+        # Run the build
+        repo.working_dir do
+          outlogger.info(repo.cmd(
+            BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+        end
+
+        # Upload build
+        # this is missing something - not sure exactly what to pass in here
+        deployer.deploy
+      end
+
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
