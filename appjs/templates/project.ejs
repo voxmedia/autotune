@@ -97,7 +97,7 @@
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
     <div role="tabpanel" class="tab-pane" id="live-preview">
 
-      <% if ( ! model.isNew() && model.blueprint.hasPreviewType('static') ) { %>
+      <% if ( ! model.isNew() && ! model.blueprint.hasPreviewType('live') ) { %>
         <% if ( model.hasStatus('broken') ) { %>
         <p class="text-danger">
            <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
