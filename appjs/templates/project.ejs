@@ -57,7 +57,7 @@
       <% } %>
     <% } else { %>
       <% if ( model.isDraft() ) { %>
-        <% if ( model.hasType( 'graphic' ) ) { %>
+        <% if ( model.blueprint.hasPreviewType('live') ) { %>
           <li role="presentation"><a
               href="#live-preview" id="draft-preview" aria-controls="live-preview"
               role="tab" data-toggle="tab">Preview</a></li>
@@ -93,7 +93,7 @@
       </div>
       <% } %>
     </div>
-    <% if ( model.hasType( 'graphic' ) ) { %>
+    <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
     <div role="tabpanel" class="tab-pane" id="live-preview">
 
@@ -161,8 +161,8 @@
                 data-model="Project"
                 data-model-id="<%=model.get('slug') %>">Save</button>
       </ul>
-
-      <div class="preview-frame" id="<%= model.get( 'slug' ) %>__graphic" style="border: 2px dashed #ccc;"></div>
+      <% slug = model.get( 'slug' ) || model.blueprint.get('slug') %>
+      <div class="preview-frame" id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div>
 
     </div>
     <% } %>

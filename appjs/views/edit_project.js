@@ -32,9 +32,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: function(e){
-    var $form = this.$('#projectForm'),
-        inst = this;
-    if ( !inst.model.isNew() && inst.model.blueprint.hasType('graphic') && inst.model.blueprint.hasPreviewType('live') ){
+    var $form = this.$('#projectForm');
+    if ( this.model.blueprint.hasPreviewType('live') ){
       logger.debug('*** INST IS ALIVE');
       data = $form.alpaca('get').getValue();
       logger.debug('!!!!! form values', data);
@@ -122,27 +121,40 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    if( view.model.blueprint.hasType('graphic') && view.model.blueprint.hasPreviewType('live')){
-      if(view.copyProject){
-        // this doesn't have a slug, so grab the slug from the copied project
-        logger.debug('cp proj ~~~~', view, view.model.buildData());
+    // if( view.model.blueprint.hasPreviewType('live') ){
+    //   if(view.copyProject){
+    //     // this doesn't have a slug, so grab the slug from the copied project
+    //     logger.debug('cp proj ~~~~', view, view.model.buildData());
+    //   }
+    //   // if(view.copyProject || !view.model.isNew()){
+    //   //   logger.debug('cp proj ~~~~ or not new');
+    //   // }
+    // }
+    if ( view.model.blueprint.hasPreviewType('live') ){
+      // needs to be adjusted so not timeline for all
+      // var preview_url = view.model.get('preview_url');
+      var slug = view.model.get('slug') || view.model.blueprint.get('slug'),
+          preview_url = '//test.apps.voxmedia.com/at-preview/timeline-javascript/';
+      if( !view.model.isNew() ){
+        preview_url = view.model.get('preview_url');
       }
-      // if(view.copyProject || !view.model.isNew()){
-      //   logger.debug('cp proj ~~~~ or not new');
-      // }
-    }
-    if ( !view.model.isNew() && view.model.blueprint.get('type') === 'graphic' ){
-      var preview_url = view.model.get('preview_url');
       if( view.model.blueprint.hasPreviewType('live') ){
         preview_url += 'preview/';
+        if( view.model.isNew() ){
+          preview_url += '#new';
+        }
       }
-      pymParent = new pym.Parent(view.model.get('slug')+'__graphic', preview_url);
+      logger.debug('preview url', preview_url, view.model.blueprint.get('slug'));
+      pymParent = new pym.Parent(slug+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
-      pymParent.onMessage('childLoaded', function() {
+      if( !view.model.isNew() ){
+        pymParent.onMessage('childLoaded', function() {
         // still being triggered more than once
         // each time a project is loaded, add one to the count
-        pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
-      });
+
+          pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
+        });
+      }
     }
 
     // Setup editor for data field
