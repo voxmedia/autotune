@@ -57,7 +57,7 @@
       <% } %>
     <% } else { %>
       <% if ( model.isDraft() ) { %>
-        <% if ( model.blueprint.hasPreviewType('live') ) { %>
+        <% if ( model.blueprint.hasPreviewType('live') || model.hasType( 'graphic' ) ) { %>
           <li role="presentation"><a
               href="#live-preview" id="draft-preview" aria-controls="live-preview"
               role="tab" data-toggle="tab">Preview</a></li>

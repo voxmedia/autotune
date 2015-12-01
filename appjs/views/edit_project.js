@@ -147,6 +147,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
         });
       }
+    } else {
+      if (!( view.model.isNew() )){
+        pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
+      }
     }
 
     // Setup editor for data field
