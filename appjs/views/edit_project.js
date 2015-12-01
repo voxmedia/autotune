@@ -39,8 +39,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       logger.debug('!!!!! form values', data);
 
       pymParent.sendMessage('updateData', JSON.stringify(data));
-
-      }
+    }
   },
 
   savePreview: function(){
@@ -61,9 +60,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterInit: function(options) {
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
-    if(options.protoSlug){
-      this.protoSlug = options.protoSlug;
-    }
     this.listenForChanges();
   },
 
@@ -121,37 +117,33 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    // if( view.model.blueprint.hasPreviewType('live') ){
-    //   if(view.copyProject){
-    //     // this doesn't have a slug, so grab the slug from the copied project
-    //     logger.debug('cp proj ~~~~', view, view.model.buildData());
-    //   }
-    //   // if(view.copyProject || !view.model.isNew()){
-    //   //   logger.debug('cp proj ~~~~ or not new');
-    //   // }
-    // }
     if ( view.model.blueprint.hasPreviewType('live') ){
       // needs to be adjusted so not timeline for all
-      // var preview_url = view.model.get('preview_url');
       var slug = view.model.get('slug') || view.model.blueprint.get('slug'),
-          preview_url = '//test.apps.voxmedia.com/at-preview/timeline-javascript/';
-      if( !view.model.isNew() ){
-        preview_url = view.model.get('preview_url');
-      }
-      if( view.model.blueprint.hasPreviewType('live') ){
-        preview_url += 'preview/';
-        if( view.model.isNew() ){
-          preview_url += '#new';
+          preview_url,
+          bp_version;
+
+      if ( view.model.isNew() ){
+        if(view.copyProject){
+          bp_version = view.model.get('blueprint_version');
+        } else {
+          bp_version = view.model.blueprint.get('version');
         }
+        preview_url = '//test.apps.voxmedia.com/at-preview/' + view.model.blueprint.get('slug') + '/' + bp_version + '/preview/' + '#new';
+      } else {
+        preview_url = view.model.get('preview_url') + 'preview/';
       }
+
       logger.debug('preview url', preview_url, view.model.blueprint.get('slug'));
       pymParent = new pym.Parent(slug+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
-      if( !view.model.isNew() ){
+      var uniqBuildVals = _.uniq(_.values(view.model.buildData()));
+
+      if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
+        logger.debug(uniqBuildVals.length, typeof uniqBuildVals[0]);
         pymParent.onMessage('childLoaded', function() {
         // still being triggered more than once
         // each time a project is loaded, add one to the count
-
           pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
         });
       }

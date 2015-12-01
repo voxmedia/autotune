@@ -12,7 +12,6 @@ module Autotune
     # do the deed
     def perform(blueprint, status: nil, update: false)
       # Create a new repo object based on the blueprints working dir
-      puts 'blueprint work dir', blueprint.working_dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
 
@@ -63,12 +62,15 @@ module Autotune
       blueprint.save!
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
+
+        project_demo = blueprint.deep_dup
+        project_demo['slug'] = [blueprint.slug, blueprint.version].join('/')
         # Use this as dummy build data for the moment
         build_data = repo.read(blueprint.config['sample_data'])
         build_data.delete('base_url')
         build_data.update(
-          'title' => blueprint.title,
-          'slug' => blueprint.slug,
+          'title' => project_demo.title,
+          'slug' => project_demo.slug,
           'theme' => 'custom')
 
           # 'slug' => 'custom-' + blueprint.slug + '-' + blueprint.version,
@@ -78,7 +80,7 @@ module Autotune
         out = StringIO.new
         outlogger = Logger.new out
         deployer = Autotune.new_deployer(
-          :preview, blueprint, :logger => outlogger)
+          :preview, project_demo, :logger => outlogger)
 
         # Run the before build deployer hook
         deployer.before_build(build_data, repo.env)

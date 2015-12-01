@@ -213,7 +213,7 @@ module.exports = Backbone.Router.extend({
       new_project.blueprint = project.blueprint;
 
       view = new views.EditProject({
-        model: new_project, app: app, copyProject: true, protoSlug: old_attributes.slug });
+        model: new_project, app: app, copyProject: true });
       view.render();
 
       app.view

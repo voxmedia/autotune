@@ -73,6 +73,7 @@ module Autotune
     #   proj_url
     # end
     def deploy_path
+      puts parts.path, project.slug
       [parts.path, project.slug].join('/')
     end
 
