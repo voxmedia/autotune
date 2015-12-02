@@ -43,18 +43,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   savePreview: function(){
-    var $form = this.$('#projectForm'),
-        data = $form.alpaca('get').getValue();
-
-        var vals = {
-          title: data['title'],
-          theme: data['theme'],
-          data:  data,
-          blueprint_id: this.model.blueprint.get('id')
-        };
-
-        this.model.set(vals);
-        this.model.save();
+    this.$('#projectForm form').submit();
   },
 
   afterInit: function(options) {

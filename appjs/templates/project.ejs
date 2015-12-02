@@ -155,11 +155,16 @@
           data-model-id="<%=model.get('slug') %>">
           Fluid (100%)
         </button>
-        <!-- Needs to get form to submit - can't do it from this tab -->
+
+        <!-- add a data-action to this, maybe? -->
+        <% if ( model.blueprint.hasPreviewType('live') ) { %>
         <button type="submit" class="btn btn-default"
+
                 id="savePreview"
                 data-model="Project"
+                data-loading-text="Saving..."
                 data-model-id="<%=model.get('slug') %>">Save</button>
+        <% } %>
       </ul>
       <% slug = model.get( 'slug' ) || model.blueprint.get('slug') %>
       <div class="preview-frame" id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div>
