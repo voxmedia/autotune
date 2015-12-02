@@ -1,5 +1,5 @@
 <script>
-$(document).ready(function() {
-    app = new App(<%=raw config.to_json %>);
-});
+window.onload = function() {
+  app = new App(<%=raw config.to_json %>);
+};
 </script>
