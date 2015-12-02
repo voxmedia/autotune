@@ -223,6 +223,15 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Has this project ever been built?
+   * Used for displaying active preview tab on static projects
+   * @returns {boolean}
+   **/
+  hasInitialBuild: function() {
+    return !!this.get('output');
+  },
+
+  /**
    * Is this project a draft?
    * @returns {boolean}
    **/

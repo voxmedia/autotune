@@ -148,7 +148,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         });
       }
     } else {
-      if (!( view.model.isNew() )){
+      if ( view.model.hasInitialBuild() ){
         pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
       }
     }
