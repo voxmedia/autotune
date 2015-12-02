@@ -113,7 +113,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           preview_url,
           bp_version;
 
-      if ( view.model.isNew() ){
+      if ( view.model.isNew() || ! view.model.hasInitialBuild() ){
         if(view.copyProject){
           bp_version = view.model.get('blueprint_version');
         } else {
@@ -124,24 +124,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         preview_url = view.model.get('preview_url') + 'preview/';
       }
 
-      logger.debug('preview url', preview_url, view.model.blueprint.get('slug'));
-      // pymParent = new pym.Parent(slug+'__graphic', preview_url);
-      logger.debug('### build data --', view.model.buildData());
-      logger.debug(view.model.hasInitialBuild(), view.copyProject);
-
-
       if ( view.model.hasInitialBuild() || view.copyProject ){
         slug += '-copy';
         pymParent = new pym.Parent(slug+'__graphic', preview_url);
-        logger.debug('OR -- ');
         pymParent.onMessage('childLoaded', function() {
-        logger.debug('child Loaded');
-        // still being triggered more than once
-        // each time a project is loaded, add one to the count
           pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
         });
       } else {
+        var uniqBuildVals = _.uniq(_.values(view.model.buildData()));
         pymParent = new pym.Parent(slug+'__graphic', preview_url);
+
+        if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
+          pymParent.onMessage('childLoaded', function() {
+            pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
+          });
+        }
       }
     } else {
       if ( view.model.hasInitialBuild() ){
