@@ -126,16 +126,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       logger.debug('preview url', preview_url, view.model.blueprint.get('slug'));
       pymParent = new pym.Parent(slug+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
-      var uniqBuildVals = _.uniq(_.values(view.model.buildData()));
+      logger.debug(view.model.hasInitialBuild(), view.copyProject);
 
-      if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
-        logger.debug(uniqBuildVals.length, typeof uniqBuildVals[0]);
-        pymParent.onMessage('childLoaded', function() {
+
+      pymParent.onMessage('childLoaded', function() {
+        logger.debug('childLoaded');
+        if ( view.model.hasInitialBuild() || view.copyProject ){
+        logger.debug('OR -- ');
         // still being triggered more than once
         // each time a project is loaded, add one to the count
           pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
-        });
-      }
+        }
+      });
     } else {
       if ( view.model.hasInitialBuild() ){
         pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
