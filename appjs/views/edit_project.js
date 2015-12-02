@@ -28,7 +28,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
     'click #savePreview': 'savePreview'
-    // 'keyup': 'pollChange',
   },
 
   pollChange: function(e){
@@ -126,19 +125,24 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
 
       logger.debug('preview url', preview_url, view.model.blueprint.get('slug'));
-      pymParent = new pym.Parent(slug+'__graphic', preview_url);
+      // pymParent = new pym.Parent(slug+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
       logger.debug(view.model.hasInitialBuild(), view.copyProject);
 
-      pymParent.onMessage('childLoaded', function() {
-        logger.debug('childLoaded');
-        if ( view.model.hasInitialBuild() || view.copyProject ){
+
+      if ( view.model.hasInitialBuild() || view.copyProject ){
+        slug += '-copy';
+        pymParent = new pym.Parent(slug+'__graphic', preview_url);
         logger.debug('OR -- ');
+        pymParent.onMessage('childLoaded', function() {
+        logger.debug('child Loaded');
         // still being triggered more than once
         // each time a project is loaded, add one to the count
           pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
-        }
-      });
+        });
+      } else {
+        pymParent = new pym.Parent(slug+'__graphic', preview_url);
+      }
     } else {
       if ( view.model.hasInitialBuild() ){
         pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
