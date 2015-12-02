@@ -53,15 +53,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   listenForChanges: function() {
-    if ( !this.model.isNew() ) {
+    if ( !this.model.isNew() && !this.listening ) {
       this.listenTo(this.app.listener,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
+      this.listening = true;
     }
   },
 
   stopListeningForChanges: function() {
     this.stopListening(this.app.listener);
+    this.listening = false;
   },
 
   updateStatus: function(status) {
@@ -127,7 +129,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       pymParent = new pym.Parent(slug+'__graphic', preview_url);
       logger.debug('### build data --', view.model.buildData());
       logger.debug(view.model.hasInitialBuild(), view.copyProject);
-
 
       pymParent.onMessage('childLoaded', function() {
         logger.debug('childLoaded');

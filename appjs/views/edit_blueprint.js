@@ -25,17 +25,19 @@ var EditBlueprint = BaseView.extend(require('./mixins/actions'), require('./mixi
   },
 
   listenForChanges: function() {
-    if ( !this.model.isNew() ) {
+    if ( !this.model.isNew() && !this.listening ) {
       logger.debug('Start listening for changes');
       this.listenTo(this.app.listener,
                     'change:blueprint:' + this.model.id,
                     this.updateStatus, this);
+      this.listening = true;
     }
   },
 
   stopListeningForChanges: function() {
     logger.debug('Stop listening for changes');
     this.stopListening(this.app.listener);
+    this.listening = false;
   },
 
   updateStatus: function(status) {
