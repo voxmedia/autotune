@@ -129,9 +129,9 @@
 
       </ul>
 
-      <% slug = model.get( 'slug' ) || model.blueprint.get('slug') %>
-      <% if ( copyProject ) { %>
-        <% slug += '-copy'; %>
+      <% slug = model.blueprint.get('slug') %>
+      <% if ( ! model.blueprint.hasPreviewType('live') ) { %>
+        <% slug = model.get('slug'); %>
       <% } %>
       <!-- <div class="preview-frame" id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div> -->
       <div class="preview-frame" style="padding: 25px 0px;">

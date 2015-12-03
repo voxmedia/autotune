@@ -11,7 +11,9 @@ var $ = require('jquery'),
     pym = require('pym.js'),
     slugify = require("underscore.string/slugify"),
     pymParent,
-    data;
+    pymParentNew,
+    data,
+    theme;
 
 require('brace/mode/javascript');
 require('brace/mode/html');
@@ -31,13 +33,28 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: function(e){
-    var $form = this.$('#projectForm');
+    var $form = this.$('#projectForm'),
+        previewFrame;
+
+    if( this.model.copyProject || this.model.hasInitialBuild() ){
+      previewFrame = pymParent;
+    } else {
+      previewFrame = pymParentNew;
+    }
+
     if ( this.model.blueprint.hasPreviewType('live') ){
-      logger.debug('*** INST IS ALIVE');
       data = $form.alpaca('get').getValue();
       logger.debug('!!!!! form values', data);
 
-      pymParent.sendMessage('updateData', JSON.stringify(data));
+      if(data.theme !== theme){
+        theme = data.theme;
+        var vals = {
+          theme: data['theme']
+        };
+        this.model.set(vals);
+        this.render();
+      }
+      previewFrame.sendMessage('updateData', JSON.stringify(data));
     }
   },
 
@@ -105,41 +122,26 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterRender: function() {
-    var view = this, promises = [];
+    var view = this, promises = [], buildData = view.model.buildData();
 
     if ( view.model.blueprint.hasPreviewType('live') ){
-      // needs to be adjusted so not timeline for all
-      var slug = view.model.get('slug') || view.model.blueprint.get('slug'),
-          preview_url,
-          bp_version;
+      theme = view.model.get('theme') || 'custom';
+      var slug = view.model.blueprint.get('slug'),
+          bp_version = view.model.get('blueprint_version') || view.model.blueprint.get('version');
 
-      if ( view.model.isNew() || ! view.model.hasInitialBuild() ){
-        if(view.copyProject){
-          bp_version = view.model.get('blueprint_version');
-        } else {
-          bp_version = view.model.blueprint.get('version');
-        }
-        preview_url = '//test.apps.voxmedia.com/at-preview/' + view.model.blueprint.get('slug') + '/' + bp_version + '/preview/' + '#new';
-      } else {
-        preview_url = view.model.get('preview_url') + 'preview/';
+      var preview_url = ['//test.apps.voxmedia.com/at-preview', slug, bp_version, theme, 'preview/'].join('/');
+      if ( ! view.model.hasInitialBuild() && ! view.copyProject){
+        preview_url += '#new';
       }
 
-      if ( view.copyProject ){
-        logger.debug(view.model.hasInitialBuild(), view.copyProject);
-        slug += '-copy';
+      var temp_slug = slug;
+      if ( view.copyProject || view.model.hasInitialBuild() ){
         pymParent = new pym.Parent(slug+'__graphic', preview_url);
         pymParent.onMessage('childLoaded', function() {
-          pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
+          pymParent.sendMessage('updateData', JSON.stringify(buildData));
         });
       } else {
-        var uniqBuildVals = _.uniq(_.values(view.model.buildData()));
-        pymParent = new pym.Parent(slug+'__graphic', preview_url);
-
-        if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
-          pymParent.onMessage('childLoaded', function() {
-            pymParent.sendMessage('updateData', JSON.stringify(view.model.buildData()));
-          });
-        }
+        pymParentNew = new pym.Parent(temp_slug+'__graphic', preview_url);
       }
     } else {
       if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){

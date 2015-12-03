@@ -63,42 +63,47 @@ module Autotune
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
 
-        project_demo = blueprint.deep_dup
-        project_demo['slug'] = [blueprint.slug, blueprint.version].join('/')
-        # Use this as dummy build data for the moment
-        build_data = repo.read(blueprint.config['sample_data'])
-        build_data.delete('base_url')
-        build_data.update(
-          'title' => project_demo.title,
-          'slug' => project_demo.slug,
-          'theme' => 'custom')
+        # would be nice to see how far in deploying
 
-          # 'slug' => 'custom-' + blueprint.slug + '-' + blueprint.version,
+        blueprint.config['themes'].each do |theme|
+          project_demo = blueprint.deep_dup
+          project_demo['slug'] = [blueprint.slug, blueprint.version, theme].join('/')
+          # Use this as dummy build data for the moment
+          build_data = repo.read(blueprint.config['sample_data'])
+          build_data.delete('base_url')
+          build_data.update(
+            'title' => project_demo.title,
+            'slug' => project_demo.slug,
+            'theme' => theme)
 
-        # Get the deployer object
-        # probably don't want this to always be preview
-        out = StringIO.new
-        outlogger = Logger.new out
-        deployer = Autotune.new_deployer(
-          :preview, project_demo, :logger => outlogger)
+            # 'slug' => 'custom-' + blueprint.slug + '-' + blueprint.version,
 
-        # Run the before build deployer hook
-        deployer.before_build(build_data, repo.env)
+          # Get the deployer object
+          # probably don't want this to always be preview
+          out = StringIO.new
+          outlogger = Logger.new out
+          deployer = Autotune.new_deployer(
+            :preview, project_demo, :logger => outlogger)
 
-        # Result of this is that the blueprint slug ends up being included along with the project slug, which isn't right
-        # I wonder if you do a deep_dup of a blueprint to a project - maybe that would work
-        # build_data['base_url'] = build_data['base_url'] + '/' + build_data['slug']
-        # build_data['asset_base_url'] = build_data['asset_base_url'] + '/' + build_data['slug']
+          # Run the before build deployer hook
+          deployer.before_build(build_data, repo.env)
 
-        # Run the build
-        repo.working_dir do
-          outlogger.info(repo.cmd(
-            BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+          # Result of this is that the blueprint slug ends up being included along with the project slug, which isn't right
+          # I wonder if you do a deep_dup of a blueprint to a project - maybe that would work
+          # build_data['base_url'] = build_data['base_url'] + '/' + build_data['slug']
+          # build_data['asset_base_url'] = build_data['asset_base_url'] + '/' + build_data['slug']
+
+          # Run the build
+          repo.working_dir do
+            outlogger.info(repo.cmd(
+              BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+          end
+
+          # Upload build
+          deployer.deploy(blueprint.full_deploy_dir)
+          puts 'test.apps.voxmedia.com/at-preview/' + build_data['slug']
         end
 
-        # Upload build
-        deployer.deploy(blueprint.full_deploy_dir)
-        puts 'test.apps.voxmedia.com/at-preview/' + build_data['slug']
       end
 
     rescue => exc
