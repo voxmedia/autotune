@@ -142,7 +142,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         }
       }
     } else {
-      if ( view.model.hasInitialBuild() ){
+      if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
         pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
       }
     }

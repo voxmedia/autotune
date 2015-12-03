@@ -97,36 +97,7 @@
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
     <div role="tabpanel" class="tab-pane" id="live-preview">
 
-      <% if ( ! model.isNew() && ! model.blueprint.hasPreviewType('live') ) { %>
-        <% if ( model.hasStatus('broken') ) { %>
-        <p class="text-danger">
-           <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
-          </p>
-          <% if ( model.has('error_message') ) { %>
-          <p class="text-danger">
-           <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
-           <%=model.get('error_message') %></p>
-          <% } %>
-        </div>
-        <% } else if ( model.hasStatus('building') ) { %>
-        <p class="text-warning">
-          <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> The preview below is out-of-date.</span>
-        </p>
-        <% } else if ( model.hasStatus('built') ) { %>
-        <p class="text-success">
-          <span class="m-status status-info"><i class="icon-info"></i>This draft is up-to-date.</span>
-        </p>
-        <!-- <p class="text-warning">
-          <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>
-        </p> -->
-        <% } else if ( model.hasUnpublishedUpdates() ) { %>
-        <p class="text-warning">
-          <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
-        </p>
-        <% } %>
-      <% } %>
-
-      <ul class="nav nav-pills" style="margin-bottom: 15px;">
+      <ul class="nav nav-pills">
         <button type="button" data-action="get-preview-size" id="small-view"
           class="btn btn-default resize"
           data-model="Project"
@@ -156,21 +127,53 @@
           Fluid (100%)
         </button>
 
-        <!-- add a data-action to this, maybe? -->
-        <% if ( model.blueprint.hasPreviewType('live') ) { %>
-        <button type="submit" class="btn btn-default"
-
-                id="savePreview"
-                data-model="Project"
-                data-loading-text="Saving..."
-                data-model-id="<%=model.get('slug') %>">Save</button>
-        <% } %>
       </ul>
+
       <% slug = model.get( 'slug' ) || model.blueprint.get('slug') %>
       <% if ( copyProject ) { %>
         <% slug += '-copy'; %>
       <% } %>
-      <div class="preview-frame" id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div>
+      <!-- <div class="preview-frame" id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div> -->
+      <div class="preview-frame" style="padding: 25px 0px;">
+        <% if ( ! model.isNew() && ! model.blueprint.hasPreviewType('live') ) { %>
+          <% if ( model.hasStatus('broken') ) { %>
+          <p class="text-danger">
+             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
+            </p>
+            <% if ( model.has('error_message') ) { %>
+            <p class="text-danger">
+             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
+             <%=model.get('error_message') %></p>
+            <% } %>
+          </div>
+          <% } else if ( model.hasStatus('building') ) { %>
+          <p class="text-warning">
+            <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <br /> The preview below is out-of-date.</span>
+          </p>
+          <% } else if ( model.hasStatus('built') ) { %>
+          <p class="text-success">
+            <span class="m-status status-info"><i class="icon-info"></i>This draft is up-to-date.</span>
+          </p>
+          <!-- <p class="text-warning">
+            <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>
+          </p> -->
+          <% } else if ( model.hasUnpublishedUpdates() ) { %>
+          <p class="text-warning">
+            <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
+          </p>
+          <% } %>
+        <% } %>
+        <div id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div>
+      </div>
+
+      <% if ( model.blueprint.hasPreviewType('live') ) { %>
+      <button type="submit" class="btn btn-default"
+
+              id="savePreview"
+              data-model="Project"
+              data-loading-text="Saving..."
+              data-model-id="<%=model.get('slug') %>">Save</button>
+      <% } %>
 
     </div>
     <% } %>
