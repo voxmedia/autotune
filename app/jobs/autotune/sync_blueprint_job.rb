@@ -53,19 +53,12 @@ module Autotune
           blueprint.config['thumbnail'])
       end
 
-      # Blueprint is now ready for testing
-      if status
-        blueprint.status = status
-      elsif blueprint.status != 'ready'
-        blueprint.status = 'testing'
-      end
-      blueprint.save!
-
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
 
         # would be nice to see how far in deploying
 
         blueprint.config['themes'].each do |theme|
+          blueprint.status = theme
           project_demo = blueprint.deep_dup
           project_demo['slug'] = [blueprint.slug, blueprint.version, theme].join('/')
           # Use this as dummy build data for the moment
@@ -105,6 +98,14 @@ module Autotune
         end
 
       end
+
+      # Blueprint is now ready for testing
+      if status
+        blueprint.status = status
+      elsif blueprint.status != 'ready'
+        blueprint.status = 'testing'
+      end
+      blueprint.save!
 
     rescue => exc
       # If the command failed, raise a red flag
