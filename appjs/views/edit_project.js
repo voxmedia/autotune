@@ -122,12 +122,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.$( '#embed textarea' ).text( data );
         }).catch(function(error) {
           logger.error(error);
-        }).then( function() {
-          $.each(view.$( '#screenshots img' ), function(){
-            var src = view.model.getPreviewUrl( proto, $(this).attr( 'path' ) );
-            $(this).attr( 'src', src );
-            $(this).removeAttr( 'path' );
-          });
         })
       );
     }

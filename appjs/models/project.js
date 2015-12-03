@@ -290,7 +290,7 @@ var Project = Backbone.Model.extend({
     if ( !this.has(key) ) { return ''; }
 
     var base = this.get(key);
-    if ( base.match(/^\/\//) ) {
+    if ( base.match(/^\/\//) && preferredProto !== '' ) {
       base = preferredProto + ':' + base;
     }
 

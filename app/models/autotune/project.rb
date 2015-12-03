@@ -61,6 +61,10 @@ module Autotune
       published? && published_at < data_updated_at
     end
 
+    def publishable?
+      draft? || unpublished_updates?
+    end
+
     def update_snapshot
       if blueprint_version == blueprint.version
         update!(:status => 'building')
@@ -73,7 +77,7 @@ module Autotune
       ActiveJob::Chain.new(
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self, :update => true),
-        BuildJob.new(self)
+        BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
       ).enqueue
     rescue
       update!(:status => 'broken')
@@ -85,7 +89,7 @@ module Autotune
       ActiveJob::Chain.new(
         SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
-        BuildJob.new(self)
+        BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
       ).enqueue
     rescue
       update!(:status => 'broken')

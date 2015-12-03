@@ -46,20 +46,17 @@
     <li role="presentation" class="active"><a
         href="#edit" aria-controls="edit"
         role="tab" data-toggle="tab">Project info</a></li>
-    <% if ( model.isPublished() ) { %>
-      <% if ( model.hasType( 'graphic' ) ) { %>
+    <% if ( model.hasType( 'graphic' ) ) { %>
+      <% if ( model.isPublished() ) { %>
     <li role="presentation"><a
         href="#embed" aria-controls="embed"
         role="tab" data-toggle="tab">Embed</a></li>
+      <% } else { %>
+    <li role="presentation" class="disabled"><a>Embed</a></li>
       <% } %>
     <li role="presentation"><a
         href="#screenshots" aria-controls="screenshots"
         role="tab" data-toggle="tab">Screenshots</a></li>
-    <% } else { %>
-      <% if ( model.hasType( 'graphic' ) ) { %>
-    <li role="presentation" class="disabled"><a>Embed</a></li>
-      <% } %>
-    <li role="presentation" class="disabled"><a>Screenshots</a></li>
     <% } %>
     <% if ( hasRole('superuser') ) { %>
       <% if ( model.isNew() ) { %>
@@ -88,7 +85,6 @@
     </div>
     <% if ( model.hasType( 'graphic' ) ) { %>
     <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
-    <% } %>
     <div role="tabpanel" class="tab-pane" id="screenshots">
 
       <ul class="nav nav-pills">
@@ -97,19 +93,34 @@
         <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>
       </ul>
 
+      <% if ( model.isPublishable() ) { %>
       <div class="tab-content">
         <div id="large-ss" class="tab-pane active">
-          <img path="screenshots/screenshot_l.png" />
+          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_l.png')%>" />
         </div>
         <div id="medium-ss" class="tab-pane">
-          <img path="screenshots/screenshot_m.png" />
+          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_m.png')%>" />
         </div>
         <div id="small-ss" class="tab-pane">
-          <img path="screenshots/screenshot_s.png" />
+          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_s.png')%>" />
         </div>
       </div>
+      <% } else { %>
+      <div class="tab-content">
+        <div id="large-ss" class="tab-pane active">
+          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_l.png')%>" />
+        </div>
+        <div id="medium-ss" class="tab-pane">
+          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_m.png')%>" />
+        </div>
+        <div id="small-ss" class="tab-pane">
+          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_s.png')%>" />
+        </div>
+      </div>
+      <% } %>
 
     </div>
+    <% } %>
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">
       <p>Status:
