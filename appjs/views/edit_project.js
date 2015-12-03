@@ -124,7 +124,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         preview_url = view.model.get('preview_url') + 'preview/';
       }
 
-      if ( view.model.hasInitialBuild() || view.copyProject ){
+      if ( view.copyProject ){
+        logger.debug(view.model.hasInitialBuild(), view.copyProject);
         slug += '-copy';
         pymParent = new pym.Parent(slug+'__graphic', preview_url);
         pymParent.onMessage('childLoaded', function() {

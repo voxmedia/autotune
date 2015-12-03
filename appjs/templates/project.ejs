@@ -167,7 +167,7 @@
         <% } %>
       </ul>
       <% slug = model.get( 'slug' ) || model.blueprint.get('slug') %>
-      <% if ( model.hasInitialBuild() || copyProject ) { %>
+      <% if ( copyProject ) { %>
         <% slug += '-copy'; %>
       <% } %>
       <div class="preview-frame" id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div>
