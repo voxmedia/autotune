@@ -55,6 +55,10 @@ module Autotune
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
 
+        if ! blueprint.config['themes'].present?
+          blueprint.config['themes'] = Autotune.config.themes.keys
+        end
+
         blueprint.config['themes'].each do |theme|
           blueprint.status = theme
           project_demo = blueprint.deep_dup
@@ -87,7 +91,6 @@ module Autotune
 
           # Upload build
           deployer.deploy(blueprint.full_deploy_dir)
-          puts 'test.apps.voxmedia.com/at-preview/' + build_data['slug']
         end
 
       end
