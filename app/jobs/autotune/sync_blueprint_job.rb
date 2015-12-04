@@ -55,8 +55,6 @@ module Autotune
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
 
-        # would be nice to see how far in deploying
-
         blueprint.config['themes'].each do |theme|
           blueprint.status = theme
           project_demo = blueprint.deep_dup
@@ -80,11 +78,6 @@ module Autotune
 
           # Run the before build deployer hook
           deployer.before_build(build_data, repo.env)
-
-          # Result of this is that the blueprint slug ends up being included along with the project slug, which isn't right
-          # I wonder if you do a deep_dup of a blueprint to a project - maybe that would work
-          # build_data['base_url'] = build_data['base_url'] + '/' + build_data['slug']
-          # build_data['asset_base_url'] = build_data['asset_base_url'] + '/' + build_data['slug']
 
           # Run the build
           repo.working_dir do
