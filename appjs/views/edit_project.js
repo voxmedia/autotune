@@ -157,7 +157,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     } else {
       if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
-        pymParent = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
+        var previewLink = view.model.get('preview_url');
+        if(view.model['_previousAttributes']['preview_url'] && view.model['_previousAttributes']['preview_url'] !==  view.model.get('preview_url')){
+          previewLink = view.model['_previousAttributes']['preview_url'];
+        }
+        pymParent = new pym.Parent(view.model.get('slug')+'__graphic', previewLink);
       }
     }
 
