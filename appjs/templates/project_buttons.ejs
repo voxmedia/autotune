@@ -5,7 +5,7 @@
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
-     <% if ( ! model.hasInitialBuild() ) { %>disabled="true"<% } %>
+     <% if ( ! model.blueprint.hasPreviewType('live') && ! model.hasInitialBuild() ) { %>disabled="true"<% } %>
      data-view="preview">Preview</a>
   <% } else { %>
   <a class="btn btn-default" target="_blank" id="viewBtn"

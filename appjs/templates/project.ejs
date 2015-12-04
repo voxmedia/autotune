@@ -148,11 +148,12 @@
           </div>
           <% } else if ( model.hasStatus('building') ) { %>
           <p class="text-warning">
-            <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <br /> The preview below is out-of-date.</span>
+            <span class="status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> Building the project <br /><i class="icon-info"></i> The preview below is still building and does not reflect the changes that you just saved. It will update when the
+            project finishes building.</span>
           </p>
           <% } else if ( model.hasStatus('built') ) { %>
           <p class="text-success">
-            <span class="m-status status-info"><i class="icon-info"></i>This draft is up-to-date.</span>
+            <span class="status-success">This draft is up-to-date with the latest saved version of this project.</span>
           </p>
           <!-- <p class="text-warning">
             <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>
