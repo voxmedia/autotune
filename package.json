@@ -40,6 +40,8 @@
     "browserify-shim": "3.8.0",
     "eonasdan-bootstrap-datetimepicker": "^4.15.35",
     "escape-html": "^1.0.3",
+    "google-auth-library": "^0.9.7",
+    "googleapis": "^2.1.6",
     "handlebars": "3.0.3",
     "jquery": "2.1.1",
     "jquery-ui": "1.10.5",
