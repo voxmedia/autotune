@@ -14,7 +14,6 @@ var $ = require('jquery'),
     pymParentNew,
     data,
     theme;
-    // gapi;
 
 require('brace/mode/javascript');
 require('brace/mode/html');
@@ -30,79 +29,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   events: {
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
-    'click #savePreview': 'savePreview',
-    'click #getAuth': 'getAuth'
+    'click #savePreview': 'savePreview'
   },
-  //
-  // getAuth: function(){
-  //
-  //   var SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
-  //
-  //   /**
-  //    * Check if current user has authorized this application.
-  //    */
-  //   function checkAuth() {
-  //     gapi.auth.authorize(
-  //       {
-  //         'client_id': CLIENT_ID,
-  //         'scope': SCOPES.join(' '),
-  //         'immediate': true
-  //       }, handleAuthResult);
-  //   }
-  //
-  //   /**
-  //    * Handle response from authorization server.
-  //    *
-  //    * @param {Object} authResult Authorization result.
-  //    */
-  //   function handleAuthResult(authResult) {
-  //     var authorizeDiv = document.getElementById('authorize-div');
-  //     if (authResult && !authResult.error) {
-  //       // Hide auth UI, then load client library.
-  //       authorizeDiv.style.display = 'none';
-  //       loadDriveApi();
-  //     } else {
-  //       // Show auth UI, allowing the user to initiate authorization by
-  //       // clicking authorize button.
-  //       authorizeDiv.style.display = 'inline';
-  //     }
-  //   }
-  //
-  //   /**
-  //    * Load Drive API client library.
-  //    */
-  //   function loadDriveApi() {
-  //     gapi.client.load('drive', 'v2', listFiles);
-  //   }
-  //
-  //   /**
-  //    * Print files.
-  //    */
-  //   function listFiles() {
-  //     var request = gapi.client.drive.files.list({
-  //         'maxResults': 10
-  //       });
-  //
-  //       request.execute(function(resp) {
-  //         // appendPre('Files:');
-  //         var files = resp.items;
-  //         if (files && files.length > 0) {
-  //           for (var i = 0; i < files.length; i++) {
-  //             var file = files[i];
-  //             logger.debug(file.title, file.id);
-  //             // appendPre(file.title + ' (' + file.id + ')');
-  //           }
-  //         } else {
-  //           // appendPre('No files found.');
-  //         }
-  //       });
-  //   }
-  //
-  //   gapi.auth.authorize(
-  //     {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
-  //     handleAuthResult);
-  //
-  // },
 
   pollChange: function(e){
     var $form = this.$('#projectForm'),
