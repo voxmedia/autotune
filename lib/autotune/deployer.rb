@@ -1,4 +1,7 @@
 require 'uri'
+require 'google_drive'
+require 'google_drive/google_docs'
+require 'oauth2'
 
 module Autotune
   # Autotune blueprint base deployer
@@ -25,6 +28,21 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
+      # pp build_data.as_json
+      if build_data['google_doc_url']
+        spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/)
+        token = project.user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
+        google_session = GoogleDrive.login_with_oauth(token)
+        pp project.user.authorizations
+        pp token
+        pp google_session
+        # google_session.files.each do |file|
+        #   if file.id == spreadsheet_key
+        #     puts file.title
+        #   end
+        # end
+      end
+
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
     end

@@ -5,6 +5,8 @@ module GoogleDrive
 
   class GoogleDocs
 
+    #might borrow some from the middleman google drive code here
+
     attr_writer :client_id, :client_secret, :redirect_uri
 
     def initialize(client_id, client_secret, redirect_uri)

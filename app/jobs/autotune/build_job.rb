@@ -17,7 +17,7 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
-      env_vars = Rails.configuration.autotune.build_environment
+      # env_vars = Rails.configuration.autotune.build_environment
 
       # Creates a session. This will prompt the credential via command line for the
       # first time and save it to ./stored_token.json file for later usages.

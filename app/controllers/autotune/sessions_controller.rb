@@ -26,6 +26,8 @@ module Autotune
     private
 
     def omniauth
+      pp request.env['omniauth.auth']['credentials']
+      # need to be able to reauthenticate if the token is expired
       request.env['omniauth.auth']
     end
   end

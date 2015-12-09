@@ -87,10 +87,10 @@ Autotune::Engine.routes.draw do
   get '/logout'                    => 'sessions#destroy', :as => :logout
   get '/login'                     => 'sessions#new',     :as => :login
 
-  get '/google_login' => 'documents#google_drive_login'
-  get '/oauth2callback' => 'documents#set_google_drive_token'
-  get '/list_google_doc'  => 'documents#list_google_docs', :as => :list_google_doc #for listing the google docs
-  get '/download_google_doc'  => 'documents#download_google_docs', :as => :download_google_doc #download
+  # get '/google_login' => 'documents#google_drive_login'
+  # get '/oauth2callback' => 'documents#set_google_drive_token'
+  # get '/list_google_doc'  => 'documents#list_google_docs', :as => :list_google_doc #for listing the google docs
+  # get '/download_google_doc'  => 'documents#download_google_docs', :as => :download_google_doc #download
 
   resque_web_constraint = lambda do |request|
     current_user = Autotune::User.find_by_api_key(

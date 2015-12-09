@@ -16,22 +16,33 @@ module Autotune
     def list_google_docs
       puts 'list google docs'
       puts 'session', session.as_json
+
+      current_user.authorizations.find_by!(:provider => 'google_oauth2').credentials
+
       google_session = GoogleDrive.login_with_oauth(session[:google_token])
       # puts 'files', google_session.files
       @google_docs = []
-      for file in google_session.files
-        puts file.title
+      google_session.files.each do |file|
+        if file.id == '1oyQUL0fGHWm8SILeMdh27TzwNuCQqpgkWkLsi3RWaTs'
+          puts file.title
+          puts file['exportLinks']['text/csv']
+        end
         @google_docs << file.title
       end
     end
 
     def download_google_docs
       file_name = params[:doc_upload]
-      file_name_session = GoogleDrive.login_with_oauth(session[:google_token])
+      google_session = GoogleDrive.login_with_oauth(session[:google_token])
+      # file_name_session = GoogleDrive.login_with_oauth(session[:google_token])
+      # file_path = Rails.root.join('tmp',"doc_#{file_name_session}")
+      # file = google_session.file_by_title(file_name)
+      file = google_session.file_by_id('1oyQUL0fGHWm8SILeMdh27TzwNuCQqpgkWkLsi3RWaTs')
       file_path = Rails.root.join('tmp',"doc_#{file_name_session}")
-      file = google_session.file_by_title(file_name)
+      puts file.title
+      puts 'download'
       file.download_to_file(file_path)
-      redirect_to list_google_doc_path
+      # redirect_to list_google_doc_path
     end
 
     def set_google_drive_token
@@ -45,7 +56,8 @@ module Autotune
       puts auth_token
       session[:google_token] = auth_token.token if auth_token
       puts session.as_json
-      redirect_to list_google_doc_path
+      # redirect_to list_google_doc_path
+      redirect_to download_google_doc_path
     end
 
     def google_drive_login
@@ -57,7 +69,6 @@ module Autotune
         auth_url = google_drive.set_google_authorize_url
         redirect_to auth_url
       else
-        redirect_to list_google_doc_path
       end
     end
   end
