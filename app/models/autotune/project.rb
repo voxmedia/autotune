@@ -141,6 +141,30 @@ module Autotune
       theme_id_changed?
     end
 
+    def type
+      if blueprint_config
+        blueprint_config['type']
+      elsif blueprint
+        blueprint.type
+      elsif blueprint_id
+        Blueprint.find(blueprint_id).type
+      end
+    end
+
+    def deployed?
+      status != 'new' && blueprint_version.present?
+    end
+
+    def installed?
+      status != 'new' && blueprint_version.present?
+    end
+
+    # Rails reserves the column `type` for itself. Here we tell Rails to use a
+    # different name.
+    def self.inheritance_column
+      'class'
+    end
+
     private
 
     def check_for_updated_data

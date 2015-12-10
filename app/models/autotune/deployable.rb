@@ -4,8 +4,8 @@ module Autotune
     extend ActiveSupport::Concern
 
     included do
-      after_destroy :delete_deployed_files
-      after_save :delete_renamed_files
+      after_destroy :delete_deployed_files, :if => :deployed?
+      after_save :delete_renamed_files, :if => :deployed?
     end
 
     def deployer(target, **kwargs)
@@ -13,6 +13,10 @@ module Autotune
       key = kwargs.any? ? "#{target}:#{kwargs.to_query}" : target
       @deployers[key] ||=
         Autotune.new_deployer(target.to_sym, self, **kwargs)
+    end
+
+    def deployed?
+      true
     end
 
     def deploy_dir

@@ -45,7 +45,7 @@ module Autotune
     end
 
     def installed?
-      updating? || ready? || testing?
+      status != 'new' && version.present?
     end
 
     def updating?
@@ -58,6 +58,10 @@ module Autotune
 
     def testing?
       status == 'testing'
+    end
+
+    def deployed?
+      status != 'new' && version.present?
     end
 
     def update_repo

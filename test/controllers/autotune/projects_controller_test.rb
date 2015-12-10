@@ -117,7 +117,9 @@ module Autotune
       accept_json!
       valid_auth_header!
 
-      post :create, project_data
+      assert_performed_jobs 3 do
+        post :create, project_data
+      end
 
       assert_response :created, decoded_response['error']
       assert_project_data!
@@ -140,9 +142,12 @@ module Autotune
 
       title = 'Updated project'
 
-      put(:update,
-          :id => autotune_projects(:example_one).id,
-          :title => title)
+      assert_performed_jobs 3 do
+        put(:update,
+            :id => autotune_projects(:example_one).id,
+            :title => title)
+      end
+
       assert_response :success, decoded_response['error']
       assert_project_data!
 
@@ -156,9 +161,11 @@ module Autotune
 
       title = 'Updated project'
 
-      put(:update,
-          :id => autotune_projects(:example_six).id,
-          :title => title)
+      assert_performed_jobs 3 do
+        put(:update,
+            :id => autotune_projects(:example_six).id,
+            :title => title)
+      end
       assert_response :success, decoded_response['error']
       assert_project_data!
 
@@ -184,9 +191,11 @@ module Autotune
 
       title = 'Updated project'
 
-      put(:update,
-          :id => autotune_projects(:example_one).id,
-          :title => title)
+      assert_performed_jobs 3 do
+        put(:update,
+            :id => autotune_projects(:example_one).id,
+            :title => title)
+      end
       assert_response :success, decoded_response['error']
       assert_project_data!
 
@@ -200,9 +209,11 @@ module Autotune
 
       title = 'Updated project'
 
-      put(:update,
-          :id => autotune_projects(:example_one).id,
-          :title => title)
+      assert_performed_jobs 3 do
+        put(:update,
+            :id => autotune_projects(:example_one).id,
+            :title => title)
+      end
       assert_response :success, decoded_response['error']
       assert_project_data!
 
