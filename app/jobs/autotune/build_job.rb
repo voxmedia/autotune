@@ -17,44 +17,6 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
-      # env_vars = Rails.configuration.autotune.build_environment
-
-      # Creates a session. This will prompt the credential via command line for the
-      # first time and save it to ./stored_token.json file for later usages.
-      #
-      # If you are developing a Web app, and you want to ask the user to log in in
-      # the Web app instead of via command line, follow the example code in:
-      # http://gimite.net/doc/google-drive-ruby/GoogleDrive.html#method-c-login_with_oauth
-      # session = GoogleDrive.saved_session("./stored_token.json", nil, env_vars['GOOGLE_CLIENT_ID'], env_vars['GOOGLE_CLIENT_SECRET'])
-      #
-      # # Gets list of remote files.
-      # session.files.each do |file|
-      #   p file.title
-      # end
-      #
-      # client = Google::APIClient.new
-      # auth = client.authorization
-      # # Follow "Create a client ID and client secret" in
-      # # https://developers.google.com/drive/web/auth/web-server] to get a client ID and client secret.
-      # auth.client_id = env_vars['GOOGLE_CLIENT_ID']
-      # auth.client_secret = env_vars['GOOGLE_CLIENT_SECRET']
-      # # auth.scope =
-      # #     "https://www.googleapis.com/auth/drive " +
-      # #     "https://spreadsheets.google.com/feeds/"
-      # #
-      # # auth.code = '4/FykSU0wxCbNE_1crtY5qE60gqlViujfwfBR-CVAkj3A'
-      # auth.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
-      #
-      # begin
-      #   # client.authorization.fetch_access_token!
-      #   puts client.authorization.as_json
-      #   session = GoogleDrive.login_with_oauth(client.authorization.access_token)
-      #   ws = session.spreadsheet_by_key("1vvO35_UD3HVUA0Ii1GRUvdl4_mz54aKdhDS_TO3h54g").worksheets[0]
-      #   puts ws.as_json
-      #   # return client.authorization
-      # rescue Signet::AuthorizationError
-      #   raise CodeExchangeError.new(nil)
-      # end
 
       # Setup a new logger that logs to a string. The resulting log will
       # be saved to the output field of the project.
@@ -87,6 +49,8 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(build_data, repo.env)
+
+      pp build_data
 
       # Run the build
       repo.working_dir do
