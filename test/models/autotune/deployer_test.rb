@@ -4,7 +4,7 @@ require 'work_dir'
 module Autotune
   # test taggy stuff
   class DeployerTest < ActiveSupport::TestCase
-    fixtures 'autotune/projects'
+    fixtures 'autotune/projects', 'autotune/blueprints'
 
     test 'init deployer' do
       p = autotune_projects(:example_one)

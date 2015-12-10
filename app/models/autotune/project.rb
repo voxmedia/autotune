@@ -48,7 +48,6 @@ module Autotune
       # Make sure we stash version and config
       self.blueprint_version ||= blueprint.version unless blueprint.nil?
       self.blueprint_config ||= blueprint.config unless blueprint.nil?
-      pp self
     end
 
     def draft?
@@ -141,6 +140,30 @@ module Autotune
 
     def theme_changed?
       theme_id_changed?
+    end
+
+    def type
+      if blueprint_config
+        blueprint_config['type']
+      elsif blueprint
+        blueprint.type
+      elsif blueprint_id
+        Blueprint.find(blueprint_id).type
+      end
+    end
+
+    def deployed?
+      status != 'new' && blueprint_version.present?
+    end
+
+    def installed?
+      status != 'new' && blueprint_version.present?
+    end
+
+    # Rails reserves the column `type` for itself. Here we tell Rails to use a
+    # different name.
+    def self.inheritance_column
+      'class'
     end
 
     private

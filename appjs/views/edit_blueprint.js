@@ -9,10 +9,8 @@ var $ = require('jquery'),
     Alpaca = require('../vendor/alpaca'),
     ace = require('brace');
 
-require('brace/mode/javascript');
-require('brace/mode/html');
+require('brace/mode/json');
 require('brace/theme/textmate');
-require('brace/theme/chrome');
 
 var EditBlueprint = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/blueprint.ejs'),
@@ -21,7 +19,15 @@ var EditBlueprint = BaseView.extend(require('./mixins/actions'), require('./mixi
   },
 
   afterInit: function() {
-    this.listenForChanges();
+    this.on('load', function() {
+      this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
+      this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
+    }, this);
+
+    this.on('unload', function() {
+      this.stopListening(this.app);
+      this.stopListeningForChanges();
+    }, this);
   },
 
   listenForChanges: function() {
@@ -68,7 +74,7 @@ var EditBlueprint = BaseView.extend(require('./mixins/actions'), require('./mixi
 
       this.editor = ace.edit('schema');
       this.editor.setTheme("ace/theme/textmate");
-      this.editor.getSession().setMode("ace/mode/javascript");
+      this.editor.getSession().setMode("ace/mode/json");
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
       this.editor.setShowPrintMargin(false);
       this.editor.setValue( JSON.stringify( formData , null, "  " ), -1 );

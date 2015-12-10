@@ -18,6 +18,8 @@ Rails.configuration.autotune.themes = { :vox => 'Vox', :generic => 'Generic' }
 
 # Add more helper methods to be used by all tests here...
 class ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   def setup
     # Make some temporary working dirs
     Rails.configuration.autotune.working_dir = File.expand_path(
@@ -33,6 +35,8 @@ class ActiveSupport::TestCase
       FileUtils.rm_rf(Rails.root.join 'public', dir) \
         if File.exist?(Rails.root.join 'public', dir)
     end
+
+    assert_no_enqueued_jobs
   end
 
   def mock_auth
