@@ -1,6 +1,6 @@
 require 'uri'
 require 'google_drive'
-require 'google_drive/google_docs'
+require 'google/api_client'
 require 'oauth2'
 
 module Autotune
@@ -30,17 +30,18 @@ module Autotune
     def before_build(build_data, _env)
       # pp build_data.as_json
       if build_data['google_doc_url']
-        spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/)
+        spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
         token = project.user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
+        # project.user.authorizations.find_by!(:provider => 'google_oauth2').credentials['scope'] = "https://www.googleapis.com/auth/drive " + "https://spreadsheets.google.com/feeds/"
+
         google_session = GoogleDrive.login_with_oauth(token)
-        pp project.user.authorizations
-        pp token
-        pp google_session
-        # google_session.files.each do |file|
-        #   if file.id == spreadsheet_key
-        #     puts file.title
-        #   end
-        # end
+        # pp project.user.authorizations
+        # pp token
+        # pp google_session
+        spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
+        # .worksheets[0]
+        pp spread_sheet
+        pp spread_sheet.export_as_string("text/csv")
       end
 
       build_data['base_url'] = project_url

@@ -18,6 +18,14 @@ module Autotune
     private
 
     def defaults
+      # def request_token_from_google
+      #   url = URI("https://accounts.google.com/o/oauth2/token")
+      #   Net::HTTP.post_form(url, self.to_params)
+      # end
+      # puts 'self.creds'
+      # pp self.credentials
+      # puts 'in creds', Time.parse(self.credentials['expires_at'])
+      # puts 'now', Time.now
       self.info ||= {}
       self.credentials ||= {}
       self.extra ||= {}
