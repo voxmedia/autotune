@@ -30,18 +30,18 @@ module Autotune
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
       # pp build_data.as_json
-      if build_data['google_doc_url']
-        spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
-        token = project.user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
-
-        google_session = GoogleDrive.login_with_oauth(token)
-        spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
-        # ss_path = '/working/spreadsheets/' + spread_sheet.title + '.xls'
-        spread_sheet.export_as_file(spread_sheet.title+'.xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-        new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
-        build_data['google_data'] = new_doc.prepare_spreadsheet(spread_sheet.title+'.xls')
-      end
+      # if build_data['google_doc_url']
+      #   spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+      #   token = project.user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
+      #
+      #   google_session = GoogleDrive.login_with_oauth(token)
+      #   spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
+      #   # ss_path = '/working/spreadsheets/' + spread_sheet.title + '.xls'
+      #   spread_sheet.export_as_file(spread_sheet.title+'.xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      #
+      #   new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
+      #   build_data['google_data'] = new_doc.prepare_spreadsheet(spread_sheet.title+'.xls')
+      # end
 
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
