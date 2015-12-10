@@ -10,10 +10,8 @@ var $ = require('jquery'),
     ace = require('brace'),
     slugify = require("underscore.string/slugify");
 
-require('brace/mode/javascript');
-require('brace/mode/html');
+require('brace/mode/json');
 require('brace/theme/textmate');
-require('brace/theme/chrome');
 
 function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
@@ -28,7 +26,16 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterInit: function(options) {
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
-    this.listenForChanges();
+
+    this.on('load', function() {
+      this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
+      this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
+    }, this);
+
+    this.on('unload', function() {
+      this.stopListening(this.app);
+      this.stopListeningForChanges();
+    }, this);
   },
 
   listenForChanges: function() {
@@ -95,7 +102,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.editor.setWrapBehavioursEnabled(true);
 
       var session = this.editor.getSession();
-      session.setMode("ace/mode/javascript");
+      session.setMode("ace/mode/json");
       session.setUseWrapMode(true);
 
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
