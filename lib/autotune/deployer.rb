@@ -1,9 +1,9 @@
-# require_dependency 'autotune/application_controller'
 require 'uri'
 require 'google_drive'
 require 'google/api_client'
 require 'oauth2'
 require 'autotune/google_docs'
+require 'json'
 
 module Autotune
   # Autotune blueprint base deployer
@@ -31,6 +31,20 @@ module Autotune
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
       if build_data['google_doc_url']
+        # spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+        # cur_user = User.find(project.meta['current_user']['id'])
+        # token = cur_user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
+        #
+        # google_session = GoogleDrive.login_with_oauth(token)
+        # spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
+        #
+        # export_path = File.join(project.working_dir, 'data/'+spread_sheet.title+'.xls').to_s
+        # spread_sheet.export_as_file(export_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        #
+        # new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
+        # parsed_data = new_doc.prepare_spreadsheet(export_path)
+        # project.data['google_data'] = parsed_data
+
         spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
         cur_user = User.find(project.meta['current_user']['id'])
         token = cur_user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
@@ -42,10 +56,16 @@ module Autotune
 
         new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
         project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
+        build_data['google_doc_url'] = project.data['google_data']
       end
 
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
+
+      export_path_at = File.join(project.working_dir, 'data/autotune_b.json').to_s
+      File.open(export_path_at, 'w') do |f|
+        f.puts JSON.pretty_generate(build_data)
+      end
     end
 
     # Hook to do stuff after a project is deleted
@@ -76,21 +96,6 @@ module Autotune
       end
     end
 
-    # def deploy_path
-    #   d_path = [parts.path, project.slug].join('/')
-    #   if parts.scheme == 's3'
-    #     d_path += '/'
-    #   end
-    #   d_path
-    # end
-    #
-    # def project_url
-    #   proj_url = [base_url, project.slug].join('/')
-    #   if parts.scheme == 's3'
-    #     proj_url += '/'
-    #   end
-    #   proj_url
-    # end
     def deploy_path
       [parts.path, project.slug].join('/')
     end
