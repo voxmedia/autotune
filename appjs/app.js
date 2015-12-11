@@ -89,8 +89,12 @@ function App(config) {
     $(window).on('blur', _.bind(function(){
       this.hasFocus = false;
       logger.debug('App lost focus');
-      // Tell the listener to time out in 8mins
-      this.listener.stopAfter(8*60);
+
+      if ( !this.isDev() ) {
+        // Tell the listener to time out in 8mins
+        this.listener.stopAfter(8*60);
+      }
+
       // Proxy the event on the app object
       this.trigger('blur');
     }, this));

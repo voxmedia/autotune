@@ -61,7 +61,10 @@ module Autotune
 
       title = 'New blueprint'
 
-      post :create, :title => title, :repo_url => repo_url
+      assert_performed_jobs 1 do
+        post :create, :title => title, :repo_url => repo_url
+      end
+
       assert_response :created
       assert_blueprint_data!
 
@@ -95,11 +98,17 @@ module Autotune
 
       title = 'New blueprint'
 
-      post :create, :title => title, :repo_url => repo_url
+      assert_performed_jobs 1 do
+        post :create, :title => title, :repo_url => repo_url
+      end
+
       assert_response :created
       assert_blueprint_data!
 
-      delete :destroy, :id => decoded_response['id']
+      assert_performed_jobs 2 do
+        delete :destroy, :id => decoded_response['id']
+      end
+
       assert_response :no_content
     end
 

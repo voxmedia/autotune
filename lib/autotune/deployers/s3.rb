@@ -22,7 +22,7 @@ module Autotune
       end
 
       # Delete stuff
-      def delete!
+      def delete!(*)
         deployer = S3deploy::Deployer.new(
           :dist_dir => '', :bucket => parts.host,
           :app_path => deploy_path, :logger => logger)

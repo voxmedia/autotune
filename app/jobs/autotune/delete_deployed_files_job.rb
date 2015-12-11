@@ -16,8 +16,6 @@ module Autotune
       %w(media preview publish).each do |target|
         deployable.deployer(target).delete!(:renamed => renamed)
       end
-    rescue
-      retry_job
     end
   end
 end

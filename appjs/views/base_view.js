@@ -62,13 +62,13 @@ var BaseView = Backbone.View.extend({
   load: function(parentView) {
     this.loaded = this.firstRender = true;
     this.parentView = parentView;
-    return this;
+    return this.trigger('load');
   },
 
   unload: function() {
     this.loaded = false;
     if ( this.parentView ) { this.parentView = null; }
-    return this;
+    return this.trigger('unload');
   },
 
   hook: function() {
