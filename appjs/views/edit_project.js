@@ -134,7 +134,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [], buildData = view.model.buildData();
-    // logger.debug('xxxxxxxxxx', buildData);
 
     if ( view.model.blueprint.hasPreviewType('live') ){
       theme = view.model.get('theme') || 'custom';

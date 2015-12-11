@@ -1,6 +1,6 @@
 # require 'google_drive'
 # require 'oauth2'
-# require 'rubyXL'
+require 'rubyXL'
 
 module Autotune
 

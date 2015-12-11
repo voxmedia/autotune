@@ -50,8 +50,6 @@ module Autotune
       # Run the before build deployer hook
       deployer.before_build(build_data, repo.env)
 
-      # pp build_data
-
       # Run the build
       repo.working_dir do
         outlogger.info(repo.cmd(
