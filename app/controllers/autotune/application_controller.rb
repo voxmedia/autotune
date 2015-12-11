@@ -103,6 +103,9 @@ module Autotune
     end
 
     def require_login
+      # add some stuff here to add check for google exist
+      # and also check to see if google valid
+      # possibly render this: omniauth_path(:google_oauth2,request.original_url)
       return true if signed_in? && any_roles?
       if signed_in?
         render_error 'Not allowed', :forbidden

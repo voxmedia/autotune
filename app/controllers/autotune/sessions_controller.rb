@@ -7,6 +7,8 @@ module Autotune
 
     def create
       self.current_user = User.find_or_create_by_auth_hash(omniauth)
+      # add a new parameter to find...^^ or do something New
+      # if it already exists, add it to the current user - who is currently logged in, not by email
       if current_user
         redirect_to(request.env['omniauth.origin'] || root_path)
       else

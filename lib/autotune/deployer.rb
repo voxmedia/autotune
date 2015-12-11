@@ -1,3 +1,4 @@
+# require_dependency 'autotune/application_controller'
 require 'uri'
 require 'google_drive'
 require 'google/api_client'
@@ -31,8 +32,8 @@ module Autotune
     def before_build(build_data, _env)
       if build_data['google_doc_url']
         spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
-        # this works, but only if the current user is the owner of the project
-        token = project.user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
+        cur_user = User.find(project.meta['current_user']['id'])
+        token = cur_user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
 
         google_session = GoogleDrive.login_with_oauth(token)
         spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
