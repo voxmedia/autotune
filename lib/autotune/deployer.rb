@@ -57,21 +57,6 @@ module Autotune
       end
     end
 
-    # def deploy_path
-    #   d_path = [parts.path, project.slug].join('/')
-    #   if parts.scheme == 's3'
-    #     d_path += '/'
-    #   end
-    #   d_path
-    # end
-    #
-    # def project_url
-    #   proj_url = [base_url, project.slug].join('/')
-    #   if parts.scheme == 's3'
-    #     proj_url += '/'
-    #   end
-    #   proj_url
-    # end
     def deploy_path
       [parts.path, project.slug].join('/')
     end
@@ -85,7 +70,7 @@ module Autotune
     end
 
     def project_asset_url
-      asset = [try(:asset_base_url) || base_url, project.slug].join('/')
+      [try(:asset_base_url) || base_url, project.slug].join('/')
     end
 
     def logger
