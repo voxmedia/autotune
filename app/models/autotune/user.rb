@@ -69,7 +69,17 @@ module Autotune
       find_by(:api_key => api_key)
     end
 
+    # def self.refresh_token(google_hash)
+    #   # send request to update hash here
+    # end
+
     def self.verify_auth_hash(auth_hash)
+      # if user has been logged in with google
+      #   if Time.now > Time.at(auth_hash['credentials']['expires_at'])
+      #     refresh_token(google_hash)
+      #   end
+      # end
+
       if Rails.configuration.autotune.verify_omniauth &&
          Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
         roles = Rails.configuration.autotune.verify_omniauth.call(auth_hash)
