@@ -207,6 +207,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.$( '#embed textarea' ).text( data );
         }).catch(function(error) {
           logger.error(error);
+          view.$('.nav-tabs a[href=#embed]').parent().addClass('disabled');
         })
       );
     }
