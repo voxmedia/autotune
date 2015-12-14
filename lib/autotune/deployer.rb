@@ -32,10 +32,21 @@ module Autotune
     def before_build(build_data, _env)
       if build_data['google_doc_url']
         spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
-        cur_user = User.find(project.meta['current_user']['id'])
-        token = cur_user.authorizations.find_by!(:provider => 'google_oauth2').credentials['token']
+        cur_user = User.find(project.meta['current_user'])
+        current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
 
-        google_session = GoogleDrive.login_with_oauth(token)
+        client = Google::APIClient.new
+        auth = client.authorization
+        auth.client_id = ENV["GOOGLE_CLIENT_ID"]
+        auth.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
+        auth.scope =
+            "https://www.googleapis.com/auth/drive " +
+            "https://spreadsheets.google.com/feeds/"
+        # auth.redirect_uri = "http://example.com/redirect"
+        auth.refresh_token = current_auth.credentials['refresh_token']
+        auth.fetch_access_token!
+
+        google_session = GoogleDrive.login_with_oauth(auth.access_token)
         spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
         export_path = File.join(project.working_dir, 'data/'+spread_sheet.title+'.xls').to_s
         spread_sheet.export_as_file(export_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

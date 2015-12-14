@@ -139,7 +139,7 @@ module Autotune
     def update
       @project = instance
       @project.user = current_user if @project.user.nil?
-      @project.meta['current_user'] = current_user
+      @project.meta['current_user'] = current_user.id
       @project.attributes = select_from_post :title, :slug, :data
 
       if request.POST.key? 'theme'
