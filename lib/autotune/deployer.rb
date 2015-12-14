@@ -42,7 +42,7 @@ module Autotune
 
         new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
         project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
-        build_data['google_doc_url'] = project.data['google_data']
+        build_data['google_doc_data'] = project.data['google_data']
       end
 
       build_data['base_url'] = project_url
