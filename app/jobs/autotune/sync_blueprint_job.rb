@@ -65,7 +65,7 @@ module Autotune
         sample_data.delete('asset_base_url')
 
         themes.each do |theme|
-          slug = [blueprint.slug, blueprint.version, theme].join('-')
+          slug = [blueprint.version, theme].join('-')
           # Use this as dummy build data for the moment
           build_data = sample_data.merge(
             'title' => blueprint.title,

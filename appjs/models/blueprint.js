@@ -78,6 +78,40 @@ var Blueprint = Backbone.Model.extend({
       type: 'GET',
       url: this.url() + '/update_repo'
     });
+  },
+
+  /**
+   * Get the url for one of the built projects (preview or publish).
+   * @param {string} type - Type of the url (preview, publish)
+   * @param {string} preferredProto - Protocol to use if possible (http, https)
+   * @param {string} path - include this path in the URL
+   * @returns {string} url
+   **/
+  getMediaUrl: function(path) {
+    if ( !this.has('media_url') ) { return ''; }
+
+    var preferredProto = window.location.protocol.replace( ':', '' ),
+        base = this.get('media_url');
+
+    if ( base.match(/^\/\//) && preferredProto !== '' ) {
+      base = preferredProto + ':' + base;
+    }
+
+    if ( !path ) { return base; }
+
+    if ( base.substr(-1) === '/' ) {
+      if ( path[0] === '/' ) {
+        return base + path.substr(1);
+      } else {
+        return base + path;
+      }
+    } else {
+      if ( path[0] === '/' ) {
+        return base + path;
+      } else {
+        return base + '/' + path;
+      }
+    }
   }
 });
 
