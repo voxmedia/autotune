@@ -47,52 +47,49 @@ module Autotune
 
       # Stash the thumbnail
       if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
-        deployer = Autotune.new_deployer(:media, blueprint)
-        deployer.deploy_file(
+        blueprint.deployer(:media).deploy_file(
           blueprint.working_dir,
           blueprint.config['thumbnail'])
       end
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
 
-        if ! blueprint.config['themes'].present?
-          blueprint.config['themes'] = Autotune.config.themes.keys
+        if blueprint.config['themes'].blank?
+          themes = Autotune.config.themes.keys
+        else
+          themes = blueprint.config['themes']
         end
 
-        blueprint.config['themes'].each do |theme|
-          blueprint.status = theme
-          project_demo = blueprint.deep_dup
-          project_demo['slug'] = [blueprint.slug, blueprint.version, theme].join('/')
-          # Use this as dummy build data for the moment
-          build_data = repo.read(blueprint.config['sample_data'])
-          build_data.delete('base_url')
-          build_data.update(
-            'title' => project_demo.title,
-            'slug' => project_demo.slug,
-            'theme' => theme)
+        sample_data = repo.read(blueprint.config['sample_data'])
+        sample_data.delete('base_url')
+        sample_data.delete('asset_base_url')
 
-            # 'slug' => 'custom-' + blueprint.slug + '-' + blueprint.version,
+        themes.each do |theme|
+          slug = [blueprint.slug, blueprint.version, theme].join('-')
+          # Use this as dummy build data for the moment
+          build_data = sample_data.merge(
+            'title' => blueprint.title,
+            'slug' => slug,
+            'theme' => theme)
 
           # Get the deployer object
           # probably don't want this to always be preview
-          out = StringIO.new
-          outlogger = Logger.new out
           deployer = Autotune.new_deployer(
-            :preview, project_demo, :logger => outlogger)
+            :media, blueprint, :slug => slug)
 
           # Run the before build deployer hook
           deployer.before_build(build_data, repo.env)
 
           # Run the build
           repo.working_dir do
-            outlogger.info(repo.cmd(
-              BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+            repo.cmd(
+              BLUEPRINT_BUILD_COMMAND,
+              :stdin_data => build_data.to_json)
           end
 
           # Upload build
           deployer.deploy(blueprint.full_deploy_dir)
         end
-
       end
 
       # Blueprint is now ready for testing
@@ -101,13 +98,13 @@ module Autotune
       elsif blueprint.status != 'ready'
         blueprint.status = 'testing'
       end
-      blueprint.save!
-
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
-      blueprint.update!(:status => 'broken')
+      blueprint.status = 'broken'
       raise
+    ensure
+      blueprint.save!
     end
   end
 end
