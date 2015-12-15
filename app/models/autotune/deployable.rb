@@ -30,7 +30,7 @@ module Autotune
     private
 
     def delete_renamed_files
-      return if !slug_changed? || slug_was.nil?
+      return if !slug_changed? || slug_was.nil? || slug == slug_was
       old_data = as_json.merge(changed_attributes)
       DeleteDeployedFilesJob.perform_later(
         self.class.name, old_data.to_json, :renamed => true)

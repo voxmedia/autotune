@@ -8,7 +8,7 @@ require 'json'
 module Autotune
   # Autotune blueprint base deployer
   class Deployer
-    attr_accessor :base_url, :connect, :project
+    attr_accessor :base_url, :connect, :project, :slug
     attr_writer :logger
 
     # Create a new deployer
@@ -70,11 +70,6 @@ module Autotune
       raise NotImplementedError
     end
 
-    # Hook to do stuff after a project is deleted
-    def delete!
-      raise NotImplementedError
-    end
-
     # Hook to do stuff after a project is moved (slug changed)
     def move!
       raise NotImplementedError
@@ -94,7 +89,7 @@ module Autotune
     end
 
     def deploy_path
-      [parts.path, project.slug].join('/')
+      [parts.path, slug || project.slug].join('/')
     end
 
     def old_deploy_path
@@ -102,11 +97,11 @@ module Autotune
     end
 
     def project_url
-      [base_url, project.slug].join('/')
+      [base_url, slug || project.slug].join('/')
     end
 
     def project_asset_url
-      asset = [try(:asset_base_url) || base_url, project.slug].join('/')
+      [try(:asset_base_url) || base_url, slug || project.slug].join('/')
     end
 
     def logger

@@ -152,6 +152,31 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Get the data to populate the alpaca form.
+   * @returns {object} Data for Alpaca
+   **/
+  getErrorMsg: function() {
+    if ( this.has('error_message') ) {
+      var msg = this.get('error_message');
+      var fmt = function(o) {
+        if ( _.isArray(o) ) {
+          return o.map(fmt).join(', ');
+        } else if ( _.isObject(o) ) {
+          return Object.keys(o).reduce(function(m, k) {
+            var str = fmt(k) + ': ' + fmt(o[k]);
+            if ( m.length > 0 ) { return m + ', ' + str; }
+            else { return str; }
+          }, '');
+        } else {
+          return o;
+        }
+      };
+
+      return fmt(msg);
+    }
+  },
+
+  /**
    * Get the blueprint config.
    * @returns {object} The blueprint config
    **/

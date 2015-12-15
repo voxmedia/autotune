@@ -140,7 +140,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       var slug = view.model.blueprint.get('slug'),
           bp_version = view.model.get('blueprint_version') || view.model.blueprint.get('version');
 
-      var preview_url = ['//test.apps.voxmedia.com/at-preview', slug, bp_version, theme, 'preview/'].join('/');
+      var preview_url = '//test.apps.voxmedia.com/at-media/' + [slug, bp_version, theme].join('-') + '/';
       if ( ! view.model.hasInitialBuild() && ! view.copyProject){
         preview_url += '#new';
       }
@@ -207,6 +207,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.$( '#embed textarea' ).text( data );
         }).catch(function(error) {
           logger.error(error);
+          view.$('.nav-tabs a[href=#embed]').parent().addClass('disabled');
         })
       );
     }
