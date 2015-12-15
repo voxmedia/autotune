@@ -140,7 +140,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       var slug = view.model.blueprint.get('slug'),
           bp_version = view.model.get('blueprint_version') || view.model.blueprint.get('version');
 
-      var preview_url = '//test.apps.voxmedia.com/at-media/' + [slug, bp_version, theme].join('-') + '/';
+      var preview_url = '//test.apps.voxmedia.com/at-media/' + [slug, bp_version, theme].join('-') + '/preview/';
+      logger.debug(preview_url);
       if ( ! view.model.hasInitialBuild() && ! view.copyProject){
         preview_url += '#new';
       }
@@ -149,6 +150,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       if ( view.copyProject || view.model.hasInitialBuild() ){
         pymParent = new pym.Parent(slug+'__graphic', preview_url);
         pymParent.onMessage('childLoaded', function() {
+          logger.debug('childLoaded');
           pymParent.sendMessage('updateData', JSON.stringify(buildData));
         });
       } else {
