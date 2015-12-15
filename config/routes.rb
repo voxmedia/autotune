@@ -22,6 +22,9 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/build_and_publish',
       :to => 'projects#build_and_publish',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  get 'projects/:id/dummy_method_here',
+      :to => 'projects#dummy_method_here',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   get 'projects/:id/duplicate',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
@@ -86,11 +89,6 @@ Autotune::Engine.routes.draw do
   get '/auth/failure'              => 'sessions#failure'
   get '/logout'                    => 'sessions#destroy', :as => :logout
   get '/login'                     => 'sessions#new',     :as => :login
-
-  # get '/google_login' => 'documents#google_drive_login'
-  # get '/oauth2callback' => 'documents#set_google_drive_token'
-  # get '/list_google_doc'  => 'documents#list_google_docs', :as => :list_google_doc #for listing the google docs
-  # get '/download_google_doc'  => 'documents#download_google_docs', :as => :download_google_doc #download
 
   resque_web_constraint = lambda do |request|
     current_user = Autotune::User.find_by_api_key(
