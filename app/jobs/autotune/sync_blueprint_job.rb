@@ -65,7 +65,7 @@ module Autotune
         sample_data.delete('asset_base_url')
 
         themes.each do |theme|
-          slug = [blueprint.slug, blueprint.version, theme].join('-')
+          slug = [blueprint.version, theme].join('-')
           # Use this as dummy build data for the moment
           build_data = sample_data.merge(
             'title' => blueprint.title,
@@ -75,7 +75,7 @@ module Autotune
           # Get the deployer object
           # probably don't want this to always be preview
           deployer = Autotune.new_deployer(
-            :media, blueprint, :slug => slug)
+            :media, blueprint, :extra_slug => slug)
 
           # Run the before build deployer hook
           deployer.before_build(build_data, repo.env)

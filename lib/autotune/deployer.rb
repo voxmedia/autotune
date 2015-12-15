@@ -8,7 +8,7 @@ require 'json'
 module Autotune
   # Autotune blueprint base deployer
   class Deployer
-    attr_accessor :base_url, :connect, :project, :slug
+    attr_accessor :base_url, :connect, :project, :extra_slug
     attr_writer :logger
 
     # Create a new deployer
@@ -89,7 +89,7 @@ module Autotune
     end
 
     def deploy_path
-      [parts.path, slug || project.slug].join('/')
+      [parts.path, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def old_deploy_path
@@ -97,11 +97,11 @@ module Autotune
     end
 
     def project_url
-      [base_url, slug || project.slug].join('/')
+      [base_url, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def project_asset_url
-      [try(:asset_base_url) || base_url, slug || project.slug].join('/')
+      [try(:asset_base_url) || base_url, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def logger

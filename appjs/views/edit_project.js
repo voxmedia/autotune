@@ -9,11 +9,7 @@ var $ = require('jquery'),
     BaseView = require('./base_view'),
     ace = require('brace'),
     pym = require('pym.js'),
-    slugify = require("underscore.string/slugify"),
-    pymParent,
-    pymParentNew,
-    data,
-    theme;
+    slugify = require("underscore.string/slugify");
 
 require('brace/mode/json');
 require('brace/theme/textmate');
@@ -31,21 +27,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: function(e){
-    var $form = this.$('#projectForm'),
-        previewFrame;
-
-    if( this.model.copyProject || this.model.hasInitialBuild() ){
-      previewFrame = pymParent;
-    } else {
-      previewFrame = pymParentNew;
-    }
+    var $form = this.$('#projectForm');
 
     if ( this.model.blueprint.hasPreviewType('live') ){
-      data = $form.alpaca('get').getValue();
+      var data = $form.alpaca('get').getValue();
       logger.debug('!!!!! form values', data);
 
-      if(data.theme !== theme){
-        theme = data.theme;
+      if(data.theme !== this.theme){
+        this.theme = data.theme;
         var vals = {
           title: data['title'],
           theme: data['theme'],
@@ -56,7 +45,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         this.model.set(vals);
         this.render();
       }
-      previewFrame.sendMessage('updateData', JSON.stringify(data));
+      this.pym.sendMessage('updateData', JSON.stringify(data));
     }
   },
 
@@ -133,44 +122,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterRender: function() {
-    var view = this, promises = [], buildData = view.model.buildData();
-
-    if ( view.model.blueprint.hasPreviewType('live') ){
-      theme = view.model.get('theme') || 'custom';
-      var slug = view.model.blueprint.get('slug'),
-          bp_version = view.model.get('blueprint_version') || view.model.blueprint.get('version');
-
-      var preview_url = '//test.apps.voxmedia.com/at-media/' + [slug, bp_version, theme].join('-') + '/';
-      if ( ! view.model.hasInitialBuild() && ! view.copyProject){
-        preview_url += '#new';
-      }
-
-      var temp_slug = slug;
-      if ( view.copyProject || view.model.hasInitialBuild() ){
-        pymParent = new pym.Parent(slug+'__graphic', preview_url);
-        pymParent.onMessage('childLoaded', function() {
-          pymParent.sendMessage('updateData', JSON.stringify(buildData));
-        });
-      } else {
-        pymParentNew = new pym.Parent(temp_slug+'__graphic', preview_url);
-        var uniqBuildVals = _.uniq(_.values(buildData));
-
-        if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
-          pymParentNew.onMessage('childLoaded', function() {
-            pymParentNew.sendMessage('updateData', JSON.stringify(buildData));
-          });
-        }
-
-      }
-    } else {
-      if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
-        var previewLink = view.model.get('preview_url');
-        if(view.model['_previousAttributes']['preview_url'] && view.model['_previousAttributes']['preview_url'] !==  view.model.get('preview_url')){
-          previewLink = view.model['_previousAttributes']['preview_url'];
-        }
-        pymParent = new pym.Parent(view.model.get('slug')+'__graphic', previewLink);
-      }
-    }
+    var view = this, promises = [];
 
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
@@ -196,6 +148,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       });
     }
 
+    // load the embed code
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           embedUrl = this.model.getPublishUrl(proto, 'embed.txt');
@@ -212,12 +165,54 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       );
     }
 
+    // render the alpaca form
     promises.push( new Promise( function(resolve, reject) {
       view.renderForm(resolve, reject);
     } ) );
 
     return Promise.all(promises)
       .then(function() {
+        var formData = view.alpaca.getValue(),
+            buildData = view.model.buildData();
+
+        if ( view.model.blueprint.hasPreviewType('live') ){
+          view.theme = view.model.get('theme') || formData['theme'] || 'custom';
+
+          var slug = view.model.blueprint.get('slug'),
+              bp_version = view.model.getVersion(),
+              preview_url = view.model.blueprint.getMediaUrl(
+                [bp_version, view.theme].join('-') + '/preview');
+
+          if ( ! view.model.hasInitialBuild() && ! view.copyProject){
+            preview_url += '#new';
+          }
+
+          var childLoaded = function() {
+            view.pym.sendMessage('updateData', JSON.stringify(buildData));
+          };
+
+          if ( view.copyProject || view.model.hasInitialBuild() ){
+            view.pym = new pym.Parent(slug+'__graphic', preview_url);
+            view.pym.iframe.onload = childLoaded;
+          } else {
+            var uniqBuildVals = _.uniq(_.values(buildData));
+            view.pym = new pym.Parent(slug+'__graphic', preview_url);
+
+            if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
+              view.pym.iframe.onload = childLoaded;
+            }
+          }
+
+        } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
+          var previewLink = view.model.get('preview_url');
+          if(view.model['_previousAttributes']['preview_url'] && view.model['_previousAttributes']['preview_url'] !==  view.model.get('preview_url')){
+            previewLink = view.model['_previousAttributes']['preview_url'];
+          }
+          view.pym = new pym.Parent(view.model.get('slug')+'__graphic', previewLink);
+        }
+      }).catch(function(err) {
+        console.error(err);
+      }).then(function() {
         view.listenForChanges();
       });
   },
