@@ -111,6 +111,7 @@ module Autotune
 
     def export_project_data
       puts 'project.rb export_project_data method'
+      pp self
     end
 
     def deploy_dir

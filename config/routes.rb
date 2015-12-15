@@ -22,8 +22,8 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/build_and_publish',
       :to => 'projects#build_and_publish',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  get 'projects/:id/dummy_method_here',
-      :to => 'projects#dummy_method_here',
+  get 'projects/:id/export_project_data',
+      :to => 'projects#export_project_data',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   get 'projects/:id/duplicate',
       :to => 'application#index',

@@ -170,6 +170,9 @@ module Autotune
     end
 
     def export_project_data
+      # instance.export_project_data
+      @project = instance
+      pp @project
       puts 'this is the project controller export_project_data method'
       render_accepted
     end
