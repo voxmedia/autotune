@@ -1,4 +1,5 @@
 require_dependency 'autotune/application_controller'
+require 'json'
 
 module Autotune
   # API for projects
@@ -169,12 +170,27 @@ module Autotune
       end
     end
 
-    def export_project_data
+    def update_project_data
+      puts 'def update project data'
       # instance.export_project_data
       @project = instance
-      pp @project
-      puts 'this is the project controller export_project_data method'
-      render_accepted
+
+      # Add a few extras to the build data
+      # This will respond to whatever the data that's being posted is
+      # post comes from js somewhere
+      @build_data = request.POST
+      @parsed_build_data = JSON.parse(@build_data.keys[0])
+      # @build_data.update(
+      #   'title' => @project.title,
+      #   'slug' => @project.slug,
+      #   'theme' => @project.theme.value)
+
+      # Get the deployer object
+      deployer = @project.deployer(:preview)
+
+      # Run the before build deployer hook
+      deployer.before_build(@parsed_build_data, {})
+      pp @parsed_build_data
     end
 
     def update_snapshot

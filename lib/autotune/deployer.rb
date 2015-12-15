@@ -8,7 +8,7 @@ require 'json'
 module Autotune
   # Autotune blueprint base deployer
   class Deployer
-    attr_accessor :base_url, :connect, :project, :slug
+    attr_accessor :base_url, :connect, :project, :extra_slug
     attr_writer :logger
 
     # Create a new deployer
@@ -53,9 +53,8 @@ module Autotune
         spread_sheet.export_as_file(export_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
         new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
-        project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
-        build_data['google_doc_data'] = project.data['google_data']
-        project.export_project_data
+        # project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
+        build_data['google_doc_data'] = new_doc.prepare_spreadsheet(export_path)
       end
 
       build_data['base_url'] = project_url
@@ -92,7 +91,7 @@ module Autotune
     end
 
     def deploy_path
-      [parts.path, slug || project.slug].join('/')
+      [parts.path, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def old_deploy_path
@@ -100,11 +99,11 @@ module Autotune
     end
 
     def project_url
-      [base_url, slug || project.slug].join('/')
+      [base_url, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def project_asset_url
-      [try(:asset_base_url) || base_url, slug || project.slug].join('/')
+      [try(:asset_base_url) || base_url, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def logger
