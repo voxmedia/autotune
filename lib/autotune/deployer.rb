@@ -46,6 +46,7 @@ module Autotune
         auth.refresh_token = current_auth.credentials['refresh_token']
         auth.fetch_access_token!
 
+        # swap this for more generic code so that we can drop GoogleDrive gem
         google_session = GoogleDrive.login_with_oauth(auth.access_token)
         spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
         export_path = File.join(project.working_dir, 'data/'+spread_sheet.title+'.xls').to_s
@@ -54,11 +55,13 @@ module Autotune
         new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
         project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
         build_data['google_doc_data'] = project.data['google_data']
+        project.export_project_data
       end
 
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
 
+      # make sure to only do this if a normal project, not a themed demo
       export_path_at = File.join(project.working_dir, 'data/autotune.json').to_s
       File.open(export_path_at, 'w') do |f|
         f.puts JSON.pretty_generate(build_data)

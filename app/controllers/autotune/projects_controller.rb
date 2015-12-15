@@ -169,6 +169,11 @@ module Autotune
       end
     end
 
+    def export_project_data
+      puts 'this is the project controller export_project_data method'
+      render_accepted
+    end
+
     def update_snapshot
       instance.update_snapshot
       render_accepted

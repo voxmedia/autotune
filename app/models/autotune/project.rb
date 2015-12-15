@@ -109,6 +109,10 @@ module Autotune
       raise
     end
 
+    def export_project_data
+      puts 'project.rb export_project_data method'
+    end
+
     def deploy_dir
       if blueprint_config.present? && blueprint_config['deploy_dir']
         blueprint_config['deploy_dir']
