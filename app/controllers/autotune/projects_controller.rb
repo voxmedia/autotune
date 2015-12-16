@@ -188,6 +188,9 @@ module Autotune
     end
 
     def watch_project_spreadsheet
+      # might actually make more sense to watch all of the changes in drive
+      # then if a change comes in, and we find a project with a matching spreadsheet,
+      # we tell the project to update the data
       @spreadsheet_change = request.POST
       puts 'SPREADSHEET CHANGE'
       pp @spreadsheet_change
@@ -208,8 +211,9 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(@parsed_build_data, {})
-      # pp @parsed_build_data
-      #
+
+      # All of this is very repetitive and I would prefer to not do it here and also
+      # in the deployer. Need to look at that.
       cur_user = User.find(@project.meta['current_user'])
       current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
 
@@ -225,19 +229,11 @@ module Autotune
       auth.fetch_access_token!
       drive_api = client.discovered_api('drive', 'v2')
 
-      # results = client.execute!(
-      #   :api_method => drive_api.files.list,
-      #   :parameters => { :maxResults => 10 })
-      # puts "Files:"
-      # puts "No files found" if results.data.items.empty?
-      # results.data.items.each do |file|
-      #   puts "#{file.title} (#{file.id})"
-      # end
-
+      # this doesn't work b/c you have to have a registered domain listed as a webhook
       channel_hash = {
         'id' => watch_id,
         'type' => 'web_hook',
-        'address' => "https://localhost:3000/projects/#{@parsed_build_data['slug']}/watch_project_spreadsheet"
+        'address' => "https://127.0.0.1:3000/projects/#{@parsed_build_data['slug']}/watch_project_spreadsheet"
       }
 
       result = client.execute(
@@ -249,19 +245,12 @@ module Autotune
       else
         puts "An error occurred: #{result.data['error']['message']}"
       end
-      #
-      # watch_change(client)
-
-
-      # pp channel
       # pp drive.files.watch({'fileId': spreadsheet_key, 'channel': channel})
-      # pp request
-
+      # watch_change(client)
     end
 
     # def watch_change(client, channel_id, channel_type, channel_address)
     def watch_change(client)
-      pp client
       drive = client.discovered_api('drive', 'v2')
       result = client.execute(
         :api_method => drive.changes.watch)
