@@ -25,7 +25,6 @@ module Autotune
 
     def self.create_from_auth_hash(auth_hash)
       roles = verify_auth_hash(auth_hash)
-      logger.debug "#{auth_hash}"
       return if roles.nil?
       a = Authorization.new(
         auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
