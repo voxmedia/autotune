@@ -31,6 +31,7 @@ module Autotune
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
       if build_data['google_doc_url']
+        # build_data['google_doc_url'] = build_data['google_doc_url'].match(/^.*(?=(#))/).to_s
         spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
         cur_user = User.find(project.meta['current_user'])
         current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')

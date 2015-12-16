@@ -1,5 +1,9 @@
 require_dependency 'autotune/application_controller'
 require 'json'
+require 'google_drive'
+require 'google/api_client'
+require 'oauth2'
+require 'autotune/google_docs'
 
 module Autotune
   # API for projects
@@ -172,25 +176,51 @@ module Autotune
 
     def update_project_data
       puts 'def update project data'
-      # instance.export_project_data
       @project = instance
-
-      # Add a few extras to the build data
-      # This will respond to whatever the data that's being posted is
-      # post comes from js somewhere
       @build_data = request.POST
+      # check activesupport json since this one isn't working correctly
       @parsed_build_data = JSON.parse(@build_data.keys[0])
-      # @build_data.update(
-      #   'title' => @project.title,
-      #   'slug' => @project.slug,
-      #   'theme' => @project.theme.value)
-
       # Get the deployer object
       deployer = @project.deployer(:preview)
 
       # Run the before build deployer hook
       deployer.before_build(@parsed_build_data, {})
       pp @parsed_build_data
+
+      cur_user = User.find(@project.meta['current_user'])
+      current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
+
+      client = Google::APIClient.new
+      auth = client.authorization
+      auth.client_id = ENV["GOOGLE_CLIENT_ID"]
+      auth.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
+      auth.scope =
+          "https://www.googleapis.com/auth/drive " +
+          "https://spreadsheets.google.com/feeds/"
+      # auth.redirect_uri = "http://example.com/redirect"
+      auth.refresh_token = current_auth.credentials['refresh_token']
+      auth.fetch_access_token!
+
+      pp client
+
+      watch_change(client)
+    end
+
+    # def watch_change(client, channel_id, channel_type, channel_address)
+    def watch_change(client)
+      pp client
+      drive = client.discovered_api('drive', 'v2')
+      result = client.execute(
+        :api_method => drive.changes.watch)
+        # ,
+        # :body_object => { 'id' => channel_id, 'type' => channel_type, 'address' => channel_address })
+      if result.status == 200
+        pp result
+        return result.data
+      else
+        pp result
+        puts "An error occurred: #{result.data['error']['message']}"
+      end
     end
 
     def update_snapshot

@@ -125,13 +125,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var view = this, promises = [];
 
     // as a test for triggering the update_project_data method
-    // $.ajax({
-    //   type: "POST",
-    //   url: window.location.href + "/update_project_data",
-    //   data: JSON.stringify(view.model.buildData()),
-    //   // success: success,
-    //   dataType: 'json'
-    // });
+    $.ajax({
+      type: "POST",
+      url: window.location.href + "/update_project_data",
+      data: JSON.stringify(view.model.buildData()),
+      // success: success,
+      dataType: 'json'
+    });
 
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
@@ -438,6 +438,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         return {};
       }
     }
+
+    // need some way of stripping '#gid' so that it doesn't mess up the parsing of the 
+    // json into a hash later on
+    // if(data['google_doc_url'].match(/#gid/)){
+    //   data['google_doc_url'] = data['google_doc_url'].split('#gid')[0];
+    // }
 
     var vals = {
       title: data['title'],
