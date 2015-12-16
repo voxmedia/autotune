@@ -7,8 +7,6 @@ module Autotune
     serialize :meta, JSON
 
     validates :api_key, :presence => true, :uniqueness => true
-    validates :email,
-              :uniqueness => { :case_sensitive => false }
     after_initialize :defaults
 
     def self.generate_api_key
