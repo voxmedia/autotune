@@ -2,6 +2,10 @@ require_dependency 'autotune/application_controller'
 require 'json'
 require 'google_drive'
 require 'google/api_client'
+require 'google/api_client/auth/installed_app'
+require 'google/api_client/auth/storage'
+require 'google/api_client/auth/storages/file_store'
+require 'fileutils'
 require 'oauth2'
 require 'autotune/google_docs'
 
@@ -174,23 +178,42 @@ module Autotune
       end
     end
 
+    def set_file(file_id)
+      watchId = 'id-'+file_id+'-'+Time.now.to_s
+      uri = URI.parse("https://www.googleapis.com/drive/v2/files/#{file_id}/watch")
+      http = Net::HTTP.new(uri.host, uri.port)
+
+      request = Net::HTTP::Post.new(uri.request_uri)
+      pp request
+    end
+
+    def watch_project_spreadsheet
+      @spreadsheet_change = request.POST
+      puts 'SPREADSHEET CHANGE'
+      pp @spreadsheet_change
+    end
+
     def update_project_data
       puts 'def update project data'
       @project = instance
       @build_data = request.POST
       # check activesupport json since this one isn't working correctly
       @parsed_build_data = JSON.parse(@build_data.keys[0])
+      spreadsheet_key = @parsed_build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+
+      watch_id = 'id-'+spreadsheet_key+'-'+Time.now.to_s.gsub(' ', '')
+      # set_file(spreadsheet_key)
       # Get the deployer object
       deployer = @project.deployer(:preview)
 
       # Run the before build deployer hook
       deployer.before_build(@parsed_build_data, {})
-      pp @parsed_build_data
-
+      # pp @parsed_build_data
+      #
       cur_user = User.find(@project.meta['current_user'])
       current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
 
-      client = Google::APIClient.new
+      client = Google::APIClient.new(:application_name => 'Vox Autotune Local')
       auth = client.authorization
       auth.client_id = ENV["GOOGLE_CLIENT_ID"]
       auth.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
@@ -200,10 +223,40 @@ module Autotune
       # auth.redirect_uri = "http://example.com/redirect"
       auth.refresh_token = current_auth.credentials['refresh_token']
       auth.fetch_access_token!
+      drive_api = client.discovered_api('drive', 'v2')
 
-      pp client
+      # results = client.execute!(
+      #   :api_method => drive_api.files.list,
+      #   :parameters => { :maxResults => 10 })
+      # puts "Files:"
+      # puts "No files found" if results.data.items.empty?
+      # results.data.items.each do |file|
+      #   puts "#{file.title} (#{file.id})"
+      # end
 
-      watch_change(client)
+      channel_hash = {
+        'id' => watch_id,
+        'type' => 'web_hook',
+        'address' => "https://localhost:3000/projects/#{@parsed_build_data['slug']}/watch_project_spreadsheet"
+      }
+
+      result = client.execute(
+        :api_method => drive_api.files.watch,
+        :body_object => channel_hash,
+        :parameters => { 'fileId' => spreadsheet_key })
+      if result.status == 200
+        return result.data
+      else
+        puts "An error occurred: #{result.data['error']['message']}"
+      end
+      #
+      # watch_change(client)
+
+
+      # pp channel
+      # pp drive.files.watch({'fileId': spreadsheet_key, 'channel': channel})
+      # pp request
+
     end
 
     # def watch_change(client, channel_id, channel_type, channel_address)

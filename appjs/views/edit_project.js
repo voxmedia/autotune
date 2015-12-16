@@ -439,7 +439,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     }
 
-    // need some way of stripping '#gid' so that it doesn't mess up the parsing of the 
+    // need some way of stripping '#gid' so that it doesn't mess up the parsing of the
     // json into a hash later on
     // if(data['google_doc_url'].match(/#gid/)){
     //   data['google_doc_url'] = data['google_doc_url'].split('#gid')[0];
