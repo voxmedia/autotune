@@ -2,6 +2,7 @@
 
 var Backbone = require('backbone'),
     _ = require('underscore'),
+    utils = require('../utils'),
     ProjectCollection = require('./project_collection');
 
 var Blueprint = Backbone.Model.extend({
@@ -90,28 +91,7 @@ var Blueprint = Backbone.Model.extend({
   getMediaUrl: function(path) {
     if ( !this.has('media_url') ) { return ''; }
 
-    var preferredProto = window.location.protocol.replace( ':', '' ),
-        base = this.get('media_url');
-
-    if ( base.match(/^\/\//) && preferredProto !== '' ) {
-      base = preferredProto + ':' + base;
-    }
-
-    if ( !path ) { return base; }
-
-    if ( base.substr(-1) === '/' ) {
-      if ( path[0] === '/' ) {
-        return base + path.substr(1);
-      } else {
-        return base + path;
-      }
-    } else {
-      if ( path[0] === '/' ) {
-        return base + path;
-      } else {
-        return base + '/' + path;
-      }
-    }
+    return utils.buildUrl( this.get('media_url'), path );
   }
 });
 
