@@ -408,6 +408,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         opts.view = form_config.view;
       }
 
+      if(!this.model.isNew() || this.copyProject) {
+        opts.data = this.model.formData();
+        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
+          opts.data.theme = pluckAttr(themes, 'value')[0];
+        }
+      }
+
       $form.alpaca(opts);
     }
   },

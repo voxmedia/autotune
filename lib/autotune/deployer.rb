@@ -1,8 +1,14 @@
 require 'uri'
-require 'google_drive'
-require 'google/api_client'
-require 'oauth2'
+# require 'google_drive'
+# require 'google/api_client'
+# require 'oauth2'
 require 'autotune/google_docs'
+require 'google/api_client'
+require 'google/api_client/client_secrets'
+require 'google/api_client/auth/installed_app'
+require 'google/api_client/auth/storage'
+require 'google/api_client/auth/storages/file_store'
+require 'fileutils'
 require 'json'
 
 module Autotune
@@ -47,15 +53,35 @@ module Autotune
         auth.refresh_token = current_auth.credentials['refresh_token']
         auth.fetch_access_token!
 
-        # swap this for more generic code so that we can drop GoogleDrive gem
-        google_session = GoogleDrive.login_with_oauth(auth.access_token)
-        spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
-        export_path = File.join(project.working_dir, 'data/'+spread_sheet.title+'.xls').to_s
-        spread_sheet.export_as_file(export_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        drive = client.discovered_api('drive', 'v2')
+        visibility = :private
 
-        new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
-        # project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
-        build_data['google_doc_data'] = new_doc.prepare_spreadsheet(export_path)
+        # if title.nil?
+        copied_file = drive.files.copy.request_schema.new
+        # else
+        #   copied_file = drive.files.copy.request_schema.new('title' => title)
+        # end
+        cp_resp = client.execute(
+          api_method: drive.files.copy,
+          body_object: copied_file,
+          parameters: { fileId: spreadsheet_key, visibility: visibility.to_s.upcase })
+
+        if cp_resp.error?
+          fail CreateError, cp_resp.error_message
+        else
+          puts cp_resp.data['id'], cp_resp.data['alternateLink']
+          return { id: cp_resp.data['id'], url: cp_resp.data['alternateLink'] }
+        end
+
+        # swap this for more generic code so that we can drop GoogleDrive gem
+        # google_session = GoogleDrive.login_with_oauth(auth.access_token)
+        # spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
+        # export_path = File.join(project.working_dir, 'data/'+spread_sheet.title+'.xls').to_s
+        # spread_sheet.export_as_file(export_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        #
+        # new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
+        # # project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
+        # build_data['google_doc_data'] = new_doc.prepare_spreadsheet(export_path)
       end
 
       build_data['base_url'] = project_url
