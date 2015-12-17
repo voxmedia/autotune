@@ -237,7 +237,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         orig_this = this,
-        form_config, config_themes, newProject, populateForm = false;
+        form_config, config_themes, newProject;
 
     if ( this.disableForm ) {
       $form.append(
@@ -406,18 +406,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         opts.view = form_config.view;
       }
 
-      if(!this.model.isNew() || this.copyProject) {
-        populateForm = true;
-      } else if (this.model.isNew() && !this.copyProject && !this.hasInitialBuild){
-        populateForm = true;
-      }
-
-      if(populateForm){
-        opts.data = this.model.formData();
-        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
-          opts.data.theme = pluckAttr(themes, 'value')[0];
-        }
-      }
       $form.alpaca(opts);
     }
   },
