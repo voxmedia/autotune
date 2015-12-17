@@ -124,14 +124,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    // as a test for triggering the update_project_data method
-    $.ajax({
-      type: "POST",
-      url: window.location.href + "/update_project_data",
-      data: JSON.stringify(view.model.buildData()),
-      // success: success,
-      dataType: 'json'
-    });
+    // // as a test for triggering the update_project_data method
+    // $.ajax({
+    //   type: "POST",
+    //   url: window.location.href + "/update_project_data",
+    //   data: JSON.stringify(view.model.buildData()),
+    //   // success: success,
+    //   dataType: 'json'
+    // });
 
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
@@ -239,7 +239,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         orig_this = this,
-        form_config, config_themes, newProject, populateForm = false;
+        form_config, config_themes, newProject;
 
     if ( this.disableForm ) {
       $form.append(
@@ -408,18 +408,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         opts.view = form_config.view;
       }
 
-      if(!this.model.isNew() || this.copyProject) {
-        populateForm = true;
-      } else if (this.model.isNew() && !this.copyProject && !this.hasInitialBuild){
-        populateForm = true;
-      }
-
-      if(populateForm){
-        opts.data = this.model.formData();
-        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
-          opts.data.theme = pluckAttr(themes, 'value')[0];
-        }
-      }
       $form.alpaca(opts);
     }
   },
@@ -438,12 +426,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         return {};
       }
     }
-
-    // need some way of stripping '#gid' so that it doesn't mess up the parsing of the
-    // json into a hash later on
-    // if(data['google_doc_url'].match(/#gid/)){
-    //   data['google_doc_url'] = data['google_doc_url'].split('#gid')[0];
-    // }
 
     var vals = {
       title: data['title'],
