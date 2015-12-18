@@ -2,15 +2,14 @@
   margin-bottom: 0;
   border: none;
 }
-.navbar-header {
+.navbar-header .navbar-text {
   float: left;
-  height: $navbar-height;
+  margin:16px;
 }
 .navbar-brand {
   font-weight: bold;
   font-size: 32px;
   padding: 18px 15px;
-  height: $navbar-height;
   line-height: 1;
 
   img {
@@ -18,6 +17,7 @@
     margin-right: 10px;
   }
   @media (max-width: $grid-float-breakpoint-max) {
+    margin-left:10px;
     img {
       display: none;
     }
@@ -31,9 +31,10 @@
 }
 .navbar-nav {
   > li > a {
-    padding: 31px 0 11px 0;
+    padding: 26px 0 11px 0;
     margin-left: 10px;
     margin-right: 10px;
+    margin-bottom: -5px;
     text-transform: uppercase;
     letter-spacing: 1px;
     position: relative;
@@ -46,12 +47,11 @@
       right: 0;
       height: 5px;
       width: 0;
-      //transition: width ease-in-out 0.3s;
-      //-webkit-transition: width ease-in-out 0.3s;
+      transition: width ease-in-out 0.3s;
+      -webkit-transition: width ease-in-out 0.3s;
     }
     &:hover:after {
       width: 100%;
-      background-color: darken($primary, 10%);
     }
   }
 
@@ -65,11 +65,30 @@
   > .open a:hover:after {
     width: 0;
   }
-  
+
   @media (max-width: $grid-float-breakpoint-max) {
-    > li > a:hover:after {
-      width: 0;
+    > li.active {
+      background-color:$component-active-bg;
     }
+    > li.active > a {
+      background-color:$component-active-bg;
+      color:$component-active-color;
+    }
+    > li > a {
+      margin:0 20px;
+      padding:10px;
+    }
+    > .active a:after,
+    > .active a:hover:after,
+    > li > a:after,
+    > li > a:hover:after {
+      display:none;
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    > li { width:50%; text-align:center; }
+    > li > a { width:100%; }
   }
 }
 
@@ -158,4 +177,13 @@
   .dropdown-menu {
     margin-top: 0;
   }
+}
+
+.navbar-toggle {
+  margin-top:8px;
+  margin-bottom:8px;
+}
+
+.navbar-collapse.in {
+  overflow-y: visible;
 }

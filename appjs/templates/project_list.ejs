@@ -1,29 +1,28 @@
-<div class="row m-page-heading">
-  <div class="col-xs-12 col-sm-6">
-    <h3>Projects</h3>
-  </div>
-  <div class="col-xs-12 col-sm-6 text-right">
-    <form class="form-inline" method="get" action="/projects">
-      <div class="form-group">
-        <label class="sr-only" for="search">Search query</label>
-        <div class="btn-group">
-          <input type="text" class="form-control"
-                 name="search" id="search" placeholder="Search"
-                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-        <% if(query.search) { %>
-          <a href="/projects">clear</a>
-        <% } %>
+<div class="m-page-heading">
+    <div class="pull-right">
+      <form class="form-inline" method="get" action="/projects">
+        <div class="form-group">
+          <label class="sr-only" for="search">Search query</label>
+          <div class="btn-group">
+            <input type="text" class="form-control"
+                   name="search" id="search" placeholder="Search"
+                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          <% if(query.search) { %>
+            <a href="/projects">clear</a>
+          <% } %>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
+    <h3>Projects</h3>
   </div>
 </div>
 <table class="table projects">
   <thead>
     <tr>
       <td>
-        <a id="new-project" class="btn btn-primary btn-xs"
-       href="/projects/new">New project</a>
+        <a id="new-project" class="btn btn-primary"
+           href="/projects/new">New project</a>
       </td>
       <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
