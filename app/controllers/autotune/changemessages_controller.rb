@@ -20,6 +20,7 @@ module Autotune
         Autotune.redis_sub.subscribe('blueprint', 'project') do |on|
           on.message do |channel, msg|
             msg_obj = JSON.parse(msg)
+            pp msg_obj
             msg_obj['type'] = channel
             sse.write(msg_obj, :event => 'change')
           end

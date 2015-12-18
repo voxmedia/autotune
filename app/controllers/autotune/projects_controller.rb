@@ -1,4 +1,6 @@
 require_dependency 'autotune/application_controller'
+require 'autotune/google_docs'
+require 'redis'
 require 'json'
 
 module Autotune
@@ -170,9 +172,15 @@ module Autotune
       end
     end
 
+    def get_update_project_data
+      @build_data = instance.data
+      # coming through as a get request but not returning anything
+    end
+
     def update_project_data
-      puts 'def update project data'
+      puts 'update project data'
       @project = instance
+      # if request.POST
       @build_data = request.POST
       # check activesupport json since this one isn't working correctly
       @parsed_build_data = JSON.parse(@build_data.keys[0])
@@ -204,6 +212,12 @@ module Autotune
       # end
       # pp drive.files.watch({'fileId': spreadsheet_key, 'channel': channel})
       # watch_change(client)
+      msg = { :id => @project.id,
+              :updatedData => 'updatedData' }
+      Autotune.redis.publish 'project', msg.to_json
+      # end
+      # @build_data = @project.data
+      # render json: @build_data
     end
 
     def update_snapshot

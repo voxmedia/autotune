@@ -26,6 +26,9 @@ Autotune::Engine.routes.draw do
       :to => 'projects#update_project_data',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
       :via => [:get, :post]
+  get 'projects/:id/get_update_project_data',
+      :to => 'projects#get_update_project_data',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   match 'projects/:id/watch_project_spreadsheet',
       :to => 'projects#watch_project_spreadsheet',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },

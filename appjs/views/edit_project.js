@@ -23,7 +23,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   events: {
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
-    'click #savePreview': 'savePreview'
+    'click #savePreview': 'savePreview',
+    'keyup': 'triggerDataUpdate'
+  },
+
+  triggerDataUpdate: function(e){
+    if(e.keyCode === 220){
+      // // as a test for triggering the update_project_data method
+      $.ajax({
+        type: "POST",
+        url: window.location.href + "/update_project_data",
+        data: JSON.stringify(this.model.buildData()),
+        // success: success,
+        dataType: 'json'
+      });
+    }
   },
 
   pollChange: function(e){
@@ -69,6 +83,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   listenForChanges: function() {
+    // only works after second, separte time
+    this.listenTo(this.app.listener,
+                  'change:project:' + this.model.id,
+                  this.updatedData, this);
     if ( !this.model.isNew() && !this.listening ) {
       this.listenTo(this.app.listener,
                     'change:project:' + this.model.id,
@@ -80,6 +98,16 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   stopListeningForChanges: function() {
     this.stopListening(this.app.listener);
     this.listening = false;
+  },
+
+  updatedData: function(opts){
+    logger.debug('updatedData ------', this.model.buildData());
+    var result = $.ajax({
+      type: "GET",
+      url: window.location.href + "/get_update_project_data",
+      dataType: 'json'
+    });
+    logger.debug(result);
   },
 
   updateStatus: function(status) {
@@ -123,15 +151,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
-
-    // // as a test for triggering the update_project_data method
-    // $.ajax({
-    //   type: "POST",
-    //   url: window.location.href + "/update_project_data",
-    //   data: JSON.stringify(view.model.buildData()),
-    //   // success: success,
-    //   dataType: 'json'
-    // });
 
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
