@@ -1,13 +1,5 @@
 require_dependency 'autotune/application_controller'
 require 'json'
-require 'google_drive'
-require 'google/api_client'
-require 'google/api_client/auth/installed_app'
-require 'google/api_client/auth/storage'
-require 'google/api_client/auth/storages/file_store'
-require 'fileutils'
-require 'oauth2'
-require 'autotune/google_docs'
 
 module Autotune
   # API for projects
