@@ -1,0 +1,34 @@
+//tables
+caption {
+  margin-bottom:5px;
+}
+
+th { font-weight: normal; }
+
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > thead > tr {
+  color: $navbar-inverse-color;
+  background-color: $navbar-inverse-bg;
+}
+
+.table > thead > tr > th { border-width:0; }
+.table > tbody > tr:first-child {
+  td,
+  th { border-width:0; }
+}
+.table > thead > tr > th {
+  padding-top: $table-condensed-cell-padding;
+  padding-bottom: $table-condensed-cell-padding;
+}
+
+.table-striped {
+  > thead > tr > th,
+  > thead > tr > td,
+  > tbody > tr > th,
+  > tbody > tr > td,
+  > tfoot > tr > th,
+  > tfoot > tr > td { border-width:0; }
+}

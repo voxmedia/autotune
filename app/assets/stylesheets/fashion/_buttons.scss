@@ -1,0 +1,41 @@
+//buttons
+.btn {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-width: 0 0 5px 0;
+  padding-bottom: $padding-base-vertical - 3;
+}
+.btn-sm,
+.btn-xs { letter-spacing:0; }
+
+.btn-lg { padding-bottom: $padding-large-vertical - 5; }
+.btn-sm { padding-bottom: $padding-small-vertical - 2; }
+.btn-xs { padding-bottom: $padding-xs-vertical - 1; }
+
+.btn .caret { display:inline-block; margin-top: -2px; }
+
+.btn-group,
+.input-group-btn {
+  .btn + .btn,
+  .btn-group + .btn {
+    border-left-width: 1px;
+    margin-left:0;
+  }
+
+  .btn-group + .btn-group,
+  .btn + .btn-group {
+    .btn:first-child {
+      border-left-width: 1px;
+      margin-left:0;
+    }
+  }
+}
+
+.btn-group-vertical {
+  .btn + .btn,
+  .btn + .btn-group,
+  .btn-group + .btn,
+  .btn-group + .btn-group {
+    margin-top:4px;
+  }
+}

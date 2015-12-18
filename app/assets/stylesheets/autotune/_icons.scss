@@ -1,0 +1,69 @@
+//icons
+[class^="icon-"] {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: $gray-darker;
+  font-size: 20px;
+  margin: 0 5px;
+  &:not([disabled]):hover {
+    color: $primary;
+    text-decoration: none;
+  }
+  &[disabled] {
+    opacity: 0.5;
+    cursor: default;
+    &:hover {
+      color: $gray-darker;
+    }
+    &:hover:before,
+    &:hover:after {
+      content: "";
+    }
+  }
+}
+
+.icon-edit {
+  &:after { content: "\e065"; }
+}
+.icon-preview {
+  &:after { content: "\e105"; }
+}
+.icon-delete {
+  &:after { content: "\e020"; }
+}
+.icon-refresh {
+  &:after { content: "\e031"; }
+}
+ //alert icons
+.icon-ok,
+.icon-alert,
+.icon-info {
+  font-size: 11px;
+  margin: 0 3px 0 0;
+}
+.icon-ok {
+  &:after {
+    content: "\e013";
+    color: $green;
+  }
+}
+.icon-alert {
+  &:after {
+    content: "\e209";
+    color: $red;
+  }
+}
+.icon-info {
+  &:after {
+    content: "\e086";
+    color: $orange;
+  }
+}
+

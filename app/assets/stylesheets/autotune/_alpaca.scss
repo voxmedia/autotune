@@ -1,0 +1,61 @@
+//alpaca overrides
+.alpaca-field-array.alpaca-top,
+.alpaca-field-object.alpaca-top { padding:10px 0; }
+.alpaca-form-buttons-container { text-align:left; }
+
+.alpaca-container-label {
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.alpaca-array-actionbar-bottom {
+  min-height: 43px;
+}
+button.alpaca-array-actionbar-action {
+  background-color: transparent;
+  border: none;
+  color: $gray-darker;
+  font-size: 1.5em;
+  padding: 5px;
+  line-height: 1;
+  &[disabled],
+  &[disabled]:hover {
+    background: transparent;
+  }
+  &:hover {
+    color: $primary;
+    background: transparent;
+  }
+}
+
+.alpaca-field-checkbox {
+  label {
+    display: inline-block;
+  }
+  .checkbox {
+    display: inline-block;
+    label {
+      top: 5px;
+      left: 5px;
+      position: relative;
+    }
+  }
+}
+
+// star for required fields? this is the easeist way to adjust that
+.glyphicon-star:before {
+  font-family: $font-family-sans-serif;
+  content: "*";
+  margin-right: 3px;
+}
+
+// so we can keep alert box content flush
+.alert > .container-fluid {
+  padding:0;
+}
+
+td.actionbar .btn-group button {
+  margin-right: 0;
+  font-size: 1.1em;
+}
+

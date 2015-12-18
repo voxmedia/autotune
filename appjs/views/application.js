@@ -14,7 +14,7 @@ PNotify.prototype.options.styling = "bootstrap3";
 require('pnotify/src/pnotify.buttons');
 
 var Application = BaseView.extend(require('./mixins/links.js'), {
-  className: 'container-fluid',
+  //className: 'container-fluid',
   template: require('../templates/application.ejs'),
   alertDefaults: {
     addclass: "stack-bottomright",
