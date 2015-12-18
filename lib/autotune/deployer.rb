@@ -1,15 +1,5 @@
 require 'uri'
-# require 'google_drive'
-# require 'google/api_client'
-# require 'oauth2'
 require 'autotune/google_docs'
-require 'google/api_client'
-require 'google/api_client/client_secrets'
-require 'google/api_client/auth/installed_app'
-require 'google/api_client/auth/storage'
-require 'google/api_client/auth/storages/file_store'
-require 'fileutils'
-require 'json'
 
 module Autotune
   # Autotune blueprint base deployer
@@ -37,61 +27,27 @@ module Autotune
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
       if build_data['google_doc_url']
-        # build_data['google_doc_url'] = build_data['google_doc_url'].match(/^.*(?=(#))/).to_s
         spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
         cur_user = User.find(project.meta['current_user'])
         current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
 
-        client = Google::APIClient.new
-        auth = client.authorization
-        auth.client_id = ENV["GOOGLE_CLIENT_ID"]
-        auth.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
-        auth.scope =
-            "https://www.googleapis.com/auth/drive " +
-            "https://spreadsheets.google.com/feeds/"
-        # auth.redirect_uri = "http://example.com/redirect"
-        auth.refresh_token = current_auth.credentials['refresh_token']
-        auth.fetch_access_token!
+        google_client = GoogleDocs.new(current_auth)
+        exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
+        ss_data = google_client.prepare_spreadsheet(exp_file)
+        pp ss_data
 
-        drive = client.discovered_api('drive', 'v2')
-        visibility = :private
-
-        # if title.nil?
-        copied_file = drive.files.copy.request_schema.new
-        # else
-        #   copied_file = drive.files.copy.request_schema.new('title' => title)
-        # end
-        cp_resp = client.execute(
-          api_method: drive.files.copy,
-          body_object: copied_file,
-          parameters: { fileId: spreadsheet_key, visibility: visibility.to_s.upcase })
-
-        if cp_resp.error?
-          fail CreateError, cp_resp.error_message
-        else
-          puts cp_resp.data['id'], cp_resp.data['alternateLink']
-          return { id: cp_resp.data['id'], url: cp_resp.data['alternateLink'] }
-        end
-
-        # swap this for more generic code so that we can drop GoogleDrive gem
-        # google_session = GoogleDrive.login_with_oauth(auth.access_token)
-        # spread_sheet = google_session.spreadsheet_by_key(spreadsheet_key)
-        # export_path = File.join(project.working_dir, 'data/'+spread_sheet.title+'.xls').to_s
-        # spread_sheet.export_as_file(export_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        #
-        # new_doc = GoogleDocsParser.new(spread_sheet.title+'.xls')
-        # # project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
-        # build_data['google_doc_data'] = new_doc.prepare_spreadsheet(export_path)
+        # project.data['google_data'] = new_doc.prepare_spreadsheet(export_path)
+        build_data['google_doc_data'] = ss_data
       end
 
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
 
       # make sure to only do this if a normal project, not a themed demo
-      export_path_at = File.join(project.working_dir, 'data/autotune.json').to_s
-      File.open(export_path_at, 'w') do |f|
-        f.puts JSON.pretty_generate(build_data)
-      end
+      # export_path_at = File.join(project.working_dir, 'data/autotune.json').to_s
+      # File.open(export_path_at, 'w') do |f|
+      #   f.puts JSON.pretty_generate(build_data)
+      # end
     end
 
     # Hook to do stuff after a project is deleted

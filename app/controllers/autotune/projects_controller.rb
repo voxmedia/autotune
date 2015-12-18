@@ -178,24 +178,6 @@ module Autotune
       end
     end
 
-    def set_file(file_id)
-      watchId = 'id-'+file_id+'-'+Time.now.to_s
-      uri = URI.parse("https://www.googleapis.com/drive/v2/files/#{file_id}/watch")
-      http = Net::HTTP.new(uri.host, uri.port)
-
-      request = Net::HTTP::Post.new(uri.request_uri)
-      pp request
-    end
-
-    def watch_project_spreadsheet
-      # might actually make more sense to watch all of the changes in drive
-      # then if a change comes in, and we find a project with a matching spreadsheet,
-      # we tell the project to update the data
-      @spreadsheet_change = request.POST
-      puts 'SPREADSHEET CHANGE'
-      pp @spreadsheet_change
-    end
-
     def update_project_data
       puts 'def update project data'
       @project = instance
@@ -204,65 +186,32 @@ module Autotune
       @parsed_build_data = JSON.parse(@build_data.keys[0])
       spreadsheet_key = @parsed_build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
 
-      watch_id = 'id-'+spreadsheet_key+'-'+Time.now.to_s.gsub(' ', '')
-      # set_file(spreadsheet_key)
       # Get the deployer object
       deployer = @project.deployer(:preview)
 
       # Run the before build deployer hook
       deployer.before_build(@parsed_build_data, {})
 
-      # All of this is very repetitive and I would prefer to not do it here and also
-      # in the deployer. Need to look at that.
-      cur_user = User.find(@project.meta['current_user'])
-      current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
-
-      client = Google::APIClient.new(:application_name => 'Vox Autotune Local')
-      auth = client.authorization
-      auth.client_id = ENV["GOOGLE_CLIENT_ID"]
-      auth.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
-      auth.scope =
-          "https://www.googleapis.com/auth/drive " +
-          "https://spreadsheets.google.com/feeds/"
-      # auth.redirect_uri = "http://example.com/redirect"
-      auth.refresh_token = current_auth.credentials['refresh_token']
-      auth.fetch_access_token!
-      drive_api = client.discovered_api('drive', 'v2')
-
-      # this doesn't work b/c you have to have a registered domain listed as a webhook
-      channel_hash = {
-        'id' => watch_id,
-        'type' => 'web_hook',
-        'address' => "https://127.0.0.1:3000/projects/#{@parsed_build_data['slug']}/watch_project_spreadsheet"
-      }
-
-      result = client.execute(
-        :api_method => drive_api.files.watch,
-        :body_object => channel_hash,
-        :parameters => { 'fileId' => spreadsheet_key })
-      if result.status == 200
-        return result.data
-      else
-        puts "An error occurred: #{result.data['error']['message']}"
-      end
+      # watch_id = 'id-'+spreadsheet_key+'-'+Time.now.to_s.gsub(' ', '')
+      #
+      # # this doesn't work b/c you have to have a registered domain listed as a webhook
+      # channel_hash = {
+      #   'id' => watch_id,
+      #   'type' => 'web_hook',
+      #   'address' => "https://127.0.0.1:3000/projects/#{@parsed_build_data['slug']}/watch_project_spreadsheet"
+      # }
+      #
+      # result = client.execute(
+      #   :api_method => drive_api.files.watch,
+      #   :body_object => channel_hash,
+      #   :parameters => { 'fileId' => spreadsheet_key })
+      # if result.status == 200
+      #   return result.data
+      # else
+      #   puts "An error occurred: #{result.data['error']['message']}"
+      # end
       # pp drive.files.watch({'fileId': spreadsheet_key, 'channel': channel})
       # watch_change(client)
-    end
-
-    # def watch_change(client, channel_id, channel_type, channel_address)
-    def watch_change(client)
-      drive = client.discovered_api('drive', 'v2')
-      result = client.execute(
-        :api_method => drive.changes.watch)
-        # ,
-        # :body_object => { 'id' => channel_id, 'type' => channel_type, 'address' => channel_address })
-      if result.status == 200
-        pp result
-        return result.data
-      else
-        pp result
-        puts "An error occurred: #{result.data['error']['message']}"
-      end
     end
 
     def update_snapshot
