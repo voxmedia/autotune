@@ -37,3 +37,10 @@ select.form-control::-ms-expand{
 
 select.input-lg,
 select.input-sm { line-height:inherit; }
+
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  position:static;
+}
