@@ -18,6 +18,9 @@ module Autotune
     require 'active_job/chain'
 
     initializer 'autotune.init', :before => :load_config_initializers do |app|
+      app.config.assets.precompile += %w(
+        autotune/favicon.ico autotune/at_placeholder.png)
+
       app.config.autotune = Config.new
 
       # Figure out where we project our blueprints
