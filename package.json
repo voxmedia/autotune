@@ -43,6 +43,7 @@
     "handlebars": "3.0.3",
     "jquery": "2.1.1",
     "jquery-ui": "1.10.5",
+    "json-editor": "^0.7.23",
     "markdown": "0.5.0",
     "moment": "2.10.3",
     "node-underscorify": "0.0.14",

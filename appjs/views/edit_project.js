@@ -8,7 +8,8 @@ var $ = require('jquery'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
     ace = require('brace'),
-    slugify = require("underscore.string/slugify");
+    slugify = require("underscore.string/slugify"),
+    JSONEditor = require('../vendor/jsoneditor');
 
 require('brace/mode/json');
 require('brace/theme/textmate');
@@ -331,7 +332,35 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           opts.data.theme = pluckAttr(themes, 'value')[0];
         }
       }
-      $form.alpaca(opts);
+
+      // Initialize the editor
+      var editor = new JSONEditor( $form[0], {
+        theme: 'bootstrap3',
+        iconlib: 'bootstrap3',
+        disable_properties: true,
+        disable_edit_json: true,
+        schema: opts.schema
+      });
+
+      // Set the value
+      editor.setValue(opts.data);
+
+      // Get the value
+      //var data = editor.getValue();
+      //console.log(data.title); // "John Smith"
+
+      // Validate
+      //var errors = editor.validate();
+      //if(errors.length) {
+        // Not valid
+      //}
+
+      // Listen for changes
+      //editor.on("change",  function() {
+        // Do something...
+      //});
+
+      //$form.alpaca(opts);
     }
   },
 
