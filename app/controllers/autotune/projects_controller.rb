@@ -186,7 +186,6 @@ module Autotune
       # check activesupport json since this one isn't working correctly
       @parsed_build_data = JSON.parse(@build_data.keys[0])
       pp @parsed_build_data
-      spreadsheet_key = @parsed_build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
 
       # Get the deployer object
       deployer = @project.deployer(:preview)
