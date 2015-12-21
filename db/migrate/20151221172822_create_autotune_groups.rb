@@ -46,8 +46,9 @@ class CreateAutotuneGroups < ActiveRecord::Migration
         project.save!
       end
 
+      bluperints_themes = execute "SELECT * from autotune_blueprints_themes;"
       Autotune::Blueprint.all.each do |blueprint|
-        blueprint.themes.all do |t|
+          blueprint.themes.all do |t|
           blueprint.groups << t.group
         end
         blueprint.save!
