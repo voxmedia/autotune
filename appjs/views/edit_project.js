@@ -22,58 +22,45 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   template: require('../templates/project.ejs'),
   events: {
     'change :input': 'stopListeningForChanges',
-    // 'change form': 'pollChange',
     'click #savePreview': 'savePreview',
     'keypress': 'debounceChange'
   },
 
-  triggerDataUpdate: function(build_data){
-    // whatever is set up to watch the spreadsheet will execute this
-    // if(e.keyCode === 220){
-    //   var build_data = this.model.buildData();
-    //   logger.debug(build_data);
-      // as a test for triggering the update_project_data method
+  debounceChange: _.debounce(function(e){
+    if ( this.model.blueprint.hasPreviewType('live') ){
+      this.pollChange();
+    }
+  }, 2000),
+
+  pollChange: function(e){
+    logger.debug('pollchange');
+    var view = this,
+        $form = this.$('#projectForm'),
+        data = $form.alpaca('get').getValue();
+
     $.ajax({
       type: "POST",
       url: window.location.href + "/update_project_data",
-      data: build_data,
+      data: data,
       dataType: 'json'
     }).done(function( data ) {
-      logger.debug(data);
-      return data;
+        logger.debug('!!!!! form values', data);
+
+        if(data.theme !== view.theme){
+          view.theme = data.theme;
+          var vals = {
+            title: data['title'],
+            theme: data['theme'],
+            data:  data,
+            blueprint_id: view.model.blueprint.get('id')
+          };
+
+          view.model.set(vals);
+          view.render();
+        }
+
+        view.pym.sendMessage('updateData', JSON.stringify(data));
     });
-
-    // }
-  },
-
-  debounceChange: _.debounce(function(e){
-    this.pollChange();
-  }, 2000),
-
-  // look at keypress w/debounce
-  pollChange: function(e){
-    logger.debug('pollchange');
-    var $form = this.$('#projectForm');
-    var data = $form.alpaca('get').getValue();
-    this.triggerDataUpdate(data);
-
-    if ( this.model.blueprint.hasPreviewType('live') ){
-      logger.debug('!!!!! form values', data);
-
-      if(data.theme !== this.theme){
-        this.theme = data.theme;
-        var vals = {
-          title: data['title'],
-          theme: data['theme'],
-          data:  data,
-          blueprint_id: this.model.blueprint.get('id')
-        };
-
-        this.model.set(vals);
-        this.render();
-      }
-      this.pym.sendMessage('updateData', JSON.stringify(data));
-    }
   },
 
   savePreview: function(){
