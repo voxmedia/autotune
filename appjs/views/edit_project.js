@@ -257,7 +257,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         orig_this = this,
-        form_config, config_themes, newProject, populateForm = false;
+        form_config, config_themes, newProject, populateForm;
 
     if ( this.disableForm ) {
       $form.append(
