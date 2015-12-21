@@ -34,8 +34,8 @@ class CreateAutotuneGroups < ActiveRecord::Migration
         theme = theme.new if theme.nil?
         if !theme.group.nil?
           theme = theme.dup
-          theme.label = "#{group.name} #{theme.label}"
-          theme.value = "#{group.name}_#{theme.value}"
+          theme.label = "#{group.title} #{theme.label}"
+          theme.value = "#{group.title}_#{theme.value}"
         end
         theme.group = group
         theme.save!
