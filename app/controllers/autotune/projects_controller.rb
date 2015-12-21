@@ -1,7 +1,7 @@
 require_dependency 'autotune/application_controller'
 require 'autotune/google_docs'
 require 'redis'
-require 'json'
+# require 'json'
 
 module Autotune
   # API for projects
@@ -172,57 +172,16 @@ module Autotune
       end
     end
 
-    def get_update_project_data
-      pp instance.data
-      @build_data = instance.data
-      # coming through as a get request but not returning anything
-    end
-
     def update_project_data
-      puts 'update project data'
       @project = instance
-      # if request.POST
       @build_data = request.POST
-      # check activesupport json since this one isn't working correctly
-      @parsed_build_data = JSON.parse(@build_data.keys[0])
-      pp @parsed_build_data
 
       # Get the deployer object
       deployer = @project.deployer(:preview)
 
       # Run the before build deployer hook
-      deployer.before_build(@parsed_build_data, {})
-
-      @project.data = @parsed_build_data
-      @project.save
-      # SyncProjectJob.new(@project)
-
-      # watch_id = 'id-'+spreadsheet_key+'-'+Time.now.to_s.gsub(' ', '')
-      #
-      # # this doesn't work b/c you have to have a registered domain listed as a webhook
-      # channel_hash = {
-      #   'id' => watch_id,
-      #   'type' => 'web_hook',
-      #   'address' => "https://127.0.0.1:3000/projects/#{@parsed_build_data['slug']}/watch_project_spreadsheet"
-      # }
-      #
-      # result = client.execute(
-      #   :api_method => drive_api.files.watch,
-      #   :body_object => channel_hash,
-      #   :parameters => { 'fileId' => spreadsheet_key })
-      # if result.status == 200
-      #   return result.data
-      # else
-      #   puts "An error occurred: #{result.data['error']['message']}"
-      # end
-      # pp drive.files.watch({'fileId': spreadsheet_key, 'channel': channel})
-      # watch_change(client)
-      msg = { :id => @project.id,
-              :updatedData => 'updatedData' }
-      Autotune.redis.publish 'project', msg.to_json
-      # end
-      # @build_data = @project.data
-      # render json: @build_data
+      deployer.before_build(@build_data, {})
+      render :json => @build_data
     end
 
     def update_snapshot

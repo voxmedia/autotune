@@ -66,7 +66,12 @@ module Autotune
     end
 
     def deploy_path
-      [parts.path, project.slug, extra_slug].reject(&:blank?).join('/')
+      d_path = [parts.path, project.slug, extra_slug].reject(&:blank?).join('/')
+      if parts.path.length > 0
+        d_path
+      else
+        '/'+d_path
+      end
     end
 
     def old_deploy_path

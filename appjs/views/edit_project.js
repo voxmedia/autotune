@@ -37,13 +37,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       $.ajax({
         type: "POST",
         url: window.location.href + "/update_project_data",
-        data: JSON.stringify(build_data),
-        // success: success,
+        data: build_data,
+        // success: function(data){
+        //   setTimeout(function (){
+        //     logger.debug(data);
+        //   }, 5000);
+        // },
         dataType: 'json'
+      }).done(function( data ) {
+        logger.debug(data);
       });
+
     }
   },
 
+  // look at keypress w/debounce
   pollChange: function(e){
     var $form = this.$('#projectForm');
 
@@ -104,8 +112,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.listening = false;
   },
 
-  updatedData: function(opts){
-    logger.debug('updatedData ------', this.model.buildData());
+  updateData: function(opts){
+    logger.debug('updateData ------', this.model.buildData());
     this.pym.sendMessage('updateData', this.model.buildData());
   },
 
