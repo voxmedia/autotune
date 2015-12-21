@@ -89,22 +89,12 @@ _.extend(Listener.prototype, Backbone.Events, {
 
     logger.debug('change', data);
 
-    if(data['updatedData']){
-      logger.debug(data['updatedData']);
-      this.trigger('change',
-                   _.pick(data, 'type', 'id', 'updatedData'));
-      this.trigger(['change', data.type].join(':'),
-                   _.pick(data, 'id', 'updatedData'));
-      this.trigger(['change', data.type, data.id].join(':'),
-                   data['updatedData']);
-    } else {
-      this.trigger('change',
-                   _.pick(data, 'type', 'id', 'status'));
-      this.trigger(['change', data.type].join(':'),
-                   _.pick(data, 'id', 'status'));
-      this.trigger(['change', data.type, data.id].join(':'),
-                   data.status);
-    }
+    this.trigger('change',
+                 _.pick(data, 'type', 'id', 'status'));
+    this.trigger(['change', data.type].join(':'),
+                 _.pick(data, 'id', 'status'));
+    this.trigger(['change', data.type, data.id].join(':'),
+                 data.status);
   },
 
   handleError: function(evt) {

@@ -22,41 +22,42 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   template: require('../templates/project.ejs'),
   events: {
     'change :input': 'stopListeningForChanges',
-    'change form': 'pollChange',
+    // 'change form': 'pollChange',
     'click #savePreview': 'savePreview',
-    'keyup': 'triggerDataUpdate'
+    'keypress': 'debounceChange'
   },
 
-  triggerDataUpdate: function(e){
+  triggerDataUpdate: function(build_data){
     // whatever is set up to watch the spreadsheet will execute this
-    if(e.keyCode === 220){
-      var build_data = this.model.buildData();
-      delete build_data['google_doc_data'];
-      logger.debug(build_data);
-      // // as a test for triggering the update_project_data method
-      $.ajax({
-        type: "POST",
-        url: window.location.href + "/update_project_data",
-        data: build_data,
-        // success: function(data){
-        //   setTimeout(function (){
-        //     logger.debug(data);
-        //   }, 5000);
-        // },
-        dataType: 'json'
-      }).done(function( data ) {
-        logger.debug(data);
-      });
+    // if(e.keyCode === 220){
+    //   var build_data = this.model.buildData();
+    //   logger.debug(build_data);
+      // as a test for triggering the update_project_data method
+    $.ajax({
+      type: "POST",
+      url: window.location.href + "/update_project_data",
+      data: build_data,
+      dataType: 'json'
+    }).done(function( data ) {
+      logger.debug(data);
+      return data;
+    });
 
-    }
+    // }
   },
+
+  debounceChange: _.debounce(function(e){
+    this.pollChange();
+  }, 2000),
 
   // look at keypress w/debounce
   pollChange: function(e){
+    logger.debug('pollchange');
     var $form = this.$('#projectForm');
+    var data = $form.alpaca('get').getValue();
+    this.triggerDataUpdate(data);
 
     if ( this.model.blueprint.hasPreviewType('live') ){
-      var data = $form.alpaca('get').getValue();
       logger.debug('!!!!! form values', data);
 
       if(data.theme !== this.theme){
@@ -95,10 +96,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   listenForChanges: function() {
-    // only works after second, separte time
-    this.listenTo(this.app.listener,
-                  'change:project:' + this.model.id,
-                  this.updatedData, this);
     if ( !this.model.isNew() && !this.listening ) {
       this.listenTo(this.app.listener,
                     'change:project:' + this.model.id,

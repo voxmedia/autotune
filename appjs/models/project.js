@@ -84,19 +84,6 @@ var Project = Backbone.Model.extend({
   },
 
   /**
-   * Update this project data.
-   * @returns {object} jqXHR object
-   **/
-  updatedData: function() {
-    console.log('12341241241243', this);
-    // return Backbone.ajax({
-    //   dataType: 'json',
-    //   type: 'GET',
-    //   url: this.url() + '/update_project_data'
-    // });
-  },
-
-  /**
    * Does the blueprint for this project have instructions?
    * @returns {boolean}
    **/
