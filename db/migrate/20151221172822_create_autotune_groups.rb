@@ -11,5 +11,12 @@ class CreateAutotuneGroups < ActiveRecord::Migration
     end
     add_foreign_key :autotune_blueprints_groups, :autotune_groups, column: :group_id
     add_foreign_key :autotune_blueprints_groups, :autotune_blueprints, column: :blueprint_id
+
+    add_column :autotune_projects, :group_id, :integer
+    add_foreign_key :autotune_projects, :autotune_groups, column: :group_id
+
+    # TODO - add data migration
+
+    drop_table :autotune_blueprints_themes
   end
 end
