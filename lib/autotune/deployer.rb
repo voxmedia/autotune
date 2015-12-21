@@ -40,12 +40,6 @@ module Autotune
 
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
-
-      # make sure to only do this if a normal project, not a themed demo
-      # export_path_at = File.join(project.working_dir, 'data/autotune.json').to_s
-      # File.open(export_path_at, 'w') do |f|
-      #   f.puts JSON.pretty_generate(build_data)
-      # end
     end
 
     # Hook to do stuff after a project is deleted

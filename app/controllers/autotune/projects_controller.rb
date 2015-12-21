@@ -173,6 +173,7 @@ module Autotune
     end
 
     def get_update_project_data
+      pp instance.data
       @build_data = instance.data
       # coming through as a get request but not returning anything
     end
@@ -184,6 +185,7 @@ module Autotune
       @build_data = request.POST
       # check activesupport json since this one isn't working correctly
       @parsed_build_data = JSON.parse(@build_data.keys[0])
+      pp @parsed_build_data
       spreadsheet_key = @parsed_build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
 
       # Get the deployer object
@@ -191,6 +193,10 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(@parsed_build_data, {})
+
+      @project.data = @parsed_build_data
+      @project.save
+      # SyncProjectJob.new(@project)
 
       # watch_id = 'id-'+spreadsheet_key+'-'+Time.now.to_s.gsub(' ', '')
       #

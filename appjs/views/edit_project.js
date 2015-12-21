@@ -28,12 +28,16 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   triggerDataUpdate: function(e){
+    // whatever is set up to watch the spreadsheet will execute this
     if(e.keyCode === 220){
+      var build_data = this.model.buildData();
+      delete build_data['google_doc_data'];
+      logger.debug(build_data);
       // // as a test for triggering the update_project_data method
       $.ajax({
         type: "POST",
         url: window.location.href + "/update_project_data",
-        data: JSON.stringify(this.model.buildData()),
+        data: JSON.stringify(build_data),
         // success: success,
         dataType: 'json'
       });
@@ -102,12 +106,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   updatedData: function(opts){
     logger.debug('updatedData ------', this.model.buildData());
-    var result = $.ajax({
-      type: "GET",
-      url: window.location.href + "/get_update_project_data",
-      dataType: 'json'
-    });
-    logger.debug(result);
+    this.pym.sendMessage('updateData', this.model.buildData());
   },
 
   updateStatus: function(status) {
