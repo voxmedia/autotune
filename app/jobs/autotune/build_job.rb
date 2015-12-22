@@ -2,8 +2,6 @@ require 'work_dir'
 require 'date'
 require 'logger'
 require 'stringio'
-# require "google/api_client"
-# require "google_drive"
 
 module Autotune
   # project a blueprint
