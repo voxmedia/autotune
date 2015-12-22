@@ -1,4 +1,3 @@
-# This migration comes from autotune (originally 20151221172822)
 class CreateAutotuneGroups < ActiveRecord::Migration
   def change
     create_table :autotune_groups do |t|
@@ -29,13 +28,12 @@ class CreateAutotuneGroups < ActiveRecord::Migration
       group_theme_map.each do |g|
         puts "create group #{g['name']}"
         group = Autotune::Group.create! :title => g['name']
-        puts "update theme #{g['theme']}"
         theme = Autotune::Theme.find_by(:value => g['theme'])
         theme = theme.new if theme.nil?
         if !theme.group.nil?
           theme = theme.dup
           theme.label = "#{group.title} #{theme.label}"
-          theme.value = "#{group.title}_#{theme.value}"
+          theme.value = "#{group.title.downcase.gsub! ' ', '_'}_#{theme.value}"
         end
         theme.group = group
         theme.save!
@@ -46,11 +44,12 @@ class CreateAutotuneGroups < ActiveRecord::Migration
         project.save!
       end
 
-      bluperints_themes = execute "SELECT * from autotune_blueprints_themes;"
       Autotune::Blueprint.all.each do |blueprint|
-          blueprint.themes.all do |t|
-          blueprint.groups << t.group
-        end
+          blueprint_themes = select_rows "SELECT theme_id from autotune_blueprints_themes WHERE blueprint_id = #{blueprint.id};"
+          blueprint_themes.each do |t|
+            bp_theme = Autotune::Theme.find_by_id(t[0])
+            blueprint.groups << bp_theme.group
+          end
         blueprint.save!
       end
     end
