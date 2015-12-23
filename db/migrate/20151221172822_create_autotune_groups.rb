@@ -39,13 +39,13 @@ class CreateAutotuneGroups < ActiveRecord::Migration
 
       group_theme_map.each do |g|
         puts "create group #{g['name']}"
-        group = Autotune::Group.create! :title => g['name']
+        group = Autotune::Group.create! :name => g['name']
         theme = Autotune::Theme.find_by(:value => g['theme'])
         theme = theme.new if theme.nil?
         if !theme.group.nil?
           theme = theme.dup
-          theme.label = "#{group.title} #{theme.label}"
-          theme.value = "#{group.title.downcase.gsub! ' ', '_'}_#{theme.value}"
+          theme.label = "#{group.name} #{theme.label}"
+          theme.value = "#{group.name.downcase.gsub! ' ', '_'}_#{theme.value}"
         end
         theme.group = group
         theme.save!
