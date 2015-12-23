@@ -1,7 +1,7 @@
 class CreateAutotuneGroups < ActiveRecord::Migration
   def change
     create_table :autotune_groups do |t|
-      t.string :title
+      t.string :name
     end
 
     # Add many to many relation between groups and blueprints
@@ -12,14 +12,26 @@ class CreateAutotuneGroups < ActiveRecord::Migration
     add_foreign_key :autotune_blueprints_groups, :autotune_groups, column: :group_id
     add_foreign_key :autotune_blueprints_groups, :autotune_blueprints, column: :blueprint_id
 
+    # Add many to many relation between groups and users through memberships
+    create_table :autotune_group_memberships, :id => false do |t|
+      t.references :user, index: true
+      t.references :group, index: true
+      t.string :role
+
+      t.timestamps null: false
+    end
+    add_foreign_key :autotune_group_memberships, :autotune_users, column: :user_id
+    add_foreign_key :autotune_group_memberships, :autotune_groups, column: :group_id
+
+    # Add 1:n relation between projects and groups
     add_column :autotune_projects, :group_id, :integer
     add_foreign_key :autotune_projects, :autotune_groups, column: :group_id
 
-    # update themes
+    # Add 1:n relation between projects and themes
     add_column :autotune_themes, :group_id, :integer
     add_foreign_key :autotune_themes, :autotune_groups, column: :group_id
 
-    # Adding initial data - TODO change this later to a configuration setting
+    # Adding initial data - TODO (Kavya) change this later to a configuration setting
     require 'yaml'
     group_theme_map_file = File.join(Rails.root, 'config/chorus_theme_map.yml')
     if File.exist?(group_theme_map_file) then
@@ -54,6 +66,7 @@ class CreateAutotuneGroups < ActiveRecord::Migration
       end
     end
 
+    # remove relation between blueprints and themes
     drop_table :autotune_blueprints_themes
   end
 end

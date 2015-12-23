@@ -4,6 +4,8 @@ module Autotune
     include Searchable
     has_many :authorizations, :dependent => :destroy
     has_many :projects
+    has_many :group_memberships
+    has_many :groups, through: :group_memberships
     serialize :meta, JSON
 
     validates :api_key, :presence => true, :uniqueness => true
@@ -31,10 +33,8 @@ module Autotune
       else
         a.user = User.find_or_initialize_by(:email => auth_hash['info']['email'])
       end
-      a.user.attributes = {
-        :name => auth_hash['info']['name'],
-        :meta => { 'roles' => roles }
-      }
+      a.user.name => auth_hash['info']['name']
+      a.user.update_roles roles
       a.user.save!
       a.save!
       a.user
@@ -57,7 +57,7 @@ module Autotune
       a.update(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
 
       if a.user.meta['roles'] != roles
-        a.user.meta['roles'] = roles
+        a.user.update_roles roles
         a.user.save
       end
 
@@ -138,6 +138,23 @@ module Autotune
     end
 
     private
+    def update_roles(roles)
+      self.groups.delete
+      return if roles.nil?
+      if roles.is_a?(Array) && roles.any?
+        roles.each do |r|
+          membership = GroupMembership.new
+          membership.role = r
+          self.group_memberships << membership
+        end
+        return
+      elsif roles.is_a?(Hash) && roles.any?
+        [:author, :editor, :designer].each do |r|
+          self.groups << Group.find_or_create_by(:name => roles[r.to_s])
+        end
+      end
+      self.save!
+    end
 
     def defaults
       self.api_key ||= User.generate_api_key
