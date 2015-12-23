@@ -46,9 +46,9 @@ Autotune.configure do |conf|
 
   # Environment variables used when building blueprints
   conf.build_environment = {
-    'GOOGLE_CLIENT_ID'='ENV['GOOGLE_CLIENT_ID']'
-    'GOOGLE_CLIENT_SECRET'='ENV['GOOGLE_CLIENT_SECRET']'
-    'GOOGLE_REDIRECT_URI'='ENV['GOOGLE_REDIRECT_URI']'
+    # 'GOOGLE_CLIENT_ID'='ENV['GOOGLE_CLIENT_ID']',
+    # 'GOOGLE_CLIENT_SECRET'='ENV['GOOGLE_CLIENT_SECRET']',
+    # 'GOOGLE_REDIRECT_URI'='ENV['GOOGLE_REDIRECT_URI']',
 
     # 'AWS_ACCESS_KEY_ID' => ENV['AWS_ACCESS_KEY_ID'],
     # 'AWS_SECRET_ACCESS_KEY' => ENV['AWS_SECRET_ACCESS_KEY'],
