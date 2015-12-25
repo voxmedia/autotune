@@ -5,7 +5,7 @@ class CreateAutotuneGroups < ActiveRecord::Migration
     end
 
     # Add many to many relation between groups and blueprints
-    create_table :autotune_blueprints_groups, :id => false do |t|
+    create_table :autotune_blueprints_groups do |t|
       t.references :blueprint, index: true
       t.references :group, index: true
     end
@@ -13,7 +13,7 @@ class CreateAutotuneGroups < ActiveRecord::Migration
     add_foreign_key :autotune_blueprints_groups, :autotune_blueprints, column: :blueprint_id
 
     # Add many to many relation between groups and users through memberships
-    create_table :autotune_group_memberships, :id => false do |t|
+    create_table :autotune_group_memberships do |t|
       t.references :user, index: true
       t.references :group, index: true
       t.string :role
