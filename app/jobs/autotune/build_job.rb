@@ -1,6 +1,7 @@
 require 'work_dir'
 require 'date'
 require 'logger'
+require 'json'
 require 'stringio'
 
 module Autotune
@@ -38,7 +39,8 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme.value)
+        'theme' => project.theme.value,
+        'theme_data' => JSON.parse(project.theme.data))
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
