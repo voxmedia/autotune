@@ -13,6 +13,7 @@ module Autotune
     belongs_to :blueprint
     belongs_to :user
     belongs_to :theme
+    belongs_to :group
 
     validates_length_of :output, :maximum => 64.kilobytes - 1
     validates :title, :blueprint, :user, :theme, :presence => true
