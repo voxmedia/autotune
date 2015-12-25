@@ -4,9 +4,11 @@ module Autotune
     include Searchable
     has_many :authorizations, :dependent => :destroy
     has_many :projects
-    has_many :group_memberships
+    has_many :group_memberships, -> {includes :group}
     has_many :groups, through: :group_memberships
+
     serialize :meta, JSON
+    serialize :group_memberships, JSON
 
     validates :api_key, :presence => true, :uniqueness => true
     after_initialize :defaults
@@ -34,9 +36,10 @@ module Autotune
         a.user = User.find_or_initialize_by(:email => auth_hash['info']['email'])
       end
       a.user.attributes = {
-        :name => auth_hash['info']['name']
+        :name => auth_hash['info']['name'],
+        :meta => { :roles => roles }
       }
-      update_roles a.user, roles
+      update_roles(a.user, roles)
       a.user.save!
       a.save!
       a.user
@@ -58,10 +61,9 @@ module Autotune
 
       a.update(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
 
-      if a.user.meta['roles'] != roles
-        update_roles a.user, roles
-        a.user.save
-      end
+      update_roles a.user, roles
+      a.user.save
+
 
       a.user
     end
@@ -90,70 +92,76 @@ module Autotune
     #   # is this user an editor who can use vox or theverge themes?
     #   user.role?(:editor => :vox, :editor => :theverge)
     def role?(*args, **kwargs)
-      return false if meta.nil? || meta['roles'].nil?
+      return false if group_memberships.nil?
+
       if args.any?
-        args.reduce(false) { |a, e| a || meta['roles'].include?(e.to_s) }
+        group_memberships.exists?(:role => args)
       else
         kwargs.reduce(false) do |a, (k, v)|
           a ||
-            (meta['roles'].is_a?(Array) && meta['roles'].include?(k.to_s)) ||
-            (meta['roles'].include?(k.to_s) && meta['roles'][k.to_s].include?(v.to_s))
+            group_memberships.exists?(
+              :role => k.to_s,
+              :group => {:name => v.to_s}
+            )
         end
       end
     end
 
     # Return an array list of themes that this user is permitted to use in a project
     def author_themes
-      return [] if meta.nil? || meta['roles'].nil?
-      # if this is a superuser, return all available themes
-      # if we only have an array of roles, all themes are available
-      if role?(:superuser) || (meta['roles'].is_a?(Array) && role?(:author, :editor))
-        themes = Rails.configuration.autotune.themes.keys
-      else
-        # otherwise get all the themes for all the roles and make an array
-        themes = []
-        [:author, :editor, :superuser].each do |r|
-          themes += meta['roles'][r.to_s] if meta['roles'][r.to_s]
-        end
-        themes.uniq!
-      end
-      # return an array list of theme objects
-      Theme.where :value => themes
+      return [] if group_memberships.nil?
+      Theme.all # stubbing for now
     end
 
     # Return an array of themes that this user is allowed to edit. Editors can see and change other
     # users' projects. This user will be limited to projects that use these themes.
     def editor_themes
-      return [] if meta.nil? || meta['roles'].nil?
-      # authors can't edit other projects
-      return [] unless role?(:editor, :superuser)
-      # if we only have an array, superusers and editors can edit all themes
-      # also, superusers can always edit all the themes, even if we have a hash of roles
-      if meta['roles'].is_a?(Array) || role?(:superuser)
-        themes = Rails.configuration.autotune.themes.keys
-      else
-        # otherwise get all the themes for editor
-        themes = meta['roles']['editor']
-      end
-      # return an array list of theme objects
-      Theme.where :value => themes
+      author_themes
+    end
+
+    def editor_groups
+      return if group_memberships.nil?
+
+      groups.merge(group_memberships.with_editor_access)
+    end
+
+    def designer_groups
+      return if group_memberships.nil?
+
+      groups.merge(group_memberships.with_editor_access)
+    end
+
+    def author_groups
+      return if group_memberships.nil?
+
+      groups.merge(group_memberships.with_editor_access)
+    end
+
+    def is_superuser?
+        Group.all.size == group.merge(group_memberships.with_superuser_access).size
     end
 
     private
-    # TODO (Kavya) do a security review on this piece
+
+   # TODO (Kavya) do a security review on this piece
     def self.update_roles(user, roles)
-      user.groups.delete
+      # make sure the user is saved before trying to update relations
+      user.save
+      # TODO (Kavya) update roles instead of deleting all
+      user.group_memberships.delete
       return if roles.nil?
       if roles.is_a?(Array) && roles.any?
-        roles.each do |r|
-          membership = GroupMembership.new
-          membership.role = r
-          user.group_memberships << membership
+        role = GroupMembership.get_best_role(roles)
+        return if role.nil?
+        Group.all.each do |g|
+          user.group_memberships.create(:role => role.to_s, :group => g)
         end
         return
       elsif roles.is_a?(Hash) && roles.any?
         [:author, :editor, :designer].each do |r|
-          user.groups << Group.find_or_create_by(:name => roles[r.to_s])
+          next if roles[r.to_s].nil?
+          group = Group.find_or_create_by(:name => roles[r.to_s])
+          group.save && user.group_memberships.find_or_create_by(:group => group, :role => r.to_s)
         end
       end
       user.save!

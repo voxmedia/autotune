@@ -4,6 +4,7 @@ module Autotune
     def config
       {
         :env => Rails.env,
+        :editor_groups => current_user.editor_groups.as_json,
         :themes => current_user.nil? ? [] : current_user.author_themes.as_json,
         :user => current_user.as_json,
         :tags => Tag.all.as_json(:only => [:title, :slug]),
