@@ -107,10 +107,10 @@ module Autotune
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
-
+        @project.group = @project.theme.group
         # is this user allowed to use this theme?
         unless @project.theme.nil? ||
-               current_user.author_themes.include?(@project.theme)
+               current_user.author_groups.include?(@project.group)
           return render_error(
             "You can't use the #{@project.theme.label} theme. Please " \
             'choose another theme or contact support',
