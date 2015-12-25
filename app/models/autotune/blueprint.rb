@@ -33,7 +33,6 @@ module Autotune
       self.type = config['type'].downcase if config && config['type']
 
       update_tags_from_config
-      update_themes_from_config
     end
 
     def thumb_url
