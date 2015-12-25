@@ -40,7 +40,7 @@ module Autotune
         'title' => project.title,
         'slug' => project.slug,
         'theme' => project.theme.value,
-        'theme_data' => JSON.parse(project.theme.data))
+        'theme_data' => project.theme.data.nil? ? {} : JSON.parse(project.theme.data))
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
