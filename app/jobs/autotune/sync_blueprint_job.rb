@@ -84,8 +84,6 @@ module Autotune
             # Run the before build deployer hook
             deployer.before_build(build_data, repo.env)
 
-            logger.info('bp build data', build_data.to_json)
-
             # Run the build
             repo.working_dir do
               repo.cmd(
