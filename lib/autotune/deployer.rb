@@ -41,7 +41,6 @@ module Autotune
         google_client = GoogleDocs.new(current_auth)
         exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
         ss_data = google_client.prepare_spreadsheet(exp_file)
-        pp ss_data
         build_data['google_doc_data'] = ss_data
       end
 
