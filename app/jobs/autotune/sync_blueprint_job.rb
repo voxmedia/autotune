@@ -81,6 +81,9 @@ module Autotune
             deployer = Autotune.new_deployer(
               :media, blueprint, :extra_slug => slug)
 
+            puts 'in theme section'
+            pp blueprint.config
+
             # Run the before build deployer hook
             deployer.before_build(build_data, repo.env)
 
