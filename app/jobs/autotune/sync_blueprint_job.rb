@@ -55,7 +55,8 @@ module Autotune
 
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
-
+        repo = WorkDir.repo(blueprint.working_dir,
+                            Rails.configuration.autotune.build_environment)
         if blueprint.config['themes'].blank?
           themes = Autotune.config.themes.keys
         else
