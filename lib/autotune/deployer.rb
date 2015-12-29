@@ -28,7 +28,8 @@ module Autotune
     def before_build(build_data, _env)
       if build_data['google_doc_url']
         spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
-        cur_user = User.find(project.meta['current_user'])
+        # cur_user = User.find(project.meta['current_user'])
+        cur_user = User.find(1)
         current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
 
         google_client = GoogleDocs.new(current_auth)

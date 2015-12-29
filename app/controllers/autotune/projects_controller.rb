@@ -107,9 +107,8 @@ module Autotune
 
     def create
       @project = Project.new(:user => current_user)
-      @project.meta['current_user'] = current_user
+      @project.meta['current_user'] = current_user.id
       @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
-
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
 

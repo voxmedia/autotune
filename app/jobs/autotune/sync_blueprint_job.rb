@@ -10,7 +10,8 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status: nil, update: false)
+    # def perform(blueprint, project, status: nil, update: false)
+    def perform(blueprint, status: nil, update: false, project: false)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
@@ -52,6 +53,7 @@ module Autotune
           blueprint.config['thumbnail'])
       end
 
+
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
 
         if blueprint.config['themes'].blank?
@@ -64,31 +66,34 @@ module Autotune
         sample_data.delete('base_url')
         sample_data.delete('asset_base_url')
 
-        themes.each do |theme|
-          slug = [blueprint.version, theme].join('-')
-          # Use this as dummy build data for the moment
-          build_data = sample_data.merge(
-            'title' => blueprint.title,
-            'slug' => slug,
-            'theme' => theme)
+        # don't build a copy for each theme every time a project is updated
+        unless project
+          themes.each do |theme|
+            slug = [blueprint.version, theme].join('-')
+            # Use this as dummy build data for the moment
+            build_data = sample_data.merge(
+              'title' => blueprint.title,
+              'slug' => slug,
+              'theme' => theme)
 
-          # Get the deployer object
-          # probably don't want this to always be preview
-          deployer = Autotune.new_deployer(
-            :media, blueprint, :extra_slug => slug)
+            # Get the deployer object
+            # probably don't want this to always be preview
+            deployer = Autotune.new_deployer(
+              :media, blueprint, :extra_slug => slug)
 
-          # Run the before build deployer hook
-          deployer.before_build(build_data, repo.env)
+            # Run the before build deployer hook
+            deployer.before_build(build_data, repo.env)
 
-          # Run the build
-          repo.working_dir do
-            repo.cmd(
-              BLUEPRINT_BUILD_COMMAND,
-              :stdin_data => build_data.to_json)
+            # Run the build
+            repo.working_dir do
+              repo.cmd(
+                BLUEPRINT_BUILD_COMMAND,
+                :stdin_data => build_data.to_json)
+            end
+
+            # Upload build
+            deployer.deploy(blueprint.full_deploy_dir)
           end
-
-          # Upload build
-          deployer.deploy(blueprint.full_deploy_dir)
         end
       end
 
