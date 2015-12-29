@@ -26,8 +26,7 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
-      # let demo projects fetch their own data for now
-      if build_data['google_doc_url'] && project['meta']
+      if build_data['google_doc_url']
         spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
         if project['meta']
           cur_user = User.find(project.meta['current_user'])
