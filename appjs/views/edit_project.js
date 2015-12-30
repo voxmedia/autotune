@@ -22,8 +22,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   template: require('../templates/project.ejs'),
   events: {
     'change :input': 'stopListeningForChanges',
-    'click #savePreview': 'savePreview',
-    'keypress': 'debounceChange'
+    'change form': 'debounceChange',
+    'keypress': 'debounceChange',
+    'click #savePreview': 'savePreview'
   },
 
   debounceChange: _.debounce(function(e){
@@ -46,19 +47,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }).done(function( data ) {
         logger.debug('!!!!! form values', data);
 
-        if(data.theme !== view.theme){
-          view.theme = data.theme;
-          var vals = {
-            title: data['title'],
-            theme: data['theme'],
-            data:  data,
-            blueprint_id: view.model.blueprint.get('id')
-          };
-
-          view.model.set(vals);
-          view.render();
-        }
-
         // Arrays of objects are being converted into dicts somewhere in the process.
         // The following code undoes that.
         $.each(data, function(i,d){
@@ -75,6 +63,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             }
           }
         });
+
+        if(data.theme !== view.theme){
+          view.theme = data.theme;
+          var vals = {
+            title: data['title'],
+            theme: data['theme'],
+            data:  data,
+            blueprint_id: view.model.blueprint.get('id')
+          };
+
+          view.model.set(vals);
+          view.render();
+        }
 
         view.pym.sendMessage('updateData', JSON.stringify(data));
     });
