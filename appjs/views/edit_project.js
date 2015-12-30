@@ -59,6 +59,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.render();
         }
 
+        // Arrays of objects are being converted into dicts somewhere in the process.
+        // The following code undoes that.
+        $.each(data, function(i,d){
+          if (typeof d === 'object'){
+            var dict_keys = _.keys(d),
+                counter = 0;
+            $.each(dict_keys, function (ii, dd){
+              if (!(isNaN(parseInt(dd)))){
+                counter += 1;
+              }
+            });
+            if (dict_keys.length === counter){
+              data[i] = _.values(d);
+            }
+          }
+        });
+
         view.pym.sendMessage('updateData', JSON.stringify(data));
     });
   },

@@ -75,6 +75,18 @@ module Autotune
       end
     end
 
+    def update_project_data
+      @project = instance
+      @build_data = request.POST
+
+      # Get the deployer object
+      deployer = @project.deployer(:preview)
+
+      # Run the before build deployer hook
+      deployer.before_build(@build_data, {})
+      render :json => @build_data
+    end
+
     def builder; end
   end
 end
