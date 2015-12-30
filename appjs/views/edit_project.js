@@ -220,7 +220,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
 
           var childLoaded = function() {
-            view.pym.sendMessage('updateData', JSON.stringify(buildData));
+            view.pollChange();
           };
 
           if ( view.copyProject || view.model.hasInitialBuild() ){
