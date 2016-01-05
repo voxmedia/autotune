@@ -80,23 +80,6 @@ module Autotune
 
     private
 
-    def update_themes_from_config
-      # Associate themes
-      if config.present? && config['themes'].present?
-        tmp_themes = []
-        config['themes'].each do |t|
-          next unless Autotune.config.themes.include? t.to_sym
-          tmp_themes << Theme.find_or_create_by(
-            :value => t, :label => Autotune.config.themes[t.to_sym])
-        end
-        self.themes = tmp_themes
-      else
-        self.themes = Autotune.config.themes.map do |value, label|
-          Theme.find_or_create_by(:value => value, :label => label)
-        end
-      end
-    end
-
     def update_tags_from_config
       self.tags = config['tags'].map do |t|
         Tag.find_or_create_by(:title => t.humanize)
