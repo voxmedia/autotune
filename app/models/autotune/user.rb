@@ -149,7 +149,7 @@ module Autotune
     end
 
     def is_superuser?
-        Group.all.size == group.merge(group_memberships.with_superuser_access).size
+        role? :superuser
     end
 
     private
