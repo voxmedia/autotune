@@ -94,6 +94,7 @@ Autotune::Engine.routes.draw do
   get '/auth/failure'              => 'sessions#failure'
   get '/logout'                    => 'sessions#destroy', :as => :logout
   get '/login'                     => 'sessions#new',     :as => :login
+  # get '/google_auth'               => 'sessions#google_auth'
 
   resque_web_constraint = lambda do |request|
     current_user = Autotune::User.find_by_api_key(

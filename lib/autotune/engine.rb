@@ -30,6 +30,7 @@ module Autotune
       app.config.autotune.git_askpass = File.expand_path('../../../bin/git_ask_pass.sh', __FILE__)
       app.config.autotune.faq_url = 'http://voxmedia.helpscoutdocs.com/category/19-autotune'
       app.config.autotune.themes = { :generic => 'Generic' }
+      app.config.autotune.force_google_auth = false
 
       if ENV['REDIS_URL']
         app.config.autotune.redis = Redis.new(:url => ENV['REDIS_URL'])
