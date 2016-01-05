@@ -114,10 +114,20 @@ module Autotune
               group_memberships.pluck(:id))
     end
 
+    # Return an array list of themes that this user is permitted to modify
+    def designer_themes
+      return [] if group_memberships.nil?
+      Theme.where('(group_id IN (?))',
+              group_memberships.with_design_access.pluck(:id))
+    end
+
     # Return an array of themes that this user is allowed to edit. Editors can see and change other
     # users' projects. This user will be limited to projects that use these themes.
+    # TODO: remove dependency on this
     def editor_themes
-      author_themes
+      return [] if group_memberships.nil?
+      Theme.where('(group_id IN (?))',
+              group_memberships.with_editor_access.pluck(:id))
     end
 
     def editor_groups
@@ -135,7 +145,7 @@ module Autotune
     def author_groups
       return if group_memberships.nil?
 
-      groups.merge(group_memberships.with_author_access)
+      groups.merge(group_memberships)
     end
 
     def is_superuser?
