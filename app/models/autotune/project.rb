@@ -16,7 +16,7 @@ module Autotune
     belongs_to :group
 
     validates_length_of :output, :maximum => 64.kilobytes - 1
-    validates :title, :blueprint, :user, :theme, :presence => true
+    validates :title, :blueprint, :user, :group, :theme, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
 
