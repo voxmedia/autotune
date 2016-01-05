@@ -68,6 +68,7 @@ Autotune.configure do |conf|
     'ENV' => Rails.env
   }
 
+  # TODO : change this
   # Enabled blueprint themes
   conf.themes = {
   # :theme_name  => 'Nice display name',
