@@ -111,14 +111,13 @@ module Autotune
     end
 
     def require_login
-      puts 'require login'
       # There's a lot more that's going to have to go into this
       if signed_in? && any_roles?
         if Autotune.configuration.force_google_auth
           require_google_login
         # else
-          return true
         end
+        return true
       end
 
       # return true if signed_in? && any_roles?
@@ -126,7 +125,6 @@ module Autotune
       if signed_in?
         render_error 'Not allowed', :forbidden
       else
-        puts 'else'
         respond_to do |format|
           format.html { redirect_to login_path(request.fullpath) }
           format.json { render_error 'Unauthorized', :unauthorized }
@@ -135,9 +133,7 @@ module Autotune
     end
 
     def require_google_login
-      puts 'require google login - running'
       return true if has_google_auth?
-      puts has_google_auth?
       if has_google_auth?
         render_error 'Not allowed', :forbidden
       else

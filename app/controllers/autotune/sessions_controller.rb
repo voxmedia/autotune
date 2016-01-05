@@ -6,9 +6,7 @@ module Autotune
     skip_before_action :require_login, :only => [:new, :create, :failure]
 
     def create
-      puts 'create'
       if current_user
-        puts 'yes user'
         # things to check:
         # if the current user has matching authorization
         # if current user already has auth from this provider
@@ -32,14 +30,10 @@ module Autotune
               omniauth.is_a?(OmniAuth::AuthHash) ? omniauth.to_hash : omniauth)
           end
         end
-        # if Autotune.configuration.force_google_auth && !current_user.authorizations.find_by(:provider => 'google_oauth2')
-        #   redirect_to('google_auth')
-        # else
-        #   redirect_to(request.env['omniauth.origin'] || root_path)
-        # end
-        redirect_to(request.env['omniauth.origin'] || root_path)
+        unless omniauth['provider'] == 'google_oauth2'
+          redirect_to(request.env['omniauth.origin'] || root_path)
+        end
       else
-        puts 'no user'
         self.current_user = User.find_or_create_by_auth_hash(omniauth)
         # add a new parameter to find...^^ or do something New
         # if it already exists, add it to the current user - who is currently logged in, not by email
