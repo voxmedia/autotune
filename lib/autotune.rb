@@ -21,7 +21,7 @@ module Autotune
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :verify_omniauth, :git_ssh, :git_askpass,
-                      :redis, :faq_url, :themes)
+                      :redis, :faq_url)
 
   class << self
     delegate :redis, :to => :configuration
