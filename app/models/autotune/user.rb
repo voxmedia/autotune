@@ -110,7 +110,8 @@ module Autotune
     # Return an array list of themes that this user is permitted to use in a project
     def author_themes
       return [] if group_memberships.nil?
-      Theme.all # stubbing for now
+      Theme.where('(group_id IN (?))',
+              group_memberships.pluck(:id))
     end
 
     # Return an array of themes that this user is allowed to edit. Editors can see and change other
@@ -128,13 +129,13 @@ module Autotune
     def designer_groups
       return if group_memberships.nil?
 
-      groups.merge(group_memberships.with_editor_access)
+      groups.merge(group_memberships.with_design_access)
     end
 
     def author_groups
       return if group_memberships.nil?
 
-      groups.merge(group_memberships.with_editor_access)
+      groups.merge(group_memberships.with_author_access)
     end
 
     def is_superuser?
@@ -150,11 +151,12 @@ module Autotune
       # TODO (Kavya) update roles instead of deleting all
       user.group_memberships.delete
       return if roles.nil?
+      # If roles is an array , assign the highest privileges to all groups
       if roles.is_a?(Array) && roles.any?
-        role = GroupMembership.get_best_role(roles)
-        return if role.nil?
+        best_role = GroupMembership.get_best_role(roles)
+        return if best_role.nil?
         Group.all.each do |g|
-          user.group_memberships.create(:role => role.to_s, :group => g)
+          user.group_memberships.create(:role => best_role.to_s, :group => g)
         end
         return
       elsif roles.is_a?(Hash) && roles.any?

@@ -19,7 +19,7 @@ module Autotune
 
     private
     SUPERUSER_ROLES = [:superuser]
-    USER_ROLES = [:author, :editor, :designer, :superuser] #in-order of privileges
+    USER_ROLES = [:author, :editor, :designer, :superuser] #in order of increasing privileges
     EDITOR_ROLES = [:editor, :designer, :superuser]
     DESIGNER_ROLES = [:designer, :superuser]
   end
