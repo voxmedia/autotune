@@ -14,7 +14,7 @@ module Autotune
     before_action :only => [:show, :update, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
-             current_user.role?(:editor => instance.theme.value)
+             current_user.role?(:editor => instance.group.value)
         render_error 'Forbidden', :forbidden
       end
     end
@@ -56,10 +56,10 @@ module Autotune
       end
 
       unless current_user.role? :superuser
-        if current_user.role? :editor
+        if current_user.role? [:editor, :designer]
           @projects = @projects.where(
-            '(user_id = ? OR theme_id IN (?))',
-            current_user.id, current_user.editor_themes.pluck(:id))
+            '(user_id = ? OR group_id IN (?))',
+            current_user.id, current_user.editor_groups.pluck(:id))
         else
           query[:user_id] = current_user.id
         end
