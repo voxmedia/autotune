@@ -14,6 +14,7 @@ class CreateThemes < ActiveRecord::Migration
     add_foreign_key :autotune_projects, :autotune_themes, column: :theme_id
 
     themes = {}
+    #  TODO: Do something about this
     Rails.configuration.autotune.themes.each do |k, v|
       puts "create theme: #{k} => #{v}"
       themes[k.to_sym] = Autotune::Theme.create! :value => k, :label => v
