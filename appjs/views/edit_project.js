@@ -156,7 +156,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   renderForm: function(resolve, reject) {
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
-        form_config, config_themes, newProject;
+        form_config, themes, newProject;
 
     if ( this.disableForm ) {
       $form.append(
@@ -177,28 +177,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if ( this.model.isNew() && !this.copyProject ) {
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
-      config_themes = this.model.blueprint.get('config').themes || ['generic'];
     } else if (this.copyProject) {
       newProject = true;
       form_config = this.model.get('blueprint_config').form;
-      config_themes = this.model.get('blueprint_config').themes || ['generic'];
     } else {
       newProject = false;
       form_config = this.model.get('blueprint_config').form;
-      config_themes = this.model.get('blueprint_config').themes || ['generic'];
     }
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-      var themes = this.app.themes.filter(function(theme) {
-            if ( _.isEqual(config_themes, ['generic']) ) {
-              return true;
-            } else {
-              return _.contains(config_themes, theme.get('value'));
-            }
-          }),
+      var themes = this.app.themes.models,
           social_chars = {
             "sbnation": 8,
             "theverge": 5,
