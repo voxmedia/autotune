@@ -209,8 +209,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
         if ( view.model.blueprint.hasPreviewType('live') ){
           view.theme = view.model.get('theme') || formData['theme'] || 'custom';
-          var bp_conf = view.model.get('blueprint_config')['preview_type'];
-          logger.debug('types plz???', bp_conf);
 
           var slug = view.model.blueprint.get('slug'),
               bp_version = view.model.getVersion(),
@@ -226,8 +224,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           };
 
           if ( view.copyProject || view.model.hasInitialBuild() ){
-            view.pym = new pym.Parent(slug+'__graphic', preview_url);
-            view.pym.iframe.onload = childLoaded;
+            // if blueprint is now live, but the version on this project is not, swap what we show
+            var versioned_type = view.model.get('blueprint_config')['preview_type'];
+            if( versioned_type === 'live'){
+              view.pym = new pym.Parent(slug+'__graphic', preview_url);
+              view.pym.iframe.onload = childLoaded;
+            } else {
+              view.pym = new pym.Parent(view.model.get('slug')+'__graphic', preview_url);
+            }
           } else {
             var uniqBuildVals = _.uniq(_.values(buildData));
             view.pym = new pym.Parent(slug+'__graphic', preview_url);
