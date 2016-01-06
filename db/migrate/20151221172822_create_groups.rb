@@ -53,16 +53,6 @@ class CreateGroups < ActiveRecord::Migration
         project.group = project.theme.group
         project.save!
       end
-
-      Autotune::Blueprint.all.each do |blueprint|
-          blueprint_themes = select_rows "SELECT theme_id from autotune_blueprints_themes
-            WHERE blueprint_id = #{blueprint.id};"
-          blueprint_themes.each do |t|
-            bp_theme = Autotune::Theme.find_by_id(t[0])
-            blueprint.groups << bp_theme.group
-          end
-        blueprint.save!
-      end
     end
 
     # remove relation between blueprints and themes
