@@ -27,8 +27,6 @@ module Autotune
 
       @_files = {}
       @_spreadsheets = {}
-
-      # drive = @client.discovered_api('drive', 'v2')
     end
 
 
