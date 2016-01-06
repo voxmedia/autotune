@@ -1,16 +1,9 @@
-class CreateAutotuneGroups < ActiveRecord::Migration
+# This migration comes from autotune (originally 20151221172822)
+class CreateGroups < ActiveRecord::Migration
   def change
     create_table :autotune_groups do |t|
       t.string :name
     end
-
-    # Add many to many relation between groups and blueprints
-    create_table :autotune_blueprints_groups do |t|
-      t.references :blueprint, index: true
-      t.references :group, index: true
-    end
-    add_foreign_key :autotune_blueprints_groups, :autotune_groups, column: :group_id
-    add_foreign_key :autotune_blueprints_groups, :autotune_blueprints, column: :blueprint_id
 
     # Add many to many relation between groups and users through memberships
     create_table :autotune_group_memberships do |t|
@@ -41,17 +34,19 @@ class CreateAutotuneGroups < ActiveRecord::Migration
         puts "create group #{g['name']}"
         group = Autotune::Group.find_or_create_by :name => g['name']
         theme = Autotune::Theme.find_by(:value => g['theme'])
-        theme = theme.new if theme.nil?
-        if !theme.group.nil?
-          puts "updating theme #{g['theme']} for #{g['name']}"
-          theme = theme.dup
+        if !theme.nil?
+          if !theme.group.nil?
+            theme = theme.dup
+            theme.value = "#{group.name.downcase.gsub ' ', '_'}"
+          end
           theme.label = "#{group.name}"
-          theme.value = "#{group.id}_#{theme.value}"
-          puts "updated theme to #{theme.value}"
+          theme.group = group
+          theme.save!
+        else
+          puts "Create theme #{g['theme']}"
+          Autotune::Theme.find_or_create_by :label => g['name'],
+           :value => g['theme'], :group => group
         end
-        theme.group = group
-        puts "added  #{theme.value} #{theme.label}"
-        theme.save!
       end
 
       Autotune::Project.all.each do |project|
@@ -60,7 +55,8 @@ class CreateAutotuneGroups < ActiveRecord::Migration
       end
 
       Autotune::Blueprint.all.each do |blueprint|
-          blueprint_themes = select_rows "SELECT theme_id from autotune_blueprints_themes WHERE blueprint_id = #{blueprint.id};"
+          blueprint_themes = select_rows "SELECT theme_id from autotune_blueprints_themes
+            WHERE blueprint_id = #{blueprint.id};"
           blueprint_themes.each do |t|
             bp_theme = Autotune::Theme.find_by_id(t[0])
             blueprint.groups << bp_theme.group

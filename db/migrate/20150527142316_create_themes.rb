@@ -13,20 +13,16 @@ class CreateThemes < ActiveRecord::Migration
     add_reference :autotune_projects, :theme, index: true
     add_foreign_key :autotune_projects, :autotune_themes, column: :theme_id
 
-    themes = {}
-    #  TODO: Do something about this
-    Rails.configuration.autotune.themes.each do |k, v|
-      puts "create theme: #{k} => #{v}"
-      themes[k.to_sym] = Autotune::Theme.create! :value => k, :label => v
-    end
-
     Autotune::Project.all.each do |project|
       old_theme = project.attributes['theme']
       if old_theme == 'default' || old_theme == '' ||
          old_theme.nil? || themes[old_theme.to_sym].nil?
-        project.theme = themes[:generic]
+        theme = Autotune::Theme.find_or_create_by :value => 'generic',
+         :label => 'Generic'
+        project.theme = theme
       else
-        project.theme = themes[old_theme.to_sym]
+        project.theme = Autotune::Theme.find_or_create_by :value => old_theme,
+         :label => old_theme.capitalize
       end
       project.save!
     end
