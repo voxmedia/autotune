@@ -18,7 +18,6 @@ module Autotune
       Autotune::ROLES.reverse.each do |r|
         return r.to_sym if roles.include? r.to_sym
       end
-      return
     end
 
     private
