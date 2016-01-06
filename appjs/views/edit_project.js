@@ -230,7 +230,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               view.pym = new pym.Parent(slug+'__graphic', preview_url);
               view.pym.iframe.onload = childLoaded;
             } else {
-              view.pym = new pym.Parent(view.model.get('slug')+'__graphic', preview_url);
+              view.pym = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
             }
           } else {
             var uniqBuildVals = _.uniq(_.values(buildData));
