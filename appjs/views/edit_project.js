@@ -37,32 +37,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
-        data = $form.alpaca('get').getValue();
+        data = $form.alpaca('get').getValue(),
+        base_url = this.model.url();
+
+    if( view.model.isNew() ){
+      base_url = window.location.href;
+    }
 
     $.ajax({
       type: "POST",
-      url: window.location.href + "/update_project_data",
-      data: data,
+      url: base_url + "/update_project_data",
+      data: JSON.stringify(data),
+      contentType: 'application/json',
       dataType: 'json'
     }).done(function( data ) {
         logger.debug('!!!!! form values', data);
-
-        // Arrays of objects are being converted into dicts somewhere in the process.
-        // The following code undoes that.
-        $.each(data, function(i,d){
-          if (typeof d === 'object'){
-            var dict_keys = _.keys(d),
-                counter = 0;
-            $.each(dict_keys, function (ii, dd){
-              if (!(isNaN(parseInt(dd)))){
-                counter += 1;
-              }
-            });
-            if (dict_keys.length === counter){
-              data[i] = _.values(d);
-            }
-          }
-        });
 
         if(data.theme !== view.theme){
           view.theme = data.theme;

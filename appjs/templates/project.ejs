@@ -135,8 +135,14 @@
       </ul>
 
       <div class="preview-frame" style="padding: 25px 0px;">
+        <% check_static = true %>
+        <% if ( model.blueprint.hasPreviewType('live') && ! model.isNew() ){ %>
+          <% if ( model.get('blueprint_config')['preview_type'] === 'live' ){ %>
+            <% check_static = false %>
+          <% } %>
+        <% } %>
         <!-- Changed this because we need to account for the versioned project possibly not being live -->
-        <% if ( ! model.isNew() && model.get('blueprint_config')['preview_type'] !== 'live' ) { %>
+        <% if ( ! model.isNew() && check_static ) { %>
           <% if ( model.hasStatus('broken') ) { %>
           <p class="text-danger">
              <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
@@ -171,7 +177,7 @@
         </div>
       </div>
 
-      <% if ( model.get('blueprint_config')['preview_type'] === 'live' ) { %>
+      <% if ( ! check_static ) { %>
       <button type="submit" class="btn btn-default"
 
               id="savePreview"
