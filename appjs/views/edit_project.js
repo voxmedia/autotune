@@ -209,6 +209,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
         if ( view.model.blueprint.hasPreviewType('live') ){
           view.theme = view.model.get('theme') || formData['theme'] || 'custom';
+          var bp_conf = view.model.get('blueprint_config')['preview_type'];
+          logger.debug('types plz???', bp_conf);
 
           var slug = view.model.blueprint.get('slug'),
               bp_version = view.model.getVersion(),

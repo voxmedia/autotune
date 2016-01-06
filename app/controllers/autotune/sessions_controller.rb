@@ -30,9 +30,6 @@ module Autotune
               omniauth.is_a?(OmniAuth::AuthHash) ? omniauth.to_hash : omniauth)
           end
         end
-        # unless omniauth['provider'] == 'google_oauth2'
-        #   redirect_to(request.env['omniauth.origin'] || root_path)
-        # end
         redirect_to(request.env['omniauth.origin'] || root_path)
       else
         self.current_user = User.find_or_create_by_auth_hash(omniauth)
