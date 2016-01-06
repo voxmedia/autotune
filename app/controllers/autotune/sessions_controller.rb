@@ -7,7 +7,6 @@ module Autotune
 
     def create
       if current_user
-        puts 'has current'
         # things to check:
         # if the current user has matching authorization
         # if current user already has auth from this provider
@@ -17,11 +16,7 @@ module Autotune
           :uid => omniauth['uid'])
         if a.present?
           if a.user != current_user
-            logger.debug(a.user.as_json)
-            logger.debug(current_user.as_json)
-            current_user.authorizations.create(
-              omniauth.is_a?(OmniAuth::AuthHash) ? omniauth.to_hash : omniauth)
-            # render_error('Authorization is already in use by another account. Please contact support.')
+            render_error('Authorization is already in use by another account. Please contact support.')
           end
           # nothing changes
         else
@@ -40,9 +35,7 @@ module Autotune
         # end
         redirect_to(request.env['omniauth.origin'] || root_path)
       else
-        logger.debug('else')
         self.current_user = User.find_or_create_by_auth_hash(omniauth)
-        logger.debug(current_user.as_json)
         # add a new parameter to find...^^ or do something New
         # if it already exists, add it to the current user - who is currently logged in, not by email
         if current_user
