@@ -134,14 +134,9 @@
         </button>
       </ul>
 
-      <!-- slug needs to match here too if versioned project isn't live -->
-      <!-- <% slug = model.blueprint.get('slug') %>
-      <% if ( ! model.blueprint.hasPreviewType('live') ) { %>
-        <% slug = model.get('slug'); %>
-      <% } %> -->
-      <!-- <div class="preview-frame" id="<%= slug %>__graphic" style="border: 2px dashed #ccc;"></div> -->
       <div class="preview-frame" style="padding: 25px 0px;">
-        <% if ( ! model.isNew() && ! model.blueprint.hasPreviewType('live') ) { %>
+        <!-- Changed this because we need to account for the versioned project possibly not being live -->
+        <% if ( ! model.isNew() && model.get('blueprint_config')['preview_type'] !== 'live' ) { %>
           <% if ( model.hasStatus('broken') ) { %>
           <p class="text-danger">
              <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
@@ -176,7 +171,7 @@
         </div>
       </div>
 
-      <% if ( model.blueprint.hasPreviewType('live') ) { %>
+      <% if ( model.get('blueprint_config')['preview_type'] === 'live' ) { %>
       <button type="submit" class="btn btn-default"
 
               id="savePreview"
