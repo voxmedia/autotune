@@ -44,6 +44,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       base_url = window.location.href;
     }
 
+    var childLoaded = function() {
+      view.pollChange();
+    };
+
     $.ajax({
       type: "POST",
       url: base_url + "/update_project_data",
@@ -55,15 +59,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
         if(data.theme !== view.theme){
           view.theme = data.theme;
-          var vals = {
-            title: data['title'],
-            theme: data['theme'],
-            data:  data,
-            blueprint_id: view.model.blueprint.get('id')
-          };
+          var slug = view.model.blueprint.get('slug'),
+              bp_version = view.model.getVersion(),
+              preview_url = view.model.blueprint.getMediaUrl(
+                [bp_version, view.theme].join('-') + '/preview');
 
-          view.model.set(vals);
-          view.render();
+          $('#'+slug+'__graphic').empty();
+          view.pym = new pym.Parent(slug+'__graphic', preview_url);
+          view.pym.iframe.onload = childLoaded;
         }
 
         view.pym.sendMessage('updateData', JSON.stringify(data));
@@ -216,6 +219,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             // if blueprint is now live, but the version on this project is not, swap what we show
             var versioned_type = view.model.get('blueprint_config')['preview_type'];
             if( versioned_type === 'live'){
+              logger.debug(preview_url);
               view.pym = new pym.Parent(slug+'__graphic', preview_url);
               view.pym.iframe.onload = childLoaded;
             } else {
