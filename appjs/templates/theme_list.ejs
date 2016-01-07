@@ -9,9 +9,9 @@
   <thead>
     <tr>
       <td>
-        <a class="btn btn-primary btn-xs" href="/blueprints/new">New theme</a>
+        <a class="btn btn-primary btn-xs" href="/themes/new">New theme</a>
       </td>
-      <td class="text-right" colspan="3">      
+      <td class="text-right" colspan="3">
       </td>
     </tr>
   </thead>
@@ -28,14 +28,10 @@
   <tr>
     <td class="ok-notice"><a href="<%=item.url() %>"><%= item.attributes.label %></a></td>
     <td>
-      group name
+      <%= item.attributes.group_name %>
     </td>
     <td class="text-right" colspan="2">
       <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
-      <a data-tooltip="Upgrade" href="#"
-         data-action-message="Upgrading the blueprint..."
-         data-action="updateRepo" data-model="Blueprint" data-action-next="reload"
-         data-model-id="<%= item.attributes.slug %>"><span class="icon-refresh"></span></a>
       <a data-tooltip="delete" href="#"
          data-action-message="Blueprint deleted"
          data-action-confirm="Are you sure you wish to delete this?"

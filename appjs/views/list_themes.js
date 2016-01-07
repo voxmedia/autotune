@@ -7,27 +7,5 @@ var $ = require('jquery'),
     BaseView = require('./base_view');
 
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
-  template: require('../templates/theme_list.ejs'),
-
-  afterInit: function() {
-    this.listenForChanges();
-  },
-
-  listenForChanges: function() {
-    this.listenTo(this.app.listener, 'change:theme',
-                  this.updateStatus, this);
-  },
-
-  stopListeningForChanges: function() {
-    this.stopListening(this.app.listener);
-  },
-
-// TODO fix this
-  updateStatus: function(data) {
-    var model = this.collection.get(data.id);
-    if ( model ) {
-      model.set('status', data.status);
-      this.render();
-    }
-  }
+  template: require('../templates/theme_list.ejs')
 } );

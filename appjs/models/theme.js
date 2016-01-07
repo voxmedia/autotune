@@ -4,15 +4,7 @@ var Backbone = require('backbone'),
     _ = require('underscore');
 
 var Theme = Backbone.Model.extend({
-  /**
-   * Constructor.
-   * @param {object} args Arguments passed to the constructor
-   **/
-  initialize: function() {
-    this.projects = null;
-  },
-
-  /**
+   /**
    * Get the AJAX endpoint for this blueprint.
    * @returns {string}
    **/
