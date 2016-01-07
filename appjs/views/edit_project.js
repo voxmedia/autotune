@@ -78,8 +78,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
+    logger.debug('$$$$$$', options);
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
+    this.togglePreview = options.query.togglePreview ? true : false;
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
@@ -240,6 +242,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             previewLink = view.model['_previousAttributes']['preview_url'];
           }
           view.pym = new pym.Parent(view.model.get('slug')+'__graphic', previewLink);
+        }
+        if(view.togglePreview){
+          $( "#draft-preview" ).trigger( "click" );
         }
       }).catch(function(err) {
         console.error(err);

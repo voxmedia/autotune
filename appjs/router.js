@@ -174,7 +174,7 @@ module.exports = Backbone.Router.extend({
       return project.blueprint.fetch();
     }).then(function() {
       view = new views.EditProject({
-        model: project, app: app,
+        model: project, app: app, query: query,
         disableForm: query.hasOwnProperty('disableform') });
       view.render();
 
@@ -186,6 +186,8 @@ module.exports = Backbone.Router.extend({
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
   },
+
+  // editProjectPreview: function
 
   duplicateProject: function(slug) {
     var project = new models.Project({ id: slug }),
