@@ -111,14 +111,14 @@ module Autotune
     def author_themes
       return [] if group_memberships.nil?
       Theme.where('(group_id IN (?))',
-              group_memberships.pluck(:id))
+              group_memberships.pluck(:group_id))
     end
 
     # Return an array list of themes that this user is permitted to modify
     def designer_themes
       return [] if group_memberships.nil?
       Theme.where('(group_id IN (?))',
-              group_memberships.with_design_access.pluck(:id))
+              group_memberships.with_design_access.pluck(:group_id))
     end
 
     # Return an array of themes that this user is allowed to edit. Editors can see and change other
@@ -127,7 +127,7 @@ module Autotune
     def editor_themes
       return [] if group_memberships.nil?
       Theme.where('(group_id IN (?))',
-              group_memberships.with_editor_access.pluck(:id))
+              group_memberships.with_editor_access.pluck(:group_id))
     end
 
     def editor_groups
