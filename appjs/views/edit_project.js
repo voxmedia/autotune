@@ -78,10 +78,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
-    logger.debug('$$$$$$', options);
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
-    this.togglePreview = options.query.togglePreview ? true : false;
+    if(options.query){
+      this.togglePreview = options.query.togglePreview ? true : false;
+    }
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
@@ -221,7 +222,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             // if blueprint is now live, but the version on this project is not, swap what we show
             var versioned_type = view.model.get('blueprint_config')['preview_type'];
             if( versioned_type === 'live'){
-              logger.debug(preview_url);
               view.pym = new pym.Parent(slug+'__graphic', preview_url);
               view.pym.iframe.onload = childLoaded;
             } else {
