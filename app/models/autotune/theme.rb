@@ -1,6 +1,8 @@
 module Autotune
   # Themes for blueprints
   class Theme < ActiveRecord::Base
+    include Slugged
+    include Searchable
     serialize :data, JSON
 
     belongs_to :group
