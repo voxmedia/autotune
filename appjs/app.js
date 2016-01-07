@@ -150,7 +150,8 @@ _.extend(App.prototype, Backbone.Events, {
    * @returns {boolean}
    **/
   hasRole: function(role) {
-    return _.contains(this.user.get('meta').roles, role);
+    return _.contains(this.user.get('meta').roles, role) ||
+          this.user.get('meta').roles[role];
   }
 });
 

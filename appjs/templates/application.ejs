@@ -10,6 +10,8 @@
           <li data-tab="projects"><a href="/projects">Projects</a></li>
           <% if (hasRole('superuser')) { %>
           <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>
+          <% } %>
+          <% if (hasRole('superuser') || hasRole('designer')) { %>
           <li data-tab="themes"><a href="/themes">Themes</a></li>
           <% } %>
           <li data-tab="faq"><a href="<%=app.config.faq_url %>" target="_blank">FAQ</a></li>
