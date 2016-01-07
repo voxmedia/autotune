@@ -22,7 +22,14 @@ class CreateGroups < ActiveRecord::Migration
 
     # Add 1:n relation between projects and themes
     add_column :autotune_themes, :group_id, :integer
+
+    # Add data and theme inheritance model
+    add_column :autotune_themes, :data, :mediumtext
+    add_reference :autotune_themes, :parent, index: true
+
+
     add_foreign_key :autotune_themes, :autotune_groups, column: :group_id
+    add_foreign_key :autotune_themes, :autotune_themes, column: :parent_id
 
     # Adding initial data - TODO (Kavya) change this later to a configuration setting
     require 'yaml'
