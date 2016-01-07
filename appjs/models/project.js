@@ -204,19 +204,6 @@ var Project = Backbone.Model.extend({
   },
 
   /**
-   * Get the themes.
-   * @returns {array} Theme models
-   **/
-   // TODO: change this
-  getThemes: function() {
-    if ( this.hasConfig() ) {
-      return this.getConfig().themes || ['generic'];
-    } else {
-      return ['generic'];
-    }
-  },
-
-  /**
    * Does this project have any of these statuses?
    * @param {string} status Check for this status
    * @returns {boolean}
