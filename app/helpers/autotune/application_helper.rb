@@ -5,7 +5,8 @@ module Autotune
       {
         :env => Rails.env,
         :designer_groups => current_user.nil? ? [] : current_user.designer_groups.as_json,
-        :themes => current_user.nil? ? [] : current_user.author_themes.as_json(:only => [:value, :label, :id]),
+        :available_themes => current_user.nil? ? [] :
+                current_user.author_themes.as_json(:only => [:value, :label, :id]),
         :user => current_user.as_json,
         :tags => Tag.all.as_json(:only => [:title, :slug]),
         :blueprint_titles => Blueprint.all.as_json(:only => [:title, :id]),

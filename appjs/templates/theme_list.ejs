@@ -1,0 +1,48 @@
+<div class="row m-page-heading">
+  <div class="col-xs-12 col-sm-6">
+    <h3>Manage themes</h3>
+  </div>
+  <div class="col-xs-12 col-sm-6 text-right">
+  </div>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <td>
+        <a class="btn btn-primary btn-xs" href="/blueprints/new">New theme</a>
+      </td>
+      <td class="text-right" colspan="3">      
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="m-table-heading">
+      <td>Theme</td>
+      <td>Group</td>
+      <td class="text-right" colspan="2">Bold Actions</td>
+    </tr>
+  <% if(getObjects().length == 0) { %>
+      <td class="text-center" colspan="4"><h4>No themes found</h4></td>
+  <% }
+  _.each(getObjects(), function(item) { %>
+  <tr>
+    <td class="ok-notice"><a href="<%=item.url() %>"><%= item.attributes.label %></a></td>
+    <td>
+      group name
+    </td>
+    <td class="text-right" colspan="2">
+      <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
+      <a data-tooltip="Upgrade" href="#"
+         data-action-message="Upgrading the blueprint..."
+         data-action="updateRepo" data-model="Blueprint" data-action-next="reload"
+         data-model-id="<%= item.attributes.slug %>"><span class="icon-refresh"></span></a>
+      <a data-tooltip="delete" href="#"
+         data-action-message="Blueprint deleted"
+         data-action-confirm="Are you sure you wish to delete this?"
+         data-action="destroy" data-model="Blueprint" data-action-next="reload"
+         data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
+    </td>
+  </tr>
+<% }); %>
+  </tbody>
+</table>

@@ -36,8 +36,8 @@ Backbone.$ = $;
  */
 function App(config) {
   this.themes = new Backbone.Collection();
-  this.themes.reset(config.themes);
-  delete config.themes;
+  this.themes.reset(config.available_themes);
+  delete config.available_themes;
 
   this.tags = new Backbone.Collection();
   this.tags.reset(config.tags);
@@ -48,6 +48,7 @@ function App(config) {
 
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
+  this.edittableThemes = new models.ThemeCollection();
 
   // Initialize server event listener
   this.listener = new Listener();

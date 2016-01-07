@@ -28,7 +28,11 @@ module.exports = Backbone.Router.extend({
     "projects/new": "chooseBlueprint",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject",
-    "projects/:slug/duplicate": "duplicateProject"
+    "projects/:slug/duplicate": "duplicateProject",
+    "themes": "listThemes",
+    "themes/new": "newTheme",
+    "themes/:slug": "editTheme",
+    "themes/:slug/edit": "editTheme"
   },
 
   // This is called for every route
@@ -222,5 +226,25 @@ module.exports = Backbone.Router.extend({
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
-  }
+  },
+
+  listThemes: function(params) {
+    var themes = this.app.edittableThemes,
+        app = this.app, query = {}, view;
+
+    Promise.resolve( themes.fetch() ).then(function() {
+      view = new views.ListThemes({
+        collection: themes,
+        app: app
+      });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
 });
