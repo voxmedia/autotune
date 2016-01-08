@@ -6,5 +6,5 @@ json.extract!(
 
 json.type project.blueprint.type
 json.blueprint_title project.blueprint.title
-json.theme project.theme.value
+json.theme project.theme.slug
 json.created_by project.user.name

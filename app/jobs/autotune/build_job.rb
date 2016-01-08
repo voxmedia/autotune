@@ -39,7 +39,7 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme.value,
+        'theme' => project.theme.slug,
         'theme_data' => project.theme.config_data)
 
       # Get the deployer object

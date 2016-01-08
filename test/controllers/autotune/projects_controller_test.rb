@@ -132,7 +132,7 @@ module Autotune
       accept_json!
       valid_auth_header! :generic_author
 
-      post :create, project_data.update(:theme => autotune_themes(:vox).value)
+      post :create, project_data.update(:theme => autotune_themes(:vox).slug)
       assert_response :bad_request, decoded_response['error']
     end
 
@@ -324,7 +324,7 @@ module Autotune
         :slug => 'New project'.parameterize,
         :blueprint_id => autotune_blueprints(:example).id,
         :user_id => autotune_users(:developer).id,
-        :theme => autotune_themes(:generic).value,
+        :theme => autotune_themes(:generic).slug,
         :preview_url => '',
         :data => {
           :title => 'New project',

@@ -9,7 +9,7 @@ var ThemeCollection = Backbone.Collection.extend({
 
   get: function(id_or_slug) {
     return this.find(function(model) {
-      return model.id === id_or_slug || model.get('value') === id_or_slug;
+      return model.id === id_or_slug || model.get('slug') === id_or_slug;
     });
   }
 });

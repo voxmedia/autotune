@@ -209,8 +209,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               "title": "Theme",
               "type": "string",
               "required": true,
-              "default": pluckAttr(themes, 'value')[0],
-              "enum": pluckAttr(themes, 'value')
+              "default": pluckAttr(themes, 'slug')[0],
+              "enum": pluckAttr(themes, 'slug')
             },
             "slug": {
               "title": "Slug",
@@ -232,7 +232,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           options_fields = {
             "theme": {
               "type": "select",
-              "optionLabels": pluckAttr(themes, 'label'),
+              "optionLabels": pluckAttr(themes, 'title'),
             },
             "slug": {
               "label": "Slug",
@@ -318,8 +318,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       if(!this.model.isNew() || this.copyProject) {
         opts.data = this.model.formData();
-        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
-          opts.data.theme = pluckAttr(themes, 'value')[0];
+        if ( !_.contains(pluckAttr(themes, 'slug'), opts.data.theme) ) {
+          opts.data.theme = pluckAttr(themes, 'slug')[0];
         }
       }
       $form.alpaca(opts);

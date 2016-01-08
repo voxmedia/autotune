@@ -11,7 +11,7 @@ module Autotune
 
     before_action :only => [:show, :update, :destroy] do
       unless current_user.role?(:superuser) ||
-             current_user.role?(:designer => instance.group.value)
+             current_user.role?(:designer => instance.group.name)
         render_error 'Forbidden', :forbidden
       end
     end

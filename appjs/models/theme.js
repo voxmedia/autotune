@@ -10,8 +10,8 @@ var Theme = Backbone.Model.extend({
    **/
   url: function() {
     if(this.isNew()) { return this.urlRoot; }
-    if(this.attributes.value) {
-      return [this.urlRoot, this.attributes.value].join('/');
+    if(this.attributes.slug) {
+      return [this.urlRoot, this.attributes.slug].join('/');
     } else {
       return [this.urlRoot, this.id].join('/');
     }

@@ -24,6 +24,8 @@ class CreateGroups < ActiveRecord::Migration
     add_column :autotune_themes, :group_id, :integer
 
     # Add data and theme inheritance model
+    rename_column :autotune_themes, :value, :slug
+    rename_column :autotune_themes, :label, :title
     add_column :autotune_themes, :data, :mediumtext
     add_reference :autotune_themes, :parent, index: true
 
@@ -40,19 +42,19 @@ class CreateGroups < ActiveRecord::Migration
       group_theme_map.each do |g|
         puts "create group #{g['name']}"
         group = Autotune::Group.find_or_create_by :name => g['name']
-        theme = Autotune::Theme.find_by(:value => g['theme'])
+        theme = Autotune::Theme.find_by(:slug => g['theme'])
         if !theme.nil?
           if !theme.group.nil?
             theme = theme.dup
-            theme.value = "#{group.name.downcase.gsub ' ', '_'}"
+            theme.slug = "#{group.name.downcase.gsub ' ', '_'}"
           end
-          theme.label = "#{group.name}"
+          theme.title = "#{group.name}"
           theme.group = group
           theme.save!
         else
           puts "Create theme #{g['theme']}"
-          Autotune::Theme.find_or_create_by :label => g['name'],
-           :value => g['theme'], :group => group
+          Autotune::Theme.find_or_create_by :title => g['name'],
+           :slug => g['theme'], :group => group
         end
       end
 

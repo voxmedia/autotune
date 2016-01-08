@@ -9,13 +9,13 @@ module Autotune
     belongs_to :parent, class_name: "Theme"
     has_many :children, class_name: "Theme", foreign_key: "parent_id"
 
-    validates :value, :label, :group, :presence => true
-    validates :value,
+    validates :slug, :title, :group, :presence => true
+    validates :slug,
               :uniqueness => true,
               :format => { :with => /\A[0-9a-z\-_]+\z/ }
 
     after_initialize :defaults
-    default_scope { order('label ASC') }
+    default_scope { order('title ASC') }
 
     # Merge data with parent theme
     def config_data
