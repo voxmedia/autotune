@@ -46,7 +46,7 @@ class CreateGroups < ActiveRecord::Migration
         if !theme.nil?
           if !theme.group.nil?
             theme = theme.dup
-            theme.slug = "#{group.name.downcase.gsub ' ', '_'}"
+            theme.slug = "#{group.name.downcase.gsub ' ', '-'}"
           end
           theme.title = "#{group.name}"
           theme.group = group
