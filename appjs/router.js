@@ -247,4 +247,33 @@ module.exports = Backbone.Router.extend({
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
   },
+
+  editTheme: function(slug) {
+    var app = this.app, view,
+        theme = new models.Theme({ id: slug });
+
+    Promise.resolve( theme.fetch() ).then(function() {
+      var view = new views.EditTheme({ model: theme, app: app });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+  
+  newTheme: function() {
+    var theme = new models.Theme(),
+        view = new views.EditTheme({ model: theme, app: this.app });
+
+    view.render();
+
+    this.app.view
+      .display( view )
+      .setTab('themes');
+
+  },
 });

@@ -189,7 +189,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-      var themes = this.app.themes.models,
+      var availableThemes = this.app.themes.models,
           social_chars = {
             "sbnation": 8,
             "theverge": 5,
@@ -209,8 +209,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               "title": "Theme",
               "type": "string",
               "required": true,
-              "default": pluckAttr(themes, 'slug')[0],
-              "enum": pluckAttr(themes, 'slug')
+              "default": pluckAttr(availableThemes, 'slug')[0],
+              "enum": pluckAttr(availableThemes, 'slug')
             },
             "slug": {
               "title": "Slug",
@@ -232,7 +232,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           options_fields = {
             "theme": {
               "type": "select",
-              "optionLabels": pluckAttr(themes, 'title'),
+              "optionLabels": pluckAttr(availableThemes, 'title'),
             },
             "slug": {
               "label": "Slug",
@@ -261,7 +261,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           };
 
       // if there is only one theme option, hide the dropdown
-      if ( themes.length === 1 ) {
+      if ( availableThemes.length === 1 ) {
         options_fields['theme']['type'] = 'hidden';
       }
 
@@ -318,8 +318,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       if(!this.model.isNew() || this.copyProject) {
         opts.data = this.model.formData();
-        if ( !_.contains(pluckAttr(themes, 'slug'), opts.data.theme) ) {
-          opts.data.theme = pluckAttr(themes, 'slug')[0];
+        if ( !_.contains(pluckAttr(availableThemes, 'slug'), opts.data.theme) ) {
+          opts.data.theme = pluckAttr(availableThemes, 'slug')[0];
         }
       }
       $form.alpaca(opts);
