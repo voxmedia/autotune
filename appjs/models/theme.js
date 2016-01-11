@@ -17,6 +17,14 @@ var Theme = Backbone.Model.extend({
     }
   },
 
+  /**
+   * Is this the default blueprint for the group?
+   * @returns {boolean}
+   **/
+  isDefault: function() {
+    return !this.has('parent_id') || this.get('parent_id') === undefined;
+  },
+
   urlRoot: '/themes'
 });
 

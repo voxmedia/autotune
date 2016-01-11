@@ -46,6 +46,10 @@ function App(config) {
   this.user = new Backbone.Model(config.user);
   delete config.user;
 
+  this.designerGroups = new Backbone.Collection();
+  this.designerGroups.reset(config.designer_groups);
+  delete config.designer_groups;
+
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
   this.edittableThemes = new models.ThemeCollection();

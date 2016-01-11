@@ -9,7 +9,7 @@ module Autotune
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update, :destroy] do
+    before_action :only => [:show, :create, :update, :destroy] do
       unless current_user.role?(:superuser) ||
              current_user.role?(:designer => instance.group.name)
         render_error 'Forbidden', :forbidden
@@ -33,6 +33,48 @@ module Autotune
 
     def show
       @theme = instance
+    end
+
+    def create
+      @theme = Theme.new
+      @theme.attributes = select_from_post :title, :data, :group_id, :slug
+      @theme.parent = Theme.get_default_theme_for_group(@theme.group_id)
+      if @theme.valid?
+        @theme.save
+        render :show, :status => :created
+      else
+        render_error @theme.errors.full_messages.join(', '), :bad_request
+      end
+    end
+
+    def update
+      @theme = instance
+      @theme.attributes = select_from_post :title, :data, :slug, :group_id
+      @theme.parent = Theme.get_default_theme_for_group(
+                                @theme.group_id) unless @theme.parent.nil?
+      if @theme.valid?
+        @theme.save
+        render :show
+      else
+        render_error @theme.errors.full_messages.join(', '), :bad_request
+      end
+    end
+
+    def destroy
+      @theme = instance
+      if @theme.parent.nil?
+        render_error(
+          'Default themes cannot be deleted',
+          :bad_request)
+      elsif @theme.projects.count > 0
+        render_error(
+          'This theme is in use. You must delete the projects which use this theme.',
+          :bad_request)
+      elsif @theme.destroy
+        head :no_content
+      else
+        render_error @theme.errors.full_messages.join(', '), :bad_request
+      end
     end
   end
 end

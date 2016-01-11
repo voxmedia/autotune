@@ -1,5 +1,68 @@
 <div class="row m-page-heading">
   <div class="col-xs-12">
-    <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+    <h3><% if ( model.isNew() ) { %>New Theme<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-xs-12">
+    <div id="edit">
+      <div class="row">
+        <div class="col-sm-12">
+          <form id="new-theme" role="form"
+                data-next="show" data-model="Theme"
+                <% if(model.isNew()) { %>
+                data-action="new"
+                <% } else { %>
+                data-action="edit" data-model-id="<%=model.get('id') %>"
+                <% } %> >
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" required class="form-control"
+                     <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
+                     id="title" name="title" placeholder="Enter title">
+            </div>
+            <div class="form-group">
+              <label for="group_id" class="block">Brand
+                <% if ( !model.isNew() && model.isDefault()) { %>
+                  <span class="text-muted text-warning"><i class="icon-info"></i>Cannot change brand for default theme</span>
+                <% } %>
+              </label>
+              <div class="select">
+                <select id="group_id" name="group_id" class="form-control"
+                          <% if ( !model.isNew() && !model.get('parent_id')) { %>
+                            disabled
+                          <% } %>>
+                  <option>Select Brand</option>
+                  <% this.app.designerGroups.each(function(group) { %>
+                      <option value="<%= group.get('id') %>" <% if ( model.get('group_id') === group.get('id') ) { %>selected<% } %>>
+                        <%= group.get('name') %>
+                      </option>
+                  <% }); %>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="data">Theme data</label>
+              <div id="data" style="height:300px;"></div>
+            </div>
+            <button type="submit" class="btn btn-primary"
+                    data-loading-text="Saving...">Save changes</button>
+
+            <% if ( !model.isNew() && !model.isDefault()) { %>
+            <button type="button" class="btn btn-danger"
+                    data-action-message="Theme deleted"
+                    data-action-confirm="Are you sure you wish to delete this?"
+                    data-loading-text="Deleting..."
+                    data-action="destroy"
+                    data-action-next="/themes" data-model="Theme"
+                    data-model-id="<%=model.get('slug') %>">Delete</button>
+            <% } %>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
