@@ -28,7 +28,7 @@
               <label for="group_id" class="block">Group</label>
               <div class="select">
                 <select id="group_id" name="group_id" class="form-control">
-                  <option>Select Brand</option>
+                  <option>Select group</option>
                   <% this.app.designerGroups.each(function(group) { %>
                       <option value="<%= group.get('id') %>" <% if ( model.get('group_id') === group.get('id') ) { %>selected<% } %>>
                         <%= group.get('name') %>

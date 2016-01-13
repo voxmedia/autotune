@@ -49,7 +49,6 @@ module Autotune
 
     def update
       @theme = instance
-      original_group_id = @theme.group_id
       @theme.attributes = select_from_post :title, :data
       if @theme.valid?
         @theme.save
