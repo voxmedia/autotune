@@ -93,7 +93,7 @@ module Autotune
 
     test 'thumb url' do
       assert_equal(
-        '/assets/autotune/at_placeholder.png',
+        ActionController::Base.helpers.asset_path('autotune/at_placeholder.png'),
         autotune_blueprints(:example).thumb_url)
     end
   end
