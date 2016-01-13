@@ -15,6 +15,12 @@ require('brace/theme/textmate');
 
 var EditTheme = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/theme.ejs'),
+  events: {
+       'change #data': 'getDataFromAce'
+   },
+  getDataFromAce : function(){
+    console.log('test');
+  },
   afterRender: function() {
     var view = this, promises = [];
 
@@ -37,6 +43,20 @@ var EditTheme = BaseView.extend(require('./mixins/actions'), require('./mixins/f
 
       this.editor.setValue(JSON.stringify( this.model.get('data'), null, "  " ), -1 );
     }
+  },
+
+  formValues: function($form) {
+    var values = {};
+    _.each($form.serializeArray(), function(val){
+      values[val.name] = val.value;
+    });
+    try {
+      values.data = JSON.parse(this.editor.getValue());
+    } catch (ex) {
+      logger.error("Theme data JSON is bad");
+      return {};
+    }
+    return values;
   }
 });
 
