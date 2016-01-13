@@ -23,7 +23,7 @@ module Autotune
     # Merge data with parent theme
     def config_data
       return data if parent.nil?
-      return parent.data.merge!(data)
+      return parent.data.merge(data)
     end
 
     # Get default theme for group
