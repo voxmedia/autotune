@@ -29,7 +29,6 @@ module Autotune
     def index
       @projects = Project
       # a user can have multiple authorizations
-      # puts current_user.authorizations.find_by!(:provider => 'google_oauth2').credentials
       # Filter and search query
       type = false
       query = {}

@@ -55,7 +55,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).done(function( data ) {
-        logger.debug('!!!!! form values', data);
+        logger.debug('received form values', data);
 
         if(data.theme !== view.theme){
           view.theme = data.theme;

@@ -29,7 +29,6 @@ var BaseView = Backbone.View.extend({
     // Do some renderin'. First up: beforeRender()
     return view.hook( 'beforeRender' ).then(function() {
       // Generate the element using template and templateData()
-      logger.debug(view, 'stuff');
       view.$el.html(
         helpers.render(
           view.template, view.templateData() ) );
