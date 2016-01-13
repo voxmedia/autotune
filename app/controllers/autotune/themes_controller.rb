@@ -50,12 +50,7 @@ module Autotune
     def update
       @theme = instance
       original_group_id = @theme.group_id
-      @theme.attributes = select_from_post :title, :data, :slug, :group_id
-      @theme.parent = Theme.get_default_theme_for_group(
-                                @theme.group_id) unless @theme.parent.nil?
-
-      # Don't change the group if it is a default theme
-      @theme.group_id = original_group_id if @theme.parent.nil?
+      @theme.attributes = select_from_post :title, :data
       if @theme.valid?
         @theme.save
         render :show
