@@ -177,6 +177,7 @@ module Autotune
         end
       end
       # delete all memberships that weren't updated
+      # TODO: change 
       user.group_memberships.where("updated_at < ?", start_time).delete_all
       user.save!
     end
