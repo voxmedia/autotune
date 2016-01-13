@@ -57,6 +57,17 @@ var EditTheme = BaseView.extend(require('./mixins/actions'), require('./mixins/f
       return {};
     }
     return values;
+  },
+
+  formValidate: function(){
+    var valid = false;
+    try {
+      JSON.parse(this.editor.getValue());
+      valid = true;
+    } catch (ex) {
+      logger.error("Theme data JSON is bad");
+    }
+    return valid;
   }
 });
 
