@@ -121,27 +121,21 @@ module Autotune
               group_memberships.with_design_access.pluck(:group_id))
     end
 
-    # Return an array of themes that this user is allowed to edit. Editors can see and change other
-    # users' projects. This user will be limited to projects that use these themes.
-    # TODO: remove dependency on this
-    def editor_themes
-      return [] if group_memberships.nil?
-      Theme.where('(group_id IN (?))',
-              group_memberships.with_editor_access.pluck(:group_id))
-    end
-
+    # Return an array list of groups that this user has at least editor privileges for
     def editor_groups
       return if group_memberships.nil?
 
       groups.merge(group_memberships.with_editor_access)
     end
 
+    # Return an array list of groups that this user has at least designer privileges for
     def designer_groups
       return if group_memberships.nil?
 
       groups.merge(group_memberships.with_design_access)
     end
 
+    # Return an array list of groups that this user has access to
     def author_groups
       return if group_memberships.nil?
 
@@ -157,25 +151,33 @@ module Autotune
    # TODO (Kavya) do a security review on this piece
     def self.update_roles(user, roles)
       # make sure the user is saved before trying to update relations
-      user.save
-      # TODO (Kavya) update roles instead of deleting all
-      user.group_memberships.delete
-      return if roles.nil?
+      user.save!
+      if roles.nil?
+        user.group_memberships.delete
+        return
+      end
+      start_time = Time.now.utc
       # If roles is an array , assign the highest privileges to all groups
       if roles.is_a?(Array) && roles.any?
         best_role = GroupMembership.get_best_role(roles)
         return if best_role.nil?
         Group.all.each do |g|
-          user.group_memberships.create(:role => best_role.to_s, :group => g)
+          membership = user.group_memberships.find_or_create_by(:group => g)
+          membership.role = best_role.to_s
+          membership.save!
         end
-        return
       elsif roles.is_a?(Hash) && roles.any?
         [:author, :editor, :designer].each do |r|
           next if roles[r.to_s].nil?
           group = Group.find_or_create_by(:name => roles[r.to_s])
-          group.save && user.group_memberships.find_or_create_by(:group => group, :role => r.to_s)
+          group.save
+          membership = user.group_memberships.find_or_create_by(:group => group)
+          membership.role = r.to_s
+          membership.save!
         end
       end
+      # delete all memberships that weren't updated
+      user.group_memberships.where("updated_at < ?", start_time).delete_all
       user.save!
     end
 
