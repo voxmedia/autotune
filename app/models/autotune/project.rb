@@ -76,8 +76,7 @@ module Autotune
           :blueprint_config => blueprint.config)
       end
       ActiveJob::Chain.new(
-        # SyncBlueprintJob.new(blueprint, self),
-        SyncBlueprintJob.new(blueprint, :project => true),
+        SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self, :update => true),
         BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
       ).enqueue
@@ -89,7 +88,7 @@ module Autotune
     def build
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :project => true),
+        SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
       ).enqueue
@@ -101,7 +100,7 @@ module Autotune
     def build_and_publish
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :project => true),
+        SyncBlueprintJob.new(blueprint),
         SyncProjectJob.new(self),
         BuildJob.new(self, :target => 'publish')
       ).enqueue

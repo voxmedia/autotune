@@ -85,11 +85,7 @@ module Autotune
     end
 
     def has_google_auth?
-      if current_user.authorizations.find_by(:provider => 'google_oauth2')
-        return true
-      else
-        return false
-      end
+      current_user.authorizations.find_by(:provider => 'google_oauth2').present?
     end
 
     def any_roles?
@@ -111,16 +107,12 @@ module Autotune
     end
 
     def require_login
-      # There's a lot more that's going to have to go into this
       if signed_in? && any_roles?
         if Autotune.configuration.force_google_auth
           require_google_login
-        # else
         end
         return true
       end
-
-      # return true if signed_in? && any_roles?
 
       if signed_in?
         render_error 'Not allowed', :forbidden

@@ -10,8 +10,7 @@ module Autotune
     end
 
     # do the deed
-    # def perform(blueprint, project, status: nil, update: false)
-    def perform(blueprint, status: nil, update: false, project: false)
+    def perform(blueprint, status: nil, update: false, build_themes: false)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
@@ -68,7 +67,9 @@ module Autotune
         sample_data.delete('asset_base_url')
 
         # don't build a copy for each theme every time a project is updated
-        unless project
+      # when build themes = false
+        #if not build_themes
+        if build_themes
           themes.each do |theme|
             slug = [blueprint.version, theme].join('-')
             # Use this as dummy build data for the moment

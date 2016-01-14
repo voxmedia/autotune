@@ -10,8 +10,8 @@ Autotune::Engine.routes.draw do
   get 'blueprints/:id/new_project',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  match 'blueprints/:id/new_project/update_project_data',
-      :to => 'blueprints#update_project_data',
+  match 'blueprints/:id/new_project/preview_build_data',
+      :to => 'blueprints#preview_build_data',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
       :via => [:get, :post]
 
@@ -26,12 +26,12 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/build_and_publish',
       :to => 'projects#build_and_publish',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  match 'projects/:id/update_project_data',
-      :to => 'projects#update_project_data',
+  match 'projects/:id/preview_build_data',
+      :to => 'projects#preview_build_data',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
       :via => [:get, :post]
-  match 'projects/:id/duplicate/update_project_data',
-      :to => 'projects#update_project_data',
+  match 'projects/:id/duplicate/preview_build_data',
+      :to => 'projects#preview_build_data',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
       :via => [:get, :post]
   get 'projects/:id/duplicate',
@@ -98,7 +98,6 @@ Autotune::Engine.routes.draw do
   get '/auth/failure'              => 'sessions#failure'
   get '/logout'                    => 'sessions#destroy', :as => :logout
   get '/login'                     => 'sessions#new',     :as => :login
-  # get '/google_auth'               => 'sessions#google_auth'
 
   resque_web_constraint = lambda do |request|
     current_user = Autotune::User.find_by_api_key(

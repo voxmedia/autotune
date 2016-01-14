@@ -68,7 +68,7 @@ module Autotune
       final_status = ready? ? 'ready' : 'testing'
       update!(:status => 'updating')
       SyncBlueprintJob.perform_later(
-        self, :status => final_status, :update => true, :project => false)
+        self, :status => final_status, :update => true, :build_themes => true)
     rescue
       update!(:status => 'broken')
       raise

@@ -75,7 +75,7 @@ module Autotune
       end
     end
 
-    def update_project_data
+    def preview_build_data
       @project = instance
       @build_data = request.POST
 

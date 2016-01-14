@@ -50,7 +50,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     $.ajax({
       type: "POST",
-      url: base_url + "/update_project_data",
+      url: base_url + "/preview_build_data",
       data: JSON.stringify(data),
       contentType: 'application/json',
       dataType: 'json'
