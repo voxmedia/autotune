@@ -67,8 +67,6 @@ module Autotune
         sample_data.delete('asset_base_url')
 
         # don't build a copy for each theme every time a project is updated
-      # when build themes = false
-        #if not build_themes
         if build_themes
           themes.each do |theme|
             slug = [blueprint.version, theme].join('-')
