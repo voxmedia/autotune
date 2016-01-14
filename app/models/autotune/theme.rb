@@ -11,6 +11,8 @@ module Autotune
     has_many :children, class_name: "Theme", foreign_key: "parent_id"
 
     validates :slug, :title, :group, :presence => true
+    validates :title,
+              :uniqueness => true
     validates :slug,
               :uniqueness => true,
               :format => { :with => /\A[0-9a-z\-_]+\z/ }
