@@ -156,28 +156,46 @@ module Autotune
         user.group_memberships.delete
         return
       end
-      start_time = Time.now.utc
+
+      # Global role assignment
       # If roles is an array , assign the highest privileges to all groups
       if roles.is_a?(Array) && roles.any?
-        best_role = GroupMembership.get_best_role(roles)
-        return if best_role.nil?
+        role_to_assign = GroupMembership.get_best_role(roles)
+        if role_to_assign.nil?
+          user.group_memberships.delete
+          return
+        end
+      # assign global superuser role if the user has superuser role for anything
+      elsif roles.is_a?(Hash) && !roles[:superuser].nil?
+        role_to_assign = :superuser
+      end
+
+      unless role_to_assign.nil?
         Group.all.each do |g|
           membership = user.group_memberships.find_or_create_by(:group => g)
-          membership.role = best_role.to_s
+          membership.role = role_to_assign.to_s
           membership.save!
         end
-      elsif roles.is_a?(Hash) && roles.any?
+        return
+      end
+
+      # handle the case where it is a hash but not superuser
+      if roles.is_a?(Hash) && roles.any?
+        stale_ids = user.group_memberships.pluck(:id)
         [:author, :editor, :designer].each do |r|
           next if roles[r.to_s].nil?
-          group = Group.find_or_create_by(:name => roles[r.to_s])
-          group.save
-          membership = user.group_memberships.find_or_create_by(:group => group)
-          membership.role = r.to_s
-          membership.save!
+          roles[r.to_s].each do |g|
+            group = Group.find_or_create_by(:name => g)
+            group.save
+            membership = user.group_memberships.find_or_create_by(:group => group)
+            membership.role = r.to_s
+            membership.save!
+            stale_ids.delete(membership.id)
+          end
         end
       end
       # delete all memberships that weren't updated
-      user.group_memberships.where("updated_at < ?", start_time).delete_all
+      user.group_memberships.where("id in ?", stale_ids).delete_all unless stale_ids.empty?
       user.save!
     end
 
