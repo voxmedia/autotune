@@ -10,6 +10,10 @@ Autotune::Engine.routes.draw do
   get 'blueprints/:id/new_project',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  match 'blueprints/:id/new_project/preview_build_data',
+      :to => 'blueprints#preview_build_data',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
+      :via => [:get, :post]
 
   resources :projects,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
@@ -22,6 +26,14 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/build_and_publish',
       :to => 'projects#build_and_publish',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  match 'projects/:id/preview_build_data',
+      :to => 'projects#preview_build_data',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
+      :via => [:get, :post]
+  match 'projects/:id/duplicate/preview_build_data',
+      :to => 'projects#preview_build_data',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
+      :via => [:get, :post]
   get 'projects/:id/duplicate',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }

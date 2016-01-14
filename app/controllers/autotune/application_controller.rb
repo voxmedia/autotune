@@ -84,6 +84,10 @@ module Autotune
       current_user.present?
     end
 
+    def has_google_auth?
+      current_user.authorizations.find_by(:provider => 'google_oauth2').present?
+    end
+
     def any_roles?
       !current_user.meta['roles'].nil? && !current_user.meta['roles'].empty?
     end
@@ -103,13 +107,30 @@ module Autotune
     end
 
     def require_login
-      return true if signed_in? && any_roles?
+      if signed_in? && any_roles?
+        if Autotune.configuration.force_google_auth
+          require_google_login
+        end
+        return true
+      end
+
       if signed_in?
         render_error 'Not allowed', :forbidden
       else
         respond_to do |format|
           format.html { redirect_to login_path(request.fullpath) }
           format.json { render_error 'Unauthorized', :unauthorized }
+        end
+      end
+    end
+
+    def require_google_login
+      return true if has_google_auth?
+      if has_google_auth?
+        render_error 'Not allowed', :forbidden
+      else
+        respond_to do |format|
+          format.html { render 'google_auth' }
         end
       end
     end

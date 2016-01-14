@@ -1,9 +1,10 @@
 require 'uri'
+require 'autotune/google_docs'
 
 module Autotune
   # Autotune blueprint base deployer
   class Deployer
-    attr_accessor :base_url, :connect, :project
+    attr_accessor :base_url, :connect, :project, :extra_slug
     attr_writer :logger
 
     # Create a new deployer
@@ -25,12 +26,35 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
+      if build_data['google_doc_url']
+        spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+        if project['meta']
+          cur_user = User.find(project.meta['current_user'])
+        else
+          # There must be a better way to do this.
+          # Don't have a meta field on blueprints and therefore they don't have a current_user
+          # So right now this is just getting the user account for the author or the blueprint
+          cur_user = User.find_by_name(project.config['authors'][0].split('<')[0])
+        end
+        current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
+
+        google_client = GoogleDocs.new(current_auth)
+        exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
+        ss_data = google_client.prepare_spreadsheet(exp_file)
+        build_data['google_doc_data'] = ss_data
+      end
+
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
     end
 
     # Hook to do stuff after a project is deleted
     def delete!(*)
+      raise NotImplementedError
+    end
+
+    # Hook to do stuff after a project is moved (slug changed)
+    def move!
       raise NotImplementedError
     end
 
@@ -48,15 +72,24 @@ module Autotune
     end
 
     def deploy_path
-      [parts.path, project.slug].join('/')
+      d_path = [parts.path, project.slug, extra_slug].reject(&:blank?).join('/')
+      if parts.path.length > 0
+        d_path
+      else
+        '/'+d_path
+      end
+    end
+
+    def old_deploy_path
+      [parts.path, project.slug_was].join('/') if project.slug_changed?
     end
 
     def project_url
-      [base_url, project.slug].join('/')
+      [base_url, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def project_asset_url
-      [try(:asset_base_url) || base_url, project.slug].join('/')
+      [try(:asset_base_url) || base_url, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
     def logger

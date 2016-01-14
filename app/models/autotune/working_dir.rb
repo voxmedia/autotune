@@ -30,7 +30,7 @@ module Autotune
     private
 
     def move_working_dir
-      return if !slug_changed? || slug_was.nil?
+      return if !slug_changed? || slug_was.nil? || slug == slug_was
       MoveWorkDirJob.perform_later(working_dir_was, working_dir)
     end
 

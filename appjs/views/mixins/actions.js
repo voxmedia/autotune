@@ -10,7 +10,16 @@ var $ = require('jquery'),
 
 module.exports = {
   events: {
-    'click button[data-action], a[data-action]': 'handleAction'
+    'click button[data-action], a[data-action]': 'handleAction',
+    'click a[data-view]': 'viewDraft'
+  },
+
+  viewDraft: function(eve){
+    var view = $(eve.currentTarget).data('view');
+    $( "#draft-preview" ).trigger( "click" );
+    if( view === 'preview'){
+      $( window ).scrollTop(0);
+    }
   },
 
   handleAction: function(eve) {
@@ -28,7 +37,7 @@ module.exports = {
     logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
     this.app.trigger('loadingStart');
-    if ( $btn.hasClass('btn') ) {
+    if ( $btn.hasClass('btn') && !$btn.hasClass('resize') ) {
       $btn.button('loading');
     }
 
@@ -44,12 +53,15 @@ module.exports = {
     } else {
       inst = this.model;
     }
+    logger.debug(inst);
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
-        app.view.alert(action_message, 'success', false, 4000);
+        if(action_message){
+          app.view.alert(action_message, 'success', false, 4000);
+        }
 
         switch (action) {
           case 'build':
@@ -68,6 +80,20 @@ module.exports = {
           Backbone.history.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
           return view.render();
+        } else if ( next === 'resize' ) {
+          var width = '100%';
+          if ($btn.attr('id') === 'large-view') {
+            width = '720px';
+          } else if ($btn.attr('id') === 'medium-view') {
+            width = '500px';
+          } else if ($btn.attr('id') === 'small-view') {
+            width = '320px';
+          }
+          $('.nav.nav-pills button').removeClass('active');
+          $btn.addClass('active');
+          $('.preview-frame').css({'max-width': width, 'margin': 'auto'});
+          app.trigger( 'loadingStop' );
+          return view;
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
         }

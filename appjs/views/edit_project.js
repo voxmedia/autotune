@@ -8,6 +8,7 @@ var $ = require('jquery'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
     ace = require('brace'),
+    pym = require('pym.js'),
     slugify = require("underscore.string/slugify");
 
 require('brace/mode/json');
@@ -20,12 +21,68 @@ function pluckAttr(models, attribute) {
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
   events: {
-    'change :input': 'stopListeningForChanges'
+    'change :input': 'stopListeningForChanges',
+    'change form': 'debounceChange',
+    'keypress': 'debounceChange',
+    'click #savePreview': 'savePreview'
+  },
+
+  debounceChange: _.debounce(function(e){
+    if ( this.model.blueprint.hasPreviewType('live') ){
+      this.pollChange();
+    }
+  }, 2000),
+
+  pollChange: function(e){
+    logger.debug('pollchange');
+    var view = this,
+        $form = this.$('#projectForm'),
+        data = $form.alpaca('get').getValue(),
+        base_url = this.model.url();
+
+    if( view.model.isNew() ){
+      base_url = window.location.href;
+    }
+
+    var childLoaded = function() {
+      view.pollChange();
+    };
+
+    $.ajax({
+      type: "POST",
+      url: base_url + "/preview_build_data",
+      data: JSON.stringify(data),
+      contentType: 'application/json',
+      dataType: 'json'
+    }).done(function( data ) {
+        logger.debug('received form values', data);
+
+        if(data.theme !== view.theme){
+          view.theme = data.theme;
+          var slug = view.model.blueprint.get('slug'),
+              bp_version = view.model.getVersion(),
+              preview_url = view.model.blueprint.getMediaUrl(
+                [bp_version, view.theme].join('-') + '/preview');
+
+          $('#'+slug+'__graphic').empty();
+          view.pym = new pym.Parent(slug+'__graphic', preview_url);
+          view.pym.iframe.onload = childLoaded;
+        }
+
+        view.pym.sendMessage('updateData', JSON.stringify(data));
+    });
+  },
+
+  savePreview: function(){
+    this.$('#projectForm form').submit();
   },
 
   afterInit: function(options) {
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
+    if(options.query){
+      this.togglePreview = options.query.togglePreview ? true : false;
+    }
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
@@ -118,6 +175,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       });
     }
 
+    // load the embed code
     if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
       var proto = window.location.protocol.replace( ':', '' ),
           embedUrl = this.model.getPublishUrl(proto, 'embed.txt');
@@ -134,19 +192,69 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       );
     }
 
+    // render the alpaca form
     promises.push( new Promise( function(resolve, reject) {
       view.renderForm(resolve, reject);
     } ) );
 
     return Promise.all(promises)
       .then(function() {
+        var formData = view.alpaca.getValue(),
+            buildData = view.model.buildData();
+
+        if ( view.model.blueprint.hasPreviewType('live') ){
+          view.theme = view.model.get('theme') || formData['theme'] || 'custom';
+
+          var slug = view.model.blueprint.get('slug'),
+              bp_version = view.model.getVersion(),
+              preview_url = view.model.blueprint.getMediaUrl(
+                [bp_version, view.theme].join('-') + '/preview');
+
+          if ( ! view.model.hasInitialBuild() && ! view.copyProject){
+            preview_url += '#new';
+          }
+
+          var childLoaded = function() {
+            view.pollChange();
+          };
+
+          if ( view.copyProject || view.model.hasInitialBuild() ){
+            // if blueprint is now live, but the version on this project is not, swap what we show
+            var versioned_type = view.model.get('blueprint_config')['preview_type'];
+            if( versioned_type === 'live'){
+              view.pym = new pym.Parent(slug+'__graphic', preview_url);
+              view.pym.iframe.onload = childLoaded;
+            } else {
+              view.pym = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
+            }
+          } else {
+            var uniqBuildVals = _.uniq(_.values(buildData));
+            view.pym = new pym.Parent(slug+'__graphic', preview_url);
+
+            if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
+              view.pym.iframe.onload = childLoaded;
+            }
+          }
+
+        } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
+          var previewLink = view.model.get('preview_url');
+          if(view.model['_previousAttributes']['preview_url'] && view.model['_previousAttributes']['preview_url'] !==  view.model.get('preview_url')){
+            previewLink = view.model['_previousAttributes']['preview_url'];
+          }
+          view.pym = new pym.Parent(view.model.get('slug')+'__graphic', previewLink);
+        }
+        if(view.togglePreview){
+          $( "#draft-preview" ).trigger( "click" );
+        }
+      }).catch(function(err) {
+        console.error(err);
+      }).then(function() {
         view.listenForChanges();
       });
   },
 
   afterSubmit: function() {
     this.listenForChanges();
-
     if (this.model.hasStatus('building')){
       this.app.view.alert(
         'Building... This might take a moment.', 'notice', false, 16000);
@@ -154,9 +262,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   renderForm: function(resolve, reject) {
+    logger.debug('debugging this', this);
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
-        form_config, config_themes, newProject;
+        orig_this = this,
+        form_config, config_themes, newProject, populateForm = false;
 
     if ( this.disableForm ) {
       $form.append(
@@ -326,11 +436,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
 
       if(!this.model.isNew() || this.copyProject) {
+        populateForm = true;
+      } else if (this.model.isNew() && !this.copyProject && !this.hasInitialBuild){
+        var uniqBuildVals = _.uniq(_.values(this.model.buildData()));
+        if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
+          populateForm = true;
+        }
+      }
+
+      if(populateForm){
         opts.data = this.model.formData();
         if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
           opts.data.theme = pluckAttr(themes, 'value')[0];
         }
       }
+
       $form.alpaca(opts);
     }
   },

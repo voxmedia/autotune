@@ -1,4 +1,6 @@
 require_dependency 'autotune/application_controller'
+require 'autotune/google_docs'
+require 'redis'
 
 module Autotune
   # API for projects
@@ -25,7 +27,7 @@ module Autotune
 
     def index
       @projects = Project
-
+      # a user can have multiple authorizations
       # Filter and search query
       type = false
       query = {}
@@ -103,8 +105,8 @@ module Autotune
 
     def create
       @project = Project.new(:user => current_user)
+      @project.meta['current_user'] = current_user.id
       @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
-
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
 
@@ -137,6 +139,7 @@ module Autotune
     def update
       @project = instance
       @project.user = current_user if @project.user.nil?
+      @project.meta['current_user'] = current_user.id
       @project.attributes = select_from_post :title, :slug, :data
 
       if request.POST.key? 'theme'
@@ -164,6 +167,18 @@ module Autotune
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    def preview_build_data
+      @project = instance
+      @build_data = request.POST
+
+      # Get the deployer object
+      deployer = @project.deployer(:preview)
+
+      # Run the before build deployer hook
+      deployer.before_build(@build_data, {})
+      render :json => @build_data
     end
 
     def update_snapshot

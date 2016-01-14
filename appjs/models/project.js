@@ -1,8 +1,10 @@
 "use strict";
 
 var Backbone = require('backbone'),
+    $ = require('jquery'),
     _ = require('underscore'),
     moment = require('moment'),
+    utils = require('../utils'),
     markdown = require('markdown').markdown;
 
 var Project = Backbone.Model.extend({
@@ -240,6 +242,15 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Has this project ever been built?
+   * Used for displaying active preview tab on static projects
+   * @returns {boolean}
+   **/
+  hasInitialBuild: function() {
+    return !!this.get('output');
+  },
+
+  /**
    * Is this project a draft?
    * @returns {boolean}
    **/
@@ -283,13 +294,26 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Return the version of the blueprint
+   * @returns {string} commit hash
+   **/
+  getVersion: function() {
+    return this.get('blueprint_version') || this.blueprint.get('version');
+  },
+
+  /**
    * Get the url of the preview.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
    * @param {string} path - include this path in the URL
    * @returns {string} url
    **/
   getPreviewUrl: function(preferredProto, path) {
-    return this.getBuildUrl('preview', preferredProto, path);
+    return utils.buildUrl(this.get('preview_url'), path, preferredProto);
+  },
+
+  getPreviewSize: function() {
+    console.log(this.model);
+    console.log('getting preview size', this);
   },
 
   /**
@@ -299,41 +323,7 @@ var Project = Backbone.Model.extend({
    * @returns {string} url
    **/
   getPublishUrl: function(preferredProto, path) {
-    return this.getBuildUrl('publish', preferredProto, path);
-  },
-
-  /**
-   * Get the url for one of the built projects (preview or publish).
-   * @param {string} type - Type of the url (preview, publish)
-   * @param {string} preferredProto - Protocol to use if possible (http, https)
-   * @param {string} path - include this path in the URL
-   * @returns {string} url
-   **/
-  getBuildUrl: function(type, preferredProto, path) {
-    var key = ( type === 'publish' ) ? 'publish_url' : 'preview_url';
-
-    if ( !this.has(key) ) { return ''; }
-
-    var base = this.get(key);
-    if ( base.match(/^\/\//) && preferredProto !== '' ) {
-      base = preferredProto + ':' + base;
-    }
-
-    if ( !path ) { return base; }
-
-    if ( base.substr(-1) === '/' ) {
-      if ( path[0] === '/' ) {
-        return base + path.substr(1);
-      } else {
-        return base + path;
-      }
-    } else {
-      if ( path[0] === '/' ) {
-        return base + path;
-      } else {
-        return base + '/' + path;
-      }
-    }
+    return utils.buildUrl(this.get('publish_url'), path, preferredProto);
   }
 });
 

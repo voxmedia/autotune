@@ -5,7 +5,8 @@
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
-     href="<%=model.getPreviewUrl('http') %>">Preview</a>
+     <% if ( ! model.blueprint.hasPreviewType('live') && ! model.hasInitialBuild() ) { %>disabled="true"<% } %>
+     data-view="preview">Preview</a>
   <% } else { %>
   <a class="btn btn-default" target="_blank" id="viewBtn"
      href="<%=model.getPublishUrl('http') %>">View</a>
@@ -13,6 +14,7 @@
 
   <% if ( model.isPublishable() ) { %>
   <button type="button" class="btn btn-success" id="publishBtn"
+          <% if ( ! model.hasInitialBuild() ) { %>disabled="true"<% } %>
           data-action-message="Publishing..."
           data-action="build-and-publish" data-model="Project"
           data-action-next="reload"

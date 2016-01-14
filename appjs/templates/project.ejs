@@ -25,7 +25,7 @@
            target="_blank" href="<%=model.get('publish_url') %>">Published</a>
       <% } else { %>
         <a data-tooltip="View Draft Preview"
-           target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
+           target="_blank" data-view="view-draft">Draft</a>
       <% } %>
       <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
     </p>
@@ -47,6 +47,9 @@
         href="#edit" aria-controls="edit"
         role="tab" data-toggle="tab">Project info</a></li>
     <% if ( model.hasType( 'graphic' ) ) { %>
+      <li role="presentation"><a
+          href="#live-preview" id="draft-preview" aria-controls="live-preview"
+          role="tab" data-toggle="tab">Preview</a></li>
       <% if ( model.isPublished() ) { %>
     <li role="presentation"><a
         href="#embed" aria-controls="embed"
@@ -57,16 +60,27 @@
     <li role="presentation"><a
         href="#screenshots" aria-controls="screenshots"
         role="tab" data-toggle="tab">Screenshots</a></li>
+    <% } else { %>
+      <% if ( model.isDraft() ) { %>
+        <% if ( model.blueprint.hasPreviewType('live') || model.hasType( 'graphic' ) && model.hasInitialBuild() ) { %>
+          <li role="presentation"><a
+              href="#live-preview" id="draft-preview" aria-controls="live-preview"
+              role="tab" data-toggle="tab">Preview</a></li>
+        <% } else { %>
+          <li role="presentation" class="disabled"><a>Preview</a></li>
+        <% } %>
+        <li role="presentation" class="disabled"><a>Embed</a></li>
+      <% } %>
     <% } %>
     <% if ( hasRole('superuser') ) { %>
-      <% if ( model.isNew() ) { %>
+    <% if ( model.isNew() ) { %>
       <li role="presentation" class="disabled"><a>Developer</a></li>
-      <% } else { %>
+    <% } else { %>
       <li role="presentation"><a
           href="#developer" aria-controls="data"
           role="tab" data-toggle="tab">Developer</a></li>
-      <% } %>
     <% } %>
+  <% } %>
   </ul>
 
   <!-- Tab panes -->
@@ -83,16 +97,103 @@
       </div>
       <% } %>
     </div>
-    <% if ( model.hasType( 'graphic' ) ) { %>
-    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
-    <div role="tabpanel" class="tab-pane" id="screenshots">
 
+    <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
+    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
+    <div role="tabpanel" class="tab-pane" id="live-preview">
+
+      <ul class="nav nav-pills">
+        <button type="button" data-action="get-preview-size" id="small-view"
+          class="btn btn-default resize"
+          data-model="Project"
+          data-action-next="resize"
+          data-model-id="<%=model.get('slug') %>">
+          Small
+        </button>
+        <button type="button" data-action="get-preview-size" id="medium-view"
+          class="btn btn-default resize"
+          data-model="Project"
+          data-action-next="resize"
+          data-model-id="<%=model.get('slug') %>">
+          Medium
+        </button>
+        <button type="button" data-action="get-preview-size" id="large-view"
+          class="btn btn-default resize"
+          data-model="Project"
+          data-action-next="resize"
+          data-model-id="<%=model.get('slug') %>">
+          Large
+        </button>
+        <button type="button" data-action="get-preview-size" id="fluid-view"
+          class="btn btn-default resize active"
+          data-model="Project"
+          data-action-next="resize"
+          data-model-id="<%=model.get('slug') %>">
+          Fluid (100%)
+        </button>
+      </ul>
+
+      <div class="preview-frame" style="padding: 25px 0px;">
+        <% check_static = true %>
+        <% if ( model.blueprint.hasPreviewType('live') && ! model.isNew() ){ %>
+          <% if ( model.get('blueprint_config')['preview_type'] === 'live' ){ %>
+            <% check_static = false %>
+          <% } %>
+        <% } %>
+        <!-- Changed this because we need to account for the versioned project possibly not being live -->
+        <% if ( ! model.isNew() && check_static ) { %>
+          <% if ( model.hasStatus('broken') ) { %>
+          <p class="text-danger">
+             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
+            </p>
+            <% if ( model.has('error_message') ) { %>
+            <p class="text-danger">
+             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
+             <%=model.get('error_message') %></p>
+            <% } %>
+          </div>
+          <% } else if ( model.hasStatus('building') ) { %>
+          <p class="text-warning">
+            <span class="status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> Building the project <br /><i class="icon-info"></i> The preview below is still building and does not reflect the changes that you just saved. It will update when the
+            project finishes building.</span>
+          </p>
+          <% } else if ( model.hasStatus('built') ) { %>
+          <p class="text-success">
+            <span class="status-success">This draft is up-to-date with the latest saved version of this project.</span>
+          </p>
+          <!-- <p class="text-warning">
+            <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>
+          </p> -->
+          <% } else if ( model.hasUnpublishedUpdates() ) { %>
+          <p class="text-warning">
+            <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
+          </p>
+          <% } %>
+        <% } %>
+        <div style="border: 2px dashed #ccc;">
+          <div id="<%= model.blueprint.get('slug') %>__graphic" ></div>
+          <div id="<%= model.get('slug') %>__graphic" ></div>
+        </div>
+      </div>
+
+      <% if ( ! check_static ) { %>
+      <button type="submit" class="btn btn-default"
+
+              id="savePreview"
+              data-model="Project"
+              data-loading-text="Saving..."
+              data-model-id="<%=model.get('slug') %>">Save</button>
+      <% } %>
+
+    </div>
+    <% } %>
+
+    <div role="tabpanel" class="tab-pane" id="screenshots">
       <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>
         <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>
         <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>
       </ul>
-
       <% if ( model.isPublishable() ) { %>
       <div class="tab-content">
         <div id="large-ss" class="tab-pane active">
@@ -118,9 +219,8 @@
         </div>
       </div>
       <% } %>
-
     </div>
-    <% } %>
+
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">
       <p>Status:
