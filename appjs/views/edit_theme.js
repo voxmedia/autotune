@@ -15,34 +15,22 @@ require('brace/theme/textmate');
 
 var EditTheme = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/theme.ejs'),
-  events: {
-       'change #data': 'getDataFromAce'
-   },
-  getDataFromAce : function(){
-    console.log('test');
-  },
   afterRender: function() {
     var view = this, promises = [];
 
     // Setup editor for data field
-    if ( this.app.hasRole('superuser') ) {
-      this.editor = ace.edit('data');
-      this.editor.setShowPrintMargin(false);
-      this.editor.setOptions({
-        'showLineNumbers': false,
-        'showGutter': false
-      });
-      this.editor.setTheme("ace/theme/textmate");
-      this.editor.setWrapBehavioursEnabled(true);
+    this.editor = ace.edit('data');
+    this.editor.setShowPrintMargin(false);
+    this.editor.setTheme("ace/theme/textmate");
+    this.editor.setWrapBehavioursEnabled(true);
 
-      var session = this.editor.getSession();
-      session.setMode("ace/mode/json");
-      session.setUseWrapMode(true);
+    var session = this.editor.getSession();
+    session.setMode("ace/mode/json");
+    session.setUseWrapMode(true);
 
-      this.editor.renderer.setHScrollBarAlwaysVisible(false);
-
-      this.editor.setValue(JSON.stringify( this.model.get('data'), null, "  " ), -1 );
-    }
+    this.editor.renderer.setHScrollBarAlwaysVisible(false);
+    var editor_data = JSON.stringify( this.model.get('data'), null, "  " );
+    this.editor.setValue(editor_data ? editor_data : "{}", -1 );
   },
 
   formValues: function($form) {

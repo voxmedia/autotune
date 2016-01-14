@@ -98,10 +98,13 @@ module Autotune
         group_memberships.exists?(:role => args)
       else
         kwargs.reduce(false) do |a, (k, v)|
+          group = Group.find_by_name v
           a ||
-            group_memberships.exists?(
-              :role => k.to_s,
-              :group => {:name => v.to_s}
+            (!group.nil? &&
+              group_memberships.exists?(
+                :role => k.to_s,
+                :group_id => group.id
+              )
             )
         end
       end
