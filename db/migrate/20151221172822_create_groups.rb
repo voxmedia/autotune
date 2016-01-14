@@ -10,8 +10,6 @@ class CreateGroups < ActiveRecord::Migration
       t.references :user, index: true
       t.references :group, index: true
       t.string :role
-
-      t.timestamps null: false
     end
     add_foreign_key :autotune_group_memberships, :autotune_users, column: :user_id
     add_foreign_key :autotune_group_memberships, :autotune_groups, column: :group_id
