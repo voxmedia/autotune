@@ -26,8 +26,7 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
-      if build_data['google_doc_url']
-        spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+      if build_data == {} || build_data['google_doc_url']
         if project['meta']
           cur_user = User.find(project.meta['current_user'])
         else
@@ -36,12 +35,19 @@ module Autotune
           # So right now this is just getting the user account for the author or the blueprint
           cur_user = User.find_by_name(project.config['authors'][0].split('<')[0])
         end
-        current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
 
+        current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
         google_client = GoogleDocs.new(current_auth)
-        exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
-        ss_data = google_client.prepare_spreadsheet(exp_file)
-        build_data['google_doc_data'] = ss_data
+
+        if build_data == {}
+          puts 'got to build data'
+          google_client.create_spreadsheet
+        else
+          spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+          exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
+          ss_data = google_client.prepare_spreadsheet(exp_file)
+          build_data['google_doc_data'] = ss_data
+        end
       end
 
       build_data['base_url'] = project_url

@@ -33,12 +33,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
   }, 2000),
 
-  pollChange: function(e){
-    logger.debug('pollchange');
+  pollChange: function(){
+    logger.debug('pollchange', this.$('#projectForm').alpaca('get'));
     var view = this,
         $form = this.$('#projectForm'),
-        data = $form.alpaca('get').getValue(),
-        base_url = this.model.url();
+        alpaca_data = $form.alpaca('get'),
+        base_url = this.model.url(),
+        config_themes = this.model.blueprint.get('config').themes || ['generic'],
+        data;
+
+    if(alpaca_data){
+      data = alpaca_data.getValue();
+    } else {
+      data = this.model.formData();
+      // data.theme = config_themes[0];
+      // view.theme = data.theme;
+      logger.debug(data);
+    }
 
     if( view.model.isNew() ){
       base_url = window.location.href;
@@ -56,6 +67,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       dataType: 'json'
     }).done(function( data ) {
         logger.debug('received form values', data);
+        logger.debug(data.theme, view.theme);
 
         if(data.theme !== view.theme){
           view.theme = data.theme;
@@ -69,8 +81,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.pym.iframe.onload = childLoaded;
         }
 
-        view.pym.sendMessage('updateData', JSON.stringify(data));
+        if(view.theme){
+          view.pym.sendMessage('updateData', JSON.stringify(data));
+        }
     });
+
+    // could have this return build data
   },
 
   savePreview: function(){
@@ -288,6 +304,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
+      if(this.model.blueprint.hasPreviewType('live') && form_config.options.fields.google_doc_url){
+        logger.debug('yes field', this.model.formData(), this.model.get('data'));
+        this.pollChange();
+      }
     } else if (this.copyProject) {
       newProject = true;
       form_config = this.model.get('blueprint_config').form;
