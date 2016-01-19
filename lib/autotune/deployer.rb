@@ -1,5 +1,6 @@
 require 'uri'
 require 'autotune/google_docs'
+require 'date'
 
 module Autotune
   # Autotune blueprint base deployer
@@ -47,9 +48,24 @@ module Autotune
           build_data['google_doc_url'] = spreadsheet_copy[:url]
         else
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
-          exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
-          ss_data = google_client.prepare_spreadsheet(exp_file)
-          build_data['google_doc_data'] = ss_data
+          resp = google_client.find(spreadsheet_key)
+          last_modified = DateTime.parse(resp['modifiedDate'].to_s).to_s
+          needs_update = false
+          if build_data['google_last_updated']
+            if build_data['google_last_updated'] != last_modified
+              needs_update = true
+            end
+          else
+            needs_update = true
+          end
+
+          if needs_update
+            build_data['google_last_updated'] = last_modified
+            exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
+            ss_data = google_client.prepare_spreadsheet(exp_file)
+            build_data['google_doc_data'] = ss_data
+            pp ss_data
+          end
         end
       end
 

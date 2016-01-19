@@ -52,6 +52,22 @@ module Autotune
 
       @_files[file_id] = resp.data
     end
+    #
+    # def get_changes(file_id)
+    #   return @_files[file_id] unless @_files[file_id].nil?
+    #
+    #   drive = @client.discovered_api('drive', 'v2')
+    #
+    #   # get the file metadata
+    #   resp = @client.execute(
+    #     api_method: drive.changes.get,
+    #     parameters: { fileId: file_id })
+    #
+    #   # die if there's an error
+    #   fail GoogleDriveError, resp.error_message if resp.error?
+    #
+    #   @_files[file_id] = resp.data
+    # end
 
     # Export a file
     # Returns the file contents

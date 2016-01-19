@@ -60,6 +60,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       view.pollChange();
     };
 
+    if(view.google_last_updated){
+      data.google_last_updated = view.google_last_updated;
+    }
+
     $.ajax({
       type: "POST",
       url: base_url + "/preview_build_data",
@@ -70,6 +74,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         if(data.spreadsheet_template){
           delete data.spreadsheet_template;
           $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+        }
+        if(data.google_last_updated){
+          view.google_last_updated = data.google_last_updated;
         }
         logger.debug('received form values', data);
         logger.debug(data.theme, view.theme);
@@ -86,6 +93,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.pym.iframe.onload = childLoaded;
         }
 
+        // this won't work because we're setting view.theme above when the themes aren't equal
         if(view.theme){
           view.pym.sendMessage('updateData', JSON.stringify(data));
         }
