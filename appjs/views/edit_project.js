@@ -31,7 +31,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if ( this.model.blueprint.hasPreviewType('live') ){
       this.pollChange();
     }
-  }, 2000),
+  }, 1000),
 
   pollChange: function(){
     logger.debug('pollchange', this.$('#projectForm').alpaca('get'));
@@ -46,6 +46,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       data = alpaca_data.getValue();
     } else {
       data = this.model.formData();
+      data.spreadsheet_template = this.model.blueprint.get('config')['spreadsheet_template'];
       // data.theme = config_themes[0];
       // view.theme = data.theme;
       logger.debug(data);
@@ -305,7 +306,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
       if(this.model.blueprint.hasPreviewType('live') && form_config.options.fields.google_doc_url){
-        logger.debug('yes field', this.model.formData(), this.model.get('data'));
+        // logger.debug('yes field', form_config);
         this.pollChange();
       }
     } else if (this.copyProject) {

@@ -29,32 +29,6 @@ module Autotune
       @_spreadsheets = {}
     end
 
-    def create_spreadsheet
-      drive = @client.discovered_api('drive', 'v2')
-      # 'application/vnd.google-apps.drive-sdk'
-      file = drive.files.insert.request_schema.new({
-        'title' => 'My spreadsheet',
-        'description' => 'A test spreadsheet',
-        'mimeType' => 'application/vnd.google-apps.drive-sdk'
-      })
-
-      # media = Google::APIClient::UploadIO.new('document.csv', "text/csv")
-      # pp media
-      result = @client.execute(
-        :api_method => drive.files.insert,
-        :body_object => file,
-        # :media => media,
-        :parameters => {
-          'uploadType' => 'multipart',
-          # 'convert' => true,
-          'alt' => 'json'})
-
-      fail GoogleDriveError, result.error_message if result.error?
-
-      # Pretty print the API result
-      pp result.data.to_hash
-    end
-
 
     # Find a Google Drive file
     # Takes the key of a Google Drive file and returns a hash of meta data. The returned hash is
@@ -72,32 +46,6 @@ module Autotune
       resp = @client.execute(
         api_method: drive.files.get,
         parameters: { fileId: file_id })
-
-      # die if there's an error
-      fail GoogleDriveError, resp.error_message if resp.error?
-
-      @_files[file_id] = resp.data
-    end
-
-    def watch(file_id)
-      # return @_files[file_id] unless @_files[file_id].nil?
-
-      drive = @client.discovered_api('drive', 'v2')
-      channel_address = "https://staging.autotune.voxmedia.com/projects/";
-      channel_id = 'id-'+file_id;
-
-      # get the file metadata
-      resp = @client.execute(
-        api_method: drive.files.watch,
-        :body_object => { 'id' => channel_id, 'type' => 'web_hook', 'address' => channel_address },
-        parameters: { fileId: file_id })
-      pp resp
-      if resp.status == 200
-        puts resp.data
-        return resp.data
-      else
-        puts "An error occurred: #{result.data['error']['message']}"
-      end
 
       # die if there's an error
       fail GoogleDriveError, resp.error_message if resp.error?

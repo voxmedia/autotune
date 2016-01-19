@@ -26,7 +26,8 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
-      if build_data == {} || build_data['google_doc_url']
+      # pp build_data
+      if build_data['spreadsheet_template'] || build_data['google_doc_url']
         if project['meta']
           cur_user = User.find(project.meta['current_user'])
         else
@@ -39,9 +40,10 @@ module Autotune
         current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
         google_client = GoogleDocs.new(current_auth)
 
-        if build_data == {}
-          puts 'got to build data'
-          google_client.create_spreadsheet
+        if build_data['spreadsheet_template']
+          spreadsheet_template_key = build_data['spreadsheet_template'].match(/[-\w]{25,}/).to_s
+          spreadsheet_copy = google_client.copy(spreadsheet_template_key)
+          build_data['google_doc_url'] = spreadsheet_copy[:url]
         else
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
           exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
