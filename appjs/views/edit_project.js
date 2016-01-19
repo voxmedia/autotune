@@ -67,6 +67,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).done(function( data ) {
+        if(data.spreadsheet_template){
+          delete data.spreadsheet_template;
+          $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+        }
         logger.debug('received form values', data);
         logger.debug(data.theme, view.theme);
 
@@ -85,9 +89,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         if(view.theme){
           view.pym.sendMessage('updateData', JSON.stringify(data));
         }
-    });
 
-    // could have this return build data
+    });
   },
 
   savePreview: function(){
@@ -306,7 +309,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
       if(this.model.blueprint.hasPreviewType('live') && form_config.options.fields.google_doc_url){
-        // logger.debug('yes field', form_config);
         this.pollChange();
       }
     } else if (this.copyProject) {
