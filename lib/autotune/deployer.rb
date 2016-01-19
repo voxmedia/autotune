@@ -43,6 +43,7 @@ module Autotune
         if build_data['spreadsheet_template']
           spreadsheet_template_key = build_data['spreadsheet_template'].match(/[-\w]{25,}/).to_s
           spreadsheet_copy = google_client.copy(spreadsheet_template_key)
+          set_permissions = google_client.insert_permission(spreadsheet_copy[:id], 'voxmedia.com', 'domain', 'writer')
           build_data['google_doc_url'] = spreadsheet_copy[:url]
         else
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s

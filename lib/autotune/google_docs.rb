@@ -118,7 +118,7 @@ module Autotune
       if title.nil?
         copied_file = drive.files.copy.request_schema.new
       else
-        copied_file = drive.files.copy.request_schema.new('title' => title)
+        copied_file = drive.files.copy.request_schema.new('title' => title, 'writersCanShare' => true)
       end
       cp_resp = @client.execute(
         api_method: drive.files.copy,
@@ -132,6 +132,25 @@ module Autotune
       end
     end
     alias_method :copy_doc, :copy
+
+    def insert_permission(file_id, value, perm_type, role)
+      drive = @client.discovered_api('drive', 'v2')
+      new_permission = {
+          'value': value,
+          'type': perm_type,
+          'role': role
+      }
+      cp_resp = @client.execute(
+        api_method: drive.permissions.insert,
+        body_object: new_permission,
+        parameters: { fileId: file_id })
+
+      if cp_resp.error?
+        fail CreateError, cp_resp.error_message
+      else
+        return cp_resp.data
+      end
+    end
 
     # Get the mime type from a file extension
     #
