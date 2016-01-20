@@ -60,8 +60,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       view.pollChange();
     };
 
+    // have to assign this to the data so that it can be passed back in to compare times in before_build
     if(view.google_last_updated){
       data.google_last_updated = view.google_last_updated;
+    }
+    if(view.google_doc_data){
+      data.google_doc_data = view.google_doc_data;
     }
 
     $.ajax({
@@ -75,14 +79,20 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           delete data.spreadsheet_template;
           $( "input[name='google_doc_url']" ).val(data.google_doc_url);
         }
+        // have to assign this to the view so that it will be included in the data passed through before_build
+        // since it is not included in alpaca itself
+        // same premise as caching, but not sure if there's a better way to do this
         if(data.google_last_updated){
           view.google_last_updated = data.google_last_updated;
         }
-        logger.debug('received form values', data);
-        logger.debug(data.theme, view.theme);
+        if(data.google_doc_data){
+          view.google_doc_data = data.google_doc_data;
+        }
 
         if(data.theme !== view.theme){
-          view.theme = data.theme;
+          if(typeof data.theme !== 'undefined'){
+            view.theme = data.theme;
+          }
           var slug = view.model.blueprint.get('slug'),
               bp_version = view.model.getVersion(),
               preview_url = view.model.blueprint.getMediaUrl(
@@ -93,7 +103,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.pym.iframe.onload = childLoaded;
         }
 
-        // this won't work because we're setting view.theme above when the themes aren't equal
         if(view.theme){
           view.pym.sendMessage('updateData', JSON.stringify(data));
         }
