@@ -47,13 +47,16 @@ module Autotune
           set_permissions = google_client.insert_permission(spreadsheet_copy[:id], 'voxmedia.com', 'domain', 'writer')
           build_data['google_doc_url'] = spreadsheet_copy[:url]
         else
+          # the best way to do this is probably to force a new download when in focus
+          # very unlikely that the app will be in focus and ss will be changing
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
           resp = google_client.find(spreadsheet_key)
+          # track_id = resp['exportLinks'].to_s.scan(/\w+/)[1]
           cache_key = "googledoc#{spreadsheet_key}"
           needs_update = false
           if Rails.cache.exist?(cache_key) && Rails.cache.read(cache_key)['version']
-            puts Rails.cache.read(cache_key)['version'],  resp['version']
-            if version != Rails.cache.read(cache_key)['version']
+            puts Rails.cache.read(cache_key)['version'], resp['version']
+            if resp['version'] != Rails.cache.read(cache_key)['version']
               needs_update = true
             end
           else
