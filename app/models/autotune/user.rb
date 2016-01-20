@@ -64,10 +64,6 @@ module Autotune
       a.user
     end
 
-    def self.find_by_api_key(api_key)
-      find_by(:api_key => api_key)
-    end
-
     def self.verify_auth_hash(auth_hash)
       if Rails.configuration.autotune.verify_omniauth &&
          Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
