@@ -31,7 +31,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if ( this.model.blueprint.hasPreviewType('live') ){
       this.pollChange();
     }
-  }, 1000),
+  }, 500),
 
   pollChange: function(){
     logger.debug('pollchange', this.$('#projectForm').alpaca('get'));
