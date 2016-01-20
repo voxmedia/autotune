@@ -64,12 +64,12 @@ module Autotune
         if session[:api_key].present?
           User.find_by_api_key(session[:api_key])
         elsif request.headers['Authorization'].present?
-          if Autotune.config.verify_authorization_header
-            Autotune.config.verify_authorization_header(
-              request.headers['Authorization'])
-          elsif request.headers['Authorization'] =~ AUTH_KEY_RE
+          if request.headers['Authorization'] =~ AUTH_KEY_RE
             # $~ is the match object from the last regex ^
             User.find_by_api_key($~[1])
+          elsif Autotune.config.verify_authorization_header.is_a?(Proc)
+            Autotune.config.verify_authorization_header.call(
+              request.headers['Authorization'])
           end
         end
     end
