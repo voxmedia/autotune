@@ -135,12 +135,12 @@
 
       <div class="preview-frame" style="padding: 25px 0px;">
         <% check_static = true %>
-        <% if ( model.blueprint.hasPreviewType('live') && ! model.isNew() ){ %>
-          <% if ( model.get('blueprint_config')['preview_type'] === 'live' ){ %>
+        <% if ( model.blueprint.hasPreviewType('live') ){ %>
+          <% if ( model.isNew() || model.get('blueprint_config')['preview_type'] === 'live' ){ %>
             <% check_static = false %>
           <% } %>
         <% } %>
-        <!-- Changed this because we need to account for the versioned project possibly not being live -->
+
         <% if ( ! model.isNew() && check_static ) { %>
           <% if ( model.hasStatus('broken') ) { %>
           <p class="text-danger">
@@ -161,9 +161,6 @@
           <p class="text-success">
             <span class="status-success">This draft is up-to-date with the latest saved version of this project.</span>
           </p>
-          <!-- <p class="text-warning">
-            <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>
-          </p> -->
           <% } else if ( model.hasUnpublishedUpdates() ) { %>
           <p class="text-warning">
             <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>

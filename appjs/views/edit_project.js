@@ -34,7 +34,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   }, 500),
 
   pollChange: function(){
-    logger.debug('pollchange', this.$('#projectForm').alpaca('get'));
+    logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
         alpaca_data = $form.alpaca('get'),
@@ -47,9 +47,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     } else {
       data = this.model.formData();
       data.spreadsheet_template = this.model.blueprint.get('config')['spreadsheet_template'];
-      // data.theme = config_themes[0];
-      // view.theme = data.theme;
-      logger.debug(data);
     }
 
     if( view.model.isNew() ){
@@ -59,14 +56,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var childLoaded = function() {
       view.pollChange();
     };
-
-    // have to assign this to the data so that it can be passed back in to compare times in before_build
-    if(view.google_last_updated){
-      data.google_last_updated = view.google_last_updated;
-    }
-    if(view.google_doc_data){
-      data.google_doc_data = view.google_doc_data;
-    }
 
     $.ajax({
       type: "POST",
@@ -78,15 +67,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         if(data.spreadsheet_template){
           delete data.spreadsheet_template;
           $( "input[name='google_doc_url']" ).val(data.google_doc_url);
-        }
-        // have to assign this to the view so that it will be included in the data passed through before_build
-        // since it is not included in alpaca itself
-        // same premise as caching, but not sure if there's a better way to do this
-        if(data.google_last_updated){
-          view.google_last_updated = data.google_last_updated;
-        }
-        if(data.google_doc_data){
-          view.google_doc_data = data.google_doc_data;
         }
 
         if(data.theme !== view.theme){
@@ -124,6 +104,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
+      this.listenTo(this.app, 'focus', this.pollChange, this);
     }, this);
 
     this.on('unload', function() {

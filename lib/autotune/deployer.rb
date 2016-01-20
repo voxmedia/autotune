@@ -49,23 +49,27 @@ module Autotune
         else
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
           resp = google_client.find(spreadsheet_key)
-          last_modified = DateTime.parse(resp['modifiedDate'].to_s).to_s
+          cache_key = "googledoc#{spreadsheet_key}"
           needs_update = false
-          if build_data['google_last_updated']
-            if build_data['google_last_updated'] != last_modified
+          if Rails.cache.exist?(cache_key) && Rails.cache.read(cache_key)['version']
+            puts Rails.cache.read(cache_key)['version'],  resp['version']
+            if version != Rails.cache.read(cache_key)['version']
               needs_update = true
             end
           else
             needs_update = true
           end
 
-          if needs_update
-            build_data['google_last_updated'] = last_modified
+          if needs_update || ! Rails.cache.exist?(cache_key)
+            puts 'needs update'
             exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
             ss_data = google_client.prepare_spreadsheet(exp_file)
             build_data['google_doc_data'] = ss_data
-            pp ss_data
+            Rails.cache.write(cache_key, {'ss_data' => ss_data, 'version' => resp['version']})
+          else
+            build_data['google_doc_data'] = Rails.cache.read(cache_key)['ss_data']
           end
+
         end
       end
 
