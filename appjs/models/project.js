@@ -316,6 +316,21 @@ var Project = Backbone.Model.extend({
     console.log('getting preview size', this);
   },
 
+  createSpreadsheet: function() {
+    var ss_key = this.blueprint.get('config')['spreadsheet_template'].match(/[-\w]{25,}/)[0],
+        base_url = window.location.href;
+    var w = window.open('');
+    $.ajax({
+      type: "POST",
+      url: base_url + "/create_spreadsheet",
+      data: JSON.stringify(ss_key),
+      contentType: 'application/json',
+      dataType: 'json'
+    }).done(function( data ) {
+      w.location = data['google_doc_url'];
+    });
+  },
+
   /**
    * Get the url to the published project.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible

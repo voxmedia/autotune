@@ -94,6 +94,8 @@ module.exports = {
           $('.preview-frame').css({'max-width': width, 'margin': 'auto'});
           app.trigger( 'loadingStop' );
           return view;
+        } else if ( next === 'nothing' ) {
+          return view;
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
         }

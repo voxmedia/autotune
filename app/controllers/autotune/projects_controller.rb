@@ -185,6 +185,22 @@ module Autotune
       render :json => @build_data
     end
 
+    def create_spreadsheet
+      @project = instance
+      @ss_key = request.POST
+      if @project['meta']
+        cur_user = User.find(@project.meta['current_user'])
+      else
+        cur_user = User.find_by_name(@project.config['authors'][0].split('<')[0])
+      end
+
+      current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
+      google_client = GoogleDocs.new(current_auth)
+      spreadsheet_copy = google_client.copy(@ss_key['_json'])
+      set_permissions = google_client.insert_permission(spreadsheet_copy[:id], 'voxmedia.com', 'domain', 'writer')
+      render :json => {:google_doc_url => spreadsheet_copy[:url]}
+    end
+
     def update_snapshot
       instance.update_snapshot
       render_accepted

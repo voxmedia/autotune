@@ -414,6 +414,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         options_fields['theme']['type'] = 'hidden';
       }
 
+      if(this.model.blueprint.hasPreviewType('live') && this.model.blueprint.get('config')['spreadsheet_template']){
+        var google_text = form_config['schema']['properties']['google_doc_url']['title'];
+        form_config['schema']['properties']['google_doc_url']['title'] = google_text + '<br /><button type="button" data-action="create-spreadsheet" data-action-next="nothing" id="get_new" data-model="Project" class="btn btn-default resize" style="margin: 10px 0">Get spreadsheet</button>';
+      }
+
       _.extend(schema_properties, form_config['schema']['properties'] || {});
       if( form_config['options'] ) {
         _.extend(options_form, form_config['options']['form'] || {});
