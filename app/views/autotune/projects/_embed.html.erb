@@ -1,13 +1,13 @@
 <div data-analytics-class="embed"
      data-analytics-viewport="autotune"
      id="<%=@project.slug %>__graphic"></div>
-<script type="text/javascript"><!--
+<script type="text/javascript">
 (function() {
   var l = function() {
     new pym.Parent(
       '<%=@project.slug %>__graphic',
       '<%=@project.deployer(:publish).url_for('/') %>');
-  }
+  };
   if(typeof(pym) === 'undefined') {
     var h = document.getElementsByTagName('head')[0],
         s = document.createElement('script');
@@ -19,4 +19,4 @@
     l();
   }
 })();
-// --></script>
+</script>
