@@ -33,7 +33,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
   }, 500),
 
-  pollChange: function(){
+  focusPollChange: function(){
+    this.pollChange({'event': 'focus'});
+  },
+
+  pollChange: function(options){
+    logger.debug('app', this.app);
     logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
@@ -48,6 +53,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       data = this.model.formData();
       data.spreadsheet_template = this.model.blueprint.get('config')['spreadsheet_template'];
     }
+
+    data.options = options;
+    logger.debug('options?', data);
 
     if( view.model.isNew() ){
       base_url = window.location.href;
@@ -104,7 +112,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-      this.listenTo(this.app, 'focus', this.pollChange, this);
+      this.listenTo(this.app, 'focus', this.focusPollChange, this);
     }, this);
 
     this.on('unload', function() {

@@ -27,6 +27,14 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
+      opts = { :event => nil }
+      if build_data['options']
+        build_data['options'].each do |key, value|
+          if opts[key]
+            opts[key] = value
+          end
+        end
+      end
       # pp build_data
       if build_data['spreadsheet_template'] || build_data['google_doc_url']
         if project['meta']
@@ -47,21 +55,29 @@ module Autotune
           set_permissions = google_client.insert_permission(spreadsheet_copy[:id], 'voxmedia.com', 'domain', 'writer')
           build_data['google_doc_url'] = spreadsheet_copy[:url]
         else
-          # the best way to do this is probably to force a new download when in focus
-          # very unlikely that the app will be in focus and ss will be changing
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
           resp = google_client.find(spreadsheet_key)
-          # track_id = resp['exportLinks'].to_s.scan(/\w+/)[1]
           cache_key = "googledoc#{spreadsheet_key}"
           needs_update = false
-          if Rails.cache.exist?(cache_key) && Rails.cache.read(cache_key)['version']
-            puts Rails.cache.read(cache_key)['version'], resp['version']
-            if resp['version'] != Rails.cache.read(cache_key)['version']
+          if opts[:event] == 'focus'
+            puts 'has focus'
+            needs_update = true
+          else
+            if Rails.cache.exist?(cache_key) && Rails.cache.read(cache_key)['version']
+              puts 'cache exists AND has version'
+              puts Rails.cache.read(cache_key)['version'], resp['version']
+              if resp['version'] != Rails.cache.read(cache_key)['version']
+                puts 'version != cached version'
+                needs_update = true
+              end
+            else
+              puts 'cache key does not exist or doesn\'t have version'
               needs_update = true
             end
-          else
-            needs_update = true
           end
+
+          puts needs_update
+          puts
 
           if needs_update || ! Rails.cache.exist?(cache_key)
             puts 'needs update'
