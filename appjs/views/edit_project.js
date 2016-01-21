@@ -34,26 +34,28 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   }, 500),
 
   focusPollChange: function(){
-    this.pollChange({'event': 'focus'});
+    this.pollChange({'force_update': true});
   },
 
   pollChange: function(options){
     logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
-        alpaca_data = $form.alpaca('get'),
+        // alpaca_data = $form.alpaca('get'),
         base_url = this.model.url(),
         config_themes = this.model.blueprint.get('config').themes || ['generic'],
-        data;
+        query = '',
+        data = $form.alpaca('get').getValue();
 
-    if(alpaca_data){
-      data = alpaca_data.getValue();
-    } else {
-      data = this.model.formData();
-      data.spreadsheet_template = this.model.blueprint.get('config')['spreadsheet_template'];
+    if(options){
+      query = '?'+$.param( options );
     }
-
-    data.options = options;
+    // if(alpaca_data){
+    //   data = alpaca_data.getValue();
+    // } else {
+    //   data = this.model.formData();
+    //   data.spreadsheet_template = this.model.blueprint.get('config')['spreadsheet_template'];
+    // }
 
     if( view.model.isNew() ){
       base_url = window.location.href;
@@ -65,7 +67,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     $.ajax({
       type: "POST",
-      url: base_url + "/preview_build_data",
+      url: base_url + "/preview_build_data" + query,
       data: JSON.stringify(data),
       contentType: 'application/json',
       dataType: 'json'
@@ -174,6 +176,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
+
+    $('#gen_ss').click(function(){
+      logger.debug('clicked gen ss');
+    });
 
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
@@ -312,9 +318,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       newProject = true;
       form_config = this.model.blueprint.get('config').form;
       config_themes = this.model.blueprint.get('config').themes || ['generic'];
-      if(this.model.blueprint.hasPreviewType('live') && form_config.options.fields.google_doc_url){
-        this.pollChange();
-      }
     } else if (this.copyProject) {
       newProject = true;
       form_config = this.model.get('blueprint_config').form;

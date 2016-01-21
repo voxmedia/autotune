@@ -27,14 +27,7 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
-      opts = { 'event' => nil }
-      if build_data['options']
-        build_data['options'].each do |key, value|
-          if opts.key?(key)
-            opts[key] = value
-          end
-        end
-      end
+
       if build_data['spreadsheet_template'] || build_data['google_doc_url']
         if project['meta']
           cur_user = User.find(project.meta['current_user'])
@@ -58,19 +51,15 @@ module Autotune
           resp = google_client.find(spreadsheet_key)
           cache_key = "googledoc#{spreadsheet_key}"
           needs_update = false
-          if opts['event'] == 'focus'
-            needs_update = true
-          else
-            if Rails.cache.exist?(cache_key) && Rails.cache.read(cache_key)['version']
-              if resp['version'] != Rails.cache.read(cache_key)['version']
-                needs_update = true
-              end
-            else
+          if Rails.cache.exist?(cache_key)
+            if Rails.cache.read(cache_key)['version'] && resp['version'] != Rails.cache.read(cache_key)['version']
               needs_update = true
             end
+          else
+            needs_update = true
           end
 
-          if needs_update || ! Rails.cache.exist?(cache_key)
+          if needs_update
             exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
             ss_data = google_client.prepare_spreadsheet(exp_file)
             build_data['google_doc_data'] = ss_data

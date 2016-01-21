@@ -78,6 +78,10 @@ module Autotune
     def preview_build_data
       @project = instance
       @build_data = request.POST
+      cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
+      if request.GET[:force_update]
+        Rails.cache.delete(cache_key)
+      end
 
       # Get the deployer object
       deployer = @project.deployer(:preview)
