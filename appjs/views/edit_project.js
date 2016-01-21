@@ -38,7 +38,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: function(options){
-    logger.debug('app', this.app);
     logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
@@ -55,7 +54,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     data.options = options;
-    logger.debug('options?', data);
 
     if( view.model.isNew() ){
       base_url = window.location.href;
