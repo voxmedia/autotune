@@ -53,22 +53,6 @@ module Autotune
 
       @_files[file_id] = resp.data
     end
-    #
-    # def get_changes(file_id)
-    #   return @_files[file_id] unless @_files[file_id].nil?
-    #
-    #   drive = @client.discovered_api('drive', 'v2')
-    #
-    #   # get the file metadata
-    #   resp = @client.execute(
-    #     api_method: drive.changes.get,
-    #     parameters: { fileId: file_id })
-    #
-    #   # die if there's an error
-    #   fail GoogleDriveError, resp.error_message if resp.error?
-    #
-    #   @_files[file_id] = resp.data
-    # end
 
     # Export a file
     # Returns the file contents
@@ -150,6 +134,27 @@ module Autotune
       end
     end
     alias_method :copy_doc, :copy
+
+    def check_permission(file_id)
+      drive = @client.discovered_api('drive', 'v2')
+      cp_resp = @client.execute(
+        api_method: drive.permissions.list,
+        parameters: { fileId: file_id })
+
+      has_permission = false
+      cp_resp.data.items.each do |item|
+        # need to set domain somewhere else - maybe in config
+        if item['type'] == 'domain' && item['domain'] == 'voxmedia.com'
+          has_permission = true
+        end
+      end
+
+      if cp_resp.error?
+        fail CreateError, cp_resp.error_message
+      else
+        return has_permission
+      end
+    end
 
     def insert_permission(file_id, value, perm_type, role)
       drive = @client.discovered_api('drive', 'v2')
