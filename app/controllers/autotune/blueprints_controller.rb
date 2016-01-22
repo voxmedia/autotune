@@ -78,8 +78,8 @@ module Autotune
     def preview_build_data
       @project = instance
       @build_data = request.POST
-      cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
-      if request.GET[:force_update]
+      if @build_data['google_doc_url'] && request.GET[:force_update]
+        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
         Rails.cache.delete(cache_key)
       end
 
@@ -103,7 +103,7 @@ module Autotune
       current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
       google_client = GoogleDocs.new(current_auth)
       spreadsheet_copy = google_client.copy(@ss_key['_json'])
-      set_permissions = google_client.insert_permission(spreadsheet_copy[:id], 'voxmedia.com', 'domain', 'writer')
+      set_permissions = google_client.insert_permission(spreadsheet_copy[:id], Autotune.configuration.google_auth_domain, 'domain', 'writer')
       render :json => {:google_doc_url => spreadsheet_copy[:url]}
     end
 

@@ -50,12 +50,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if(options){
       query = '?'+$.param( options );
     }
-    // if(alpaca_data){
-    //   data = alpaca_data.getValue();
-    // } else {
-    //   data = this.model.formData();
-    //   data.spreadsheet_template = this.model.blueprint.get('config')['spreadsheet_template'];
-    // }
 
     if( view.model.isNew() ){
       base_url = window.location.href;
@@ -95,6 +89,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.pym.sendMessage('updateData', JSON.stringify(data));
         }
 
+    }).fail(function(err){
+      logger.debug(err);
     });
   },
 

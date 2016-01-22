@@ -147,6 +147,12 @@ module Autotune
       end
     end
 
+    def create_spreadsheet_placeholder
+      respond_to do |format|
+        format.html { render 'create_spreadsheet_placeholder' }
+      end
+    end
+
     def respond_to_html
       # It appears Rails automatically assumes you want HTML if html or */*
       # is anywhere in the Accept header. This is not how the Accept header is

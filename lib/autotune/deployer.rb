@@ -27,7 +27,6 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env)
-
       if build_data['google_doc_url']
         if project['meta']
           cur_user = User.find(project.meta['current_user'])
@@ -39,32 +38,34 @@ module Autotune
         end
 
         current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
-        google_client = GoogleDocs.new(current_auth)
+        if current_auth
+          google_client = GoogleDocs.new(current_auth)
 
-        spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
-        resp = google_client.find(spreadsheet_key)
-        cache_key = "googledoc#{spreadsheet_key}"
-        needs_update = false
+          spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+          resp = google_client.find(spreadsheet_key)
+          cache_key = "googledoc#{spreadsheet_key}"
+          needs_update = false
 
-        if Rails.cache.exist?(cache_key)
-          if Rails.cache.read(cache_key)['version'] && resp['version'] != Rails.cache.read(cache_key)['version']
+          if Rails.cache.exist?(cache_key)
+            if Rails.cache.read(cache_key)['version'] && resp['version'] != Rails.cache.read(cache_key)['version']
+              needs_update = true
+            end
+          else
             needs_update = true
           end
-        else
-          needs_update = true
-        end
 
-        if needs_update
-          has_permission = google_client.check_permission(spreadsheet_key)
-          unless has_permission
-            set_permissions = google_client.insert_permission(spreadsheet_key, 'voxmedia.com', 'domain', 'writer')
+          if needs_update
+            has_permission = google_client.check_permission(spreadsheet_key)
+            unless has_permission
+              set_permissions = google_client.insert_permission(spreadsheet_key, Autotune.configuration.google_auth_domain, 'domain', 'writer')
+            end
+            exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
+            ss_data = google_client.prepare_spreadsheet(exp_file)
+            build_data['google_doc_data'] = ss_data
+            Rails.cache.write(cache_key, {'ss_data' => ss_data, 'version' => resp['version']})
+          else
+            build_data['google_doc_data'] = Rails.cache.read(cache_key)['ss_data']
           end
-          exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
-          ss_data = google_client.prepare_spreadsheet(exp_file)
-          build_data['google_doc_data'] = ss_data
-          Rails.cache.write(cache_key, {'ss_data' => ss_data, 'version' => resp['version']})
-        else
-          build_data['google_doc_data'] = Rails.cache.read(cache_key)['ss_data']
         end
       end
 

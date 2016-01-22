@@ -51,6 +51,8 @@ Autotune::Engine.routes.draw do
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   get '/changemessages' => 'changemessages#index'
 
+  get '/create_spreadsheet_placeholder' => 'application#create_spreadsheet_placeholder'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

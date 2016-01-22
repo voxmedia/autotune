@@ -198,7 +198,7 @@ module Autotune
       google_client = GoogleDocs.new(current_auth)
       spreadsheet_copy = google_client.copy(@ss_key['_json'])
       # domain here too
-      set_permissions = google_client.insert_permission(spreadsheet_copy[:id], 'voxmedia.com', 'domain', 'writer')
+      set_permissions = google_client.insert_permission(spreadsheet_copy[:id], Autotune.configuration.google_auth_domain, 'domain', 'writer')
       render :json => {:google_doc_url => spreadsheet_copy[:url]}
     end
 

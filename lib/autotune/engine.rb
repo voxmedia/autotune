@@ -34,6 +34,7 @@ module Autotune
       app.config.autotune.faq_url = 'http://voxmedia.helpscoutdocs.com/category/19-autotune'
       app.config.autotune.themes = { :generic => 'Generic' }
       app.config.autotune.force_google_auth = false
+      app.config.autotune.google_auth_domain = nil
 
       if ENV['REDIS_URL']
         app.config.autotune.redis = Redis.new(:url => ENV['REDIS_URL'])
