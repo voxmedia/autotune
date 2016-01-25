@@ -181,20 +181,14 @@ module Autotune
       deployer = @project.deployer(:preview)
 
       # Run the before build deployer hook
-      deployer.before_build(@build_data, {})
+      deployer.before_build(@build_data, {}, current_user)
       render :json => @build_data
     end
 
     def create_spreadsheet
       @project = instance
       @ss_key = request.POST
-      if @project['meta']
-        cur_user = User.find(@project.meta['current_user'])
-      else
-        cur_user = User.find_by_name(@project.config['authors'][0].split('<')[0])
-      end
-
-      current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
+      current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
       google_client = GoogleDocs.new(current_auth)
       spreadsheet_copy = google_client.copy(@ss_key['_json'])
       # domain here too

@@ -26,21 +26,11 @@ module Autotune
     end
 
     # Hook for adjusting data and files before build
-    def before_build(build_data, _env)
-      if build_data['google_doc_url']
-        if project['meta']
-          cur_user = User.find(project.meta['current_user'])
-        else
-          # There must be a better way to do this.
-          # Don't have a meta field on blueprints and therefore they don't have a current_user
-          # So right now this is just getting the user account for the author or the blueprint
-          cur_user = User.find_by_name(project.config['authors'][0].split('<')[0])
-        end
-
-        current_auth = cur_user.authorizations.find_by!(:provider => 'google_oauth2')
-        if current_auth
+    def before_build(build_data, _env, current_user = nil)
+      if build_data['google_doc_url'] && current_user
+        current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
+        if current_user
           google_client = GoogleDocs.new(current_auth)
-
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
           resp = google_client.find(spreadsheet_key)
           cache_key = "googledoc#{spreadsheet_key}"

@@ -95,6 +95,7 @@ module.exports = {
           app.trigger( 'loadingStop' );
           return view;
         } else if ( next === 'nothing' ) {
+          app.trigger( 'loadingStop' );
           return view;
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
