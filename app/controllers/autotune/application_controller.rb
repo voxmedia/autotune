@@ -108,7 +108,7 @@ module Autotune
 
     def require_login
       if signed_in? && any_roles?
-        if Autotune.configuration.force_google_auth
+        if Autotune.configuration.google_auth_enabled
           require_google_login
         end
         return true
