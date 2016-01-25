@@ -184,13 +184,15 @@ module Autotune
     end
 
     def create_spreadsheet
+      puts 'project version'
       @project = instance
       @ss_key = request.POST
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
       google_client = GoogleDocs.new(current_auth)
       spreadsheet_copy = google_client.copy(@ss_key['_json'])
-      # domain here too
-      set_permissions = google_client.insert_permission(spreadsheet_copy[:id], Autotune.configuration.google_auth_domain, 'domain', 'writer')
+      if Autotune.configuration.google_auth_domain.present?
+        google_client.share_with_domain(spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
+      end
       render :json => {:google_doc_url => spreadsheet_copy[:url]}
     end
 

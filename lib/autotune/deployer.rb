@@ -45,10 +45,7 @@ module Autotune
           end
 
           if needs_update
-            has_permission = google_client.check_permission(spreadsheet_key)
-            unless has_permission
-              set_permissions = google_client.insert_permission(spreadsheet_key, Autotune.configuration.google_auth_domain, 'domain', 'writer')
-            end
+            google_client.share_with_domain(spreadsheet_key, Autotune.configuration.google_auth_domain)
             exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
             ss_data = google_client.prepare_spreadsheet(exp_file)
             build_data['google_doc_data'] = ss_data

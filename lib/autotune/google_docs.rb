@@ -135,7 +135,13 @@ module Autotune
     end
     alias_method :copy_doc, :copy
 
-    def check_permission(file_id)
+    def share_with_domain(file_id, domain)
+      unless check_permission(file_id, domain)
+        insert_permission(file_id, domain, 'domain', 'writer')
+      end
+    end
+
+    def check_permission(file_id, domain)
       drive = @client.discovered_api('drive', 'v2')
       cp_resp = @client.execute(
         api_method: drive.permissions.list,
@@ -144,7 +150,7 @@ module Autotune
       has_permission = false
       cp_resp.data.items.each do |item|
         # need to set domain somewhere else - maybe in config
-        if item['type'] == 'domain' && item['domain'] == 'voxmedia.com'
+        if item['type'] == 'domain' && item['domain'] == domain
           has_permission = true
         end
       end

@@ -319,7 +319,6 @@ var Project = Backbone.Model.extend({
   createSpreadsheet: function() {
     var ss_key = this.blueprint.get('config')['spreadsheet_template'].match(/[-\w]{25,}/)[0],
         base_url = window.location.href;
-    var w = window.open(window.location.origin+'/create_spreadsheet_placeholder');
     $.ajax({
       type: "POST",
       url: base_url + "/create_spreadsheet",
@@ -327,11 +326,16 @@ var Project = Backbone.Model.extend({
       contentType: 'application/json',
       dataType: 'json'
     }).done(function( data ) {
-      w.location = data['google_doc_url'];
+      if($( "input[name='google_doc_url']" ).val().length > 0){
+        var confirm = window.confirm('This will replace the spreadsheet link currenlty associated with this project. Click "OK" to confirm the replacement.');
+        if(confirm){
+          $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+        }
+      } else {
+        $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+      }
     }).fail(function(err) {
-      // Would like to display a better error than this.
       console.log('There was an error authenticating your Google account.', err);
-      w.location = '//docs.google.com/spreadsheets/u/0/#new';
     });
   },
 
