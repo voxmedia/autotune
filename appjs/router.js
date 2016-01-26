@@ -117,7 +117,6 @@ module.exports = Backbone.Router.extend({
 
   listProjects: function(params) {
     var projects = this.app.projects,
-        // bp_list = this.app.blueprints.pluck('id', 'title'),
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }

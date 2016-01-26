@@ -170,8 +170,8 @@ module Autotune
     def preview_build_data
       @project = instance
       @build_data = request.POST
-      cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
-      if request.GET[:force_update]
+      if @build_data['google_doc_url'] && request.GET[:force_update]
+        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
         Rails.cache.delete(cache_key)
       end
 
