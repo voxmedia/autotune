@@ -36,6 +36,18 @@ module Autotune
         :group_id => group_id)
     end
 
+    def update_data
+      update!(:status => "updating")
+      SyncThemeJob.perform_later(
+        self, :update => true)
+    end
+
+    def self.get_theme_data
+      # stubbed theme data function
+      #TODO (Kavya) Actual implementation
+      {:test => "something"}
+    end
+
     private
     def defaults
       self.data ||= {}

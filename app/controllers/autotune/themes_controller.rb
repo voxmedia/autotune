@@ -41,6 +41,7 @@ module Autotune
       @theme.parent = Theme.get_default_theme_for_group(@theme.group_id)
       if @theme.valid?
         @theme.save
+        @theme.update_data
         render :show, :status => :created
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request
