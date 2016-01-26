@@ -9,5 +9,7 @@ unless @project.meta['error_message'].blank?
   json.error_message @project.meta['error_message']
 end
 
+json.embed_html @embed_html
+
 # Only send build script output to superusers
 json.output @project.output if role? :superuser

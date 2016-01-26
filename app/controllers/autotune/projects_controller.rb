@@ -27,7 +27,6 @@ module Autotune
       @projects = Project
 
       # Filter and search query
-      type = false
       query = {}
 
       query[:status] = params[:status] if params.key? :status
@@ -44,9 +43,7 @@ module Autotune
       if params.key? :search
         users = User.search(params[:search], :name).pluck(:id)
         ups = @projects.where(:user_id => users)
-        ups_ids = ups.pluck(:id)
         ptitle = @projects.search(params[:search], :title)
-        ptitle_ids = ptitle.pluck(:id)
         @projects = @projects.where(:id => ( ups + ptitle ).uniq)
       end
 
@@ -69,8 +66,8 @@ module Autotune
 
       if params.key? :type
         @blueprints = Blueprint
-        @blueprint_ids = @blueprints.where({:type => params[:type]}).pluck(:id)
-        @projects = @projects.where( :blueprint_id => @blueprint_ids )
+        @blueprint_ids = @blueprints.where(:type => params[:type]).pluck(:id)
+        @projects = @projects.where(:blueprint_id => @blueprint_ids)
       end
 
       page = params[:page] || 1
@@ -99,6 +96,8 @@ module Autotune
 
     def show
       @project = instance
+
+      prep_embed_html
     end
 
     def create
@@ -128,6 +127,9 @@ module Autotune
       if @project.valid?
         @project.save
         @project.build
+
+        prep_embed_html
+
         render :show, :status => :created
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
@@ -160,6 +162,9 @@ module Autotune
       if @project.valid?
         @project.save
         @project.build
+
+        prep_embed_html
+
         render :show
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
@@ -188,6 +193,15 @@ module Autotune
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    private
+
+    def prep_embed_html
+      @project ||= instance
+      @embed_html = render_to_string(
+        :file => 'autotune/projects/_embed.html.erb', :layout => false
+      ).gsub(/\s*\n+\s*/, ' ')
     end
   end
 end
