@@ -30,7 +30,15 @@ module Autotune
       query = {}
 
       query[:status] = params[:status] if params.key? :status
-      query[:blueprint_id] = params[:blueprint_title] if params.key? :blueprint_title
+
+      if params.key? :blueprint
+        blueprint = Blueprint.find_by_slug(params[:blueprint])
+        query[:blueprint_id] = blueprint.id
+      elsif params.key? :blueprint_id
+        query[:blueprint_id] = params[:blueprint_id]
+      elsif params.key? :blueprint_title
+        query[:blueprint_id] = params[:blueprint_title]
+      end
 
       if params.key? :pub_status
         if params[:pub_status] == 'published'
@@ -103,6 +111,10 @@ module Autotune
     def create
       @project = Project.new(:user => current_user)
       @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
+
+      if request.POST.key? 'blueprint'
+        @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
+      end
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
