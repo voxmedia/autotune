@@ -2,7 +2,9 @@
 class CreateGroups < ActiveRecord::Migration
   def change
     create_table :autotune_groups do |t|
-      t.string :name
+      t.string :name, index: true
+      t.string :slug, index: true
+      t.integer :external_id
     end
 
     # Add many to many relation between groups and users through memberships
@@ -20,6 +22,8 @@ class CreateGroups < ActiveRecord::Migration
 
     # Add 1:n relation between projects and themes
     add_column :autotune_themes, :group_id, :integer
+    add_column :autotune_themes, :status, :string
+    add_index :autotune_themes, :status
 
     # Add data and theme inheritance model
     rename_column :autotune_themes, :value, :slug
