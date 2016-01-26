@@ -18,6 +18,7 @@ module Autotune
               :format => { :with => /\A[0-9a-z\-_]+\z/ }
     # validate that there is only one 'default' theme per group
     validates :group_id, :uniqueness => { :scope => :parent_id }, if: ":parent_id.nil?"
+    validates :status, :inclusion => { :in => Autotune::THEME_STATUSES }
 
     after_initialize :defaults
     default_scope { order('title ASC') }
@@ -38,6 +39,7 @@ module Autotune
     private
     def defaults
       self.data ||= {}
+      self.status ||= 'new'
     end
   end
 end

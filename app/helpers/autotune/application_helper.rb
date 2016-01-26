@@ -14,6 +14,7 @@ module Autotune
         :project_pub_statuses => Autotune::PROJECT_PUB_STATUSES,
         :blueprint_statuses => Autotune::BLUEPRINT_STATUSES,
         :blueprint_types => Autotune::BLUEPRINT_TYPES,
+        :theme_statuses => Autotune::THEME_STATUSES,
         :spinner => ActionController::Base.helpers.asset_path('autotune/spinner.gif'),
         :faq_url => Rails.configuration.autotune.faq_url
       }
