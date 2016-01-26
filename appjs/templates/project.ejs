@@ -46,40 +46,34 @@
     <li role="presentation" class="active"><a
         href="#edit" aria-controls="edit"
         role="tab" data-toggle="tab">Project info</a></li>
-    <% if ( model.hasType( 'graphic' ) ) { %>
+    <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
       <li role="presentation"><a
           href="#live-preview" id="draft-preview" aria-controls="live-preview"
           role="tab" data-toggle="tab">Preview</a></li>
-      <% if ( model.isPublished() ) { %>
-    <li role="presentation"><a
-        href="#embed" aria-controls="embed"
-        role="tab" data-toggle="tab">Embed</a></li>
-      <% } else { %>
-    <li role="presentation" class="disabled"><a>Embed</a></li>
-      <% } %>
-    <li role="presentation"><a
+      <% if ( model.has( 'embed_html' ) ) { %>
+      <li role="presentation"><a
+          href="#embed" aria-controls="embed"
+          role="tab" data-toggle="tab">Embed</a></li>
+        <% } else { %>
+      <li role="presentation" class="disabled"><a>Embed</a></li>
+        <% } %>
+
+      <% if ( model.has( 'screenshot_sm_url' ) ) { %>
+      <li role="presentation"><a
         href="#screenshots" aria-controls="screenshots"
         role="tab" data-toggle="tab">Screenshots</a></li>
-    <% } else { %>
-      <% if ( model.isDraft() ) { %>
-        <% if ( model.blueprint.hasPreviewType('live') || model.hasType( 'graphic' ) && model.hasInitialBuild() ) { %>
-          <li role="presentation"><a
-              href="#live-preview" id="draft-preview" aria-controls="live-preview"
-              role="tab" data-toggle="tab">Preview</a></li>
-        <% } else { %>
-          <li role="presentation" class="disabled"><a>Preview</a></li>
-        <% } %>
-        <li role="presentation" class="disabled"><a>Embed</a></li>
+      <% } else { %>
+      <li role="presentation" class="disabled"><a>Screenshots</a></li>
       <% } %>
     <% } %>
     <% if ( hasRole('superuser') ) { %>
-    <% if ( model.isNew() ) { %>
+      <% if ( model.isNew() ) { %>
       <li role="presentation" class="disabled"><a>Developer</a></li>
-    <% } else { %>
+      <% } else { %>
       <li role="presentation"><a
           href="#developer" aria-controls="data"
           role="tab" data-toggle="tab">Developer</a></li>
-    <% } %>
+      <% } %>
   <% } %>
   </ul>
 
@@ -99,9 +93,7 @@
     </div>
 
     <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
-    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
     <div role="tabpanel" class="tab-pane" id="live-preview">
-
       <ul class="nav nav-pills">
         <button type="button" data-action="get-preview-size" id="small-view"
           class="btn btn-default resize"
@@ -183,40 +175,36 @@
       <% } %>
 
     </div>
-    <% } %>
 
+    <div role="tabpanel" class="tab-pane" id="embed">
+      <% if ( model.has('embed_html') ) { %>
+      <textarea class="form-control" rows="6" readonly><%=model.get('embed_html') %></textarea>
+      <% } %>
+    </div>
     <div role="tabpanel" class="tab-pane" id="screenshots">
+
+      <% if ( model.has('screenshot_sm_url') ) { %>
       <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>
         <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>
         <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>
       </ul>
-      <% if ( model.isPublishable() ) { %>
+
       <div class="tab-content">
         <div id="large-ss" class="tab-pane active">
-          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_l.png')%>" />
+          <img src="<%=model.get('screenshot_lg_url')%>" />
         </div>
         <div id="medium-ss" class="tab-pane">
-          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_m.png')%>" />
+          <img src="<%=model.get('screenshot_md_url')%>" />
         </div>
         <div id="small-ss" class="tab-pane">
-          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_s.png')%>" />
-        </div>
-      </div>
-      <% } else { %>
-      <div class="tab-content">
-        <div id="large-ss" class="tab-pane active">
-          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_l.png')%>" />
-        </div>
-        <div id="medium-ss" class="tab-pane">
-          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_m.png')%>" />
-        </div>
-        <div id="small-ss" class="tab-pane">
-          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_s.png')%>" />
+          <img src="<%=model.get('screenshot_sm_url')%>" />
         </div>
       </div>
       <% } %>
+
     </div>
+    <% } %>
 
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">

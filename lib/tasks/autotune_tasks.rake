@@ -62,16 +62,41 @@ namespace :autotune do
   end
 
   desc 'Create machine user'
-  task :create_superuser, [:set_email] => [:environment] do |t, args|
-    u = Autotune::User.find_or_create_by({
-        :name => 'autobot_machine'
-      })
-    u.attributes = {
-      :email => args[:set_email],
-      :meta => { 'roles' => [:superuser] }
-    }
-    u.save!
-    puts u.as_json
+  task :create_superuser, [:email] => [:environment] do |_, args|
+    u = Autotune::User
+        .create_with(
+          :name => 'autobot_machine', :meta => { 'roles' => [:superuser] })
+        .find_or_create_by!(:email => args[:email])
+    puts "Superuser with name '#{u.name}' and email '#{u.email}':"
+    puts "User ID: #{u.id}"
+    puts "API key: #{u.api_key}"
+  end
+
+  desc 'Get API key'
+  task :get_api_key, [:email] => [:environment] do |_, args|
+    u = Autotune::User.find_by_email(args[:email])
+
+    if u.blank?
+      puts "No user found with email address #{args[:email]}"
+    else
+      puts "Account with name '#{u.name}' and email '#{u.email}':"
+      puts "User ID: #{u.id}"
+      puts "API key: #{u.api_key}"
+    end
+  end
+
+  desc 'Reset API key'
+  task :reset_api_key, [:email] => [:environment] do |_, args|
+    u = Autotune::User.find_by_email(args[:email])
+
+    if u.blank?
+      puts "No user found with email '#{args[:email]}'"
+    else
+      u.update!(:api_key => Autotune::User.generate_api_key)
+      puts "Reset API key for account with name '#{u.name}' and email '#{u.email}':"
+      puts "User ID: #{u.id}"
+      puts "API key: #{u.api_key}"
+    end
   end
 
 end

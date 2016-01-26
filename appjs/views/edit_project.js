@@ -41,7 +41,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
-        // alpaca_data = $form.alpaca('get'),
         base_url = this.model.url(),
         config_themes = this.model.blueprint.get('config').themes || ['generic'],
         query = '',
@@ -173,9 +172,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    $('#gen_ss').click(function(){
-      logger.debug('clicked gen ss');
-    });
+    // autoselect embed code on focus
+    this.$("#embed textarea").focus( function() { $(this).select(); } );
 
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
@@ -201,24 +199,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       });
     }
 
-    // load the embed code
-    if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
-      var proto = window.location.protocol.replace( ':', '' ),
-          embedUrl = this.model.getPublishUrl(proto, 'embed.txt');
-
-      promises.push( Promise
-        .resolve( $.get( embedUrl ) )
-        .then( function(data) {
-          data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
-          view.$( '#embed textarea' ).text( data );
-        }).catch(function(error) {
-          logger.error(error);
-          view.$('.nav-tabs a[href=#embed]').parent().addClass('disabled');
-        })
-      );
-    }
-
-    // render the alpaca form
     promises.push( new Promise( function(resolve, reject) {
       view.renderForm(resolve, reject);
     } ) );

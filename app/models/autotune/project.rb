@@ -152,12 +152,21 @@ module Autotune
       end
     end
 
+    def embed_html
+      ac = Autotune::ProjectsController.new
+      ac.embed_html
+    end
+
     def deployed?
       status != 'new' && blueprint_version.present?
     end
 
     def installed?
       status != 'new' && blueprint_version.present?
+    end
+
+    def built?
+      output.present?
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
