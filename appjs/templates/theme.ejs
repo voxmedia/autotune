@@ -1,7 +1,20 @@
 <div class="row m-page-heading">
   <div class="col-xs-12">
     <h3><% if ( model.isNew() ) { %>New Theme<% } else { %><%=model.get( 'title' ) %><% } %></h3>
-
+    <% if ( !model.isNew() ) { %>
+    <p class="text-muted">
+      Status:
+      <% if(model.hasStatus('ready')) { %>
+      <span class="text-success"><i class="icon-ok"></i>Ready</span>
+      <% } else if(model.hasStatus('broken')) { %>
+      <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+      <% } else if(model.hasStatus('updating')) { %>
+      <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+      <% } else { %>
+      <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
+      <% } %>
+    </p>
+    <% } %>
   </div>
 </div>
 

@@ -25,6 +25,18 @@ var Theme = Backbone.Model.extend({
     return !this.has('parent_id') || this.get('parent_id') === undefined;
   },
 
+  /**
+   * Does this theme have any of these statuses?
+   * @param {string} status Check for this status
+   * @returns {boolean}
+   **/
+  hasStatus: function() {
+    var iteratee = function(m, i) {
+      return m || this.get( 'status' ) === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
   urlRoot: '/themes'
 });
 

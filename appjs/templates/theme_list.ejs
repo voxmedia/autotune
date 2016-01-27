@@ -19,6 +19,7 @@
     <tr class="m-table-heading">
       <td>Theme</td>
       <td>Group</td>
+      <td>Status</td>
       <td class="text-right" colspan="2">Bold Actions</td>
     </tr>
   <% if(getObjects().length == 0) { %>
@@ -26,9 +27,26 @@
   <% }
   _.each(getObjects(), function(item) { %>
   <tr>
-    <td class="ok-notice"><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
+    <td <% if(item.get('status') == 'ready') { %>
+      class="ok-notice"
+      <% } else if(item.get('status') == 'broken') { %>
+      class="alert-notice"
+      <% } else { %>
+      class="info-notice"
+      <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
     <td>
       <%= item.attributes.group_name %>
+    </td>
+    <td>
+      <% if(item.get('status') == 'ready') { %>
+      <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
+      <% } else if(item.get('status') == 'broken') { %>
+        <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
+      <% } else if(item.hasStatus('updating')) { %>
+        <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+      <% } else { %>
+        <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
+      <% } %>
     </td>
     <td class="text-right" colspan="2">
       <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
