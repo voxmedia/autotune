@@ -14,7 +14,10 @@ module Autotune
         where(search_sql(text))
       end
 
-      # Generate the sql for active record
+      # Generate the sql for active record.
+      #   > User.search_sql('ryan mark')
+      #   ['(name LIKE ? OR email LIKE ?) AND (name LIKE ? OR email LIKE ?)',
+      #    '%ryan%', '%ryan%', '%mark%', '%mark%']
       #
       # @param text [String] string of keywords
       # @return [Array] ActiveRecord where params
