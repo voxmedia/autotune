@@ -22,7 +22,7 @@ module Autotune
 
     # This can be overridden in the app to pull data from an external source
     def get_theme_data(theme)
-      {:test => "something"}
+      Autotune.configuration.generic_theme
     end
   end
 end
