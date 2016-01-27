@@ -98,5 +98,4 @@ namespace :autotune do
       puts "API key: #{u.api_key}"
     end
   end
-
 end
