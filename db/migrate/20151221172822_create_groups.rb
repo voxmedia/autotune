@@ -55,9 +55,10 @@ class CreateGroups < ActiveRecord::Migration
           theme.save!
         else
           puts "Create theme #{g['theme']}"
-          Autotune::Theme.find_or_create_by :title => g['name'],
+          theme = Autotune::Theme.find_or_create_by :title => g['name'],
            :slug => g['theme'], :group => group
         end
+        theme.update_data
       end
 
       Autotune::Project.all.each do |project|

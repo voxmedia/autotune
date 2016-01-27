@@ -13,7 +13,7 @@ module Autotune
   PROJECT_STATUSES = %w(new building updated built broken)
   PROJECT_PUB_STATUSES = %w(draft published)
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
-  THEME_STATUSES = %w(new updating testing ready)
+  THEME_STATUSES = %w(new updating ready broken)
   BLUEPRINT_TYPES = %w(graphic app)
   ROLES = %w(author editor designer superuser)
 

@@ -26,7 +26,13 @@ module Autotune
     # Merge data with parent theme
     def config_data
       return data if parent.nil?
-      return parent.data.merge(data)
+      return parent.data.deep_merge(data)
+    end
+
+    def update_data
+      update!(:status => "updating")
+      SyncThemeJob.perform_later(
+        self, :update => true)
     end
 
     # Get default theme for group
@@ -36,17 +42,16 @@ module Autotune
         :group_id => group_id)
     end
 
-    def update_data
-      update!(:status => "updating")
-      SyncThemeJob.perform_later(
-        self, :update => true)
+    def self.add_default_theme_for_group(group)
+      default_theme = Theme.get_default_theme_for_group
+      return default unless default_theme.nil?
+      default_theme = Theme.create_by(
+        :title => group.name,
+        :group_id => group.id)
+      default_theme.save!
+      default_theme.update_data
     end
 
-    def self.get_theme_data
-      # stubbed theme data function
-      #TODO (Kavya) Actual implementation
-      {:test => "something"}
-    end
 
     private
     def defaults

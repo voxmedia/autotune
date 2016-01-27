@@ -190,6 +190,7 @@ module Autotune
           roles[r.to_s].each do |g|
             group = Group.find_or_create_by(:name => g)
             group.save
+            Theme.add_default_theme_for_group(group)
             membership = user.group_memberships.find_or_create_by(:group => group)
             membership.role = r.to_s
             membership.save!
