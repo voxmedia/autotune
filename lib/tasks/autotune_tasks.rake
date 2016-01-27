@@ -61,6 +61,19 @@ namespace :autotune do
     end
   end
 
+  desc 'Correct project type'
+  task :correct_project_type, [:blueprint_slug] => [:environment] do |_, args|
+    blueprint = Autotune::Blueprint.find_by_slug(args[:blueprint_slug])
+    Autotune::Project.where(:blueprint_id => blueprint.id).each do |proj|
+      if proj.type != blueprint.type
+        original_type = proj.type
+        proj.blueprint_config['type'] = blueprint.type
+        proj.save!
+        puts "'#{proj.title}' type changed from '#{original_type}' to '#{proj.type}'"
+      end
+    end
+  end
+
   desc 'Create machine user'
   task :create_superuser, [:email] => [:environment] do |_, args|
     u = Autotune::User
