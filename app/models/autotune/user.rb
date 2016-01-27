@@ -6,6 +6,10 @@ module Autotune
     has_many :projects
     serialize :meta, JSON
 
+    default_scope { order('updated_at DESC') }
+
+    search_fields :email, :name
+
     validates :api_key, :presence => true, :uniqueness => true
     after_initialize :defaults
 

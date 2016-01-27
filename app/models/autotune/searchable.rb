@@ -10,24 +10,38 @@ module Autotune
       #
       # @param text [String] string of keywords
       # @return [ActiveRecord::Relation] matching model instances
-      def search(text, field)
-        return nil if text.nil? || text.empty?
-        return nil unless defined? @@search_fields && @@search_fields.any?
+      def search(text)
+        where(search_sql(text))
+      end
+
+      # Generate the sql for active record
+      #
+      # @param text [String] string of keywords
+      # @return [Array] ActiveRecord where params
+      def search_sql(text)
+        return '' if text.nil? || text.empty? || search_fields.blank?
         words = text.to_s.strip.split.uniq
-        words.reduce(self) do |combined_scope, word|
-          search_fields(field)
-          query_tmpl = @@search_fields.map { |item| "#{item} LIKE ?" }
-          combined_scope.where(
-            [query_tmpl.join(' OR ')] +
-            ["%#{word}%"] * @@search_fields.length)
+
+        query_list = words.map do |word|
+          ["%#{word}%"] * search_fields.length
         end
+
+        [search_field_sql(words.length)] + query_list.flatten
       end
 
       # Set the fields to search across when `search` is used
       #
       # @param [Symbol] field names
       def search_fields(*args)
-        @@search_fields = args.map { |a| a.to_sym }
+        return @search_fields if args.length == 0
+        @search_fields = args.map(&:to_sym)
+      end
+
+      private
+
+      def search_field_sql(num_of_keywords = 1)
+        sql = search_fields.map { |item| "#{item} LIKE ?" }.join(' OR ')
+        '(' + ([sql] * num_of_keywords).join(') AND (') + ')'
       end
     end
   end
