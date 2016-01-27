@@ -1,14 +1,11 @@
 "use strict";
 
-// how is this mapped to the save button for the form only?
-
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     camelize = require('underscore.string/camelize'),
     models = require('../../models'),
     logger = require('../../logger'),
-    pym = require('pym.js'),
     helpers = require('../../helpers');
 
 module.exports = {
@@ -32,14 +29,12 @@ module.exports = {
         action = $form.data('action'),
         next = $form.data('next');
 
-    logger.debug('form form', $form);
     $form.find('[type=submit]').button('loading');
 
     if(model_class && action === 'new') {
       inst = new models[model_class]();
     } else if(_.isObject(this.model) && action === 'edit') {
       inst = this.model;
-      logger.debug(this, inst);
     } else if ($form.attr('method').toLowerCase() === 'get') {
       // if the method attr is `get` then we can navigate to that new
       // url and avoid any posting
@@ -60,6 +55,7 @@ module.exports = {
         }
 
         logger.debug('form is valid, saving...');
+
         return inst.save();
       }).then(function() {
         logger.debug('form finished saving');
