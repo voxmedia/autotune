@@ -29,7 +29,7 @@
       <td class="text-right" colspan="3">
         <form class="form-inline" method="get" action="/themes">
           Filters
-          <% if(query.status) { %>
+          <% if(query.status || query.group) { %>
             (<a href="/themes">clear</a>)
           <% } %>
           &nbsp;
@@ -38,7 +38,7 @@
             <select name="group" id="group" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.group_title) { %>selected<% } %>>Group</option>
               <% app.designerGroups.each(function(group) { %>
-                <option <% if(group.get('name') == query.group) { %>selected<% } %>
+                <option <% if(group.get('id') == query.group) { %>selected<% } %>
                       value="<%=group.get('id') %>"><%= group.get('name') %></option>
               <% }) %>
             </select>
@@ -49,7 +49,7 @@
               <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
             <% _.each(app.config.theme_statuses, function(status) { %>
               <option <% if(status === query.status) { %>selected<% } %>
-                    value="<%=status %>"><%=status %></option>
+                    value="<%= status %>"><%= status %></option>
             <% }) %>
             </select>
           </div>
