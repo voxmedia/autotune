@@ -23,6 +23,8 @@ module Autotune
     after_initialize :defaults
     default_scope { order('title ASC') }
 
+    after_save :pub_to_redis
+
     # Merge data with parent theme
     def config_data
       return data if parent.nil?
@@ -57,6 +59,13 @@ module Autotune
     def defaults
       self.data ||= {}
       self.status ||= 'new'
+    end
+
+    def pub_to_redis
+      return if Autotune.redis.nil?
+      msg = { :id => id,
+              :status => status }
+      Autotune.redis.publish 'theme', msg.to_json
     end
   end
 end
