@@ -37,7 +37,20 @@ var Theme = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
-  urlRoot: '/themes'
+  urlRoot: '/themes',
+
+  /**
+   * Reset this theme.
+   * @returns {object} jqXHR object
+   **/
+  reset: function() {
+    this.set({'status': 'updating'});
+    return Backbone.ajax({
+      dataType: 'json',
+      type: 'GET',
+      url: this.url() + '/reset'
+    });
+  }
 });
 
 module.exports = Theme;

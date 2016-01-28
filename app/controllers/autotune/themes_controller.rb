@@ -40,6 +40,7 @@ module Autotune
       @theme.attributes = select_from_post :title, :data, :group_id, :slug
       @theme.parent = Theme.get_default_theme_for_group(@theme.group_id)
       if @theme.valid?
+        @theme.status = "ready"
         @theme.save
         render :show, :status => :created
       else
@@ -52,10 +53,16 @@ module Autotune
       @theme.attributes = select_from_post :title, :data
       if @theme.valid?
         @theme.save
+        @theme.status = "ready"
         render :show
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    def reset
+      instance.update_data
+      render_accepted
     end
 
     def destroy

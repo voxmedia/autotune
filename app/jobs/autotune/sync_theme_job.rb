@@ -7,10 +7,8 @@ module Autotune
     end
 
     def perform(theme, update: false)
-      #TODO (Kavya): Flesh this out
-      # stub implementation of the job
       external_data = get_theme_data(theme)
-      theme.data.deep_merge! external_data unless external_data.nil?
+      theme.data = external_data unless external_data.nil?
       theme.status = "ready"
       theme.save!
     rescue => exc
