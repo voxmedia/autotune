@@ -29,6 +29,41 @@ module Autotune
     def index
       #TODO add search and filter functionality
       @themes = current_user.designer_themes
+
+      # Filter and search query
+      query = {}
+
+      query[:status] = params[:status] if params.key? :status
+      query[:group_id] = params[:group] if params.key? :group
+
+      if params.key? :search
+        @themes = @themes.search(params[:search], :title)
+      end
+
+      @themes = @themes.where(query)
+
+      page = params[:page] || 1
+      per_page = params[:per_page] || 15
+      @themes = @themes.paginate(:page => page, :per_page => per_page)
+      link_str = '<%s>; rel="%s"'
+      links = [
+        link_str % [
+          themes_url(:page => @themes.current_page, :per_page => per_page), 'page'],
+        link_str % [
+          themes_url(:page => 1, :per_page => per_page), 'first'],
+        link_str % [
+          themes_url(:page => @themes.total_pages, :per_page => per_page), 'last']
+      ]
+      if @themes.next_page
+        links << link_str % [
+          themes_url(:page => @themes.next_page, :per_page => per_page), 'next']
+      end
+      if @themes.previous_page
+        links << link_str % [
+          themes_url(:page => @themes.previous_page, :per_page => per_page), 'prev']
+      end
+      headers['Link'] = links.join(', ')
+      headers['X-Total'] = @themes.count
     end
 
     def show

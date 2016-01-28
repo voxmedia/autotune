@@ -230,11 +230,20 @@ module.exports = Backbone.Router.extend({
 
   listThemes: function(params) {
     var themes = this.app.edittableThemes,
-        app = this.app, query = {}, view;
+        app = this.app, query = {}, view, jqxhr;
 
-    Promise.resolve( themes.fetch() ).then(function() {
+    if(params) { query = querystring.parse(params); }
+
+    if (query.page) {
+      jqxhr = themes.getPage(parseInt(query.page), {data: query});
+    } else {
+      jqxhr = themes.getFirstPage({data: query});
+    }
+
+    Promise.resolve( jqxhr  ).then(function() {
       view = new views.ListThemes({
         collection: themes,
+        query: _.pick(query, 'status', 'group', 'search'),
         app: app
       });
       view.render();
@@ -264,7 +273,7 @@ module.exports = Backbone.Router.extend({
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
   },
-  
+
   newTheme: function() {
     var theme = new models.Theme(),
         view = new views.EditTheme({ model: theme, app: this.app });
