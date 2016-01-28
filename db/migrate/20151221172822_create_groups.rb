@@ -35,9 +35,9 @@ class CreateGroups < ActiveRecord::Migration
     add_foreign_key :autotune_themes, :autotune_groups, column: :group_id
     add_foreign_key :autotune_themes, :autotune_themes, column: :parent_id
 
-    # Adding initial data - TODO (Kavya) change this later to a configuration setting
+    # Adding initial data
     require 'yaml'
-    group_theme_map_file = File.join(Rails.root, 'config/chorus_theme_map.yml')
+    group_theme_map_file = File.join(Rails.root, 'config/theme_map.yml')
     if File.exist?(group_theme_map_file) then
       group_theme_map = YAML.load_file(group_theme_map_file)
 

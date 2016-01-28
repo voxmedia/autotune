@@ -27,7 +27,6 @@ module Autotune
     def edit; end
 
     def index
-      #TODO add search and filter functionality
       @themes = current_user.designer_themes
 
       # Filter and search query
