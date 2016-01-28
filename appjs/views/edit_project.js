@@ -32,10 +32,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(options){
-    logger.debug('pollchange', options);
+    if ( !this.model.blueprint.hasPreviewType('live') ) { return; }
+
+    logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
-        base_url = this.model.url(),
         config_themes = this.model.blueprint.get('config').themes || ['generic'],
         query = '',
         data = $form.alpaca('get').getValue();
@@ -48,45 +49,47 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       view.pollChange();
     };
 
-    $.ajax({
+    return $.ajax({
       type: "POST",
-      url: base_url + "/preview_build_data" + query,
+      url: this.model.url() + "/preview_build_data" + query,
       data: JSON.stringify(data),
       contentType: 'application/json',
       dataType: 'json'
-    }).done(function( data ) {
-      if(data.spreadsheet_template){
-        delete data.spreadsheet_template;
-        $( "input[name='google_doc_url']" ).val(data.google_doc_url);
-      }
-
-      if(data.theme !== view.theme){
-        if(typeof data.theme !== 'undefined'){
-          view.theme = data.theme;
+    }).then(function( data ) {
+        if(data.spreadsheet_template){
+          delete data.spreadsheet_template;
+          $( "input[name='google_doc_url']" ).val(data.google_doc_url);
         }
-        var slug = view.model.blueprint.get('slug'),
-            bp_version = view.model.getVersion(),
-            preview_url = view.model.blueprint.getMediaUrl(
-              [bp_version, view.theme].join('-') + '/preview');
 
-        $('#'+slug+'__graphic').empty();
-        view.pym = new pym.Parent(slug+'__graphic', preview_url);
-        view.pym.iframe.onload = childLoaded;
-      }
+        if(data.theme !== view.theme){
+          if(typeof data.theme !== 'undefined'){
+            view.theme = data.theme;
+          }
+          var slug = view.model.blueprint.get('slug'),
+              bp_version = view.model.getVersion(),
+              preview_url = view.model.blueprint.getMediaUrl(
+                [bp_version, view.theme].join('-') + '/preview');
 
-      if(view.theme){
-        view.pym.sendMessage('updateData', JSON.stringify(data));
+          $('#'+slug+'__graphic').empty();
+          view.pym = new pym.Parent(slug+'__graphic', preview_url);
+          view.pym.iframe.onload = childLoaded;
+        }
+
+        if(view.theme){
+          view.pym.sendMessage('updateData', JSON.stringify(data));
+        }
+      },
+      function(err) {
+        if ( err.status < 500 ) {
+          var dat = err.responseJSON;
+          view.app.view.error( dat.error );
+        } else {
+          view.app.view.error(
+            "There was a problem updating the preview, please contact support" );
+          logger.error(err);
+        }
       }
-    }).fail(function(err){
-      if ( err.status < 500 ) {
-        var dat = err.responseJSON;
-        view.app.view.error( dat.error );
-      } else {
-        view.app.view.error(
-          "There was a problem updating the preview, please contact support" );
-        logger.error(err);
-      }
-    });
+    );
   }, 500),
 
   savePreview: function(){

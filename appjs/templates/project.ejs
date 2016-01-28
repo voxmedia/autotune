@@ -50,6 +50,7 @@
       <li role="presentation"><a
           href="#live-preview" id="draft-preview" aria-controls="live-preview"
           role="tab" data-toggle="tab">Preview</a></li>
+
       <% if ( model.has( 'embed_html' ) ) { %>
       <li role="presentation"><a
           href="#embed" aria-controls="embed"
@@ -65,6 +66,7 @@
       <% } else { %>
       <li role="presentation" class="disabled"><a>Screenshots</a></li>
       <% } %>
+
     <% } %>
     <% if ( hasRole('superuser') ) { %>
       <% if ( model.isNew() ) { %>
@@ -137,13 +139,13 @@
           <% if ( model.hasStatus('broken') ) { %>
           <p class="text-danger">
              <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
-            </p>
+          </p>
             <% if ( model.has('error_message') ) { %>
             <p class="text-danger">
              <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
-             <%=model.get('error_message') %></p>
+             <%=model.get('error_message') %>
+            </p>
             <% } %>
-          </div>
           <% } else if ( model.hasStatus('building') ) { %>
           <p class="text-warning">
             <span class="status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> Building the project <br /><i class="icon-info"></i> The preview below is still building and does not reflect the changes that you just saved. It will update when the
