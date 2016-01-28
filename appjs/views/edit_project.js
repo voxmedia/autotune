@@ -28,9 +28,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   debounceChange: _.debounce(function(e){
-    if ( this.model.blueprint.hasPreviewType('live') ){
       this.pollChange();
-    }
   }, 500),
 
   focusPollChange: function(){
@@ -38,59 +36,61 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: function(options){
-    logger.debug('pollchange');
-    var view = this,
-        $form = this.$('#projectForm'),
-        base_url = this.model.url(),
-        config_themes = this.model.blueprint.get('config').themes || ['generic'],
-        query = '',
-        data = $form.alpaca('get').getValue();
+    if ( this.model.blueprint.hasPreviewType('live') ){
+      logger.debug('pollchange');
+      var view = this,
+          $form = this.$('#projectForm'),
+          base_url = this.model.url(),
+          config_themes = this.model.blueprint.get('config').themes || ['generic'],
+          query = '',
+          data = $form.alpaca('get').getValue();
 
-    if(options){
-      query = '?'+$.param( options );
-    }
+      if(options){
+        query = '?'+$.param( options );
+      }
 
-    if( view.model.isNew() ){
-      base_url = window.location.href;
-    }
+      if( view.model.isNew() ){
+        base_url = window.location.href;
+      }
 
-    var childLoaded = function() {
-      view.pollChange();
-    };
+      var childLoaded = function() {
+        view.pollChange();
+      };
 
-    $.ajax({
-      type: "POST",
-      url: base_url + "/preview_build_data" + query,
-      data: JSON.stringify(data),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).done(function( data ) {
-        if(data.spreadsheet_template){
-          delete data.spreadsheet_template;
-          $( "input[name='google_doc_url']" ).val(data.google_doc_url);
-        }
-
-        if(data.theme !== view.theme){
-          if(typeof data.theme !== 'undefined'){
-            view.theme = data.theme;
+      $.ajax({
+        type: "POST",
+        url: base_url + "/preview_build_data" + query,
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        dataType: 'json'
+      }).done(function( data ) {
+          if(data.spreadsheet_template){
+            delete data.spreadsheet_template;
+            $( "input[name='google_doc_url']" ).val(data.google_doc_url);
           }
-          var slug = view.model.blueprint.get('slug'),
-              bp_version = view.model.getVersion(),
-              preview_url = view.model.blueprint.getMediaUrl(
-                [bp_version, view.theme].join('-') + '/preview');
 
-          $('#'+slug+'__graphic').empty();
-          view.pym = new pym.Parent(slug+'__graphic', preview_url);
-          view.pym.iframe.onload = childLoaded;
-        }
+          if(data.theme !== view.theme){
+            if(typeof data.theme !== 'undefined'){
+              view.theme = data.theme;
+            }
+            var slug = view.model.blueprint.get('slug'),
+                bp_version = view.model.getVersion(),
+                preview_url = view.model.blueprint.getMediaUrl(
+                  [bp_version, view.theme].join('-') + '/preview');
 
-        if(view.theme){
-          view.pym.sendMessage('updateData', JSON.stringify(data));
-        }
+            $('#'+slug+'__graphic').empty();
+            view.pym = new pym.Parent(slug+'__graphic', preview_url);
+            view.pym.iframe.onload = childLoaded;
+          }
 
-    }).fail(function(err){
-      logger.debug(err);
-    });
+          if(view.theme){
+            view.pym.sendMessage('updateData', JSON.stringify(data));
+          }
+
+      }).fail(function(err){
+        logger.debug(err);
+      });
+    }
   },
 
   savePreview: function(){
