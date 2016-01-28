@@ -317,26 +317,30 @@ var Project = Backbone.Model.extend({
   },
 
   createSpreadsheet: function() {
-    var ss_key = this.blueprint.get('config')['spreadsheet_template'].match(/[-\w]{25,}/)[0],
-        base_url = window.location.href;
-    $.ajax({
+    var ss_key = this.blueprint.get('config')['spreadsheet_template'].match(/[-\w]{25,}/)[0];
+
+    return $.ajax({
       type: "POST",
-      url: base_url + "/create_spreadsheet",
+      url: this.url() + "/create_spreadsheet",
       data: JSON.stringify(ss_key),
       contentType: 'application/json',
       dataType: 'json'
-    }).done(function( data ) {
-      if($( "input[name='google_doc_url']" ).val().length > 0){
-        var confirm = window.confirm('This will replace the spreadsheet link currenlty associated with this project. Click "OK" to confirm the replacement.');
-        if(confirm){
-          $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+    }).then(
+      function( data ) {
+        var $input = $( "input[name='google_doc_url']" );
+        if($input.val().length > 0){
+          var msg = 'This will replace the spreadsheet link currenlty associated with this project. Click "OK" to confirm the replacement.';
+          if( window.confirm(msg) ){
+            $input.val(data.google_doc_url);
+          }
+        } else {
+          $input.val(data.google_doc_url);
         }
-      } else {
-        $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+      },
+      function(err) {
+        console.log('There was an error authenticating your Google account.', err);
       }
-    }).fail(function(err) {
-      console.log('There was an error authenticating your Google account.', err);
-    });
+    );
   },
 
   /**

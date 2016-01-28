@@ -9,19 +9,17 @@ require 'json'
 require 'date'
 
 module Autotune
-
   class GoogleDocs
-
     attr_reader :client
 
     def initialize(current_auth)
       @client = Google::APIClient.new
       auth = client.authorization
-      auth.client_id = ENV["GOOGLE_CLIENT_ID"]
-      auth.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
+      auth.client_id = ENV['GOOGLE_CLIENT_ID']
+      auth.client_secret = ENV['GOOGLE_CLIENT_SECRET']
       auth.scope =
-          "https://www.googleapis.com/auth/drive " +
-          "https://spreadsheets.google.com/feeds/"
+        'https://www.googleapis.com/auth/drive ' \
+        'https://spreadsheets.google.com/feeds/'
       # auth.redirect_uri = "http://example.com/redirect"
       auth.refresh_token = current_auth.credentials['refresh_token']
       auth.fetch_access_token!
@@ -29,7 +27,6 @@ module Autotune
       @_files = {}
       @_spreadsheets = {}
     end
-
 
     # Find a Google Drive file
     # Takes the key of a Google Drive file and returns a hash of meta data. The returned hash is
@@ -45,11 +42,11 @@ module Autotune
 
       # get the file metadata
       resp = @client.execute(
-        api_method: drive.files.get,
-        parameters: { fileId: file_id })
+        :api_method => drive.files.get,
+        :parameters => { :fileId => file_id })
 
       # die if there's an error
-      fail GoogleDriveError, resp.error_message if resp.error?
+      handle_errors resp
 
       @_files[file_id] = resp.data
     end
@@ -75,14 +72,13 @@ module Autotune
       end
 
       # get the export
-      get_resp = @client.execute(uri: uri)
+      get_resp = @client.execute(:uri => uri)
 
       # die if there's an error
-      fail GoogleDriveError, get_resp.error_message if get_resp.error?
+      handle_errors get_resp
 
       # contents
       get_resp.body
-
     end
 
     # Export a file and save to disk
@@ -99,7 +95,7 @@ module Autotune
         # get a temporary file. The export is binary, so open the tempfile in
         # write binary mode
         fp = Tempfile.create(
-          ['googledoc', ".#{type}"], binmode: mime_for(type.to_s).binary?)
+          ['googledoc', ".#{type}"], :binmode => mime_for(type.to_s).binary?)
         filename = fp.path
         fp.write(contents)
         fp.close
@@ -120,18 +116,19 @@ module Autotune
       if title.nil?
         copied_file = drive.files.copy.request_schema.new
       else
-        copied_file = drive.files.copy.request_schema.new('title' => title, 'writersCanShare' => true)
+        copied_file = drive.files.copy.request_schema.new(
+          'title' => title, 'writersCanShare' => true)
       end
       cp_resp = @client.execute(
-        api_method: drive.files.copy,
-        body_object: copied_file,
-        parameters: { fileId: file_id, visibility: visibility.to_s.upcase })
+        :api_method => drive.files.copy,
+        :body_object => copied_file,
+        :parameters => {
+          :fileId => file_id, :visibility => visibility.to_s.upcase })
 
-      if cp_resp.error?
-        fail CreateError, cp_resp.error_message
-      else
-        return { id: cp_resp.data['id'], url: cp_resp.data['alternateLink'] }
-      end
+      # die if there's an error
+      handle_errors cp_resp
+
+      { :id => cp_resp.data['id'], :url => cp_resp.data['alternateLink'] }
     end
     alias_method :copy_doc, :copy
 
@@ -144,8 +141,8 @@ module Autotune
     def check_permission(file_id, domain)
       drive = @client.discovered_api('drive', 'v2')
       cp_resp = @client.execute(
-        api_method: drive.permissions.list,
-        parameters: { fileId: file_id })
+        :api_method => drive.permissions.list,
+        :parameters => { :fileId => file_id })
 
       has_permission = false
       cp_resp.data.items.each do |item|
@@ -156,7 +153,7 @@ module Autotune
       end
 
       if cp_resp.error?
-        fail CreateError, cp_resp.error_message
+        raise CreateError, cp_resp.error_message
       else
         return has_permission
       end
@@ -165,17 +162,17 @@ module Autotune
     def insert_permission(file_id, value, perm_type, role)
       drive = @client.discovered_api('drive', 'v2')
       new_permission = {
-          'value': value,
-          'type': perm_type,
-          'role': role
+        'value' => value,
+        'type' => perm_type,
+        'role' => role
       }
       cp_resp = @client.execute(
-        api_method: drive.permissions.insert,
-        body_object: new_permission,
-        parameters: { fileId: file_id })
+        :api_method => drive.permissions.insert,
+        :body_object => new_permission,
+        :parameters => { :fileId => file_id })
 
       if cp_resp.error?
-        fail CreateError, cp_resp.error_message
+        raise CreateError, cp_resp.error_message
       else
         return cp_resp.data
       end
@@ -206,14 +203,14 @@ module Autotune
         # the first column contains keys and the second contains values.
         # Like tarbell.
         if %w(microcopy copy).include?(title.downcase) ||
-            title.downcase =~ /[ -_]copy$/
+           title.downcase =~ /[ -_]copy$/
           data[title] = load_microcopy(sheet.extract_data)
         else
           # otherwise parse the sheet into a hash
           data[title] = load_table(sheet.extract_data)
         end
       end
-      return data
+      data
     end
 
     # Take a two-dimensional array from a spreadsheet and create a hash. The first
@@ -263,5 +260,25 @@ module Autotune
       end
     end
 
+    class GoogleDriveError < StandardError; end
+    class CreateError < GoogleDriveError; end
+    class ConfigurationError < GoogleDriveError; end
+    class ClientError < GoogleDriveError; end
+    class DoesNotExist < ClientError; end
+
+    private
+
+    def handle_errors(result)
+      return if result.success?
+      # die if there's an error
+      if result.response.status >= 500
+        ex = GoogleDriveError
+      elsif result.response.status == 404
+        ex = DoesNotExist
+      elsif result.response.status >= 400
+        ex = ClientError
+      end
+      raise ex, result.error_message
+    end
   end
 end

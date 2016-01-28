@@ -199,19 +199,27 @@ module Autotune
       # Run the before build deployer hook
       deployer.before_build(@build_data, {}, current_user)
       render :json => @build_data
+    rescue => exc
+      if @project.meta['error_message'].present?
+        render_error @project.meta['error_message'], :bad_request
+      else
+        render_error exc.message
+      end
     end
 
     def create_spreadsheet
-      puts 'project version'
-      @project = instance
-      @ss_key = request.POST
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
       google_client = GoogleDocs.new(current_auth)
-      spreadsheet_copy = google_client.copy(@ss_key['_json'])
+      spreadsheet_copy = google_client.copy(request.POST['_json'])
+
       if Autotune.configuration.google_auth_domain.present?
-        google_client.share_with_domain(spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
+        google_client.share_with_domain(
+          spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
       end
-      render :json => {:google_doc_url => spreadsheet_copy[:url]}
+
+      render :json => { :google_doc_url => spreadsheet_copy[:url] }
+    rescue => exc
+      render_error exc.message
     end
 
     def update_snapshot

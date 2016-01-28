@@ -22,23 +22,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   template: require('../templates/project.ejs'),
   events: {
     'change :input': 'stopListeningForChanges',
-    'change form': 'debounceChange',
-    'keypress': 'debounceChange',
+    'change form': 'pollChange',
+    'keypress': 'pollChange',
     'click #savePreview': 'savePreview'
   },
-
-  debounceChange: _.debounce(function(e){
-    if ( this.model.blueprint.hasPreviewType('live') ){
-      this.pollChange();
-    }
-  }, 500),
 
   focusPollChange: function(){
     this.pollChange({'force_update': true});
   },
 
-  pollChange: function(options){
-    logger.debug('pollchange');
+  pollChange: _.debounce(function(options){
+    logger.debug('pollchange', options);
     var view = this,
         $form = this.$('#projectForm'),
         base_url = this.model.url(),
@@ -46,12 +40,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         query = '',
         data = $form.alpaca('get').getValue();
 
-    if(options){
+    if(options && options.force_update){
       query = '?'+$.param( options );
-    }
-
-    if( view.model.isNew() ){
-      base_url = window.location.href;
     }
 
     var childLoaded = function() {
@@ -65,33 +55,39 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).done(function( data ) {
-        if(data.spreadsheet_template){
-          delete data.spreadsheet_template;
-          $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+      if(data.spreadsheet_template){
+        delete data.spreadsheet_template;
+        $( "input[name='google_doc_url']" ).val(data.google_doc_url);
+      }
+
+      if(data.theme !== view.theme){
+        if(typeof data.theme !== 'undefined'){
+          view.theme = data.theme;
         }
+        var slug = view.model.blueprint.get('slug'),
+            bp_version = view.model.getVersion(),
+            preview_url = view.model.blueprint.getMediaUrl(
+              [bp_version, view.theme].join('-') + '/preview');
 
-        if(data.theme !== view.theme){
-          if(typeof data.theme !== 'undefined'){
-            view.theme = data.theme;
-          }
-          var slug = view.model.blueprint.get('slug'),
-              bp_version = view.model.getVersion(),
-              preview_url = view.model.blueprint.getMediaUrl(
-                [bp_version, view.theme].join('-') + '/preview');
+        $('#'+slug+'__graphic').empty();
+        view.pym = new pym.Parent(slug+'__graphic', preview_url);
+        view.pym.iframe.onload = childLoaded;
+      }
 
-          $('#'+slug+'__graphic').empty();
-          view.pym = new pym.Parent(slug+'__graphic', preview_url);
-          view.pym.iframe.onload = childLoaded;
-        }
-
-        if(view.theme){
-          view.pym.sendMessage('updateData', JSON.stringify(data));
-        }
-
+      if(view.theme){
+        view.pym.sendMessage('updateData', JSON.stringify(data));
+      }
     }).fail(function(err){
-      logger.debug(err);
+      if ( err.status < 500 ) {
+        var dat = err.responseJSON;
+        view.app.view.error( dat.error );
+      } else {
+        view.app.view.error(
+          "There was a problem updating the preview, please contact support" );
+        logger.error(err);
+      }
     });
-  },
+  }, 500),
 
   savePreview: function(){
     this.$('#projectForm form').submit();

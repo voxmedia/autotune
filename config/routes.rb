@@ -10,14 +10,6 @@ Autotune::Engine.routes.draw do
   get 'blueprints/:id/new_project',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  match 'blueprints/:id/new_project/preview_build_data',
-      :to => 'blueprints#preview_build_data',
-      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
-      :via => [:get, :post]
-  match 'blueprints/:id/new_project/create_spreadsheet',
-      :to => 'blueprints#create_spreadsheet',
-      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
-      :via => [:get, :post]
 
   resources :projects,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
@@ -30,25 +22,18 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/build_and_publish',
       :to => 'projects#build_and_publish',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  match 'projects/:id/preview_build_data',
-      :to => 'projects#preview_build_data',
-      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
-      :via => [:get, :post]
-  match 'projects/:id/duplicate/preview_build_data',
-      :to => 'projects#preview_build_data',
-      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
-      :via => [:get, :post]
-  match 'projects/:id/create_spreadsheet',
-      :to => 'projects#create_spreadsheet',
-      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
-      :via => [:get, :post]
-  match 'projects/:id/duplicate/create_spreadsheet',
-      :to => 'projects#create_spreadsheet',
-      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX },
-      :via => [:get, :post]
   get 'projects/:id/duplicate',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+
+  post 'projects/:id/preview_build_data',
+       :to => 'projects#preview_build_data',
+       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  post 'projects/preview_build_data',
+       :to => 'projects#preview_build_data'
+  post 'projects/create_spreadsheet',
+       :to => 'projects#create_spreadsheet'
+
   get '/changemessages' => 'changemessages#index'
 
   # The priority is based upon order of creation: first created -> highest priority.

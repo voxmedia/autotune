@@ -45,11 +45,12 @@ module Autotune
           end
 
           if needs_update
-            google_client.share_with_domain(spreadsheet_key, Autotune.configuration.google_auth_domain)
+            google_client.share_with_domain(
+              spreadsheet_key, Autotune.configuration.google_auth_domain)
             exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
             ss_data = google_client.prepare_spreadsheet(exp_file)
             build_data['google_doc_data'] = ss_data
-            Rails.cache.write(cache_key, {'ss_data' => ss_data, 'version' => resp['version']})
+            Rails.cache.write(cache_key, 'ss_data' => ss_data, 'version' => resp['version'])
           else
             build_data['google_doc_data'] = Rails.cache.read(cache_key)['ss_data']
           end
@@ -58,6 +59,11 @@ module Autotune
 
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
+    rescue GoogleDocs::GoogleDriveError => exc
+      logger.error(exc)
+      project.meta['error_message'] = exc.message
+
+      raise
     end
 
     # Hook to do stuff after a project is deleted

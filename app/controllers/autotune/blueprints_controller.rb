@@ -74,35 +74,5 @@ module Autotune
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
       end
     end
-
-    def preview_build_data
-      @project = instance
-      @build_data = request.POST
-      if @build_data['google_doc_url'] && request.GET[:force_update]
-        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
-        Rails.cache.delete(cache_key)
-      end
-
-      # Get the deployer object
-      deployer = @project.deployer(:preview)
-
-      # Run the before build deployer hook
-      deployer.before_build(@build_data, {}, current_user)
-      render :json => @build_data
-    end
-
-    def create_spreadsheet
-      @project = instance
-      @ss_key = request.POST
-      current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
-      google_client = GoogleDocs.new(current_auth)
-      spreadsheet_copy = google_client.copy(@ss_key['_json'])
-      if Autotune.configuration.google_auth_domain.present?
-        google_client.share_with_domain(spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
-      end
-      render :json => {:google_doc_url => spreadsheet_copy[:url]}
-    end
-
-    def builder; end
   end
 end
