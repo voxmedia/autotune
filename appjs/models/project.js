@@ -301,6 +301,19 @@ var Project = Backbone.Model.extend({
     return this.get('blueprint_version') || this.blueprint.get('version');
   },
 
+  hasPreviewType: function() {
+    if ( this.has('blueprint_config') ) {
+      var iteratee = function(m, i) {
+        return m || this.get('blueprint_config')['preview_type'] === i;
+      };
+      return _.reduce( arguments, _.bind(iteratee, this), false );
+    } else if ( this.blueprint ) {
+      return this.blueprint.hasPreviewType.call(arguments);
+    } else {
+      return false;
+    }
+  },
+
   /**
    * Get the url of the preview.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible

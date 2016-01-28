@@ -20,6 +20,8 @@ function pluckAttr(models, attribute) {
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
+  forceUpdateDataFlag: false,
+  previousData: null,
   events: {
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
@@ -28,26 +30,34 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   focusPollChange: function(){
-    this.pollChange({'force_update': true});
+    this.forceUpdateDataFlag = true;
+    this.pollChange();
   },
 
-  pollChange: _.debounce(function(options){
+  pollChange: _.debounce(function(){
     if ( !this.model.blueprint.hasPreviewType('live') ) { return; }
 
-    logger.debug('pollchange');
     var view = this,
         $form = this.$('#projectForm'),
         config_themes = this.model.blueprint.get('config').themes || ['generic'],
         query = '',
         data = $form.alpaca('get').getValue();
 
-    if(options && options.force_update){
-      query = '?'+$.param( options );
+    if( this.forceUpdateDataFlag ){
+      query = '?force_update=true';
+      this.forceUpdateDataFlag = false;
+    } else if ( _.isEqual( this.previousData, data ) ) {
+      return;
     }
 
-    var childLoaded = function() {
-      view.pollChange();
-    };
+    // Make sure the form is valid before proceeding
+    if ( !this.formValidate(this.model, $form) ) {
+      return;
+    }
+
+    logger.debug('pollchange');
+
+    this.previousData = data;
 
     return $.ajax({
       type: "POST",
@@ -56,6 +66,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).then(function( data ) {
+        var childLoaded = function() {
+          view.pym.sendMessage('updateData', JSON.stringify(data));
+        };
+
         if(data.spreadsheet_template){
           delete data.spreadsheet_template;
           $( "input[name='google_doc_url']" ).val(data.google_doc_url);
@@ -75,9 +89,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.pym.iframe.onload = childLoaded;
         }
 
-        if(view.theme){
-          view.pym.sendMessage('updateData', JSON.stringify(data));
-        }
+        if(view.theme){ childLoaded(); }
       },
       function(err) {
         if ( err.status < 500 ) {
@@ -207,34 +219,22 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         var formData = view.alpaca.getValue(),
             buildData = view.model.buildData();
 
-        if ( view.model.blueprint.hasPreviewType('live') ){
+        // if blueprint is now live, but the version on this project is not, swap what we show
+        if ( view.model.hasPreviewType('live') ){
           view.theme = view.model.get('theme') || formData['theme'] || 'custom';
 
           var slug = view.model.blueprint.get('slug'),
               bp_version = view.model.getVersion(),
               preview_url = view.model.blueprint.getMediaUrl(
-                [bp_version, view.theme].join('-') + '/preview');
-
-          if ( ! view.model.hasInitialBuild() && ! view.copyProject){
-            preview_url += '#new';
-          }
-
-          var childLoaded = function() {
-            view.pollChange();
-          };
+                [bp_version, view.theme].join('-') + '/preview'),
+              childLoaded = function() { view.pollChange(); };
 
           if ( view.copyProject || view.model.hasInitialBuild() ){
-            // if blueprint is now live, but the version on this project is not, swap what we show
-            var versioned_type = view.model.get('blueprint_config')['preview_type'];
-            if( versioned_type === 'live'){
-              view.pym = new pym.Parent(slug+'__graphic', preview_url);
-              view.pym.iframe.onload = childLoaded;
-            } else {
-              view.pym = new pym.Parent(view.model.get('slug')+'__graphic', view.model.get('preview_url'));
-            }
+            view.pym = new pym.Parent(slug+'__graphic', preview_url);
+            view.pym.iframe.onload = childLoaded;
           } else {
             var uniqBuildVals = _.uniq(_.values(buildData));
-            view.pym = new pym.Parent(slug+'__graphic', preview_url);
+            view.pym = new pym.Parent(slug+'__graphic', preview_url + '#new');
 
             if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
               view.pym.iframe.onload = childLoaded;
@@ -248,6 +248,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
           view.pym = new pym.Parent(view.model.get('slug')+'__graphic', previewLink);
         }
+
         if(view.togglePreview){
           $( "#draft-preview" ).trigger( "click" );
         }
@@ -500,16 +501,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     logger.debug('form validate');
 
     if ( control ) {
+      // Validate the alpaca form
+      control.form.refreshValidationState(true);
       valid = control.form.isFormValid();
 
       if ( !valid ) {
-        control.form.refreshValidationState(true);
         $form.find('#validation-error').removeClass('hidden');
       } else {
         $form.find('#resolve-message').removeClass('hidden');
         $form.find('#validation-error').addClass('hidden');
       }
     } else {
+      // Validate the raw data editor
       try {
         JSON.parse(this.editor.getValue());
         valid = true;
