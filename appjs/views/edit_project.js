@@ -249,7 +249,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
         // Callback for when iframe loads
         iframeLoaded = function() {
-          if ( view.model.hasBuildData() ) {
+          logger.debug('iframeLoaded');
+          if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
             view.pollChange();
           } else {
             $('#embed-preview').removeClass('loading');
