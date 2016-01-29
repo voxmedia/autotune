@@ -88,13 +88,7 @@ var Project = Backbone.Model.extend({
    * @returns {boolean}
    **/
   hasInstructions: function() {
-    if ( this.get('blueprint_config') && this.get('blueprint_config').instructions ) {
-      return true;
-    } else if ( this.blueprint && this.blueprint.get('config') &&
-                this.blueprint.get('config').instructions ) {
-      return true;
-    }
-    return false;
+    return !!this.getConfig().instructions;
   },
 
   /**
@@ -103,12 +97,7 @@ var Project = Backbone.Model.extend({
    **/
   instructions: function() {
     if(this.hasInstructions()) {
-      var instructions;
-      if ( this.get('blueprint_config') ) {
-        instructions = this.get('blueprint_config').instructions;
-      } else {
-        instructions = this.blueprint.get('config')['instructions'];
-      }
+      var instructions = this.getConfig().instructions;
       return markdown.toHTML(instructions);
     }
   },
@@ -301,17 +290,16 @@ var Project = Backbone.Model.extend({
     return this.get('blueprint_version') || this.blueprint.get('version');
   },
 
+  /**
+   * Does this project belong to a preview type?
+   * @param {string} type Check for this type
+   * @returns {boolean}
+   **/
   hasPreviewType: function() {
-    if ( this.has('blueprint_config') ) {
-      var iteratee = function(m, i) {
-        return m || this.get('blueprint_config')['preview_type'] === i;
-      };
-      return _.reduce( arguments, _.bind(iteratee, this), false );
-    } else if ( this.blueprint ) {
-      return this.blueprint.hasPreviewType.call(arguments);
-    } else {
-      return false;
-    }
+    var iteratee = function(m, i) {
+      return m || this.getConfig()['preview_type'] === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
   /**
@@ -330,7 +318,9 @@ var Project = Backbone.Model.extend({
   },
 
   createSpreadsheet: function() {
-    var ss_key = this.blueprint.get('config')['spreadsheet_template'].match(/[-\w]{25,}/)[0];
+    if ( !this.getConfig().spreadsheet_template ) { return; }
+
+    var ss_key = this.getConfig().spreadsheet_template.match(/[-\w]{25,}/)[0];
 
     return $.ajax({
       type: "POST",
