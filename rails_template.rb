@@ -68,12 +68,15 @@ Autotune.configure do |conf|
     'ENV' => Rails.env
   }
 
-  # TODO : change this
-  # Enabled blueprint themes
-  conf.themes = {
-  # :theme_name  => 'Nice display name',
-    :generic     => 'Generic',
-    :mynewsorg   => 'My news organization'
+  # Generic theme data
+  conf.generic_theme = {
+    'primary-color' => '#292929',
+    'secondary-color' => '#e6e6e6',
+
+    'body-font-family' => 'Verdana, Helvetica, Roboto, Arial, sans-serif',
+    'header-font-family' => 'Georgia, Cambria, "Times New Roman", Times, serif',
+
+    'twitter-handle' => '@newsorg'
   }
 end
 
@@ -134,10 +137,14 @@ Autotune.config.verify_omniauth = lambda do |omniauth|
   return [:superuser] # or return true
   # refuse access to a user
   # return false
+  # give designer access
+  # return [:designer]
   # give editor access
   # return [:editor]
   # give author access
   # return [:author]
+  # give designer access to specific themes
+  # return :designer => [:mynewsorg]
   # give author access to specific themes
   # return :author => [:mynewsorg]
   # give editor access to specific themes
@@ -148,6 +155,12 @@ CODE
 file 'config/unicorn.rb', <<-CODE
 worker_processes 6
 timeout 90
+CODE
+
+file 'config/theme_map.yml', <<-CODE
+---
+- name: Generic
+  theme: generic
 CODE
 
 # add engine routes
