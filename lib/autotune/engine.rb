@@ -53,11 +53,6 @@ module Autotune
         :connect => "file://#{Rails.root.join('public', 'publish')}",
         :base_url => '/publish'
       )
-    end
-
-    initializer 'autotune.init', :after => :load_config_initializers do |app|
-      # make sure the generic theme is always enabled
-      # app.config.autotune.themes[:generic] = 'Generic'
-    end
+    end    
   end
 end
