@@ -54,6 +54,11 @@ module Autotune
       default_theme.update_data
     end
 
+    # add a function to return twitter handle
+    def twitter_handle
+      return config_data['twitter-handle']
+    end
+
 
     private
     def defaults

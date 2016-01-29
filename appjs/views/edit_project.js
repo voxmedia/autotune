@@ -190,15 +190,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       reject('This blueprint does not have a form!');
     } else {
       var availableThemes = this.app.themes.models,
-          social_chars = {
-            "sbnation": 8,
-            "theverge": 5,
-            "polygon": 7,
-            "racked": 6,
-            "eater": 5,
-            "vox": 9,
-            "custom": 0
-          },
           schema_properties = {
             "title": {
               "title": "Title",
@@ -287,16 +278,24 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           this.alpaca = control;
 
           var theme = control.childrenByPropertyId["theme"],
-             social = control.childrenByPropertyId["tweet_text"];
+             social = control.childrenByPropertyId["tweet_text"],
+             indexedThemes = this.app.themes.indexBy('slug');
+
+          var getTwitterHandleLength = function(slug){
+            var twitter = indexedThemes[slug].get('twitter_handle');
+            return twitter ? twitter.length : 0;
+          };
 
           if ( social && social.type !== 'hidden' ) {
-            social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+
+            social.schema.maxLength = 140 - ( 26 + getTwitterHandleLength(theme.getValue()));
             social.updateMaxLengthIndicator();
 
             if ( theme && theme.type !== 'hidden' ) {
-              $(theme).on('change', function(){
-                social.schema.maxLength = 140 - (
-                  26 + social_chars[ theme.getValue() ] );
+              $('#' + theme.domEl.attr('id')).on('change', function(){
+                theme = control.childrenByPropertyId["theme"];
+                social.schema.maxLength = 140 -
+                        ( 26 + getTwitterHandleLength(theme.getValue()) );
                 social.updateMaxLengthIndicator();
               });
             }
