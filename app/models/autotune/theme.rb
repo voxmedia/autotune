@@ -1,3 +1,5 @@
+require 'redis'
+
 module Autotune
   # Themes for blueprints
   class Theme < ActiveRecord::Base
