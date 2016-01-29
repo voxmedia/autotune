@@ -21,7 +21,8 @@ module Autotune
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
-                      :verify_omniauth, :git_ssh, :git_askpass,
+                      :verify_omniauth, :verify_authorization_header,
+                      :git_ssh, :git_askpass,
                       :redis, :faq_url, :generic_theme)
 
   class << self

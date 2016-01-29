@@ -46,7 +46,7 @@
     "markdown": "0.5.0",
     "moment": "2.10.3",
     "node-underscorify": "0.0.14",
-    "pnotify": "git://github.com/sciactive/pnotify",
+    "pnotify": "sciactive/pnotify#2.1.0",
     "pym.js": "0.4.1",
     "underscore": "1.7.0",
     "underscore.string": "3.0.3"

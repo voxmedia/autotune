@@ -94,6 +94,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
+    // autoselect embed code on focus
+    this.$("#embed textarea").focus( function() { $(this).select(); } );
+
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
       this.editor = ace.edit('blueprint-data');
@@ -116,22 +119,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         logger.debug('editor content changed');
         debouncedStopListeningForChanges();
       });
-    }
-
-    if ( this.model.isPublished() && this.model.blueprint.get('type') === 'graphic' ) {
-      var proto = window.location.protocol.replace( ':', '' ),
-          embedUrl = this.model.getPublishUrl(proto, 'embed.txt');
-
-      promises.push( Promise
-        .resolve( $.get( embedUrl ) )
-        .then( function(data) {
-          data = data.replace( /(?:\r\n|\r|\n)/gm, '' );
-          view.$( '#embed textarea' ).text( data );
-        }).catch(function(error) {
-          logger.error(error);
-          view.$('.nav-tabs a[href=#embed]').parent().addClass('disabled');
-        })
-      );
     }
 
     promises.push( new Promise( function(resolve, reject) {

@@ -21,6 +21,8 @@ module Autotune
 
     default_scope { order('updated_at DESC') }
 
+    search_fields :title
+
     after_initialize do
       self.status ||= 'new'
       self.type   ||= 'app'
