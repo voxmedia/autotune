@@ -1,6 +1,8 @@
 module Autotune
+  # Groups to control access to themes and projects
   class Group < ActiveRecord::Base
     include Slugged
+
     has_many :themes
     has_and_belongs_to_many :projects
     has_many :group_memberships
