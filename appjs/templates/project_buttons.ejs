@@ -4,12 +4,17 @@
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
+    <% if ( model.hasType( 'graphic' ) ) { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
-     <% if ( ! model.blueprint.hasPreviewType('live') && ! model.hasInitialBuild() ) { %>disabled="true"<% } %>
+     <% if ( ! model.hasPreviewType('live') && ! model.hasInitialBuild()) { %>disabled="true"<% } %>
      data-view="preview">Preview</a>
+    <% } else { %>
+  <a class="btn btn-default" target="_blank" id="previewBtn"
+     href="<%=model.getPreviewUrl() %>">Preview</a>
+    <% } %>
   <% } else { %>
   <a class="btn btn-default" target="_blank" id="viewBtn"
-     href="<%=model.getPublishUrl('http') %>">View</a>
+     href="<%=model.getPublishUrl() %>">View</a>
   <% } %>
 
   <% if ( model.isPublishable() ) { %>

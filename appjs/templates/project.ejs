@@ -19,13 +19,16 @@
       <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
       <% } else if ( model.hasUnpublishedUpdates() ) { %>
         <a data-tooltip="Your Published Version Has Updates"
-           target="_blank" href="<%=model.get('publish_url') %>">Published</a> (has updates)
+           target="_blank" href="<%=model.getPublishUrl() %>">Published</a> (has updates)
       <% } else if ( model.isPublished() ) { %>
         <a data-tooltip="View Published Preview"
-           target="_blank" href="<%=model.get('publish_url') %>">Published</a>
-      <% } else { %>
+           target="_blank" href="<%=model.getPublishUrl() %>">Published</a>
+      <% } else if ( model.hasType( 'graphic' ) ) { %>
         <a data-tooltip="View Draft Preview"
            target="_blank" data-view="view-draft">Draft</a>
+      <% } else { %>
+        <a data-tooltip="View Draft Preview"
+           target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
       <% } %>
       <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
     </p>
@@ -97,45 +100,18 @@
     <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
     <div role="tabpanel" class="tab-pane" id="live-preview">
       <ul class="nav nav-pills">
-        <button type="button" data-action="get-preview-size" id="small-view"
-          class="btn btn-default resize"
-          data-model="Project"
-          data-action-next="resize"
-          data-model-id="<%=model.get('slug') %>">
-          Small
-        </button>
-        <button type="button" data-action="get-preview-size" id="medium-view"
-          class="btn btn-default resize"
-          data-model="Project"
-          data-action-next="resize"
-          data-model-id="<%=model.get('slug') %>">
-          Medium
-        </button>
-        <button type="button" data-action="get-preview-size" id="large-view"
-          class="btn btn-default resize"
-          data-model="Project"
-          data-action-next="resize"
-          data-model-id="<%=model.get('slug') %>">
-          Large
-        </button>
-        <button type="button" data-action="get-preview-size" id="fluid-view"
-          class="btn btn-default resize active"
-          data-model="Project"
-          data-action-next="resize"
-          data-model-id="<%=model.get('slug') %>">
-          Fluid (100%)
-        </button>
+        <button type="button" id="small-view"
+                class="btn btn-default resize"> Small </button>
+        <button type="button" id="medium-view"
+                class="btn btn-default resize"> Medium </button>
+        <button type="button" id="large-view"
+                class="btn btn-default resize"> Large </button>
+        <button type="button" id="fluid-view"
+                class="btn btn-default resize active"> Full </button>
       </ul>
 
       <div class="preview-frame">
-        <% check_static = true %>
-        <% if ( model.blueprint.hasPreviewType('live') ){ %>
-          <% if ( model.isNew() || model.get('blueprint_config')['preview_type'] === 'live' ){ %>
-            <% check_static = false %>
-          <% } %>
-        <% } %>
-
-        <% if ( ! model.isNew() && check_static ) { %>
+        <% if ( ! model.hasPreviewType('live') ) { %>
           <% if ( model.hasStatus('broken') ) { %>
           <p class="text-danger">
              <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
@@ -161,15 +137,15 @@
           </p>
           <% } %>
         <% } %>
-        <div id="embed-preview" class="loading" ></div>
+        <div id="embed-preview" class="loading">
+          <div class="overlay">
+            <%=render(require('./spinner.ejs'), {size:30, color:'white'})%> Loading preview</div>
+        </div>
       </div>
 
-      <% if ( ! check_static ) { %>
+      <% if ( model.hasPreviewType('live') ) { %>
       <button type="submit" class="btn btn-default"
-              id="savePreview"
-              data-model="Project"
-              data-loading-text="Saving..."
-              data-model-id="<%=model.get('slug') %>">Save</button>
+              id="savePreview" data-loading-text="Saving...">Save</button>
       <% } %>
 
     </div>

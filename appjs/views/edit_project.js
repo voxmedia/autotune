@@ -26,7 +26,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
     'keypress': 'pollChange',
-    'click #savePreview': 'savePreview'
+    'click #savePreview': 'savePreview',
+    'click #live-preview .resize': 'resizePreview',
+    'click a[data-view]': 'viewDraft'
   },
 
   afterInit: function(options) {
@@ -95,31 +97,25 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).then(function( data ) {
-        var childLoaded = function() {
+        var iframeLoaded = function() {
           view.pym.sendMessage('updateData', JSON.stringify(data));
           $('#embed-preview').removeClass('loading');
         };
-
-        if(data.spreadsheet_template){
-          delete data.spreadsheet_template;
-          $( "input[name='google_doc_url']" ).val(data.google_doc_url);
-        }
 
         if(data.theme !== view.theme){
           if(typeof data.theme !== 'undefined'){
             view.theme = data.theme;
           }
-          var slug = view.model.blueprint.get('slug'),
-              bp_version = view.model.getVersion(),
-              preview_url = view.model.blueprint.getMediaUrl(
-                [bp_version, view.theme].join('-') + '/preview');
+          var version = view.model.getVersion(),
+              previewUrl = view.model.blueprint.getMediaUrl(
+                [version, view.theme].join('-') + '/preview');
 
           $('#embed-preview').empty();
-          view.pym = new pym.Parent('embed-preview', preview_url);
-          view.pym.iframe.onload = childLoaded;
+          view.pym = new pym.Parent('embed-preview', previewUrl);
+          view.pym.iframe.onload = iframeLoaded;
+        } else {
+          iframeLoaded();
         }
-
-        if(view.theme){ childLoaded(); }
       },
       function(err) {
         if ( err.status < 500 ) {
@@ -136,6 +132,26 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   savePreview: function(){
     this.$('#projectForm form').submit();
+  },
+
+  resizePreview: function(eve) {
+    var $btn = $(eve.currentTarget);
+
+    $btn
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $('.preview-frame')
+      .removeClass()
+      .addClass('preview-frame ' + $btn.attr('id'));
+  },
+
+  viewDraft: function(eve){
+    var view = $(eve.currentTarget).data('view');
+    $( "#draft-preview" ).trigger( "click" );
+    if( view === 'preview'){
+      $( window ).scrollTop(0);
+    }
   },
 
   listenForChanges: function() {
@@ -228,47 +244,43 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return Promise.all(promises)
       .then(function() {
         var formData = view.alpaca.getValue(),
-            buildData = view.model.buildData();
+            buildData = view.model.buildData(),
+            previewUrl = '', iframeLoaded;
 
-        // if blueprint is now live, but the version on this project is not, swap what we show
-        if ( view.model.hasPreviewType('live') ){
+        // Callback for when iframe loads
+        iframeLoaded = function() {
+          if ( view.model.hasBuildData() ) {
+            view.pollChange();
+          } else {
+            $('#embed-preview').removeClass('loading');
+          }
+        };
+
+        // Figure out preview url
+        if ( view.model.hasPreviewType('live') ) {
+          // if the project has live preview enabled
           view.theme = view.model.get('theme') || formData['theme'] || 'custom';
 
-          var slug = view.model.blueprint.get('slug'),
-              bp_version = view.model.getVersion(),
-              preview_url = view.model.blueprint.getMediaUrl(
-                [bp_version, view.theme].join('-') + '/preview'),
-              childLoaded = function() {
-                view.pollChange();
-                $('#embed-preview').removeClass('loading');
-              };
+          previewUrl = view.model.blueprint.getMediaUrl(
+            [view.model.getVersion(), view.theme].join('-') + '/preview');
 
-          if ( view.copyProject || view.model.hasInitialBuild() ){
-            view.pym = new pym.Parent('embed-preview', preview_url);
-            view.pym.iframe.onload = childLoaded;
-          } else {
-            var uniqBuildVals = _.uniq(_.values(buildData));
-            view.pym = new pym.Parent('embed-preview', preview_url + '#new');
-
-            if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
-              view.pym.iframe.onload = function() {
-                view.pollChange();
-                $('#embed-preview').removeClass('loading');
-              };
-            } else {
-              view.pym.iframe.onload = function() {
-                $('#embed-preview').removeClass('loading');
-              };
-            }
+          if ( !view.copyProject && !view.model.hasInitialBuild() ){
+            previewUrl = previewUrl + '#new';
           }
-
         } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
-          var previewLink = view.model.get('preview_url');
-          if(view.model['_previousAttributes']['preview_url'] && view.model['_previousAttributes']['preview_url'] !==  view.model.get('preview_url')){
-            previewLink = view.model['_previousAttributes']['preview_url'];
+          // if the project is a graphic and has been built (but doesn't have live enabled)
+          var previousPreviewUrl = view.model['_previousAttributes']['preview_url'];
+
+          if(previousPreviewUrl && previousPreviewUrl !==  view.model.get('preview_url')){
+            previewUrl = previousPreviewUrl;
+          } else {
+            previewUrl = view.model.get('preview_url');
           }
-          view.pym = new pym.Parent('embed-preview', previewLink);
         }
+
+        // Setup our iframe with pym
+        view.pym = new pym.Parent('embed-preview', previewUrl);
+        view.pym.iframe.onload = iframeLoaded;
 
         if(view.togglePreview){
           $( "#draft-preview" ).trigger( "click" );

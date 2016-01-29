@@ -70,19 +70,30 @@ label.block {
 }
 
 .preview-frame {
-  margin: 25px 0px;
+  margin: 25px auto;
+
+  &.large-view {
+    width:720px;
+  }
+  &.medium-view {
+    width:500px;
+  }
+  &.small-view {
+    width:320px;
+  }
 }
 
 #embed-preview {
   position:relative;
   border: 2px dashed #ccc;
+  .overlay { display: none; }
 
-  &.loading:after {
+  &.loading .overlay {
+    display:block;
     position:absolute;
     top:0; right:0; bottom:0; left:0;
     background-color:rgba($black, 0.6);
     color:white;
-    content: "Loading...";
     font-size:40px;
     padding-top:40px;
     text-align:center;

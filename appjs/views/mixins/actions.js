@@ -8,23 +8,18 @@ var $ = require('jquery'),
     logger = require('../../logger'),
     helpers = require('../../helpers');
 
+/* Actions view mixin
+ * Generic handler for action buttons that do something to a model.
+ */
 module.exports = {
   events: {
-    'click button[data-action], a[data-action]': 'handleAction',
-    'click a[data-view]': 'viewDraft'
-  },
-
-  viewDraft: function(eve){
-    var view = $(eve.currentTarget).data('view');
-    $( "#draft-preview" ).trigger( "click" );
-    if( view === 'preview'){
-      $( window ).scrollTop(0);
-    }
+    'click button[data-action], a[data-action]': 'handleAction'
   },
 
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+
     var inst, view = this, app = this.app,
         $btn = $(eve.currentTarget),
         action = $btn.data('action'),
@@ -37,7 +32,7 @@ module.exports = {
     logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
     this.app.trigger('loadingStart');
-    if ( $btn.hasClass('btn') && !$btn.hasClass('resize') ) {
+    if ( $btn.hasClass('btn') ) {
       $btn.button('loading');
     }
 
@@ -80,23 +75,11 @@ module.exports = {
           Backbone.history.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
           return view.render();
-        } else if ( next === 'resize' ) {
-          var width = '100%';
-          if ($btn.attr('id') === 'large-view') {
-            width = '720px';
-          } else if ($btn.attr('id') === 'medium-view') {
-            width = '500px';
-          } else if ($btn.attr('id') === 'small-view') {
-            width = '320px';
-          }
-          $('.nav.nav-pills button').removeClass('active');
-          $btn.addClass('active');
-          $('.preview-frame').css({'max-width': width, 'margin': 'auto'});
-          app.trigger( 'loadingStop' );
-        } else if ( next === 'nothing' ) {
-          app.trigger( 'loadingStop' );
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
+        } else {
+          if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
+          app.trigger( 'loadingStop' );
         }
       }).catch(function(error) {
         view.handleRequestError( error );
@@ -113,6 +96,5 @@ module.exports = {
       this.app.view.error( 'Something bad happened... Please reload and try again' );
     }
     logger.error("REQUEST FAILED!!", xhr);
-  },
-
+  }
 };

@@ -106,6 +106,16 @@ var Project = Backbone.Model.extend({
    * Get the data that was passed to the blueprint build.
    * @returns {object} Blueprint build data
    **/
+  hasBuildData: function() {
+    var uniqBuildVals = _.uniq(_.values(this.buildData()));
+    return !( uniqBuildVals.length === 1 &&
+              typeof uniqBuildVals[0] === 'undefined' );
+  },
+
+  /**
+   * Get the data that was passed to the blueprint build.
+   * @returns {object} Blueprint build data
+   **/
   buildData: function() {
     return _.extend({ 'base_url': this.baseUrl() }, this.formData());
   },
