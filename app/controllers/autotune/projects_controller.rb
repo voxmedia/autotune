@@ -14,7 +14,8 @@ module Autotune
     before_action :only => [:show, :update, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
-             current_user.role?(:editor => instance.group.name)
+             current_user.role?(:editor => instance.group.slug) ||
+             current_user.role?(:designer => instance.group.slug)
         render_error 'Forbidden', :forbidden
       end
     end
