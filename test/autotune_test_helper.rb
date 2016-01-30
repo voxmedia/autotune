@@ -6,11 +6,16 @@ OmniAuth.config.test_mode = true
 OmniAuth.config.add_mock(:developer, OmniAuth::AuthHash.new(
   :provider => 'developer',
   :uid => 'test@example.com',
-  :info => { :name => 'test', :email => 'test@example.com' }
+  :info => { :name => 'test', :email => 'test@example.com' }  
 ))
 
 # Reset themes for testing
-Rails.configuration.autotune.themes = { :vox => 'Vox', :generic => 'Generic' }
+Rails.configuration.autotune.generic_theme = {
+  'primary-color' => '#292929',
+  'secondary-color' => '#e6e6e6',
+
+  'twitter-handle' => '@testhandle'
+}
 
 # Display work_dir commands
 # require 'work_dir'

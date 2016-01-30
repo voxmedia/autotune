@@ -3,54 +3,39 @@
 example_one:
   title: Example build one
   slug: example-build-one
-  theme: generic
+  theme: theverge
   status: new
   data: '{"title": "Example build one"}'
   blueprint: example
   user: developer
+  group: group1
 
 example_two:
   title: Example build two
   slug: example-build-two
-  theme: generic
+  theme: sbn
   status: new
   data: '{"title": "Example build two"}'
   blueprint: example
   user: developer
+  group: group2
 
 example_three:
   title: Example build three
   slug: example-build-three
-  theme: generic
+  theme: sbn
   status: new
   data: '{"title": "Example build three"}'
-  blueprint: example
-  user: generic_author
+  blueprint: example_two
+  user: group2_author
+  group: group2
 
 example_four:
   title: Example build four
   slug: example-build-four
-  theme: vox
-  status: new
+  theme: sbn
+  status: broken
   data: '{"title": "Example build four"}'
-  blueprint: example
-  user: developer
-
-example_five:
-  title: Example build five
-  slug: example-build-five
-  theme: vox
-  status: new
-  data: '{"title": "Example build five"}'
-  blueprint: example
-  user: developer
-
-example_six:
-  title: Example build six
-  slug: example-build-six
-  theme: vox
-  status: new
-  data: '{"title": "Example build six"}'
-  blueprint: example
+  blueprint: example_two
   user: author
-
+  group: group2

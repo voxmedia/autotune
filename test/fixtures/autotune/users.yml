@@ -21,17 +21,29 @@ editor:
 author:
   name: author
   email: author@example.com
-  api_key: rz4qSB0LkspAakCmxmbB
+  api_key: rx4qSB0LkspAakCmxmbB
   meta: '{"roles": ["author"]}'
 
-generic_editor:
-  name: generic editor
-  email: editor@example.com
-  api_key: ALpfHEllZiLJIcHv3jDe
-  meta: '{"roles": {"editor": ["generic"]}}'
-
-generic_author:
-  name: generic author
+designer:
+  name: author
   email: author@example.com
-  api_key: ao3j4frsdasfkdjalsjf
-  meta: '{"roles": {"author": ["generic"]}}'
+  api_key: abcdB0LkspAakCmxmbB
+  meta: '{"roles": ["designer"]}'
+
+group1_editor:
+  name: group1 editor
+  email: editor@example.com
+  api_key: thenhflZiLJIcHv3jDe
+  meta: '{"roles": {"editor": ["group1"]}}'
+
+group2_author:
+  name: group2 author
+  email: author@example.com
+  api_key: s2drSdfrsdasfkdjalsjf
+  meta: '{"roles": {"author": ["group2"]}}'
+
+group1_designer:
+  name: group1 designer
+  email: editor@example.com
+  api_key: Q32dc4lZiLJIcHv3jDe
+  meta: '{"roles": {"designer": ["group1"]}}'
