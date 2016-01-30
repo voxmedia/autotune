@@ -94,10 +94,10 @@ module Autotune
       return false if group_memberships.nil?
 
       if args.any?
-        group_memberships.exists?(:role => args)
+        group_memberships.exists?(:role => args.flatten)
       else
         kwargs.reduce(false) do |a, (k, v)|
-          group = Group.find_by_name v
+          group = Group.find_by_slug v
           a ||
             (!group.nil? &&
               group_memberships.exists?(
@@ -173,6 +173,11 @@ module Autotune
       end
 
       unless role_to_assign.nil?
+        # create a generic group if for some reason no group exists
+        if Group.all.empty?
+          group = Group.create!(:name => "generic")
+          Theme.add_default_theme_for_group(group)
+        end
         Group.all.each do |g|
           membership = user.group_memberships.find_or_create_by(:group => g)
           membership.role = role_to_assign.to_s

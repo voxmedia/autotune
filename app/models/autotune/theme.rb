@@ -48,8 +48,8 @@ module Autotune
 
     def self.add_default_theme_for_group(group)
       default_theme = Theme.get_default_theme_for_group(group.id)
-      return default unless default_theme.nil?
-      default_theme = Theme.create_by(
+      return default_theme unless default_theme.nil?
+      default_theme = Theme.create(
         :title => group.name,
         :group_id => group.id)
       default_theme.save!
