@@ -440,8 +440,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
              social = control.childrenByPropertyId["tweet_text"];
 
           if ( social && social.type !== 'hidden' ) {
-            logger.debug(theme.getValue(), social_chars);
-            social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+            if ( social_chars[theme.getValue()] ) {
+              social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
+            } else {
+              social.schema.maxLength = 140 - 26;
+            }
             social.updateMaxLengthIndicator();
 
             if ( theme && theme.type !== 'hidden' ) {
