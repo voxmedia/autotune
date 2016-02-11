@@ -340,6 +340,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             "racked": 6,
             "eater": 5,
             "vox": 9,
+            "curbed": 6,
             "custom": 0
           },
           schema_properties = {
@@ -410,7 +411,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
         var googleText = form_config.schema.properties.google_doc_url.title;
-        var newText = googleText + '<button type="button" id="get-new-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
+        var newText = googleText + '<br><button type="button" id="get-new-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
         form_config.schema.properties.google_doc_url.title = newText;
       }
 
@@ -439,6 +440,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
              social = control.childrenByPropertyId["tweet_text"];
 
           if ( social && social.type !== 'hidden' ) {
+            logger.debug(theme.getValue(), social_chars);
             social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
             social.updateMaxLengthIndicator();
 
