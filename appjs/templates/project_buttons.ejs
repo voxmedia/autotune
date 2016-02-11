@@ -5,9 +5,9 @@
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
     <% if ( model.hasType( 'graphic' ) ) { %>
-  <a class="btn btn-default" target="_blank" id="previewBtn"
-     <% if ( ! model.hasPreviewType('live') && ! model.hasInitialBuild()) { %>disabled="true"<% } %>
-     data-view="preview">Preview</a>
+  <a class="btn btn-default" id="previewBtn"
+     <% if ( !model.hasPreviewType('live') && !model.hasInitialBuild()) { %>disabled="true"<% } %>
+      href="#preview">Preview</a>
     <% } else { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
      href="<%=model.getPreviewUrl() %>">Preview</a>

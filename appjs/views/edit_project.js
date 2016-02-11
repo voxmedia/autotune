@@ -27,8 +27,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change form': 'pollChange',
     'keypress': 'pollChange',
     'click #savePreview': 'savePreview',
-    'click #live-preview .resize': 'resizePreview',
-    'click a[data-view]': 'viewDraft'
+    'click #live-preview .resize': 'resizePreview'
   },
 
   afterInit: function(options) {
@@ -144,14 +143,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     $('.preview-frame')
       .removeClass()
       .addClass('preview-frame ' + $btn.attr('id'));
-  },
-
-  viewDraft: function(eve){
-    var view = $(eve.currentTarget).data('view');
-    $( "#draft-preview" ).trigger( "click" );
-    if( view === 'preview'){
-      $( window ).scrollTop(0);
-    }
   },
 
   listenForChanges: function() {
@@ -304,7 +295,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   renderForm: function(resolve, reject) {
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
-        orig_this = this,
+        view = this,
         form_config, config_themes, newProject, populateForm = false;
 
     if ( this.disableForm ) {
@@ -323,10 +314,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     });
 
+    newProject = false;
     if ( this.model.isNew() || this.copyProject ) {
       newProject = true;
-    }  else {
-      newProject = false;
     }
 
     form_config = this.model.getConfig().form;
@@ -419,14 +409,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
 
       if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
-        var google_text = form_config['schema']['properties']['google_doc_url']['title'];
-        form_config['schema']['properties']['google_doc_url']['title'] = google_text + '<br /><button type="button" data-action="create-spreadsheet" data-action-next="nothing" id="get_new" data-model="Project" class="btn btn-default resize" style="margin: 10px 0">Get new spreadsheet</button>';
+        var googleText = form_config.schema.properties.google_doc_url.title;
+        var newText = googleText + '<button type="button" id="get-new-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
+        form_config.schema.properties.google_doc_url.title = newText;
       }
 
-      _.extend(schema_properties, form_config['schema']['properties'] || {});
-      if( form_config['options'] ) {
-        _.extend(options_form, form_config['options']['form'] || {});
-        _.extend(options_fields, form_config['options']['fields'] || {});
+      _.extend(schema_properties, form_config.schema.properties || {});
+      if( form_config.options ) {
+        _.extend(options_form, form_config.options.form || {});
+        _.extend(options_fields, form_config.options.fields || {});
       }
 
       var opts = {
@@ -549,6 +540,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     }
     return valid;
+  },
+
+  copyEmbedToClipboard: function() {
+    this.$("#embed textarea").select();
+    document.execCommand('copy');
+    this.app.view.alert('Embed code copied to clipboard!');
   }
 } );
 

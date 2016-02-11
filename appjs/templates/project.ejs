@@ -24,8 +24,7 @@
         <a data-tooltip="View Published Preview"
            target="_blank" href="<%=model.getPublishUrl() %>">Published</a>
       <% } else if ( model.hasType( 'graphic' ) ) { %>
-        <a data-tooltip="View Draft Preview"
-           target="_blank" data-view="view-draft">Draft</a>
+        <a data-tooltip="View Draft Preview" data-toggle="tab" href="#preview">Draft</a>
       <% } else { %>
         <a data-tooltip="View Draft Preview"
            target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
@@ -51,7 +50,7 @@
         role="tab" data-toggle="tab">Project info</a></li>
     <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
       <li role="presentation"><a
-          href="#live-preview" id="draft-preview" aria-controls="live-preview"
+          href="#preview" id="draft-preview" aria-controls="live-preview"
           role="tab" data-toggle="tab">Preview</a></li>
 
       <% if ( model.has( 'embed_html' ) ) { %>
@@ -98,7 +97,12 @@
     </div>
 
     <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
-    <div role="tabpanel" class="tab-pane" id="live-preview">
+    <div role="tabpanel" class="tab-pane" id="preview">
+      <div class="pull-right">
+        <button type="button" class="btn btn-default"
+                data-hook="copyEmbedToClipboard">Copy embed code</button>
+      </div>
+
       <ul class="nav nav-pills">
         <button type="button" id="small-view"
                 class="btn btn-default resize"> Small </button>
