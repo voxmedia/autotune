@@ -98,11 +98,6 @@
 
     <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
     <div role="tabpanel" class="tab-pane" id="preview">
-      <div class="pull-right">
-        <button type="button" class="btn btn-default"
-                data-hook="copyEmbedToClipboard">Copy embed code</button>
-      </div>
-
       <ul class="nav nav-pills">
         <button type="button" id="small-view"
                 class="btn btn-default resize"> Small </button>
@@ -156,6 +151,11 @@
 
     <div role="tabpanel" class="tab-pane" id="embed">
       <% if ( model.has('embed_html') ) { %>
+      <p>
+        <button type="button" class="btn btn-default"
+                data-hook="copyEmbedToClipboard">Copy embed code</button>
+      </p>
+
       <textarea class="form-control" rows="6" readonly><%=model.get('embed_html') %></textarea>
       <% } %>
     </div>
