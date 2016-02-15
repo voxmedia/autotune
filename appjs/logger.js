@@ -11,13 +11,19 @@ module.exports = {
    */
   log: function log() {
     console.log.apply(console, arguments);
+    return arguments;
   },
 
   /**
    * Put a debugging message into the log
    */
   debug: function debug() {
-    if (this.level === 'debug') { console.debug.apply(console, arguments); }
+    if (this.level === 'debug') { 
+      console.debug.apply(console, arguments);
+      return true; 
+    } else {
+      return false;
+    }
   },
 
   /**
@@ -25,5 +31,6 @@ module.exports = {
    */
   error: function error() {
     console.error.apply(console, arguments);
+    return arguments;
   }
 };

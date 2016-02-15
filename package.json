@@ -29,7 +29,7 @@
     "lint": "grunt jshint",
     "watch": "watchify --verbose --poll --debug appjs/app.js -o app/assets/javascripts/autotune/application.js",
     "build": "browserify --debug appjs/app.js > app/assets/javascripts/autotune/application.js",
-    "test": "browserify --debug testjs/*/test_*.js | browser-run -b safari | tap-spec"
+    "test": "browserify --debug testjs/*/test_*.js | browser-run -b phantom | tap-spec"
   },
   "dependencies": {
     "backbone": "1.2.3",
