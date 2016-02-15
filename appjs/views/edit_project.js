@@ -76,7 +76,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       // Check the flag in case we want to force an update
       query = '?force_update=true';
       this.forceUpdateDataFlag = false;
-    } else if ( _.isEqual( this.previousData, data ) ) {
+    } else if ( _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
       // If data hasn't changed, bail
       return;
     }
