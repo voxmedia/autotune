@@ -29,7 +29,7 @@
     "lint": "grunt jshint",
     "watch": "watchify --verbose --poll --debug appjs/app.js -o app/assets/javascripts/autotune/application.js",
     "build": "browserify --debug appjs/app.js > app/assets/javascripts/autotune/application.js",
-    "test": "browserify --debug testjs/*/test_*.js | browser-run -b phantom | tap-spec"
+    "test": "browserify --debug testjs/*/test_*.js | browser-run -b safari | tap-spec"
   },
   "dependencies": {
     "backbone": "1.2.3",
@@ -47,6 +47,7 @@
     "moment": "2.10.3",
     "node-underscorify": "0.0.14",
     "pnotify": "sciactive/pnotify#2.1.0",
+    "promise": "^7.1.1",
     "pym.js": "0.4.1",
     "underscore": "1.7.0",
     "underscore.string": "3.0.3"

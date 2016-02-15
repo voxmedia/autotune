@@ -2,7 +2,7 @@ var test = require('../test_helper'),
     helpers = require('../../appjs/helpers'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    Application = require('../../appjs/app');
+    App = require('../../appjs/app');
 
 test('render', function(t) {
   t.plan(1);
@@ -54,28 +54,36 @@ test('has objects', function(t) {
   t.end();
 });
 
-// test('has role', function(t) {
-//   t.plan(1);
-//   var template = _.template('<%= hasRole( role ) ? true : false %>');
+test('has role', function(t) {
+  t.plan(2);
+  var template = _.template('<%= hasRole( role ) ? true : false %>');
 
-//   //Application.prototype.extend maybe?
-//   console.log(
-//     helpers.render( template, {
-//       role: 'superuser',
-//       app: {
-//         user: {
-//           attributes: {
-//             meta: {
-//               roles: ['superuser']
-//             }
-//           }
-//         }
-//       }
-//     })
-//   );
+  t.equal(
+    helpers.render( template, {
+      role: 'superuser',
+      app: new App({
+        user: {
+          meta: {
+            roles: ['superuser']
+          }
+        }
+      })
+    }), 'true');
 
-//   t.end();
-// });
+  t.equal(
+    helpers.render( template, {
+      role: 'superuser',
+      app: new App({
+        user: {
+          meta: {
+            roles: ['superduper']
+          }
+        }
+      })
+    }), 'false');
+
+  t.end();
+});
 
 test('has next page', function(t) {
   t.plan(2);
