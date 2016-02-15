@@ -121,15 +121,6 @@
              <%=model.get('error_message') %>
             </p>
             <% } %>
-          <% } else if ( model.hasStatus('building') ) { %>
-          <p class="text-warning">
-            <span class="status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> Building the project <br /><i class="icon-info"></i> The preview below is still building and does not reflect the changes that you just saved. It will update when the
-            project finishes building.</span>
-          </p>
-          <% } else if ( model.hasStatus('built') ) { %>
-          <p class="text-success">
-            <span class="status-success">This draft is up-to-date with the latest saved version of this project.</span>
-          </p>
           <% } else if ( model.hasUnpublishedUpdates() ) { %>
           <p class="text-warning">
             <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
@@ -138,7 +129,13 @@
         <% } %>
         <div id="embed-preview" class="loading">
           <div class="overlay">
-            <%=render(require('./spinner.ejs'), {size:30, color:'white'})%> Loading preview</div>
+            <%=render(require('./spinner.ejs'), {size:30, color:'white'})%>
+            <% if ( model.hasPreviewType('live') ) { %>
+            Loading preview
+            <% } else { %>
+            Building project
+            <% } %>
+          </div>
         </div>
       </div>
 

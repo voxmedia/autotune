@@ -165,6 +165,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     logger.debug('Update project status: ' + status);
     if (status === 'built'){
+      if(!this.model.hasPreviewType('live')){
+        $('#embed-preview').removeClass('loading');
+      }
       this.app.view.success('Building complete');
     }
 
@@ -244,7 +247,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
             view.pollChange();
           } else {
-            $('#embed-preview').removeClass('loading');
+            if(!view.model.hasStatus('building')){
+              $('#embed-preview').removeClass('loading');
+            }
           }
         };
 
@@ -287,6 +292,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterSubmit: function() {
     this.listenForChanges();
     if (this.model.hasStatus('building')){
+      if(!this.model.hasPreviewType('live')){
+        $('#embed-preview').addClass('loading');
+      }
       this.app.view.alert(
         'Building... This might take a moment.', 'notice', false, 16000);
     }
