@@ -111,6 +111,11 @@
 
       <div class="preview-frame">
         <% if ( ! model.hasPreviewType('live') ) { %>
+          <div id="save-warning">
+            <p class="text-warning">
+             The data in the project form isn't up-to-date with the latest project build data. Save your project to see changes.
+            </p>
+          </div>
           <% if ( model.hasStatus('broken') ) { %>
           <p class="text-danger">
              <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
@@ -130,10 +135,10 @@
         <div id="embed-preview" class="loading">
           <div class="overlay">
             <%=render(require('./spinner.ejs'), {size:30, color:'white'})%>
-            <% if ( model.hasPreviewType('live') ) { %>
-            Loading preview
-            <% } else { %>
+            <% if (!model.hasPreviewType('live') && model.hasStatus('building')) { %>
             Building project
+            <% } else { %>
+            Loading preview
             <% } %>
           </div>
         </div>

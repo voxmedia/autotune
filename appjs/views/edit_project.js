@@ -58,14 +58,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
-    if ( !this.model.hasPreviewType('live') ) { return; }
-
     var view = this,
         $form = this.$('#projectForm'),
         config_themes = this.model.getConfig().themes || ['generic'],
         query = '',
         data = $form.alpaca('get').getValue();
 
+    if ( !this.model.hasPreviewType('live') ) {
+      data['slug'] = [data['theme'], data['slug']].join('-');
+      if( !_.isEqual(this.model.formData(), data) ){
+        $('#save-warning').show();
+      } else {
+        $('#save-warning').hide();
+      }
+      return;
+    }
     // Make sure the form is valid before proceeding
     if ( !this.formValidate(this.model, $form) ) {
       // If the form isn't valid, bail
