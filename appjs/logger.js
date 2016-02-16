@@ -10,8 +10,7 @@ module.exports = {
    * Put an informational message into the log
    */
   log: function log() {
-    console.log.apply(console, arguments);
-    return arguments;
+    return console.log.apply(console, arguments);
   },
 
   /**
@@ -19,10 +18,7 @@ module.exports = {
    */
   debug: function debug() {
     if (this.level === 'debug') { 
-      console.debug.apply(console, arguments);
-      return true; 
-    } else {
-      return false;
+      return console.debug.apply(console, arguments);
     }
   },
 
@@ -30,7 +26,6 @@ module.exports = {
    * Put an error message into the log
    */
   error: function error() {
-    console.error.apply(console, arguments);
-    return arguments;
+    return console.error.apply(console, arguments);
   }
 };
