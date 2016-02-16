@@ -51,10 +51,13 @@ module Autotune
       end
 
       if params.key? :search
-        users = User.search(params[:search], :name).pluck(:id)
-        ups = @projects.where(:user_id => users)
-        ptitle = @projects.search(params[:search], :title)
-        @projects = @projects.where(:id => ( ups + ptitle ).uniq)
+        users = User.search(params[:search]).pluck(:id)
+        sql = @projects.search_sql(params[:search])
+
+        sql[0] = "(#{sql[0]}) OR (user_id IN (?))"
+        sql << users
+
+        @projects = @projects.where(sql)
       end
 
       if params.key? :theme
@@ -106,8 +109,6 @@ module Autotune
 
     def show
       @project = instance
-
-      prep_embed_html
     end
 
     def create
@@ -142,8 +143,6 @@ module Autotune
         @project.save
         @project.build
 
-        prep_embed_html
-
         render :show, :status => :created
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
@@ -176,8 +175,6 @@ module Autotune
       if @project.valid?
         @project.save
         @project.build
-
-        prep_embed_html
 
         render :show
       else
@@ -247,12 +244,5 @@ module Autotune
     end
 
     private
-
-    def prep_embed_html
-      @project ||= instance
-      @embed_html = render_to_string(
-        :file => 'autotune/projects/_embed.html.erb', :layout => false
-      ).gsub(/\s*\n+\s*/, ' ')
-    end
   end
 end

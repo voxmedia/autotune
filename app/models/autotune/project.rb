@@ -21,6 +21,8 @@ module Autotune
 
     default_scope { order('updated_at DESC') }
 
+    search_fields :title
+
     before_save :check_for_updated_data
 
     after_save :pub_to_redis
