@@ -103,10 +103,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).then(function( data ) {
-        var iframeLoaded = function() {
+        var iframeLoaded = _.once(function() {
           view.pym.sendMessage('updateData', JSON.stringify(data));
           $('#embed-preview').removeClass('loading');
-        };
+        });
 
         if(data.theme !== view.theme){
           if(typeof data.theme !== 'undefined'){
@@ -119,6 +119,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           $('#embed-preview').empty();
           view.pym = new pym.Parent('embed-preview', previewUrl);
           view.pym.iframe.onload = iframeLoaded;
+
+          // In case some dumb script hangs the loading process
+          setTimeout(iframeLoaded, 12000);
         } else {
           iframeLoaded();
         }
@@ -249,7 +252,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             previewUrl = '', iframeLoaded;
 
         // Callback for when iframe loads
-        iframeLoaded = function() {
+        iframeLoaded = _.once(function() {
           logger.debug('iframeLoaded');
           if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
             view.pollChange();
@@ -258,7 +261,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               $('#embed-preview').removeClass('loading');
             }
           }
-        };
+        });
 
         // Figure out preview url
         if ( view.model.hasPreviewType('live') ) {
@@ -285,6 +288,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         // Setup our iframe with pym
         view.pym = new pym.Parent('embed-preview', previewUrl);
         view.pym.iframe.onload = iframeLoaded;
+
+        // In case some dumb script hangs the loading process
+        setTimeout(iframeLoaded, 12000);
 
         if(view.togglePreview){
           $( "#draft-preview" ).trigger( "click" );
