@@ -121,7 +121,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.pym.iframe.onload = iframeLoaded;
 
           // In case some dumb script hangs the loading process
-          setTimeout(iframeLoaded, 8000);
+          setTimeout(iframeLoaded, 2500);
         } else {
           iframeLoaded();
         }
@@ -290,7 +290,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         view.pym.iframe.onload = iframeLoaded;
 
         // In case some dumb script hangs the loading process
-        setTimeout(iframeLoaded, 8000);
+        setTimeout(iframeLoaded, 2500);
 
         if(view.togglePreview){
           $( "#draft-preview" ).trigger( "click" );
