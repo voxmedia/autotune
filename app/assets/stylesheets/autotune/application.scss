@@ -73,6 +73,10 @@ label.block {
   &.small-view {
     width:320px;
   }
+
+  iframe {
+    display:block;
+  }
 }
 
 #save-warning{
