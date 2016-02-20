@@ -19,9 +19,9 @@ module Autotune
     end
 
     test 'search blueprints' do
-      assert_equal 2, Blueprint.search('Example', :title).count
-      assert_equal 1, Blueprint.search('two', :title).count
-      assert_equal 0, Blueprint.search('foo', :title).count
+      assert_equal 2, Blueprint.search('Example').count
+      assert_equal 1, Blueprint.search('two').count
+      assert_equal 0, Blueprint.search('foo').count
     end
 
     test "that slugs don't change" do
@@ -93,7 +93,7 @@ module Autotune
 
     test 'thumb url' do
       assert_equal(
-        '/assets/autotune/at_placeholder.png',
+        ActionController::Base.helpers.asset_path('autotune/at_placeholder.png'),
         autotune_blueprints(:example).thumb_url)
     end
   end

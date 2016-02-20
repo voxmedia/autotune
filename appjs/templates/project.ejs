@@ -19,13 +19,15 @@
       <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
       <% } else if ( model.hasUnpublishedUpdates() ) { %>
         <a data-tooltip="Your Published Version Has Updates"
-           target="_blank" href="<%=model.get('publish_url') %>">Published</a> (has updates)
+           target="_blank" href="<%=model.getPublishUrl() %>">Published</a> (has updates)
       <% } else if ( model.isPublished() ) { %>
         <a data-tooltip="View Published Preview"
-           target="_blank" href="<%=model.get('publish_url') %>">Published</a>
+           target="_blank" href="<%=model.getPublishUrl() %>">Published</a>
+      <% } else if ( model.hasType( 'graphic' ) ) { %>
+        <a data-tooltip="View Draft Preview" data-toggle="tab" href="#preview">Draft</a>
       <% } else { %>
         <a data-tooltip="View Draft Preview"
-           target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
+           target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
       <% } %>
       <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
     </p>
@@ -46,17 +48,27 @@
     <li role="presentation" class="active"><a
         href="#edit" aria-controls="edit"
         role="tab" data-toggle="tab">Project info</a></li>
-    <% if ( model.hasType( 'graphic' ) ) { %>
-      <% if ( model.isPublished() ) { %>
-    <li role="presentation"><a
-        href="#embed" aria-controls="embed"
-        role="tab" data-toggle="tab">Embed</a></li>
-      <% } else { %>
-    <li role="presentation" class="disabled"><a>Embed</a></li>
-      <% } %>
-    <li role="presentation"><a
+    <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
+      <li role="presentation"><a
+          href="#preview" id="draft-preview" aria-controls="live-preview"
+          role="tab" data-toggle="tab">Preview</a></li>
+
+      <% if ( model.has( 'embed_html' ) ) { %>
+      <li role="presentation"><a
+          href="#embed" aria-controls="embed"
+          role="tab" data-toggle="tab">Embed</a></li>
+        <% } else { %>
+      <li role="presentation" class="disabled"><a>Embed</a></li>
+        <% } %>
+
+      <% if ( model.has( 'screenshot_sm_url' ) ) { %>
+      <li role="presentation"><a
         href="#screenshots" aria-controls="screenshots"
         role="tab" data-toggle="tab">Screenshots</a></li>
+      <% } else { %>
+      <li role="presentation" class="disabled"><a>Screenshots</a></li>
+      <% } %>
+
     <% } %>
     <% if ( hasRole('superuser') ) { %>
       <% if ( model.isNew() ) { %>
@@ -66,7 +78,7 @@
           href="#developer" aria-controls="data"
           role="tab" data-toggle="tab">Developer</a></li>
       <% } %>
-    <% } %>
+  <% } %>
   </ul>
 
   <!-- Tab panes -->
@@ -83,44 +95,97 @@
       </div>
       <% } %>
     </div>
-    <% if ( model.hasType( 'graphic' ) ) { %>
-    <div role="tabpanel" class="tab-pane" id="embed"><textarea class="form-control" rows="6" readonly></textarea></div>
+
+    <% if ( model.hasType( 'graphic' ) || model.blueprint.hasPreviewType('live') ) { %>
+    <div role="tabpanel" class="tab-pane" id="preview">
+      <ul class="nav nav-pills">
+        <button type="button" id="small-view"
+                class="btn btn-default resize"> Small </button>
+        <button type="button" id="medium-view"
+                class="btn btn-default resize"> Medium </button>
+        <button type="button" id="large-view"
+                class="btn btn-default resize"> Large </button>
+        <button type="button" id="fluid-view"
+                class="btn btn-default resize active"> Full </button>
+      </ul>
+
+      <div class="preview-frame">
+        <% if ( ! model.hasPreviewType('live') ) { %>
+          <div id="save-warning">
+            <p class="text-warning">
+             The data in the project form isn't up-to-date with the latest project build data. Save your project to see changes.
+            </p>
+          </div>
+          <% if ( model.hasStatus('broken') ) { %>
+          <p class="text-danger">
+             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
+          </p>
+            <% if ( model.has('error_message') ) { %>
+            <p class="text-danger">
+             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
+             <%=model.get('error_message') %>
+            </p>
+            <% } %>
+          <% } else if ( model.hasUnpublishedUpdates() ) { %>
+          <p class="text-warning">
+            <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
+          </p>
+          <% } %>
+        <% } %>
+        <div id="embed-preview" class="loading">
+          <div class="overlay">
+            <%=render(require('./spinner.ejs'), {size:30, color:'white'})%>
+            <% if (!model.hasPreviewType('live') && model.hasStatus('building')) { %>
+            Building project
+            <% } else { %>
+            Loading preview
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <% if ( model.hasPreviewType('live') ) { %>
+      <button type="submit" class="btn btn-default"
+              id="savePreview" data-loading-text="Saving...">Save</button>
+      <% } %>
+
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="embed">
+      <% if ( model.has('embed_html') ) { %>
+      <p>
+        <button type="button" class="btn btn-default"
+                data-hook="copyEmbedToClipboard">Copy embed code</button>
+      </p>
+
+      <textarea class="form-control" rows="6" readonly><%=model.get('embed_html') %></textarea>
+      <% } %>
+    </div>
     <div role="tabpanel" class="tab-pane" id="screenshots">
 
+      <% if ( model.has('screenshot_sm_url') ) { %>
       <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>
         <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>
         <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>
       </ul>
 
-      <% if ( model.isPublishable() ) { %>
       <div class="tab-content">
         <div id="large-ss" class="tab-pane active">
-          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_l.png')%>" />
+          <img src="<%=model.get('screenshot_lg_url')%>" />
         </div>
         <div id="medium-ss" class="tab-pane">
-          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_m.png')%>" />
+          <img src="<%=model.get('screenshot_md_url')%>" />
         </div>
         <div id="small-ss" class="tab-pane">
-          <img src="<%=model.getPreviewUrl('', 'screenshots/screenshot_s.png')%>" />
-        </div>
-      </div>
-      <% } else { %>
-      <div class="tab-content">
-        <div id="large-ss" class="tab-pane active">
-          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_l.png')%>" />
-        </div>
-        <div id="medium-ss" class="tab-pane">
-          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_m.png')%>" />
-        </div>
-        <div id="small-ss" class="tab-pane">
-          <img src="<%=model.getPublishUrl('', 'screenshots/screenshot_s.png')%>" />
+          <img src="<%=model.get('screenshot_sm_url')%>" />
         </div>
       </div>
       <% } %>
 
     </div>
     <% } %>
+
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">
       <p>Status:

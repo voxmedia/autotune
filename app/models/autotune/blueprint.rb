@@ -22,6 +22,8 @@ module Autotune
 
     default_scope { order('updated_at DESC') }
 
+    search_fields :title
+
     after_initialize do
       self.status ||= 'new'
       self.type   ||= 'app'
@@ -68,7 +70,7 @@ module Autotune
       final_status = ready? ? 'ready' : 'testing'
       update!(:status => 'updating')
       SyncBlueprintJob.perform_later(
-        self, :status => final_status, :update => true)
+        self, :status => final_status, :update => true, :build_themes => true)
     rescue
       update!(:status => 'broken')
       raise
@@ -103,6 +105,14 @@ module Autotune
       self.tags = config['tags'].map do |t|
         Tag.find_or_create_by(:title => t.humanize)
       end if config.present? && config['tags'].present?
+    end
+
+    def deploy_dir
+      if config.present? && config['deploy_dir']
+        config['deploy_dir']
+      else
+        'build'
+      end
     end
 
     def pub_to_redis

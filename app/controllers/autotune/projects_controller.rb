@@ -1,4 +1,6 @@
 require_dependency 'autotune/application_controller'
+require 'autotune/google_docs'
+require 'redis'
 
 module Autotune
   # API for projects
@@ -25,13 +27,20 @@ module Autotune
 
     def index
       @projects = Project
-
+      # a user can have multiple authorizations
       # Filter and search query
-      type = false
       query = {}
 
       query[:status] = params[:status] if params.key? :status
-      query[:blueprint_id] = params[:blueprint_title] if params.key? :blueprint_title
+
+      if params.key? :blueprint
+        blueprint = Blueprint.find_by_slug(params[:blueprint])
+        query[:blueprint_id] = blueprint.id
+      elsif params.key? :blueprint_id
+        query[:blueprint_id] = params[:blueprint_id]
+      elsif params.key? :blueprint_title
+        query[:blueprint_id] = params[:blueprint_title]
+      end
 
       if params.key? :pub_status
         if params[:pub_status] == 'published'
@@ -42,12 +51,13 @@ module Autotune
       end
 
       if params.key? :search
-        users = User.search(params[:search], :name).pluck(:id)
-        ups = @projects.where(:user_id => users)
-        ups_ids = ups.pluck(:id)
-        ptitle = @projects.search(params[:search], :title)
-        ptitle_ids = ptitle.pluck(:id)
-        @projects = @projects.where(:id => ( ups + ptitle ).uniq)
+        users = User.search(params[:search]).pluck(:id)
+        sql = @projects.search_sql(params[:search])
+
+        sql[0] = "(#{sql[0]}) OR (user_id IN (?))"
+        sql << users
+
+        @projects = @projects.where(sql)
       end
 
       if params.key? :theme
@@ -69,8 +79,8 @@ module Autotune
 
       if params.key? :type
         @blueprints = Blueprint
-        @blueprint_ids = @blueprints.where({:type => params[:type]}).pluck(:id)
-        @projects = @projects.where( :blueprint_id => @blueprint_ids )
+        @blueprint_ids = @blueprints.where(:type => params[:type]).pluck(:id)
+        @projects = @projects.where(:blueprint_id => @blueprint_ids)
       end
 
       page = params[:page] || 1
@@ -105,6 +115,10 @@ module Autotune
       @project = Project.new(:user => current_user)
       @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
 
+      if request.POST.key? 'blueprint'
+        @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
+      end
+
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
 
@@ -128,6 +142,7 @@ module Autotune
       if @project.valid?
         @project.save
         @project.build
+
         render :show, :status => :created
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
@@ -160,10 +175,48 @@ module Autotune
       if @project.valid?
         @project.save
         @project.build
+
         render :show
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    def preview_build_data
+      @project = instance
+      @build_data = request.POST
+      if @build_data['google_doc_url'] && request.GET[:force_update]
+        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
+        Rails.cache.delete(cache_key)
+      end
+
+      # Get the deployer object
+      deployer = @project.deployer(:preview)
+
+      # Run the before build deployer hook
+      deployer.before_build(@build_data, {}, current_user)
+      render :json => @build_data
+    rescue => exc
+      if @project.meta['error_message'].present?
+        render_error @project.meta['error_message'], :bad_request
+      else
+        render_error exc.message
+      end
+    end
+
+    def create_spreadsheet
+      current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
+      google_client = GoogleDocs.new(current_auth)
+      spreadsheet_copy = google_client.copy(request.POST['_json'])
+
+      if Autotune.configuration.google_auth_domain.present?
+        google_client.share_with_domain(
+          spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
+      end
+
+      render :json => { :google_doc_url => spreadsheet_copy[:url] }
+    rescue => exc
+      render_error exc.message
     end
 
     def update_snapshot
@@ -189,5 +242,7 @@ module Autotune
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
     end
+
+    private
   end
 end

@@ -127,8 +127,8 @@
       <a data-tooltip="preview" target="_blank"
          href="<%=item.getPublishUrl('http') %>"><span class="icon-preview"></span></a>
     <% } else { %>
-      <a data-tooltip="preview" target="_blank"
-         href="<%=item.getPreviewUrl('http') %>"><span class="icon-preview"></span></a>
+      <a data-tooltip="preview"
+         href="<%=item.url() %>/edit?togglePreview=true"><span class="icon-preview"></span></a>
     <% } %>
       <a data-tooltip="delete"
          data-action-message="Project deleted"

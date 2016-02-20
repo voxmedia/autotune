@@ -6,6 +6,10 @@ module Autotune
     has_many :projects
     serialize :meta, JSON
 
+    default_scope { order('updated_at DESC') }
+
+    search_fields :email, :name
+
     validates :api_key, :presence => true, :uniqueness => true
     after_initialize :defaults
 
@@ -64,13 +68,8 @@ module Autotune
       a.user
     end
 
-    def self.find_by_api_key(api_key)
-      find_by(:api_key => api_key)
-    end
-
     def self.verify_auth_hash(auth_hash)
-      if Rails.configuration.autotune.verify_omniauth &&
-         Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
+      if Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
         roles = Rails.configuration.autotune.verify_omniauth.call(auth_hash)
         logger.debug "#{auth_hash['nickname']} roles: #{roles}"
         return unless (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?

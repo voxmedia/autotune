@@ -21,6 +21,8 @@ module Autotune
 
     default_scope { order('updated_at DESC') }
 
+    search_fields :title
+
     before_save :check_for_updated_data
 
     after_save :pub_to_redis
@@ -31,6 +33,7 @@ module Autotune
     end
 
     before_validation do
+
       # Make sure our slug includes the theme
       if theme && (theme_changed? || slug_changed?)
         self.slug = self.class.unique_slug(theme.value + '-' + slug_sans_theme, id)
@@ -151,12 +154,21 @@ module Autotune
       end
     end
 
+    def embed_html
+      ac = Autotune::ProjectsController.new
+      ac.embed_html
+    end
+
     def deployed?
       status != 'new' && blueprint_version.present?
     end
 
     def installed?
       status != 'new' && blueprint_version.present?
+    end
+
+    def built?
+      output.present?
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a

@@ -18,6 +18,9 @@ module Autotune
     require 'active_job/chain'
 
     initializer 'autotune.init', :before => :load_config_initializers do |app|
+      app.config.assets.precompile += %w(
+        autotune/favicon.ico autotune/at_placeholder.png)
+
       app.config.autotune = Config.new
 
       # Figure out where we project our blueprints
@@ -30,6 +33,8 @@ module Autotune
       app.config.autotune.git_askpass = File.expand_path('../../../bin/git_ask_pass.sh', __FILE__)
       app.config.autotune.faq_url = 'http://voxmedia.helpscoutdocs.com/category/19-autotune'
       app.config.autotune.themes = { :generic => 'Generic' }
+      app.config.autotune.google_auth_enabled = false
+      app.config.autotune.google_auth_domain = nil
 
       if ENV['REDIS_URL']
         app.config.autotune.redis = Redis.new(:url => ENV['REDIS_URL'])

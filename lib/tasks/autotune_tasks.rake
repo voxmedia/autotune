@@ -61,16 +61,54 @@ namespace :autotune do
     end
   end
 
+  desc 'Correct project type'
+  task :correct_project_type, [:blueprint_slug] => [:environment] do |_, args|
+    blueprint = Autotune::Blueprint.find_by_slug(args[:blueprint_slug])
+    Autotune::Project.where(:blueprint_id => blueprint.id).each do |proj|
+      if proj.type != blueprint.type
+        original_type = proj.type
+        proj.blueprint_config['type'] = blueprint.type
+        proj.save!
+        puts "'#{proj.title}' type changed from '#{original_type}' to '#{proj.type}'"
+      end
+    end
+  end
+
   desc 'Create machine user'
-  task :create_superuser, [:set_email] => [:environment] do |t, args|
-    u = Autotune::User.find_or_create_by({
-        :name => 'autobot_machine'
-      })
-    u.attributes = {
-      :email => args[:set_email],
-      :meta => { 'roles' => [:superuser] }
-    }
-    u.save!
-    puts u.as_json
+  task :create_superuser, [:email] => [:environment] do |_, args|
+    u = Autotune::User
+        .create_with(
+          :name => 'autobot_machine', :meta => { 'roles' => [:superuser] })
+        .find_or_create_by!(:email => args[:email])
+    puts "Superuser with name '#{u.name}' and email '#{u.email}':"
+    puts "User ID: #{u.id}"
+    puts "API key: #{u.api_key}"
+  end
+
+  desc 'Get API key'
+  task :get_api_key, [:email] => [:environment] do |_, args|
+    u = Autotune::User.find_by_email(args[:email])
+
+    if u.blank?
+      puts "No user found with email address #{args[:email]}"
+    else
+      puts "Account with name '#{u.name}' and email '#{u.email}':"
+      puts "User ID: #{u.id}"
+      puts "API key: #{u.api_key}"
+    end
+  end
+
+  desc 'Reset API key'
+  task :reset_api_key, [:email] => [:environment] do |_, args|
+    u = Autotune::User.find_by_email(args[:email])
+
+    if u.blank?
+      puts "No user found with email '#{args[:email]}'"
+    else
+      u.update!(:api_key => Autotune::User.generate_api_key)
+      puts "Reset API key for account with name '#{u.name}' and email '#{u.email}':"
+      puts "User ID: #{u.id}"
+      puts "API key: #{u.api_key}"
+    end
   end
 end

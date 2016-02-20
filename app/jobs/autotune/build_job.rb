@@ -15,6 +15,7 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview')
+
       # Setup a new logger that logs to a string. The resulting log will
       # be saved to the output field of the project.
       out = StringIO.new

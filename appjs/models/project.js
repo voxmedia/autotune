@@ -1,8 +1,10 @@
 "use strict";
 
 var Backbone = require('backbone'),
+    $ = require('jquery'),
     _ = require('underscore'),
     moment = require('moment'),
+    utils = require('../utils'),
     markdown = require('markdown').markdown;
 
 var Project = Backbone.Model.extend({
@@ -86,13 +88,7 @@ var Project = Backbone.Model.extend({
    * @returns {boolean}
    **/
   hasInstructions: function() {
-    if ( this.get('blueprint_config') && this.get('blueprint_config').instructions ) {
-      return true;
-    } else if ( this.blueprint && this.blueprint.get('config') &&
-                this.blueprint.get('config').instructions ) {
-      return true;
-    }
-    return false;
+    return !!this.getConfig().instructions;
   },
 
   /**
@@ -101,14 +97,19 @@ var Project = Backbone.Model.extend({
    **/
   instructions: function() {
     if(this.hasInstructions()) {
-      var instructions;
-      if ( this.get('blueprint_config') ) {
-        instructions = this.get('blueprint_config').instructions;
-      } else {
-        instructions = this.blueprint.get('config')['instructions'];
-      }
+      var instructions = this.getConfig().instructions;
       return markdown.toHTML(instructions);
     }
+  },
+
+  /**
+   * Get the data that was passed to the blueprint build.
+   * @returns {object} Blueprint build data
+   **/
+  hasBuildData: function() {
+    var uniqBuildVals = _.uniq(_.values(this.formData()));
+    return !( uniqBuildVals.length === 1 &&
+              typeof uniqBuildVals[0] === 'undefined' );
   },
 
   /**
@@ -240,6 +241,15 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Has this project ever been built?
+   * Used for displaying active preview tab on static projects
+   * @returns {boolean}
+   **/
+  hasInitialBuild: function() {
+    return !!this.get('output');
+  },
+
+  /**
    * Is this project a draft?
    * @returns {boolean}
    **/
@@ -283,13 +293,71 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Return the version of the blueprint
+   * @returns {string} commit hash
+   **/
+  getVersion: function() {
+    return this.get('blueprint_version') || this.blueprint.get('version');
+  },
+
+  /**
+   * Does this project belong to a preview type?
+   * @param {string} type Check for this type
+   * @returns {boolean}
+   **/
+  hasPreviewType: function() {
+    var iteratee = function(m, i) {
+      return m || this.getConfig()['preview_type'] === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  /**
    * Get the url of the preview.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
    * @param {string} path - include this path in the URL
    * @returns {string} url
    **/
   getPreviewUrl: function(preferredProto, path) {
-    return this.getBuildUrl('preview', preferredProto, path);
+    return utils.buildUrl(this.get('preview_url'), path, preferredProto);
+  },
+
+  getPreviewSize: function() {
+    console.log(this.model);
+    console.log('getting preview size', this);
+  },
+
+  /**
+   * Create a new spreadsheet from a template
+   * @returns {Promise} Promise to provide the Google Doc URL
+   **/
+  createSpreadsheet: function() {
+    if ( !this.getConfig().spreadsheet_template ) { return Promise.resolve(); }
+
+    var ss_key = this.getConfig().spreadsheet_template.match(/[-\w]{25,}/)[0];
+
+    return Promise.resolve( $.ajax({
+      type: "POST",
+      url: this.urlRoot + "/create_spreadsheet",
+      data: JSON.stringify(ss_key),
+      contentType: 'application/json',
+      dataType: 'json'
+    }) ).then(
+      function( data ) {
+        var $input = $( "input[name='google_doc_url']" );
+        if( $input.val().length > 0 ){
+          var msg = 'This will replace the spreadsheet link currenlty associated with this project. Click "OK" to confirm the replacement.';
+          if( window.confirm(msg) ) {
+            $input.val(data.google_doc_url);
+          }
+        } else {
+          $input.val(data.google_doc_url);
+        }
+      },
+      function(err) {
+        console.log('There was an error authenticating your Google account.', err);
+      }
+    );
   },
 
   /**
@@ -299,41 +367,7 @@ var Project = Backbone.Model.extend({
    * @returns {string} url
    **/
   getPublishUrl: function(preferredProto, path) {
-    return this.getBuildUrl('publish', preferredProto, path);
-  },
-
-  /**
-   * Get the url for one of the built projects (preview or publish).
-   * @param {string} type - Type of the url (preview, publish)
-   * @param {string} preferredProto - Protocol to use if possible (http, https)
-   * @param {string} path - include this path in the URL
-   * @returns {string} url
-   **/
-  getBuildUrl: function(type, preferredProto, path) {
-    var key = ( type === 'publish' ) ? 'publish_url' : 'preview_url';
-
-    if ( !this.has(key) ) { return ''; }
-
-    var base = this.get(key);
-    if ( base.match(/^\/\//) && preferredProto !== '' ) {
-      base = preferredProto + ':' + base;
-    }
-
-    if ( !path ) { return base; }
-
-    if ( base.substr(-1) === '/' ) {
-      if ( path[0] === '/' ) {
-        return base + path.substr(1);
-      } else {
-        return base + path;
-      }
-    } else {
-      if ( path[0] === '/' ) {
-        return base + path;
-      } else {
-        return base + '/' + path;
-      }
-    }
+    return utils.buildUrl(this.get('publish_url'), path, preferredProto);
   }
 });
 

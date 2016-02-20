@@ -108,8 +108,8 @@ module Autotune
     end
 
     test 'search projects' do
-      assert_equal 6, Project.search('Example', :title).count
-      assert_equal 0, Project.search('foo', :title).count
+      assert_equal 6, Project.search('Example').count
+      assert_equal 0, Project.search('foo').count
     end
 
     test 'slugs include themes' do
