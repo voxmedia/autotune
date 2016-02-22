@@ -49,6 +49,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('unload', function() {
       this.stopListening(this.app);
       this.stopListeningForChanges();
+      if ( this.pym ) { this.pym.remove(); }
     }, this);
   },
 
@@ -115,6 +116,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           var version = view.model.getVersion(),
               previewUrl = view.model.blueprint.getMediaUrl(
                 [version, view.theme].join('-') + '/preview');
+
+          if ( view.pym ) { view.pym.remove(); }
 
           $('#embed-preview').empty();
           view.pym = new pym.Parent('embed-preview', previewUrl);
@@ -286,6 +289,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         }
 
         // Setup our iframe with pym
+        if ( view.pym ) { view.pym.remove(); }
         view.pym = new pym.Parent('embed-preview', previewUrl);
         view.pym.iframe.onload = iframeLoaded;
 
