@@ -74,11 +74,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       return;
     }
+
     // Make sure the form is valid before proceeding
-    if ( !this.formValidate(this.model, $form) ) {
+    // Alpaca takes a loooong time to validate a complex form
+    //if ( !this.formValidate(this.model, $form) ) {
       // If the form isn't valid, bail
-      return;
-    }
+      //return;
+    //}
 
     if( this.forceUpdateDataFlag ){
       // Check the flag in case we want to force an update
