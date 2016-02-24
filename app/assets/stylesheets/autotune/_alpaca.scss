@@ -15,6 +15,27 @@ td.actionbar .btn-group button {
   font-size: 1.1em;
 }
 
+.alpaca-field-object .alpaca-field-object,
+.alpaca-field-array {
+  margin-top:40px;
+  margin-bottom:15px;
+}
+.alpaca-field-array .alpaca-field-object {
+  margin-top:0;
+}
+
+.alpaca-field-array {
+  border-bottom: 1px solid $legend-border-color;
+  padding-bottom:15px;
+  > legend {
+    font-size:$font-size-h3;
+  }
+}
+
+.alpaca-container-item {
+  position:relative;
+}
+
 .alpaca-array-actionbar-bottom {
   position:absolute;
   bottom:0;
@@ -28,7 +49,11 @@ td.actionbar .btn-group button {
 }
 
 .alpaca-container-item {
-  position:relative;
+}
+
+.alpaca-field-checkbox .alpaca-control.checkbox {
+  margin-left:8px;
+  display:inline-block;
 }
 
 .alpaca-array-actionbar {
@@ -56,17 +81,44 @@ td.actionbar .btn-group button {
   }
 }
 
+.alpaca-container span[data-toggle=collapse] {
+  display:block;
+  position:relative;
+}
+.alpaca-container span[data-toggle=collapse]:after {
+  content:' Click to collapse';
+  display:inline-block;
+  margin-left:8px;
+  font-size:60%;
+  color:$headings-small-color;
+}
+.alpaca-container span[data-toggle=collapse].collapsed:after {
+  content:' Click to expand';
+}
+
+
 .alpaca-field-table .table-responsive {
-  margin: 0 -19px;
+  border-collapse: collapse;
+  td { border:1px solid $input-border; }
+
+  .table > tbody > tr:first-child td {
+    border-width:1px;
+  }
 
   .alpaca-array-actionbar-top {
     padding:0 4px;
     position:static;
   }
 
+  .alpaca-field-checkbox {
+    padding:0 4px;
+  }
+
   .form-control {
-    border-width:0;
+    border-width:1;
+    border-color:transparent;
     padding:2px 0 2px 4px;
+    &:focus { border-color:$input-border-focus; }
   }
 
   .btn {
@@ -77,17 +129,10 @@ td.actionbar .btn-group button {
     margin:0;
   }
 
-  tbody td:not(:first-child) { border-left:1px solid $input-border; }
-  tbody tr { border-bottom:1px solid $input-border; }
-  tbody tr:first-child { border-top:1px solid $input-border; }
-
   td { padding:0; background-color:$input-bg; }
   th { padding:2px; }
 
   .form-group { margin-bottom: 0; }
 
   tbody .alpaca-control-label { display:none; }
-
-
 }
-
