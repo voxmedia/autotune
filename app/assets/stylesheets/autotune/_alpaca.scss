@@ -25,7 +25,6 @@ td.actionbar .btn-group button {
 }
 
 .alpaca-field-array {
-  border-bottom: 1px solid $legend-border-color;
   padding-bottom:15px;
   > legend {
     font-size:$font-size-h3;
@@ -46,6 +45,10 @@ td.actionbar .btn-group button {
   position:absolute;
   top:0;
   right:0;
+}
+
+.alpaca-field-hidden {
+  display:none;
 }
 
 .alpaca-container-item {
