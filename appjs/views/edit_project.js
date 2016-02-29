@@ -291,7 +291,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
         }
 
-        if ( view.model.hasType( 'graphic' ) ) {
+        if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
           // Setup our iframe with pym
           if ( view.pym ) { view.pym.remove(); }
           view.pym = new pym.Parent('embed-preview', previewUrl);
