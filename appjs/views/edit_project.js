@@ -27,7 +27,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change form': 'pollChange',
     'keypress': 'pollChange',
     'click #savePreview': 'savePreview',
-    'click #preview .resize': 'resizePreview'
+    'click #preview .resize': 'resizePreview',
+    'click #saveBtn': 'handleForm'
   },
 
   afterInit: function(options) {
@@ -290,16 +291,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
         }
 
-        // Setup our iframe with pym
-        if ( view.pym ) { view.pym.remove(); }
-        view.pym = new pym.Parent('embed-preview', previewUrl);
-        view.pym.iframe.onload = iframeLoaded;
+        if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
+          // Setup our iframe with pym
+          if ( view.pym ) { view.pym.remove(); }
+          view.pym = new pym.Parent('embed-preview', previewUrl);
+          view.pym.iframe.onload = iframeLoaded;
 
-        // In case some dumb script hangs the loading process
-        setTimeout(iframeLoaded, 20000);
+          // In case some dumb script hangs the loading process
+          setTimeout(iframeLoaded, 20000);
 
-        if(view.togglePreview){
-          $( "#draft-preview" ).trigger( "click" );
+          if ( view.togglePreview ){
+            $( "#draft-preview" ).trigger( "click" );
+          }
         }
       }).catch(function(err) {
         console.error(err);
@@ -397,7 +400,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               "data-model": "Project",
               "data-model-id": this.model.isNew() ? '' : this.model.id,
               "data-action": this.model.isNew() ? 'new' : 'edit',
-              "data-next": 'show'
+              "data-next": 'show',
+              "method": 'post'
             }
           },
           options_fields = {
@@ -458,7 +462,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         "options": {
           "form": options_form,
           "fields": options_fields,
-          "focus": this.firstRender
+          "focus": this.firstRender,
+          "hideInitValidationError": true
         },
         "postRender": _.bind(function(control) {
           this.alpaca = control;
@@ -553,8 +558,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     if ( control ) {
       // Validate the alpaca form
-      control.form.refreshValidationState(true);
-      valid = control.form.isFormValid();
+      //control.form.refreshValidationState(true);
+      //valid = control.form.isFormValid();
+      valid = true;
 
       if ( !valid ) {
         $form.find('#validation-error').removeClass('hidden');
