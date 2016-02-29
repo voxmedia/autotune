@@ -19,7 +19,7 @@
 
   <% if ( model.isPublishable() ) { %>
   <button type="button" class="btn btn-success" id="publishBtn"
-          <% if ( ! model.hasInitialBuild() ) { %>disabled="true"<% } %>
+          <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
           data-action-message="Publishing..."
           data-action="build-and-publish" data-model="Project"
           data-action-next="reload"

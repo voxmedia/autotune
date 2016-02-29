@@ -141,7 +141,11 @@ module Autotune
 
       if @project.valid?
         @project.save
-        @project.build unless @project.live?
+        if @project.live?
+          @project.set_built
+        else
+          @project.build
+        end
 
         render :show, :status => :created
       else
@@ -174,7 +178,11 @@ module Autotune
 
       if @project.valid?
         @project.save
-        @project.build unless @project.live?
+        if @project.live?
+          @project.set_built
+        else
+          @project.build
+        end
 
         render :show
       else

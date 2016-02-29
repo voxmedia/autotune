@@ -72,6 +72,10 @@ module Autotune
       blueprint_config['preview_type'] == 'live'
     end
 
+    def set_built
+      update!(:status => 'built')
+    end
+
     def update_snapshot
       if blueprint_version == blueprint.version
         update!(:status => 'building')
