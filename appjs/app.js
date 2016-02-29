@@ -13,6 +13,7 @@ var $ = require('jquery'),
     moment = require('moment'),
     Alpaca = require('./alpaca_patches'),
     Datepicker = require('eonasdan-bootstrap-datetimepicker'),
+    Spectrum = require('spectrum-colorpicker'),
     // Load our components and run the app
     Router = require('./router'),
     Listener = require('./listener'),
