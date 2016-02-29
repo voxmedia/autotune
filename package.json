@@ -48,6 +48,7 @@
     "node-underscorify": "0.0.14",
     "pnotify": "sciactive/pnotify#2.1.0",
     "pym.js": "0.4.5",
+    "spectrum-colorpicker": "bgrins/spectrum",
     "underscore": "1.7.0",
     "underscore.string": "3.0.3"
   },
