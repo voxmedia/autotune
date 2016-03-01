@@ -140,12 +140,9 @@ module Autotune
       end
 
       if @project.valid?
+        @project.status = 'built' if @project.live?
         @project.save
-        if @project.live?
-          @project.set_built
-        else
-          @project.build
-        end
+        @project.build unless @project.live?
 
         render :show, :status => :created
       else
@@ -177,12 +174,9 @@ module Autotune
       @project.data.delete('theme')
 
       if @project.valid?
+        @project.status = 'built' if @project.live?
         @project.save
-        if @project.live?
-          @project.set_built
-        else
-          @project.build
-        end
+        @project.build unless @project.live?
 
         render :show
       else
