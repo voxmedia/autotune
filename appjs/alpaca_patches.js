@@ -1,4 +1,4 @@
-var Alpaca = require('./vendor/alpaca');
+var Alpaca = require('alpaca/build/alpaca/bootstrap/alpaca');
 
 // Cause there doesn't seem to be a better way to set defaults for Alpaca
 Alpaca.RuntimeView.prototype.toolbarSticky = true;
