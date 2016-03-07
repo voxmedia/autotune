@@ -50,7 +50,7 @@ module Autotune
         end
       end
 
-      if params.key? :search
+      if params.key? :search && params[:search].present?
         users = User.search(params[:search]).pluck(:id)
         sql = @projects.search_sql(params[:search])
 
