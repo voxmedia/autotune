@@ -18,7 +18,9 @@ module Autotune
       if repo.exist?
         if update
           # Update the repo
-          repo.update
+          repo.check_hash(blueprint.repo_url)
+          # I don't love the way this is set up right now but at least it isn't running twice
+          # repo.update
         elsif blueprint.status.in?(%w(testing ready))
           # if we're not updating, bail if we have the files
           return
@@ -30,6 +32,7 @@ module Autotune
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
+        repo.check_hash(blueprint.repo_url)
       end
 
       # Setup the environment

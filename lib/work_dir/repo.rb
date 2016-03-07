@@ -10,13 +10,14 @@ module WorkDir
 
     # Update the repo on disk
     def update
+      puts branch
       working_dir do
         git 'checkout', working_dir
         git 'clean', '-fd'
-        git 'checkout', 'master'
+        git 'checkout', branch
         git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
-        git 'checkout', branch
+        git 'checkout', commit_hash
         git 'submodule', 'update', '--init'
       end
     end
@@ -27,10 +28,18 @@ module WorkDir
       update
     end
 
+    def check_hash(repo_url)
+      if /#\S+[^\/]/.match(repo_url)
+        self.switch(repo_url.split('#')[1])
+      else
+        update
+      end
+    end
+
     # Clone a repo to disk from the url
     def clone(repo_url)
       FileUtils.mkdir_p(File.dirname(working_dir))
-      git 'clone', '--recursive', repo_url, working_dir
+      git 'clone', '--recursive', repo_url.split('#')[0], working_dir
     end
 
     # Get the current commit hash

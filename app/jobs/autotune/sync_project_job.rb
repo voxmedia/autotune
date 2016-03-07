@@ -37,9 +37,12 @@ module Autotune
         blueprint_dir.copy_to(project_dir.working_dir)
       end
 
+      puts 'look here'
+      puts project_dir.commit_hash, project.blueprint_version
       if project_dir.commit_hash != project.blueprint_version
+        puts 'dont match'
         # checkout the right git version
-        project_dir.switch(project.blueprint_version)
+        project_dir.commit_hash(project.blueprint_version)
         # Make sure the environment is correct for this version
         project_dir.setup_environment
         # update the status
