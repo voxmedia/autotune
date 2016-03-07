@@ -132,10 +132,12 @@ module Autotune
     end
 
     def slug_sans_theme
-      if theme_changed? && theme_was
-        slug.sub(/^(#{theme.value}|#{theme_was.value})-/, '')
-      else
-        slug.sub(/^#{theme.value}-/, '')
+      if slug.is_a?(String)
+        if theme_changed? && theme_was
+          slug.sub(/^(#{theme.value}|#{theme_was.value})-/, '')
+        else
+          slug.sub(/^#{theme.value}-/, '')
+        end
       end
     end
 
