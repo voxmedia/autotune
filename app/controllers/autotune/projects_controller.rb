@@ -199,7 +199,7 @@ module Autotune
       deployer.before_build(@build_data, {}, current_user)
       render :json => @build_data
     rescue => exc
-      if @project.meta['error_message'].present?
+      if @project.meta.present? && @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
       else
         render_error exc.message
