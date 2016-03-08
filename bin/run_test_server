@@ -1,0 +1,6 @@
+#!/bin/bash
+
+RAILS_ENV=test bundle exec rake db:drop db:create db:migrate db:fixtures:load
+
+cd ./test/dummy
+bundle exec rails s -p 3033 -e test
