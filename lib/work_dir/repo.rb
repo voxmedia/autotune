@@ -10,7 +10,8 @@ module WorkDir
 
     # Update the repo on disk
     def update
-      puts branch
+      puts 'working_dir', working_dir
+      puts 'commit_hash', commit_hash
       working_dir do
         git 'checkout', working_dir
         git 'clean', '-fd'

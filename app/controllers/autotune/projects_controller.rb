@@ -112,7 +112,6 @@ module Autotune
     end
 
     def create
-      pp request.POST
       @project = Project.new(:user => current_user)
       @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
 
@@ -143,8 +142,6 @@ module Autotune
         @project.data.delete('slug')
         @project.data.delete('theme')
       end
-
-      pp @project
 
       if @project.valid?
         @project.status = 'built' if @project.live?
