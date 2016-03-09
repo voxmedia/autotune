@@ -1,18 +1,16 @@
 #!/bin/bash
 
-echo 'Resetting test DB...'
 export PATH=./node_modules/.bin:$PATH
 export RAILS_ENV=test
+
 bundle exec rake db:drop db:create db:migrate db:fixtures:load > /dev/null
 
 (
-  echo 'Starting rails...'
   cd ./test/dummy
-  exec bundle exec rails s -p 3033 -e test > /dev/null
-) & server=$!
+  exec bundle exec rails s -p 3033 -e test
+) > /dev/null & server=$!
 
 function finish {
-  echo 'Shutting server down...'
   kill -s INT $server
 }
 trap finish EXIT
