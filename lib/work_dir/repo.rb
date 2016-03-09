@@ -10,15 +10,13 @@ module WorkDir
 
     # Update the repo on disk
     def update
-      puts 'working_dir', working_dir
-      puts 'commit_hash', commit_hash
       working_dir do
         git 'checkout', working_dir
         git 'clean', '-fd'
         git 'checkout', branch
         git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
-        git 'checkout', commit_hash
+        git 'checkout', branch
         git 'submodule', 'update', '--init'
       end
     end
@@ -52,6 +50,13 @@ module WorkDir
       version.strip
     end
     alias_method :version, :commit_hash
+
+    def checkout_version(version_hash)
+      version = 'HEAD'
+      working_dir do
+        version = git 'checkout', version_hash || 'HEAD'
+      end
+    end
 
     # Get a tar archive of the repo as a string
     def archive(branch_or_tag = nil)

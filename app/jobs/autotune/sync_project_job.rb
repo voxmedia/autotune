@@ -29,9 +29,9 @@ module Autotune
         # We have to make a new copy.
         project_dir.destroy
         blueprint_dir.copy_to(project_dir.working_dir)
-      # elsif project_dir.exist?
-      #   # if we're not updating, bail if we have the files
-      #   return
+      elsif project_dir.exist?
+        # if we're not updating, bail if we have the files
+        return
       else
         # Copy the blueprint to the project working dir.
         blueprint_dir.copy_to(project_dir.working_dir)
@@ -41,8 +41,13 @@ module Autotune
 
       if project_dir.commit_hash != project.blueprint_version
         # checkout the right git version
-        project_dir.commit_hash(project.blueprint_version)
+
+        # project_dir.commit_hash(project.blueprint_version)
+        project_dir.checkout_version(project.blueprint_version)
+
         # Make sure the environment is correct for this version
+        # project_dir.update
+        # Make sure to get correct version and branch
         project_dir.setup_environment
         # update the status
         project.update!(
