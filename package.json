@@ -29,7 +29,7 @@
     "lint": "grunt jshint",
     "watch": "watchify --verbose --poll --debug appjs/app.js -o app/assets/javascripts/autotune/application.js",
     "build": "browserify --debug appjs/app.js > app/assets/javascripts/autotune/application.js",
-    "test": "browserify --debug testjs/*/test_*.js | browser-run -b safari | tap-spec"
+    "test": "./bin/run_test_server"
   },
   "dependencies": {
     "alpaca": "voxmedia/alpaca",
@@ -54,7 +54,7 @@
     "underscore.string": "3.0.3"
   },
   "devDependencies": {
-    "browser-run": "^2.6.2",
+    "browser-run": ">=2.6.2",
     "glob": "^5.0.15",
     "grunt": "0.4.5",
     "grunt-cli": "0.1.13",
