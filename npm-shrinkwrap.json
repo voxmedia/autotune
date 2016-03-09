@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "dependencies": {
     "alpaca": {
-      "version": "1.5.14",
-      "from": "voxmedia/alpaca",
-      "resolved": "git://github.com/voxmedia/alpaca.git#4d05874b4c61415b2f8a01f61d87326ecb0a9fee"
+      "version": "1.5.15",
+      "from": "voxmedia/alpaca#dev",
+      "resolved": "git://github.com/voxmedia/alpaca.git#30050d678deea835300a04811c1cc8646dd224b0"
     },
     "backbone": {
       "version": "1.2.3",
