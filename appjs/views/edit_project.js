@@ -78,10 +78,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
-    //if ( !this.formValidate(this.model, $form) ) {
+    if ( !this.formValidate(this.model, $form) ) {
       // If the form isn't valid, bail
-      //return;
-    //}
+      return;
+    }
 
     if( this.forceUpdateDataFlag ){
       // Check the flag in case we want to force an update
@@ -462,8 +462,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         "options": {
           "form": options_form,
           "fields": options_fields,
-          "focus": this.firstRender,
-          "hideInitValidationError": true
+          "focus": this.firstRender
         },
         "postRender": _.bind(function(control) {
           this.alpaca = control;
@@ -558,9 +557,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     if ( control ) {
       // Validate the alpaca form
-      //control.form.refreshValidationState(true);
-      //valid = control.form.isFormValid();
-      valid = true;
+      control.form.refreshValidationState(true);
+      valid = control.form.isFormValid();
 
       if ( !valid ) {
         $form.find('#validation-error').removeClass('hidden');
