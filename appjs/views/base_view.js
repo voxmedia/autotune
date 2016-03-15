@@ -3,6 +3,7 @@
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
+    camelize = require('underscore.string/camelize'),
     models = require('../models'),
     logger = require('../logger'),
     helpers = require('../helpers');
@@ -10,6 +11,10 @@ var $ = require('jquery'),
 var BaseView = Backbone.View.extend({
   loaded: true,
   firstRender: true,
+  events: {
+    'click button[data-hook], a[data-hook]': 'handleHook'
+  },
+
   initialize: function(options) {
     if (_.isObject(options)) {
       _.extend(this, _.pick(options, 'app', 'query'));
@@ -18,9 +23,23 @@ var BaseView = Backbone.View.extend({
     this.hook('afterInit', options);
   },
 
+  handleHook: function(eve) {
+    var $btn = $(eve.currentTarget);
+
+    if ( $btn.hasClass('btn') ) { $btn.button( 'loading' ); }
+
+    this.hook(
+      camelize($btn.data('hook')), $btn.data('hook-options')
+    ).catch(function(err) {
+      logger.error('Hook failed', err);
+    }).then(function() {
+      if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
+    });
+  },
+
   render: function() {
     var scrollPos = $(window).scrollTop(),
-        activeTab = this.$('.nav-tabs .active a').attr('href'),
+        activeTab = window.location.hash,
         view = this;
 
     // Only render if this view is loaded
@@ -35,13 +54,20 @@ var BaseView = Backbone.View.extend({
 
       return view.hook( 'afterRender' );
     }).then(function() {
+      // Set a tab on the page if we have an anchor
+      if ( activeTab ) {
+        logger.debug( 'set tab', activeTab );
+        view.$('.nav-tabs a[href='+activeTab+']').tab('show');
+      }
+
       if ( view.firstRender ) {
+        // Reset first render flag
         logger.debug( 'first render' );
         view.firstRender = false;
       } else {
-        logger.debug('re-render; fix scroll and tabs',
-                     scrollPos, activeTab, $(document).height());
-        view.$('.nav-tabs a[href='+activeTab+']').tab('show');
+        // Reset scroll position
+        logger.debug('re-render; set scroll',
+                     activeTab, scrollPos, $(document).height());
         $(window).scrollTop(scrollPos);
       }
 
@@ -104,7 +130,7 @@ BaseView.extend = function() {
       _.pluck(arguments, 'events'),
       function(m, o) { return _.extend(m, o); },
       {} ),
-    this.prototype.event
+    this.prototype.events
   );
 
   // Make a view

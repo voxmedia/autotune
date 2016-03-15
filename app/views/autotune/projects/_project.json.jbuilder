@@ -5,7 +5,7 @@ json.extract!(
   :blueprint_version)
 
 json.built project.built?
-json.type project.blueprint.type
+json.type project.type
 json.blueprint_title project.blueprint.title
 json.theme project.theme.slug
 json.created_by project.user.name

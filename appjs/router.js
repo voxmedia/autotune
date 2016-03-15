@@ -121,7 +121,6 @@ module.exports = Backbone.Router.extend({
 
   listProjects: function(params) {
     var projects = this.app.projects,
-        // bp_list = this.app.blueprints.pluck('id', 'title'),
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }
@@ -178,7 +177,7 @@ module.exports = Backbone.Router.extend({
       return project.blueprint.fetch();
     }).then(function() {
       view = new views.EditProject({
-        model: project, app: app,
+        model: project, app: app, query: query,
         disableForm: query.hasOwnProperty('disableform') });
       view.render();
 
@@ -191,6 +190,8 @@ module.exports = Backbone.Router.extend({
     });
   },
 
+  // editProjectPreview: function
+
   duplicateProject: function(slug) {
     var project = new models.Project({ id: slug }),
         app = this.app, view,
@@ -202,7 +203,7 @@ module.exports = Backbone.Router.extend({
       return project.blueprint.fetch();
     }).then(function() {
       old_attributes = _.clone(project.attributes);
-
+      logger.debug('oldies', old_attributes);
       new_attributes.blueprint_config = old_attributes.blueprint_config;
       new_attributes.blueprint_id = old_attributes.blueprint_id;
       new_attributes.blueprint_title = old_attributes.blueprint_title;

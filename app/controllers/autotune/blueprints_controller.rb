@@ -70,7 +70,5 @@ module Autotune
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
       end
     end
-
-    def builder; end
   end
 end

@@ -41,6 +41,48 @@
 .icon-refresh {
   &:after { content: "\e031"; }
 }
+
+/* spinner css */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+.icon-spin {
+  display:inline-block;
+  height: 0.75em;
+  width: 0.75em;
+}
+.icon-spin:after {
+  content: "\e031";
+  animation-name: spin;
+  -webkit-animation-name: spin;
+  animation-duration: 0.8s;
+  -webkit-animation-duration: 0.8s;
+  animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  -webkit-animation-timing-function: linear;
+}
+div.icon-spin {
+  display:block;
+  position:relative;
+  height:0;
+  width:100%;
+  padding:0 0 100% 0;
+  overflow:hidden;
+}
+div.icon-spin:after {
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+}
+
  //alert icons
 .icon-ok,
 .icon-alert,

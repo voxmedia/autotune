@@ -1,4 +1,6 @@
 require_dependency 'autotune/application_controller'
+require 'autotune/google_docs'
+require 'redis'
 
 module Autotune
   # API for projects
@@ -26,7 +28,7 @@ module Autotune
 
     def index
       @projects = Project
-
+      # a user can have multiple authorizations
       # Filter and search query
       query = {}
 
@@ -139,8 +141,9 @@ module Autotune
       end
 
       if @project.valid?
+        @project.status = 'built' if @project.live?
         @project.save
-        @project.build
+        @project.build unless @project.live?
 
         render :show, :status => :created
       else
@@ -172,13 +175,51 @@ module Autotune
       @project.data.delete('theme')
 
       if @project.valid?
+        @project.status = 'built' if @project.live?
         @project.save
-        @project.build
+        @project.build unless @project.live?
 
         render :show
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    def preview_build_data
+      @project = instance
+      @build_data = request.POST
+      if @build_data['google_doc_url'] && request.GET[:force_update]
+        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
+        Rails.cache.delete(cache_key)
+      end
+
+      # Get the deployer object
+      deployer = @project.deployer(:preview)
+
+      # Run the before build deployer hook
+      deployer.before_build(@build_data, {}, current_user)
+      render :json => @build_data
+    rescue => exc
+      if @project.meta['error_message'].present?
+        render_error @project.meta['error_message'], :bad_request
+      else
+        render_error exc.message
+      end
+    end
+
+    def create_spreadsheet
+      current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
+      google_client = GoogleDocs.new(current_auth)
+      spreadsheet_copy = google_client.copy(request.POST['_json'])
+
+      if Autotune.configuration.google_auth_domain.present?
+        google_client.share_with_domain(
+          spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
+      end
+
+      render :json => { :google_doc_url => spreadsheet_copy[:url] }
+    rescue => exc
+      render_error exc.message
     end
 
     def update_snapshot

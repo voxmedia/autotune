@@ -8,6 +8,9 @@ var $ = require('jquery'),
     logger = require('../../logger'),
     helpers = require('../../helpers');
 
+/* Actions view mixin
+ * Generic handler for action buttons that do something to a model.
+ */
 module.exports = {
   events: {
     'click button[data-action], a[data-action]': 'handleAction'
@@ -16,6 +19,7 @@ module.exports = {
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+
     var inst, view = this, app = this.app,
         $btn = $(eve.currentTarget),
         action = $btn.data('action'),
@@ -44,12 +48,15 @@ module.exports = {
     } else {
       inst = this.model;
     }
+    logger.debug(inst);
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
-        app.view.alert(action_message, 'success', false, 4000);
+        if(action_message){
+          app.view.alert(action_message, 'success', false, 4000);
+        }
 
         switch (action) {
           case 'build':
@@ -70,6 +77,9 @@ module.exports = {
           return view.render();
         } else if ( next ) {
           Backbone.history.navigate( next, {trigger: true} );
+        } else {
+          if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
+          app.trigger( 'loadingStop' );
         }
       }).catch(function(error) {
         view.handleRequestError( error );
@@ -86,6 +96,5 @@ module.exports = {
       this.app.view.error( 'Something bad happened... Please reload and try again' );
     }
     logger.error("REQUEST FAILED!!", xhr);
-  },
-
+  }
 };

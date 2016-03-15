@@ -32,6 +32,15 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/duplicate',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+
+  post 'projects/:id/preview_build_data',
+       :to => 'projects#preview_build_data',
+       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  post 'projects/preview_build_data',
+       :to => 'projects#preview_build_data'
+  post 'projects/create_spreadsheet',
+       :to => 'projects#create_spreadsheet'
+
   get '/changemessages' => 'changemessages#index'
 
   # The priority is based upon order of creation: first created -> highest priority.

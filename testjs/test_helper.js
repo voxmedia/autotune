@@ -1,6 +1,7 @@
 var $ = require('jquery'),
     Backbone = require('backbone'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    test = require('tape-catch');
 
 // Store the original version of Backbone.sync
 var backboneSync = Backbone.sync;
@@ -20,4 +21,10 @@ Backbone.sync = function (method, model, options) {
   return backboneSync(method, model, options);
 };
 
-module.exports = require('tape-catch');
+test.onFinish( function() {
+  if ( typeof window !== 'undefined' ) {
+    window.close();
+  }
+} );
+
+module.exports = test;

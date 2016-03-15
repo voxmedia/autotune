@@ -15,15 +15,21 @@ module.exports = {
   },
 
   handleForm: function(eve) {
+    var inst, Model, view = this, app = this.app, $form;
+
     eve.preventDefault();
     eve.stopPropagation();
+
+    if ( eve.currentTarget.tagName === 'FORM' ) {
+      $form = $(eve.currentTarget);
+    } else {
+      $form = $(eve.currentTarget).parents('form');
+    }
 
     this.app.trigger('loadingStart');
     logger.debug('handleForm');
 
-    var inst, Model, view = this, app = this.app,
-        $form = $(eve.currentTarget),
-        values = this.formValues($form),
+    var values = this.formValues($form),
         model_class = $form.data('model'),
         model_id = $form.data('model-id'),
         action = $form.data('action'),

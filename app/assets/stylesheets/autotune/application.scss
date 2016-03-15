@@ -10,6 +10,7 @@
 @import "pnotify";
 @import "pnotify.buttons";
 @import "bootstrap-datetimepicker";
+@import "spectrum";
 
 // TODO: merge bootstrap_overrides, custom and the rest of this file
 @import "autotune/bootstrap_overrides";
@@ -61,12 +62,43 @@ label.block {
 
 #blueprint-data { height:300px; }
 
-#preview {
-  border-top:35px solid #dfdfdf;
-  border-left:1px solid #dfdfdf;
-  border-bottom:1px solid #dfdfdf;
-  border-right:1px solid #dfdfdf;
-  border-radius:8px 8px 2px 2px;
+.preview-frame {
+  margin: 25px auto;
+
+  &.large-view {
+    width:720px;
+  }
+  &.medium-view {
+    width:500px;
+  }
+  &.small-view {
+    width:320px;
+  }
+
+  iframe {
+    display:block;
+  }
+}
+
+#save-warning{
+  display: none;
+}
+
+#embed-preview {
+  position:relative;
+  border: 2px dashed #ccc;
+  .overlay { display: none; }
+
+  &.loading .overlay {
+    display:block;
+    position:absolute;
+    top:0; right:0; bottom:0; left:0;
+    background-color:rgba($black, 0.6);
+    color:white;
+    font-size:40px;
+    padding-top:40px;
+    text-align:center;
+  }
 }
 
 footer {
