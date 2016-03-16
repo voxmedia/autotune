@@ -65,10 +65,9 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     refute repo.exist?('submodule/testfile'),
            'Should not have submodule testfile'
 
-    bp.update(:version => updated_submod)
-
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+      Autotune::SyncBlueprintJob.perform_later bp,
+        :status => 'testing', :update => 'true'
     end
 
     bp.reload
