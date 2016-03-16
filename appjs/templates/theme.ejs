@@ -18,12 +18,28 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-xs-12">
-    <div id="edit">
+<!-- <div class="col-xs-12">
+  <input type='text' class="colorpicker"/>
+</div> -->
+<div role="tabpanel">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a
+        href="#visual" aria-controls="visual"
+        role="tab" data-toggle="tab">Properties</a>
+    </li>
+    <% if ( hasRole('superuser') ) { %>
+    <li role="presentation"><a
+        href="#code" aria-controls="code"
+        role="tab" data-toggle="tab">Developer</a></li>
+  <% } %>
+  </ul>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="visual">
       <div class="row">
         <div class="col-sm-12">
-          <form id="new-theme" role="form"
+          <form id="edit-theme" role="form"
                 data-next="show" data-model="Theme"
                 <% if(model.isNew()) { %>
                 data-action="new"
@@ -51,10 +67,17 @@
               </div>
             </div>
             <% } %>
-            <div class="form-group">
-              <label for="data">Theme data</label>
-              <div id="data" style="height:300px;"></div>
+            <% if (!model.isNew()) { %>
+              <div>
+                <h3 class="block">Colors</h3>
+              <% _.each(model.themeData("colors"), function(prop, key){ %>
+                <div class="form-group">
+                  <label class="col-sm-4" for="<%= key %>"><%= key %></label>
+                  <input type='text' class='colorpicker' name="themedata-colors-<%= key %>" value="<%= prop %>" />
+                </div>
+              <% }) %>
             </div>
+            <% } %>
             <button type="submit" class="btn btn-primary"
                     data-loading-text="Saving...">Save changes</button>
 
@@ -77,6 +100,51 @@
                     data-model-id="<%=model.get('slug') %>">Delete</button>
             <% } %>
           </form>
+        </div>
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="code">
+      <div class="row">
+        <div class="col-xs-12">
+          <div id="edit">
+            <div class="row">
+              <div class="col-sm-12">
+                <form id="theme-data" role="form"
+                      data-next="show" data-model="Theme"
+                      <% if(model.isNew()) { %>
+                      data-action="new"
+                      <% } else { %>
+                      data-action="edit" data-model-id="<%=model.get('id') %>"
+                      <% } %> >
+                  <div class="form-group">
+                    <label for="data">Theme data</label>
+                    <div id="data" style="height:300px;"></div>
+                  </div>
+                  <button type="submit" class="btn btn-primary"
+                          data-loading-text="Saving...">Save changes</button>
+
+                  <% if ( hasRole('superuser') && !model.isNew() && model.isDefault()) { %>
+                  <button type="button" class="btn btn-info"
+                          data-action-message="Reset started"
+                          data-action-confirm="Resetting will delete all changes made to the theme. Are you sure you wish to continue?"
+                          data-loading-text="Resetting..."
+                          data-action="reset" data-model="Theme"
+                          data-action-next="reload"
+                          data-model-id="<%=model.get('slug') %>">Reset</button>
+                  <% } %>
+                  <% if ( !model.isNew() && !model.isDefault()) { %>
+                  <button type="button" class="btn btn-danger"
+                          data-action-message="Theme deleted"
+                          data-action-confirm="Are you sure you wish to delete this?"
+                          data-loading-text="Deleting..."
+                          data-action="destroy"
+                          data-action-next="/themes" data-model="Theme"
+                          data-model-id="<%=model.get('slug') %>">Delete</button>
+                  <% } %>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

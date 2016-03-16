@@ -74,18 +74,34 @@ var EditTheme = BaseView.extend(require('./mixins/actions'), require('./mixins/f
     var editor_data = JSON.stringify( this.model.get('data'), null, "  " );
     this.editor.setValue(editor_data ? editor_data : "{}", -1 );
     this.listenForChanges();
+
+    // initialize color pickers
+    $(".colorpicker").spectrum({
+      showInput: true,
+      preferredFormat: "hex"
+    });
   },
 
   formValues: function($form) {
-    var values = {};
+    var values = {'data': this.model.get('data')};
+    var devMode = $form.attr("id") === "theme-data";
     _.each($form.serializeArray(), function(val){
-      values[val.name] = val.value;
+      if(!devMode && val.name.startsWith('themedata-')){
+        var subGroup = val.name.match('themedata-([a-zA-Z0-9]*)-.*$')[1];
+        var propName = val.name.match('themedata-[a-zA-Z0-9]*-(.*$)')[1];
+        values.data[subGroup][propName] = val.value;
+      } else {
+        values[val.name] = val.value;
+      }
     });
-    try {
-      values.data = JSON.parse(this.editor.getValue());
-    } catch (ex) {
-      logger.error("Theme data JSON is bad");
-      return {};
+    // get value from Ace editor if the dev form was editted
+    if(devMode) {
+      try {
+        values.data = JSON.parse(this.editor.getValue());
+      } catch (ex) {
+        logger.error("Theme data JSON is bad");
+        return {};
+      }
     }
     return values;
   },

@@ -62,7 +62,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   pollChange: _.debounce(function(){
     var view = this,
         $form = this.$('#projectForm'),
-        config_themes = this.model.getConfig().themes || ['generic'],
+        themes = this.model.getConfig().themes || ['generic'],
         query = '',
         data = $form.alpaca('get').getValue();
 
@@ -350,7 +350,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     form_config = this.model.getConfig().form;
-    config_themes = this.model.getConfig().themes || ['generic'];
+    themes = this.model.getConfig().themes || ['generic'];
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');

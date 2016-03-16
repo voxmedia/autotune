@@ -37,6 +37,13 @@ var Theme = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
+  themeData: function(subGroup) {
+    if( !this.get('data') || !this.get('data')[subGroup]) {
+      return {};
+    }
+    return this.get('data')[subGroup];
+  },
+
   urlRoot: '/themes',
 
   /**
