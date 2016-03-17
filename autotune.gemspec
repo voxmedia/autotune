@@ -6,9 +6,9 @@ require 'autotune/version'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = 'autotune'
-  s.version     = Autotune::VERSION
-  s.authors     = ['Ryan Mark']
-  s.email       = ['ryan@mrk.cc']
+  s.version     = Autotune::VERSION # update via package.json
+  s.authors     = ['Ryan Mark', 'Casey Miller', 'Kavya Sukumar']
+  s.email       = ['ryan.mark@voxmedia.com', 'casey.miller@voxmedia.com', 'kavya.sukumar@voxmedia.com']
   s.homepage    = 'https://github.com/voxmedia/autotune'
   s.summary     = 'Fancy way to turn templates into web pages'
   # s.description = 'TODO: Description of Autotune.'
