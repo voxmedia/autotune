@@ -38,10 +38,14 @@ var Theme = Backbone.Model.extend({
   },
 
   themeData: function(subGroup) {
-    if( !this.get('data') || !this.get('data')[subGroup]) {
+    var mergedData = this.get('merged_data');
+    if(!subGroup){
+      return mergedData;
+    }
+    if( !mergedData || !mergedData[subGroup]) {
       return {};
     }
-    return this.get('data')[subGroup];
+    return mergedData[subGroup];
   },
 
   urlRoot: '/themes',

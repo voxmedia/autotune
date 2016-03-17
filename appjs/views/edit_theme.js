@@ -73,29 +73,64 @@ var EditTheme = BaseView.extend(require('./mixins/actions'), require('./mixins/f
     this.editor.renderer.setHScrollBarAlwaysVisible(false);
     var editor_data = JSON.stringify( this.model.get('data'), null, "  " );
     this.editor.setValue(editor_data ? editor_data : "{}", -1 );
-    this.listenForChanges();
+
+    if(this.model.get('parent_data')){
+      this.readonlyEditor = ace.edit('readonly-data');
+      this.readonlyEditor.setShowPrintMargin(false);
+      this.readonlyEditor.setTheme("ace/theme/textmate");
+      this.readonlyEditor.setWrapBehavioursEnabled(true);
+      this.readonlyEditor.setReadOnly(true);
+
+      this.readonlyEditor.renderer.setHScrollBarAlwaysVisible(false);
+      this.readonlyEditor.setValue(JSON.stringify( this.model.get('parent_data'), null, "  " ));
+
+      var readonlySession = this.readonlyEditor.getSession();
+      readonlySession.setMode("ace/mode/json");
+      readonlySession.setUseWrapMode(true);
+    }
 
     // initialize color pickers
     $(".colorpicker").spectrum({
       showInput: true,
       preferredFormat: "hex"
     });
+
+    this.listenForChanges();
   },
 
   formValues: function($form) {
-    var values = {'data': this.model.get('data')};
-    var devMode = $form.attr("id") === "theme-data";
-    _.each($form.serializeArray(), function(val){
-      if(!devMode && val.name.startsWith('themedata-')){
-        var subGroup = val.name.match('themedata-([a-zA-Z0-9]*)-.*$')[1];
-        var propName = val.name.match('themedata-[a-zA-Z0-9]*-(.*$)')[1];
-        values.data[subGroup][propName] = val.value;
-      } else {
-        values[val.name] = val.value;
-      }
-    });
-    // get value from Ace editor if the dev form was editted
-    if(devMode) {
+    var values = {},
+    parent_data = this.model.isDefault() ? null : this.model.get('parent_data'),
+    devMode = $form.attr("id") === "theme-data";
+
+    // TODO: (Kavya) Clean this code.
+    // Parse the mainform if the editor is in visual mode
+    if(!devMode){
+      values.data = {};
+      _.each($form.serializeArray(), _.bind( function(val) {
+        var subGroup = null,
+         propName = null;
+        if(val.name.startsWith('themedata-')){
+          subGroup = val.name.match('themedata-([a-zA-Z0-9]*)-.*$')[1];
+          propName = val.name.match('themedata-[a-zA-Z0-9]*-(.*$)')[1];
+
+          // Discard if this property value is the same as the parent
+          if(this.isThemeValueInheritted(subGroup, propName, val.value)){
+            return;
+          }
+          if( subGroup === "root"){
+            values.data[propName] = val.value;
+          } else {
+            if ( !values.data[subGroup]) {
+              values.data[subGroup] = {};
+            }
+            values.data[subGroup][propName] = val.value;
+          }
+        } else {
+          values[val.name] = val.value;
+        }
+      }, this));
+    } else { // Accept data as is in dev mode
       try {
         values.data = JSON.parse(this.editor.getValue());
       } catch (ex) {
@@ -115,7 +150,23 @@ var EditTheme = BaseView.extend(require('./mixins/actions'), require('./mixins/f
       logger.error("Theme data JSON is bad");
     }
     return valid;
-  }
+  },
+
+  // TODO: (Kavya) Check for a cleaner way to add a private function
+  isThemeValueInheritted: function(subGroup, propName, value){
+    if (this.model.isDefault()){
+      return false;
+    }
+    var parent_data = this.model.get ('parent_data');
+
+    if(subGroup === "root"){
+      return parent_data && parent_data[propName] &&
+        parent_data[propName] === value;
+    }
+    return parent_data && parent_data[subGroup] &&
+      parent_data[subGroup][propName] &&
+      parent_data[subGroup][propName] === value;
+  },
 });
 
 module.exports = EditTheme;
