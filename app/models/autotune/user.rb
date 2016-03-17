@@ -150,7 +150,6 @@ module Autotune
 
     private
 
-   # TODO (Kavya) do a security review on this piece
     def self.update_roles(user, roles)
       # make sure the user is saved before trying to update relations
       user.save!

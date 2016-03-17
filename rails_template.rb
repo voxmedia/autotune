@@ -74,7 +74,7 @@ Autotune.configure do |conf|
     'secondary-color' => '#e6e6e6',
 
     'body-font-family' => 'Verdana, Helvetica, Roboto, Arial, sans-serif',
-    'header-font-family' => 'Georgia, Cambria, "Times New Roman", Times, serif',
+    'header-font-family' => "Georgia, Cambria, 'Times New Roman', Times, serif",
 
     'twitter-handle' => '@newsorg'
   }
@@ -144,11 +144,11 @@ Autotune.config.verify_omniauth = lambda do |omniauth|
   # give author access
   # return [:author]
   # give designer access to specific themes
-  # return :designer => [:mynewsorg]
+  # return :designer => ['My newsorg']
   # give author access to specific themes
-  # return :author => [:mynewsorg]
+  # return :author => ['My newsorg']
   # give editor access to specific themes
-  # return :editor => [:mynewsorg, :generic]
+  # return :editor => ['My newsorg', 'Generic']
 end
 CODE
 
