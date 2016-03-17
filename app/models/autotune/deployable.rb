@@ -1,5 +1,5 @@
 module Autotune
-  # Handle stuff around having a slug on a model
+  # Handle stuff around deploying a model
   module Deployable
     extend ActiveSupport::Concern
 

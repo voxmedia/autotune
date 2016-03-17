@@ -11,6 +11,8 @@ module Autotune
     validates :user, :provider, :uid, :presence => true
     validates :provider, :uniqueness => { :scope => :user_id }
 
+    # Name of the authentication provider.
+    # @return [String] authentication provider name.
     def provider_name
       provider.split('_').first.to_s.titleize
     end
