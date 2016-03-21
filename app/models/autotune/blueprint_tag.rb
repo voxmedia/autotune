@@ -1,5 +1,5 @@
 module Autotune
-  # Blueprint/tag relationship
+  # Blueprint/tag many:many relationship
   class BlueprintTag < ActiveRecord::Base
     belongs_to :blueprint
     belongs_to :tag

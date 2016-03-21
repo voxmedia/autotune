@@ -1,7 +1,7 @@
 {
   "name": "autotune",
   "description": "Platform and UI for creating new websites and html snippets from templates stored in git repos.",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "homepage": "https://github.com/voxmedia/autotune",
   "author": {
     "name": "Ryan Mark",
@@ -29,9 +29,10 @@
     "lint": "grunt jshint",
     "watch": "watchify --verbose --poll --debug appjs/app.js -o app/assets/javascripts/autotune/application.js",
     "build": "browserify --debug appjs/app.js > app/assets/javascripts/autotune/application.js",
-    "test": "browserify --debug testjs/*/test_*.js | browser-run -b safari | tap-spec"
+    "test": "./bin/run_test_server"
   },
   "dependencies": {
+    "alpaca": "voxmedia/alpaca",
     "backbone": "1.2.3",
     "backbone.paginator": "^2.0.2",
     "bootstrap": "3.3.2",
@@ -47,12 +48,13 @@
     "moment": "2.10.3",
     "node-underscorify": "0.0.14",
     "pnotify": "sciactive/pnotify#2.1.0",
-    "pym.js": "0.4.1",
+    "pym.js": "0.4.5",
+    "spectrum-colorpicker": "bgrins/spectrum",
     "underscore": "1.7.0",
     "underscore.string": "3.0.3"
   },
   "devDependencies": {
-    "browser-run": "^2.6.2",
+    "browser-run": ">=2.6.2",
     "glob": "^5.0.15",
     "grunt": "0.4.5",
     "grunt-cli": "0.1.13",

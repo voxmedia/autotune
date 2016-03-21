@@ -6,7 +6,7 @@ var $ = require('jquery'),
     models = require('../models'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
-    Alpaca = require('../vendor/alpaca'),
+    Alpaca = require('../alpaca_patches'),
     ace = require('brace');
 
 require('brace/mode/json');

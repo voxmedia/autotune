@@ -27,7 +27,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change form': 'pollChange',
     'keypress': 'pollChange',
     'click #savePreview': 'savePreview',
-    'click #preview .resize': 'resizePreview'
+    'click #preview .resize': 'resizePreview',
+    'click #saveBtn': 'handleForm'
   },
 
   afterInit: function(options) {
@@ -49,6 +50,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('unload', function() {
       this.stopListening(this.app);
       this.stopListeningForChanges();
+      if ( this.pym ) { this.pym.remove(); }
     }, this);
   },
 
@@ -73,7 +75,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
       return;
     }
+
     // Make sure the form is valid before proceeding
+    // Alpaca takes a loooong time to validate a complex form
     if ( !this.formValidate(this.model, $form) ) {
       // If the form isn't valid, bail
       return;
@@ -115,6 +119,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           var version = view.model.getVersion(),
               previewUrl = view.model.blueprint.getMediaUrl(
                 [version, view.theme].join('-') + '/preview');
+
+          if ( view.pym ) { view.pym.remove(); }
 
           $('#embed-preview').empty();
           view.pym = new pym.Parent('embed-preview', previewUrl);
@@ -285,15 +291,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
         }
 
-        // Setup our iframe with pym
-        view.pym = new pym.Parent('embed-preview', previewUrl);
-        view.pym.iframe.onload = iframeLoaded;
+        if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
+          // Setup our iframe with pym
+          if ( view.pym ) { view.pym.remove(); }
+          view.pym = new pym.Parent('embed-preview', previewUrl);
+          view.pym.iframe.onload = iframeLoaded;
 
-        // In case some dumb script hangs the loading process
-        setTimeout(iframeLoaded, 20000);
+          // In case some dumb script hangs the loading process
+          setTimeout(iframeLoaded, 20000);
 
-        if(view.togglePreview){
-          $( "#draft-preview" ).trigger( "click" );
+          if ( view.togglePreview ){
+            $( "#draft-preview" ).trigger( "click" );
+          }
         }
       }).catch(function(err) {
         console.error(err);
@@ -391,7 +400,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               "data-model": "Project",
               "data-model-id": this.model.isNew() ? '' : this.model.id,
               "data-action": this.model.isNew() ? 'new' : 'edit',
-              "data-next": 'show'
+              "data-next": 'show',
+              "method": 'post'
             }
           },
           options_fields = {
@@ -432,7 +442,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
         var googleText = form_config.schema.properties.google_doc_url.title;
-        var newText = googleText + '<br><button type="button" id="get-new-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
+        var newText = googleText + '<br><button type="button" data-action="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
         form_config.schema.properties.google_doc_url.title = newText;
       }
 

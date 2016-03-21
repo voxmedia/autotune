@@ -117,6 +117,39 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
     end
   end
 
+  test 'checkout hash' do
+    updated_submod = 'e03176388c7d1f6dd91a5856b0197d80168a57a2'
+    with_submod = '4d3dc6432b464f4d42b0e30b891824ad72ef6abb'
+    no_submod = 'fdb4b18d01461574f68cbd763731499af2da561d'
+
+    in_tmpdir do |rdir|
+      r = WorkDir.repo rdir
+      r.clone repo_url
+
+      assert_equal updated_submod, r.version
+      assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
+      assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
+
+      r.branch = with_submod
+      r.update
+      assert_equal with_submod, r.version
+      refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
+      assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
+
+      r.branch = no_submod
+      r.update
+      assert_equal no_submod, r.version
+      refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
+      refute r.exist?('submodule/test.rb'), 'Should not have submodule test.rb'
+
+      r.branch = 'master'
+      r.update
+      assert_equal updated_submod, r.version
+      assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
+      assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
+    end
+  end
+
   def in_tmpdir
     path = File.expand_path "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/"
     yield path
