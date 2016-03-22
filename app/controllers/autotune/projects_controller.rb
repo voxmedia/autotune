@@ -202,6 +202,8 @@ module Autotune
       raw = @build_data.to_json
       response.headers['Content-Length'] = raw.length.to_s
       response.headers['Content-Type'] = 'application/json'
+      # trying to get the server to not compress the  content
+      response.headers['Vary'] = 'Accept-Encoding'
       render :body => raw
     rescue => exc
       if @project.meta['error_message'].present?
