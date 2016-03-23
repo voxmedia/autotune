@@ -11,10 +11,6 @@ module WorkDir
     # Update the repo on disk
     def update
       working_dir do
-        # git 'checkout', working_dir
-        # git 'clean', '-fd'
-        # git 'checkout', branch
-
         git 'checkout', '.'
         git 'clean', '-ffd'
         git 'checkout', branch
@@ -26,18 +22,12 @@ module WorkDir
       end
     end
 
-    # Checkout a different branch
-    def switch(new_branch)
-      self.branch = new_branch
-      update
-    end
-
-    def check_hash(repo_url)
+    # Check to see if the blueprint is on a different branch
+    def check_branch(repo_url)
       if /#\S+[^\/]/.match(repo_url)
-        self.switch(repo_url.split('#')[1])
-      else
-        update
+        self.branch = repo_url.split('#')[1]
       end
+      update
     end
 
     # Clone a repo to disk from the url

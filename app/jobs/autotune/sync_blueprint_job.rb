@@ -18,7 +18,7 @@ module Autotune
       if repo.exist?
         if update
           # Update the repo
-          repo.check_hash(blueprint.repo_url)
+          repo.check_branch(blueprint.repo_url)
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
           # if we're not updating, bail if we have the files
@@ -31,15 +31,11 @@ module Autotune
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
-        repo.check_hash(blueprint.repo_url)
-        puts "REPO VERSION"
-        puts repo.version
+        repo.check_branch(blueprint.repo_url)
         if blueprint.version.present?
-          puts 'bp version present'
           repo.branch = blueprint.version
           repo.update
         else
-          puts 'else'
           # Track the current commit version
           blueprint.version = repo.version
         end
