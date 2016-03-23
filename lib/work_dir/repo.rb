@@ -8,12 +8,22 @@ module WorkDir
     end
     attr_writer :branch
 
+    def initial_branch
+      if /\w{40}/.match(branch)
+        @initial_branch = 'master'
+      else
+        @initial_branch = branch
+      end
+    end
+
+
     # Update the repo on disk
     def update
+      # puts 'init branch', initial_branch
       working_dir do
         git 'checkout', '.'
         git 'clean', '-ffd'
-        git 'checkout', branch
+        git 'checkout', initial_branch
         git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
         git 'checkout', branch

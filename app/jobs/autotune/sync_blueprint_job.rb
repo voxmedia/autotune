@@ -21,6 +21,8 @@ module Autotune
           # repo.check_branch(blueprint.repo_url)
           if /#\S+[^\/]/.match(blueprint.repo_url)
             repo.switch(blueprint.repo_url.split('#')[1])
+          else
+            repo.update
           end
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version

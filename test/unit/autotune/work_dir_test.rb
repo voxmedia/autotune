@@ -41,8 +41,6 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
       # checkout a branch
       r.switch 'test'
 
-      pp r
-
       assert r.exist?('testfile'), 'Should have a test file'
 
       # update bundle
