@@ -19,7 +19,7 @@ module Autotune
 
     initializer 'autotune.init', :before => :load_config_initializers do |app|
       app.config.assets.precompile += %w(
-        autotune/favicon.ico autotune/at_placeholder.png)
+        autotune/favicon.ico autotune/at_placeholder.png autotune/spinner.gif)
 
       app.config.autotune = Config.new
 

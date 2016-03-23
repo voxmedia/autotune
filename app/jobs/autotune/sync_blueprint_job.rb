@@ -19,9 +19,8 @@ module Autotune
         if update
           # Update the repo
           repo.check_hash(blueprint.repo_url)
-          # I don't love the way this is set up right now but at least it isn't running twice
-          # repo.update
-        elsif blueprint.status.in?(%w(testing ready))
+          blueprint.version = repo.version
+        elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
           # if we're not updating, bail if we have the files
           return
         elsif !update
@@ -33,6 +32,17 @@ module Autotune
         # Clone the repo
         repo.clone(blueprint.repo_url)
         repo.check_hash(blueprint.repo_url)
+        puts "REPO VERSION"
+        puts repo.version
+        if blueprint.version.present?
+          puts 'bp version present'
+          repo.branch = blueprint.version
+          repo.update
+        else
+          puts 'else'
+          # Track the current commit version
+          blueprint.version = repo.version
+        end
       end
 
       # Setup the environment
@@ -45,16 +55,12 @@ module Autotune
           BLUEPRINT_CONFIG_FILENAME, blueprint.slug]
       end
 
-      # Track the current commit version
-      blueprint.version = repo.version
-
       # Stash the thumbnail
       if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
         blueprint.deployer(:media).deploy_file(
           blueprint.working_dir,
           blueprint.config['thumbnail'])
       end
-
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
         repo = WorkDir.repo(blueprint.working_dir,

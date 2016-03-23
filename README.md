@@ -39,11 +39,9 @@ And to run the front-end tests
 
 ```sh
 cd autotune
+bundle install
 npm install
-./bin/run_test_server &
 npm test
-fg
-# ctrl-c to kill the test server
 ```
 
 

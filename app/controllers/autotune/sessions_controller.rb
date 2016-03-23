@@ -16,14 +16,16 @@ module Autotune
           :uid => omniauth['uid'])
         if a.present?
           if a.user != current_user
-            render_error('Authorization is already in use by another account. Please contact support.')
+            return render_error(
+              'Authorization is already in use by another account. Please contact support.')
           end
           # nothing changes
         else
           # check if the current user already has an authorization for this provider
           if current_user.authorizations.find_by(:provider => omniauth['provider'])
             # if so throw error
-            render_error("This user account already has an authorization for omniauth provider: #{omniauth['provider']}.")
+            return render_error(
+              "This user account already has an authorization for omniauth provider: #{omniauth['provider']}.")
           else
             # else add new authorization to current user
             current_user.authorizations.create(

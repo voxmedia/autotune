@@ -1,0 +1,23 @@
+#!/bin/bash
+
+export PATH=./node_modules/.bin:$PATH
+export RAILS_ENV=test
+
+bundle exec rake db:drop db:create db:migrate db:fixtures:load > /dev/null
+
+(
+  cd ./test/dummy
+  exec bundle exec rails s -p 3033 -e test
+) > /dev/null & server=$!
+
+function finish {
+  kill -s INT $server
+}
+trap finish EXIT
+
+sleep 4
+
+if ps -p $server > /dev/null
+then
+  browserify --debug testjs/*/test_*.js | browser-run | tap-spec
+fi

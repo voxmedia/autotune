@@ -11,13 +11,18 @@ module WorkDir
     # Update the repo on disk
     def update
       working_dir do
-        git 'checkout', working_dir
-        git 'clean', '-fd'
+        # git 'checkout', working_dir
+        # git 'clean', '-fd'
+        # git 'checkout', branch
+
+        git 'checkout', '.'
+        git 'clean', '-ffd'
         git 'checkout', branch
         git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
         git 'checkout', branch
         git 'submodule', 'update', '--init'
+        git 'clean', '-ffd'
       end
     end
 
@@ -70,6 +75,12 @@ module WorkDir
       FileUtils.mkdir_p(dest.working_dir)
       dest.working_dir do
         cmd 'tar', '-x', :stdin_data => archive(branch_or_tag), :binmode => true
+      end
+    end
+
+    def status
+      working_dir do
+        git 'status'
       end
     end
 
