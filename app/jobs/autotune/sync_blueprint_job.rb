@@ -18,7 +18,10 @@ module Autotune
       if repo.exist?
         if update
           # Update the repo
-          repo.check_branch(blueprint.repo_url)
+          # repo.check_branch(blueprint.repo_url)
+          if /#\S+[^\/]/.match(blueprint.repo_url)
+            repo.switch(blueprint.repo_url.split('#')[1])
+          end
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
           # if we're not updating, bail if we have the files
@@ -31,7 +34,10 @@ module Autotune
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
-        repo.check_branch(blueprint.repo_url)
+        if /#\S+[^\/]/.match(blueprint.repo_url)
+          repo.switch(blueprint.repo_url.split('#')[1])
+        end
+        # repo.check_branch(blueprint.repo_url)
         if blueprint.version.present?
           repo.branch = blueprint.version
           repo.update

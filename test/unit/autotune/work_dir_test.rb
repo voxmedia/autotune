@@ -39,7 +39,9 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
       r.update
 
       # checkout a branch
-      r.check_branch 'test'
+      r.switch 'test'
+
+      pp r
 
       assert r.exist?('testfile'), 'Should have a test file'
 
@@ -90,7 +92,7 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
         end
 
         # checkout a different branch in the repo
-        s.check_branch 'test'
+        s.switch 'test'
         assert s.exist?('testfile'), 'Should have a test file'
 
         # what happens if i add random crap and switch?
