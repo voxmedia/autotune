@@ -40,7 +40,7 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'vertical' => project.group.slug,
+        'group' => project.group.slug,
         'theme' => project.theme.slug,
         'theme_data' => project.theme.config_data)
 
