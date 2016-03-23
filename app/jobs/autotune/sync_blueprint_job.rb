@@ -57,7 +57,7 @@ module Autotune
         repo = WorkDir.repo(blueprint.working_dir,
                             Rails.configuration.autotune.build_environment)
         if blueprint.config['themes'].blank?
-          themes = Autotune.config.themes.keys
+          themes = Theme.pluck(:slug)
         else
           themes = blueprint.config['themes']
         end
