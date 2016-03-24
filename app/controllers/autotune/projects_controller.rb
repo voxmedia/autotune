@@ -197,14 +197,7 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(@build_data, {}, current_user)
-
-      # Must manually craft response due to fastly/varnish troubles
-      raw = @build_data.to_json
-      response.headers['Content-Length'] = raw.length.to_s
-      response.headers['Content-Type'] = 'application/json'
-      # trying to get the server to not compress the  content
-      response.headers['Vary'] = 'Accept-Encoding'
-      render :body => raw
+      render :json => @build_data
     rescue => exc
       if @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
@@ -223,11 +216,7 @@ module Autotune
           spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
       end
 
-      # Must manually craft response due to fastly/varnish troubles
-      raw = { :google_doc_url => spreadsheet_copy[:url] }.to_json
-      response.headers['Content-Length'] = raw.length.to_s
-      response.headers['Content-Type'] = 'application/json'
-      render :body => raw
+      render :json => { :google_doc_url => spreadsheet_copy[:url] }
     rescue => exc
       render_error exc.message
     end
