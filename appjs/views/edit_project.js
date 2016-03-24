@@ -135,7 +135,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       function(err) {
         if ( err.status < 500 ) {
           var dat = err.responseJSON;
-          view.app.view.error( dat.error );
+          var errMsg = dat && dat.error ? dat.error : "Could not read preview data.";
+          view.app.view.error(errMsg);
         } else {
           view.app.view.error(
             "There was a problem updating the preview, please contact support" );
