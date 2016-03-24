@@ -9,17 +9,11 @@ module WorkDir
     attr_writer :branch
 
     def initial_branch
-      if /\w{40}/.match(branch)
-        @initial_branch = 'master'
-      else
-        @initial_branch = branch
-      end
+      /\w{40}/.match(branch) ? 'master' : branch
     end
-
 
     # Update the repo on disk
     def update
-      # puts 'init branch', initial_branch
       working_dir do
         git 'checkout', '.'
         git 'clean', '-ffd'
@@ -36,14 +30,6 @@ module WorkDir
       self.branch = new_branch
       update
     end
-
-    # Check to see if the blueprint is on a different branch
-    # def check_branch(repo_url)
-    #   if /#\S+[^\/]/.match(repo_url)
-    #     self.branch = repo_url.split('#')[1]
-    #   end
-    #   update
-    # end
 
     # Clone a repo to disk from the url
     def clone(repo_url)

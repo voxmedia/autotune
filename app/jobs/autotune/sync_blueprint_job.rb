@@ -17,11 +17,12 @@ module Autotune
 
       if repo.exist?
         if update
-          # Update the repo
-          # repo.check_branch(blueprint.repo_url)
+          # Check to see if referencing a branch
           if /#\S+[^\/]/.match(blueprint.repo_url)
+            # If so, switch to branch and update the repo
             repo.switch(blueprint.repo_url.split('#')[1])
           else
+            # Update the repo
             repo.update
           end
           blueprint.version = repo.version
@@ -36,7 +37,9 @@ module Autotune
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
+        # Check to see if referencing a branch
         if /#\S+[^\/]/.match(blueprint.repo_url)
+          # If so, switch to branch and update the repo
           repo.switch(blueprint.repo_url.split('#')[1])
         end
         # repo.check_branch(blueprint.repo_url)
