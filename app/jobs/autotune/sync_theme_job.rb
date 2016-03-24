@@ -6,7 +6,7 @@ module Autotune
       arguments.first.to_gid_param
     end
 
-    def perform(theme, update: false)
+    def perform(theme)
       external_data = get_theme_data(theme)
       theme.data = external_data unless external_data.nil?
       theme.status = "ready"

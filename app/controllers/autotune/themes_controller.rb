@@ -86,8 +86,9 @@ module Autotune
       @theme = instance
       @theme.attributes = select_from_post :title, :data
       if @theme.valid?
-        @theme.save
         @theme.status = "ready"
+        @theme.save
+        @theme.update_blueprint_themes
         render :show
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request

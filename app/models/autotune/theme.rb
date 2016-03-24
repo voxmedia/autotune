@@ -30,13 +30,33 @@ module Autotune
     # Merge data with parent theme
     def config_data
       return data if parent.nil?
-      return parent.data.deep_merge(data)
+      parent.data.deep_merge(data)
     end
 
     def update_data
       update!(:status => "updating")
-      SyncThemeJob.perform_later(
-        self, :update => true)
+      # testing with one blueprint first
+      themes_affected = get_children
+      ActiveJob::Chain.new(
+        SyncThemeJob.new(self),
+        SyncBlueprintJob.new(Blueprint.first, build_themes:true, themes:themes_affected)
+      ).enqueue
+    rescue
+      update!(:status => 'broken')
+      raise
+    end
+
+    def update_blueprint_themes
+      update!(:status => "updating")
+      # testing with one blueprint first
+      Blueprint.first.update(:status => "updating")
+      themes_affected = get_children
+      ActiveJob::Chain.new(
+        SyncBlueprintJob.new(Blueprint.first, build_themes:true, themes:themes_affected)
+      ).enqueue
+    rescue
+      update!(:status => 'broken')
+      raise
     end
 
     # Get default theme for group
@@ -54,6 +74,12 @@ module Autotune
         :group_id => group.id)
       default_theme.save!
       default_theme.update_data
+    end
+
+    def get_children
+      ret =[].push self
+      return ret if parent.nil?
+      ret + Theme.find_by(:parent_id => id)
     end
 
     # add a function to return twitter handle

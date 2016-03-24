@@ -10,7 +10,7 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status: nil, update: false, build_themes: false)
+    def perform(blueprint, status: nil, update: false, build_themes: false, themes: nil)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
@@ -19,7 +19,7 @@ module Autotune
         if update
           # Update the repo
           repo.update
-        elsif blueprint.status.in?(%w(testing ready))
+        elsif blueprint.status.in?(%w(testing ready)) && !build_themes
           # if we're not updating, bail if we have the files
           return
         elsif !update
@@ -56,25 +56,31 @@ module Autotune
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
         repo = WorkDir.repo(blueprint.working_dir,
                             Rails.configuration.autotune.build_environment)
-        if blueprint.config['themes'].blank?
-          themes = Theme.pluck(:slug)
-        else
-          themes = blueprint.config['themes']
-        end
 
-        sample_data = repo.read(blueprint.config['sample_data'])
-        sample_data.delete('base_url')
-        sample_data.delete('asset_base_url')
+
 
         # don't build a copy for each theme every time a project is updated
         if build_themes
+          # if no theme list is available, build everything
+          if themes.nil? && blueprint.config['themes'].blank?
+            themes = Theme.all
+          elsif themes.nil?
+            themes = Theme.find_by(:slug => blueprint.config['themes'] + ['generic'])
+          end
+
+          sample_data = repo.read(blueprint.config['sample_data'])
+          sample_data.delete('base_url')
+          sample_data.delete('asset_base_url')
+
           themes.each do |theme|
-            slug = [blueprint.version, theme].join('-')
+            slug = [blueprint.version, theme.slug].join('-')
             # Use this as dummy build data for the moment
             build_data = sample_data.merge(
               'title' => blueprint.title,
               'slug' => slug,
-              'theme' => theme)
+              'group' => theme.group.slug,
+              'theme' => theme.slug,
+              'theme_data' => theme.config_data)
 
             # Get the deployer object
             # probably don't want this to always be preview
