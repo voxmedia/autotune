@@ -440,6 +440,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         options_fields['theme']['type'] = 'hidden';
       }
 
+      // hide slug for blueprint types that are not apps
+      if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {
+        options_fields['slug']['type'] = 'hidden';
+      }
+
       if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
         var googleText = form_config.schema.properties.google_doc_url.title;
         var newText = googleText + '<br><button type="button" data-action="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
