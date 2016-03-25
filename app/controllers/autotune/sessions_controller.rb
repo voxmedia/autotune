@@ -6,41 +6,94 @@ module Autotune
     skip_before_action :require_login, :only => [:new, :create, :failure]
 
     def create
+      auth = Authorization.find_by_auth_hash(omniauth)
+
+      if auth.present?
+        # If the auth is present, make sure its data is up to date
+        auth.update_from_auth_hash(omniauth)
+        unless auth.valid?
+          # If the auth is not valid, tell the visitor and die
+          return render_error(
+            'Your account is not authorized. Please contact support.')
+        end
+      end
+
       if current_user
-        # things to check:
-        # if the current user has matching authorization
-        # if current user already has auth from this provider
-        # other things
-        a = Authorization.find_by(
-          :provider => omniauth['provider'],
-          :uid => omniauth['uid'])
-        if a.present?
-          if a.user != current_user
-            return render_error(
-              'Authorization is already in use by another account. Please contact support.')
-          end
-          # nothing changes
-        else
+        # The visitor is already logged in. They're probably trying to connect
+        # a new authorization to this account.
+
+        # Since we are adding an authorization, we must ensure that this new
+        # provider isn't the preferred one. Preferred providers are for
+        # primary login and access.
+        if auth.preferred?
+          return render_error(
+            'This provider is used for primary login. You cannot add it to an existing account. You must first log out to use it.')
+        end
+
+        if auth.present? && auth.user != current_user
+          # If the auth is present, but is connected to a different user, we
+          # have a problem. Tell the visitor.
+          return render_error(
+            'This account is in use by somebody else. Please contact support.')
+        elsif auth.blank?
+          # If the auth is not already in the database...
           # check if the current user already has an authorization for this provider
-          if current_user.authorizations.find_by(:provider => omniauth['provider'])
+          if current_user.authorizations.find_by_provider(omniauth['provider']).present?
             # if so throw error
             return render_error(
-              "This user account already has an authorization for omniauth provider: #{omniauth['provider']}.")
+              "Last time you used different account for provider #{omniauth['provider']}. Please try again.")
           else
-            # else add new authorization to current user
-            current_user.authorizations.create(
-              omniauth.is_a?(OmniAuth::AuthHash) ? omniauth.to_hash : omniauth)
+            # else add new authorization to current user.
+            auth = Authorization.initialize_by_auth_hash(auth_hash)
+            unless a.present? && a.verified?
+              return render_error(
+                'Your account is not authorized. Please contact support.')
+            end
+            auth.user = current_user
+            auth.save
           end
         end
+
         redirect_to(request.env['omniauth.origin'] || root_path)
       else
-        self.current_user = User.find_or_create_by_auth_hash(omniauth)
-        # add a new parameter to find...^^ or do something New
-        # if it already exists, add it to the current user - who is currently logged in, not by email
-        if current_user
+        # Visitor is trying to log in...
+        if auth.present?
+          # Auth is present, visitor has been here before
+
+          # Make sure user is logging in with the preferred method
+          unless auth.preferred?
+            return render_error(
+              "You can't use this account to login. You must use a #{Rails.configuration.omniauth_preferred_provider} account.")
+          end
+
+          # Log the user in!
+          self.current_user = auth.user
           redirect_to(request.env['omniauth.origin'] || root_path)
         else
-          render_error('There was a problem logging you in. Please contact support.')
+          # First timer. Set them up.
+          auth = Authorization.initialize_by_auth_hash(auth_hash)
+          unless auth.present? && auth.verified?
+            return render_error(
+              'Your account is not authorized. Please contact support.')
+          end
+
+          # Make sure user is logging in with the preferred method
+          unless auth.preferred?
+            return render_error(
+              "You can't use this account to login. You must use a #{Rails.configuration.omniauth_preferred_provider} account.")
+          end
+
+          auth.user = User.new(
+            :name => auth_hash['info']['name'],
+            :email => auth_hash['info']['email'],
+            :meta => { 'roles' => auth.roles })
+
+          auth.user.save
+          auth.save
+
+          # Log the user in!
+          self.current_user = a.user
+          redirect_to(request.env['omniauth.origin'] || root_path)
         end
       end
     end
