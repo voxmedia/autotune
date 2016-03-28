@@ -14,13 +14,13 @@ module Autotune
 
     has_many :authorizations, :dependent => :destroy do
       def create_from_auth_hash(auth_hash)
-        create(
-          auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
+        Authorization.validate_auth_hash(auth_hash)
+        create(auth_hash.to_hash)
       end
 
       def create_from_auth_hash!(auth_hash)
-        create!(
-          auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
+        Authorization.validate_auth_hash(auth_hash)
+        create!(auth_hash.to_hash)
       end
 
       def preferred
@@ -41,30 +41,30 @@ module Autotune
     #   # is this user an editor who can use vox or theverge themes?
     #   user.role?(:editor => :vox, :editor => :theverge)
     def role?(*args, **kwargs)
-      return false if meta.nil? || meta['roles'].nil?
+      return false unless verified?
       if args.any?
-        args.reduce(false) { |a, e| a || meta['roles'].include?(e.to_s) }
+        args.reduce(false) { |a, e| a || roles.include?(e.to_s) }
       else
         kwargs.reduce(false) do |a, (k, v)|
           a ||
-            (meta['roles'].is_a?(Array) && meta['roles'].include?(k.to_s)) ||
-            (meta['roles'].include?(k.to_s) && meta['roles'][k.to_s].include?(v.to_s))
+            (roles.is_a?(Array) && roles.include?(k.to_s)) ||
+            (roles.include?(k.to_s) && roles[k.to_s].include?(v.to_s))
         end
       end
     end
 
     # Return an array list of themes that this user is permitted to use in a project
     def author_themes
-      return [] if meta.nil? || meta['roles'].nil?
+      return [] unless verified?
       # if this is a superuser, return all available themes
       # if we only have an array of roles, all themes are available
-      if role?(:superuser) || (meta['roles'].is_a?(Array) && role?(:author, :editor))
+      if role?(:superuser) || (roles.is_a?(Array) && role?(:author, :editor))
         themes = Rails.configuration.autotune.themes.keys
       else
         # otherwise get all the themes for all the roles and make an array
         themes = []
         Autotune::ROLES.each do |r|
-          themes += meta['roles'][r] if meta['roles'][r]
+          themes += roles[r] if roles[r].present?
         end
         themes.uniq!
       end
@@ -75,16 +75,15 @@ module Autotune
     # Return an array of themes that this user is allowed to edit. Editors can see and change other
     # users' projects. This user will be limited to projects that use these themes.
     def editor_themes
-      return [] if meta.nil? || meta['roles'].nil?
       # authors can't edit other projects
-      return [] unless role?(:editor, :superuser)
+      return [] unless verified? || role?(:editor, :superuser)
       # if we only have an array, superusers and editors can edit all themes
       # also, superusers can always edit all the themes, even if we have a hash of roles
-      if meta['roles'].is_a?(Array) || role?(:superuser)
+      if roles.is_a?(Array) || role?(:superuser)
         themes = Rails.configuration.autotune.themes.keys
       else
         # otherwise get all the themes for editor
-        themes = meta['roles']['editor']
+        themes = roles['editor']
       end
       # return an array list of theme objects
       Theme.where :value => themes
@@ -92,6 +91,14 @@ module Autotune
 
     def preferred_auth
       authorizations.preferred
+    end
+
+    def roles
+      meta['roles'] || preferred_auth.roles
+    end
+
+    def verified?
+      (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
     end
 
     private

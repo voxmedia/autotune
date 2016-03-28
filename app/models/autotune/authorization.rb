@@ -17,49 +17,25 @@ module Autotune
       provider.split('_').first.to_s.titleize
     end
 
-    def self.find_by_auth_hash(auth_hash)
-      find_by(:provider => auth_hash['provider'], :uid => auth_hash['uid'])
-    end
-
-    def self.find_by_auth_hash!(auth_hash)
-      find_by!(:provider => auth_hash['provider'], :uid => auth_hash['uid'])
-    end
-
-    def self.create_from_auth_hash(auth_hash, user)
-      h = auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash
-      create({ :user => user }.update(h))
-    end
-
-    def self.create_from_auth_hash!(auth_hash, user)
-      h = auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash
-      create!({ :user => user }.update(h))
-    end
-
-    def self.initialize_from_auth_hash(auth_hash)
-      new(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
-    end
-
     def from_auth_hash(auth_hash)
-      self.attributes = auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash
+      self.attributes = auth_hash.to_hash
     end
 
     def update_from_auth_hash(auth_hash)
-      update(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
+      update(auth_hash.to_hash)
     end
 
     def update_from_auth_hash!(auth_hash)
-      update!(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
+      update!(auth_hash.to_hash)
     end
 
     def reload_roles
-      @roles = self.class.verify_auth_hash(as_json)
       @_roles_cached = true
-      @roles
+      @roles = self.class.verify_auth_hash(as_json)
     end
 
     def roles
-      return @roles if @_roles_cached
-      reload_roles
+      @_roles_cached ? @roles : reload_roles
     end
 
     def verified?
@@ -70,18 +46,61 @@ module Autotune
       provider == Rails.configuration.omniauth_preferred_provider.to_s
     end
 
-    def self.verify_auth_hash(auth_hash)
-      raise ArgumentError, 'Auth hash is empty or nil' if auth_hash.nil? || auth_hash.empty?
-      raise ArgumentError, 'Auth hash is not a hash' unless auth_hash.is_a?(Hash)
-      raise ArgumentError, "Missing 'info' in auth hash" unless auth_hash.key?('info')
+    def to_auth_hash
+      OmniAuth::AuthHash.new(as_json)
+    end
 
-      if Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
-        roles = Rails.configuration.autotune.verify_omniauth.call(auth_hash)
-        logger.debug "#{auth_hash['nickname']} roles: #{roles}"
-        return unless (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
-        return roles
-      else
-        return [:superuser]
+    class << self
+      def find_by_auth_hash(auth_hash)
+        validate_auth_hash(auth_hash)
+        find_by(:provider => auth_hash['provider'], :uid => auth_hash['uid'])
+      end
+
+      def find_by_auth_hash!(auth_hash)
+        validate_auth_hash(auth_hash)
+        find_by!(:provider => auth_hash['provider'], :uid => auth_hash['uid'])
+      end
+
+      def initialize_from_auth_hash(auth_hash)
+        validate_auth_hash(auth_hash)
+        new(auth_hash.to_hash)
+      end
+
+      def find_or_initialize_by_auth_hash(auth_hash)
+        find_by_auth_hash(auth_hash) || initialize_from_auth_hash(auth_hash)
+      end
+
+      def create_from_auth_hash(auth_hash, user)
+        validate_auth_hash(auth_hash)
+        create({ :user => user }.update(auth_hash.to_hash))
+      end
+
+      def create_from_auth_hash!(auth_hash, user)
+        validate_auth_hash(auth_hash)
+        create!({ :user => user }.update(auth_hash.to_hash))
+      end
+
+      def find_or_create_by_auth_hash(auth_hash)
+        find_by_auth_hash(auth_hash) || create_from_auth_hash(auth_hash)
+      end
+
+      def validate_auth_hash(auth_hash)
+        raise ArgumentError, 'Auth hash is blank' if auth_hash.blank?
+        raise ArgumentError, 'Auth hash is not a hash' unless auth_hash.is_a?(Hash)
+        %w(provider uid).each do |k|
+          raise ArgumentError, "Missing '#{k}' in auth hash" unless auth_hash.key?(k)
+        end
+      end
+
+      def verify_auth_hash(auth_hash)
+        if Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
+          roles = Rails.configuration.autotune.verify_omniauth.call(auth_hash)
+          logger.debug "#{auth_hash['nickname']} roles: #{roles}"
+          return unless (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
+          return roles
+        else
+          return [:superuser]
+        end
       end
     end
 

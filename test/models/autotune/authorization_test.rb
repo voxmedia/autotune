@@ -43,12 +43,12 @@ class Autotune::AuthorizationTest < ActiveSupport::TestCase
     end
 
     a = Autotune::Authorization.find_by_auth_hash(
-      :provider => 'developer', :uid => 'foo')
+      'provider' => 'developer', 'uid' => 'foo', 'info' => nil)
     assert_nil a, 'Should find nothing'
 
     assert_raises ActiveRecord::RecordNotFound do
       Autotune::Authorization.find_by_auth_hash!(
-        :provider => 'developer', :uid => 'foo')
+      'provider' => 'developer', 'uid' => 'foo', 'info' => nil)
     end
   end
 
@@ -92,6 +92,8 @@ class Autotune::AuthorizationTest < ActiveSupport::TestCase
                  'Should have default role of superuser'
     assert a.verified?, 'Should be verified'
 
+    old_verify = Rails.configuration.autotune.verify_omniauth
+
     Rails.configuration.autotune.verify_omniauth = lambda do |omniauth|
       nil
     end
@@ -99,6 +101,8 @@ class Autotune::AuthorizationTest < ActiveSupport::TestCase
     a.reload_roles
     assert_nil a.roles, 'Should nil roles'
     refute a.verified?, 'Should not be verified'
+
+    Rails.configuration.autotune.verify_omniauth = old_verify
   end
 
   test 'update' do

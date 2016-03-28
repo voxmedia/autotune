@@ -74,14 +74,6 @@ module Autotune
         end
     end
 
-    def current_user=(u)
-      if u.nil?
-        session.delete(:api_key)
-      else
-        session[:api_key] = u.api_key
-      end
-    end
-
     def signed_in?
       current_user.present?
     end
@@ -91,7 +83,7 @@ module Autotune
     end
 
     def any_roles?
-      !current_user.meta['roles'].nil? && !current_user.meta['roles'].empty?
+      current_user.meta['roles'].present? && current_user.meta['roles'].any?
     end
 
     def role?(*args)
@@ -128,12 +120,9 @@ module Autotune
 
     def require_google_login
       return true if has_google_auth?
-      if has_google_auth?
-        render_error 'Not allowed', :forbidden
-      else
-        respond_to do |format|
-          format.html { render 'google_auth' }
-        end
+
+      respond_to do |format|
+        format.html { render 'google_auth' }
       end
     end
 

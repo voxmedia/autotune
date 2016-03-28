@@ -15,7 +15,7 @@ module Autotune
     end
 
     test 'invalid auth' do
-      @request.env['omniauth.auth'] = :invalid_credentials
+      @request.env['omniauth.auth'] = mock_auth[:invalid_credentials]
       assert_raises ArgumentError do
         get :create, :provider => 'developer'
       end
