@@ -49,6 +49,10 @@ class CreateGroups < ActiveRecord::Migration
           if !theme.group.nil?
             theme = theme.dup
             theme.slug = "#{group.name.downcase.gsub ' ', '-'}"
+            suffix = 1
+            while Autotune::Theme.exists?(:slug => theme.slug) do
+              theme.slug = "#{group.name.downcase.gsub ' ', '-'}-#{suffix}"
+            end
           end
           theme.title = "#{group.name}"
           theme.group = group
