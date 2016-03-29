@@ -108,4 +108,11 @@ class Autotune::AuthorizationTest < ActiveSupport::TestCase
   test 'update' do
     skip
   end
+
+  test 'to_auth_hash' do
+    a = autotune_authorizations(:developer)
+    assert_nothing_raised do
+      a.to_auth_hash
+    end
+  end
 end

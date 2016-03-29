@@ -47,18 +47,6 @@ module Autotune
       render :text => '', :content_type => 'text/plain'
     end
 
-    protected
-
-    def omniauth_path(provider, origin = nil)
-      path = "/auth/#{provider}"
-      path += "?origin=#{CGI.escape(origin)}" unless origin.blank?
-      path
-    end
-
-    def login_path(origin = nil)
-      omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
-    end
-
     def current_user
       @current_user ||=
         if session[:api_key].present?
@@ -72,6 +60,18 @@ module Autotune
               request.headers['Authorization'])
           end
         end
+    end
+
+    protected
+
+    def omniauth_path(provider, origin = nil)
+      path = "/auth/#{provider}"
+      path += "?origin=#{CGI.escape(origin)}" unless origin.blank?
+      path
+    end
+
+    def login_path(origin = nil)
+      omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
     end
 
     def signed_in?

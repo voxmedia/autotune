@@ -96,15 +96,16 @@ module Autotune
       render_error('You have been logged out.', :ok)
     end
 
-    private
-
     def current_user=(u)
+      @current_user = u
       if u.nil?
         session.delete(:api_key)
       else
         session[:api_key] = u.api_key
       end
     end
+
+    private
 
     def omniauth
       request.env['omniauth.auth']
