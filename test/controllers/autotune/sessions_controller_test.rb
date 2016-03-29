@@ -124,5 +124,21 @@ module Autotune
       get :create, :provider => 'google_oauth2'
       assert_response :bad_request
     end
+
+    test 'require google login' do
+      Autotune.config.google_auth_enabled = true
+      provider = Rails.configuration.omniauth_preferred_provider
+      @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
+      get :create, :provider => provider.to_s
+      assert_redirected_to root_path
+
+      @controller = Autotune::ApplicationController.new
+      get :index
+      assert_response :ok
+      assert_match 'Please authenticate with Google', response.body,
+                   'Should display message about logging in with Google'
+
+      Autotune.config.google_auth_enabled = false
+    end
   end
 end
