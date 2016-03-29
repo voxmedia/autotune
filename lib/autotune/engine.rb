@@ -10,8 +10,14 @@ module Autotune
     require 'bootstrap-sass'
     require 'bootstrap3-datetimepicker-rails'
 
+    # Omniauth for logins
+    require 'omniauth'
+    require 'omniauth-google-oauth2'
+
+    # Will paginate for paginated active records
     require 'will_paginate'
 
+    # Some active job magic
     require 'active_job/chaining'
     require 'active_job/locking'
     require 'active_job/unique'

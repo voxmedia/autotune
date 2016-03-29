@@ -52,7 +52,7 @@ module Autotune
         # The visitor is already logged in. They're probably trying to connect
         # a new authorization to this account.
 
-        if auth.new?
+        if auth.new_record?
           # If the auth is not already in the database...
           # check if the current user already has an authorization for this provider
           if current_user.authorizations.find_by_provider(omniauth['provider']).present?
