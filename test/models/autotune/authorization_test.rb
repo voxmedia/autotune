@@ -115,4 +115,15 @@ class Autotune::AuthorizationTest < ActiveSupport::TestCase
       a.to_auth_hash
     end
   end
+
+  test 'verify auth hash' do
+    provider = Rails.configuration.omniauth_preferred_provider
+    auth = Autotune::Authorization.initialize_from_auth_hash mock_auth[provider.to_sym]
+
+    assert auth.verified?, 'Should be verified'
+
+    auth = Autotune::Authorization.initialize_from_auth_hash mock_auth[:google_oauth2]
+
+    assert auth.verified?, 'Should be verified'
+  end
 end

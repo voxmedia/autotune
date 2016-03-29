@@ -15,7 +15,7 @@ module Autotune
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
   BLUEPRINT_TYPES = %w(graphic app)
   EDITABLE_SLUG_BLUEPRINT_TYPES = %w(app)
-  ROLES = %w(author editor superuser)
+  ROLES = %w(none author editor superuser)
 
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
