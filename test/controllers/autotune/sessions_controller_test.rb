@@ -3,6 +3,7 @@ require 'test_helper'
 module Autotune
   # Test sessions controller
   class SessionsControllerTest < ActionController::TestCase
+    fixtures 'autotune/users', 'autotune/authorizations'
     test 'login' do
       get :new
       assert_response :success
@@ -15,7 +16,7 @@ module Autotune
       end
     end
 
-    test 'login with preferred provider' do
+    test 'login with existing preferred provider' do
       provider = Rails.configuration.omniauth_preferred_provider
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
@@ -23,6 +24,19 @@ module Autotune
 
       u = autotune_users(:developer)
       u.reload
+
+      assert_equal 1, u.authorizations.length, 'Should be one auth'
+    end
+
+    test 'login with new preferred provider' do
+      autotune_authorizations(:developer).destroy
+
+      provider = Rails.configuration.omniauth_preferred_provider
+      @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
+      get :create, :provider => provider.to_s
+      assert_redirected_to root_path
+
+      u = Autotune::Authorization.find_by_auth_hash(mock_auth[provider.to_sym]).user
 
       assert_equal 1, u.authorizations.length, 'Should be one auth'
     end
@@ -46,8 +60,7 @@ module Autotune
       get :create, :provider => 'google_oauth2'
       assert_redirected_to root_path
 
-      u = autotune_users(:developer)
-      u.reload
+      u = Autotune::Authorization.find_by_auth_hash(mock_auth[provider.to_sym]).user
 
       assert_equal 2, u.authorizations.length, 'Should be two auths'
     end
@@ -62,8 +75,7 @@ module Autotune
       get :create, :provider => provider.to_s
       assert_response :bad_request
 
-      u = autotune_users(:developer)
-      u.reload
+      u = Autotune::Authorization.find_by_auth_hash(mock_auth[provider.to_sym]).user
 
       assert_equal 1, u.authorizations.length, 'Should be one auth'
     end
@@ -78,8 +90,7 @@ module Autotune
       get :create, :provider => 'google_oauth2'
       assert_redirected_to root_path
 
-      u = autotune_users(:developer)
-      u.reload
+      u = Autotune::Authorization.find_by_auth_hash(mock_auth[provider.to_sym]).user
 
       assert_equal 2, u.authorizations.length, 'Should be two auths'
 
@@ -103,8 +114,7 @@ module Autotune
       get :create, :provider => 'google_oauth2'
       assert_redirected_to root_path
 
-      u = autotune_users(:developer)
-      u.reload
+      u = Autotune::Authorization.find_by_auth_hash(mock_auth[provider.to_sym]).user
 
       assert_equal 2, u.authorizations.length, 'Should be two auths'
 

@@ -70,11 +70,9 @@ module Autotune
         self.current_user = auth.user
       else
         # First timer. Set them up.
-        auth = Authorization.initialize_by_auth_hash(auth_hash)
-
         auth.user = User.new(
-          :name => auth_hash['info']['name'],
-          :email => auth_hash['info']['email'],
+          :name => omniauth['info']['name'],
+          :email => omniauth['info']['email'],
           :meta => { 'roles' => auth.roles })
 
         auth.user.save
