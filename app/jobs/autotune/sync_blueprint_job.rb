@@ -27,12 +27,22 @@ module Autotune
           end
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
-          # if we're not updating, bail if we have the files
+          if /#\S+[^\/]/.match(blueprint.repo_url)
+            # If so, switch to branch and update the repo
+            repo.switch(blueprint.repo_url.split('#')[1])
+            blueprint.version = repo.version
+          end
+          # bail if we have the files, we're not updating, and we don't need to switch branches
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up
-          repo.branch = blueprint.version
-          repo.update
+          if /#\S+[^\/]/.match(blueprint.repo_url)
+            # If so, switch to branch and update the repo
+            repo.switch(blueprint.repo_url.split('#')[1])
+          else
+            repo.branch = blueprint.version
+            repo.update
+          end
         end
       else
         # Clone the repo
@@ -42,7 +52,6 @@ module Autotune
           # If so, switch to branch and update the repo
           repo.switch(blueprint.repo_url.split('#')[1])
         end
-        # repo.check_branch(blueprint.repo_url)
         if blueprint.version.present?
           repo.branch = blueprint.version
           repo.update
