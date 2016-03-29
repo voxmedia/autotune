@@ -53,7 +53,7 @@
           href="#preview" id="draft-preview" aria-controls="live-preview"
           role="tab" data-toggle="tab">Preview</a></li>
 
-      <% if ( model.has( 'embed_html' ) ) { %>
+      <% if ( model.has( 'embed_html' ) && model.isPublished() ) { %>
       <li role="presentation"><a
           href="#embed" aria-controls="embed"
           role="tab" data-toggle="tab">Embed</a></li>
