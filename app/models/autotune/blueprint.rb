@@ -2,8 +2,9 @@ require 'uri'
 require 'work_dir'
 require 'redis'
 
+# Main autotune module
 module Autotune
-  # Blueprint
+  # Model for Autotune blueprints.
   class Blueprint < ActiveRecord::Base
     include Slugged
     include Searchable
@@ -36,6 +37,8 @@ module Autotune
       update_tags_from_config
     end
 
+    # Gets the thumbnail image url for the blueprint
+    # @return [String] thumbnail url.
     def thumb_url
       if config['thumbnail'] && !config['thumbnail'].empty?
         deployer(:media).url_for(config['thumbnail'])
@@ -44,26 +47,37 @@ module Autotune
       end
     end
 
+    # Checks if the blueprint has finished installing
+    # @return [Boolean] `true` if the blueprint is installed, `false` otherwise.
     def installed?
       status != 'new' && version.present?
     end
 
+    # Checks if the blueprint is currently updating
+    # @return [Boolean] `true` if the blueprint is updating, `false` otherwise.
     def updating?
       status == 'updating'
     end
 
+    # Checks if the blueprint is ready for use
+    # @return [Boolean] `true` if the blueprint is ready, `false` otherwise.
     def ready?
       status == 'ready'
     end
 
+    # Checks if the blueprint is in testing state
+    # @return [Boolean] `true` if the blueprint status is `testing`, `false` otherwise.
     def testing?
       status == 'testing'
     end
 
+    # Checks if the blueprint is installed
+    # @return [Boolean] `true` if the blueprint is installed, `false` otherwise.
     def deployed?
       status != 'new' && version.present?
     end
 
+    # Queues a job to update the blueprint repo
     def update_repo
       final_status = ready? ? 'ready' : 'testing'
       update!(:status => 'updating')
@@ -82,6 +96,7 @@ module Autotune
 
     private
 
+     # Parses blueprint's config and updates the tags associated with the blueprint
     def update_tags_from_config
       self.tags = config['tags'].map do |t|
         Tag.find_or_create_by(:title => t.humanize)
@@ -96,6 +111,7 @@ module Autotune
       end
     end
 
+    # Publishes status changes to redis
     def pub_to_redis
       return if Autotune.redis.nil?
       msg = { :id => id,

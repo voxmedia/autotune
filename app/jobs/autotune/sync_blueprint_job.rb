@@ -19,7 +19,8 @@ module Autotune
         if update
           # Update the repo
           repo.update
-        elsif blueprint.status.in?(%w(testing ready)) && !build_themes
+          blueprint.version = repo.version
+        elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version && !build_themes
           # if we're not updating, bail if we have the files
           return
         elsif !update
@@ -30,6 +31,13 @@ module Autotune
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
+        if blueprint.version.present?
+          repo.branch = blueprint.version
+          repo.update
+        else
+          # Track the current commit version
+          blueprint.version = repo.version
+        end
       end
 
       # Setup the environment
@@ -42,16 +50,12 @@ module Autotune
           BLUEPRINT_CONFIG_FILENAME, blueprint.slug]
       end
 
-      # Track the current commit version
-      blueprint.version = repo.version
-
       # Stash the thumbnail
       if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
         blueprint.deployer(:media).deploy_file(
           blueprint.working_dir,
           blueprint.config['thumbnail'])
       end
-
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
         repo = WorkDir.repo(blueprint.working_dir,

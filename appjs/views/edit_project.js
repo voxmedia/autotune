@@ -135,7 +135,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       function(err) {
         if ( err.status < 500 ) {
           var dat = err.responseJSON;
-          view.app.view.error( dat.error );
+          var errMsg = dat && dat.error ? dat.error : "Could not read preview data.";
+          view.app.view.error(errMsg);
         } else {
           view.app.view.error(
             "There was a problem updating the preview, please contact support" );
@@ -420,13 +421,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           };
 
       // if there is only one theme option, hide the dropdown
-      if ( availableThemes.length === 1 ) {
-        options_fields['theme']['type'] = 'hidden';
+
+      if ( themes.length === 1 ) {
+        options_fields['theme']['fieldClass'] = 'hidden';
+      }
+
+      // hide slug for blueprint types that are not apps
+      if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {
+        options_fields['slug']['fieldClass'] = 'hidden';
       }
 
       if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
         var googleText = form_config.schema.properties.google_doc_url.title;
-        var newText = googleText + '<br><button type="button" id="get-new-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
+        var newText = googleText + '<br><button type="button" data-action="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
         form_config.schema.properties.google_doc_url.title = newText;
       }
 
