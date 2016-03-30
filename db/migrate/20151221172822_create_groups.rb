@@ -42,27 +42,40 @@ class CreateGroups < ActiveRecord::Migration
       group_theme_map = YAML.load_file(group_theme_map_file)
 
       group_theme_map.each do |g|
-        puts "create group #{g['name']}"
-        group = Autotune::Group.find_or_create_by :name => g['name']
+        puts "Mapping group #{g['name']} and #{g['theme']}..."
         theme = Autotune::Theme.find_by(:slug => g['theme'])
-        if !theme.nil?
-          if !theme.group.nil?
-            theme = theme.dup
-            theme.slug = "#{group.name.downcase.gsub ' ', '-'}"
-            suffix = 1
-            while Autotune::Theme.exists?(:slug => theme.slug) do
-              theme.slug = "#{group.name.downcase.gsub ' ', '-'}-#{suffix}"
-            end
-          end
-          theme.title = "#{group.name}"
+        theme = Autotune::Theme.find_or_create_by :title => g['name'], :slug => g['theme'] unless theme.nil?
+
+        if theme.group.nil?
+          puts "Creating group #{g['name']}"
+          group = Autotune::Group.find_or_create_by :name => g['name']
           theme.group = group
-          theme.save!
+          theme.update_data
         else
-          puts "Create theme #{g['theme']}"
-          theme = Autotune::Theme.find_or_create_by :title => g['name'],
-           :slug => g['theme'], :group => group
+          puts "Skipping group #{g['name']}"
         end
-        theme.update_data
+
+
+        #
+        #
+        #
+        # if !theme.nil?
+        #   if !theme.group.nil?
+        #     theme = theme.dup
+        #     theme.slug = "#{group.name.downcase.gsub ' ', '-'}"
+        #     suffix = 1
+        #     while Autotune::Theme.exists?(:slug => theme.slug) do
+        #       theme.slug = "#{group.name.downcase.gsub ' ', '-'}-#{suffix}"
+        #     end
+        #   end
+        #   theme.title = "#{group.name}"
+        #   theme.group = group
+        #   theme.save!
+        # else
+        #   puts "Create theme #{g['theme']}"
+        #   theme = Autotune::Theme.find_or_create_by :title => g['name'],
+        #    :slug => g['theme'], :group => group
+        # end
       end
 
       Autotune::Project.all.each do |project|
