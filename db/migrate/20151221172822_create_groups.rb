@@ -1,4 +1,5 @@
 # This migration comes from autotune (originally 20151221172822)
+# This migration comes from autotune (originally 20151221172822)
 class CreateGroups < ActiveRecord::Migration
   def change
     create_table :autotune_groups do |t|
@@ -44,38 +45,22 @@ class CreateGroups < ActiveRecord::Migration
       group_theme_map.each do |g|
         puts "Mapping group #{g['name']} and #{g['theme']}..."
         theme = Autotune::Theme.find_by(:slug => g['theme'])
-        theme = Autotune::Theme.find_or_create_by :title => g['name'], :slug => g['theme'] unless theme.nil?
+        if theme.nil?
+          theme = Autotune::Theme.find_or_create_by :title => g['name'], :slug => g['theme']
+        end
 
         if theme.group.nil?
           puts "Creating group #{g['name']}"
           group = Autotune::Group.find_or_create_by :name => g['name']
           theme.group = group
+          theme.save!
           theme.update_data
         else
-          puts "Skipping group #{g['name']}"
+          puts "Skipping group #{g['name']}. Creating theme #{g['name']}"
+          Autotune::Theme.find_or_create_by :title => g['name'],
+                                            :group => theme.group,
+                                            :parent => theme
         end
-
-
-        #
-        #
-        #
-        # if !theme.nil?
-        #   if !theme.group.nil?
-        #     theme = theme.dup
-        #     theme.slug = "#{group.name.downcase.gsub ' ', '-'}"
-        #     suffix = 1
-        #     while Autotune::Theme.exists?(:slug => theme.slug) do
-        #       theme.slug = "#{group.name.downcase.gsub ' ', '-'}-#{suffix}"
-        #     end
-        #   end
-        #   theme.title = "#{group.name}"
-        #   theme.group = group
-        #   theme.save!
-        # else
-        #   puts "Create theme #{g['theme']}"
-        #   theme = Autotune::Theme.find_or_create_by :title => g['name'],
-        #    :slug => g['theme'], :group => group
-        # end
       end
 
       Autotune::Project.all.each do |project|
