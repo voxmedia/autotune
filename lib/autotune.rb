@@ -77,11 +77,16 @@ module Autotune
     end
     alias_method :config, :configuration
 
+    def can_message?
+      Autotune.redis.present?
+    end
+
     def send_message(type, data)
       ensure_redis
       dt = DateTime.current
       payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
       redis.zadd('messages', dt.utc.to_f, payload.to_json)
+      redis.publish type, data.to_json
     end
 
     def purge_messages(older_than: nil)
@@ -102,7 +107,7 @@ module Autotune
         results = redis.zrangebyscore('messages', since.utc.to_f, '+inf')
       end
 
-      results.map! { |d| JSON.parse(d) }
+      results.map! { |d| ActiveSupport::JSON.decode(d) }
 
       if type.is_a?(String)
         results.select { |m| m['type'] == type }

@@ -36,6 +36,9 @@ Autotune::Engine.routes.draw do
 
   get '/changemessages' => 'changemessages#index'
 
+  get '/notifications' => 'notifications#index'
+  post '/notifications/send' => 'notifications#send_message'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
