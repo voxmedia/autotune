@@ -16,48 +16,61 @@ module Autotune
                           Rails.configuration.autotune.setup_environment)
 
       if repo.exist?
+        repo.set_branch(blueprint.repo_url)
         if update
-          # Check to see if referencing a branch
-          if blueprint.repo_url =~ /#\S+[^\/]/
-            # If so, switch to branch and update the repo
-            repo.switch(blueprint.repo_url.split('#')[1])
-          else
-            # Update the repo
-            repo.update
-          end
+          # Update the repo
+          repo.update
+          # Track the current commit version
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
-          if blueprint.repo_url =~ /#\S+[^\/]/
-            # If so, switch to branch and update the repo
-            repo.switch(blueprint.repo_url.split('#')[1])
-            blueprint.version = repo.version
-          end
+          # repo.set_version(blueprint.version)
+          repo.update
+          # if blueprint.repo_url =~ /#\S+[^\/]/
+          #   # If so, switch to branch and update the repo
+          #   repo.switch(blueprint.repo_url.split('#')[1])
+          blueprint.version = repo.version
+          # end
           # bail if we have the files, we're not updating, and we don't need to switch branches
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up
-          if blueprint.repo_url =~ /#\S+[^\/]/
-            # If so, switch to branch and update the repo
-            repo.switch(blueprint.repo_url.split('#')[1])
-          else
-            repo.branch = blueprint.version
-            repo.update
-          end
+          # if blueprint.repo_url =~ /#\S+[^\/]/
+          #   puts "repo.branch - #{repo.branch}"
+          #   puts "repo.version - #{repo.version}"
+          #   puts "blueprint.version - #{blueprint.version}"
+          #   # If so, switch to branch and update the repo
+          #   repo.switch(blueprint.repo_url.split("#")[1])
+          #   puts
+          #   puts "repo.branch - #{repo.branch}"
+          #   puts "repo.version - #{repo.version}"
+          #   puts "blueprint.version - #{blueprint.version}"
+          # else
+          # repo.branch = blueprint.version
+          repo.version = blueprint.version
+          repo.update
+          # end
         end
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
         # Check to see if referencing a branch
-        if blueprint.repo_url =~ /#\S+[^\/]/
-          # If so, switch to branch and update the repo
-          repo.switch(blueprint.repo_url.split('#')[1])
-        end
+        # if blueprint.repo_url =~ /#\S+[^\/]/
+        #   # If so, switch to branch and update the repo
+        #   repo.switch(blueprint.repo_url.split('#')[1])
+        # end
         if blueprint.version.present?
-          repo.branch = blueprint.version
+          puts 'has present'
+          repo.set_branch(blueprint.repo_url)
+          puts "repo.version - #{repo.version}"
+          puts "blueprint.version - #{blueprint.version}"
+          # fails here
+          repo.version = blueprint.version
+          puts "repo.version - #{repo.version}"
           repo.update
         else
           # Track the current commit version
           blueprint.version = repo.version
+          repo.update
         end
       end
 

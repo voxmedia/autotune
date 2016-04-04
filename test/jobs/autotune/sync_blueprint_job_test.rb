@@ -47,6 +47,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     repo = WorkDir.repo(bp.working_dir,
                         Rails.configuration.autotune.build_environment)
 
+    puts "repo.version - #{repo.version}"
+    puts "bp.version - #{bp.version}"
     assert_equal NO_SUBMOD, bp.version,
                  'Repo should be checked out to the correct version'
 
@@ -178,5 +180,71 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     refute repo.exist?('submodule/testfile'),
            'Should not have submodule testfile'
+  end
+
+  test 'blueprint versioning with branch' do
+    bp = autotune_blueprints(:example)
+    bp.update(
+      :repo_url => "#{repo_url}#master", :version => NO_SUBMOD)
+
+    assert_performed_jobs 1 do
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+    end
+
+    bp.reload
+
+    repo = WorkDir.repo(bp.working_dir,
+                        Rails.configuration.autotune.build_environment)
+
+    assert_equal NO_SUBMOD, bp.version,
+                 'Repo should be checked out to the correct version'
+
+    refute repo.exist?('submodule/test.rb'),
+           'Should not have a submodule with a test.rb file'
+
+    refute repo.exist?('submodule/testfile'),
+           'Should not have submodule testfile'
+
+    bp.update(:version => WITH_SUBMOD)
+
+    puts 'running update for: blueprint versioning with branch'
+    pp bp
+
+    assert_performed_jobs 1 do
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+    end
+    puts
+    puts 'after'
+    pp bp
+
+    bp.reload
+    puts
+    puts 'after reload'
+    pp bp
+
+    assert_equal WITH_SUBMOD, bp.version,
+                 'Repo should be checked out to the correct version'
+
+    assert repo.exist?('submodule/test.rb'),
+           'Should have a submodule with a test.rb file'
+
+    refute repo.exist?('submodule/testfile'),
+           'Should not have submodule testfile'
+
+    assert_performed_jobs 1 do
+      Autotune::SyncBlueprintJob.perform_later bp,
+        :status => 'testing', :update => 'true'
+    end
+
+    bp.reload
+
+    assert_equal MASTER_HEAD, bp.version,
+                 'Repo should be checked out to the correct version'
+
+    assert repo.exist?('submodule/test.rb'),
+           'Should have a submodule with a test.rb file'
+
+    assert repo.exist?('submodule/testfile'),
+           'Should have submodule testfile'
   end
 end
