@@ -10,7 +10,7 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status: nil, update: false, build_themes: false)
+    def perform(blueprint, status: nil, update: false, build_themes: false, current_user: nil)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
@@ -87,7 +87,7 @@ module Autotune
               :media, blueprint, :extra_slug => slug)
 
             # Run the before build deployer hook
-            deployer.before_build(build_data, repo.env)
+            deployer.before_build(build_data, repo.env, current_user)
 
             # Run the build
             repo.working_dir do

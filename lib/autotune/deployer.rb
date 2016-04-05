@@ -34,12 +34,10 @@ module Autotune
           spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
           resp = google_client.find(spreadsheet_key)
           cache_key = "googledoc#{spreadsheet_key}"
-          needs_update = false
 
           if Rails.cache.exist?(cache_key)
-            if Rails.cache.read(cache_key)['version'] && resp['version'] != Rails.cache.read(cache_key)['version']
-              needs_update = true
-            end
+            cache_value = Rails.cache.read(cache_key)
+            needs_update = cache_value['version'] && resp['version'] != cache_value['version']
           else
             needs_update = true
           end
