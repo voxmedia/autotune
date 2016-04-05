@@ -151,6 +151,7 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
       puts '4'
 
       r.branch = 'master'
+      r.set_hash = updated_submod
       r.update
       assert_equal updated_submod, r.version
       assert r.exist?('submodule/testfile'), 'Should have submodule testfile'

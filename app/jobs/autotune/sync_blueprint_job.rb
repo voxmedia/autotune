@@ -24,15 +24,7 @@ module Autotune
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
           # run update to ensure that repo is on correct branch
-          puts 'elsif'
-          puts "repo.version - #{repo.version}"
-          puts "blueprint.version - #{blueprint.version}"
-          repo.set_hash = blueprint.version
-          puts "repo.version - #{repo.version}"
           repo.update
-
-          puts "repo.version - #{repo.version}"
-          puts "blueprint.version - #{blueprint.version}"
           blueprint.version = repo.version
           return
         elsif !update
@@ -44,15 +36,8 @@ module Autotune
         # Clone the repo
         repo.clone(blueprint.repo_url)
         if blueprint.version.present?
-          puts 'has present'
-          repo.set_branch(blueprint.repo_url)
-          puts "repo.version - #{repo.version}"
-          puts "blueprint.version - #{blueprint.version}"
-          puts
           repo.set_hash = blueprint.version
-          puts "repo.set_hash - #{repo.set_hash}"
           repo.update
-          puts "repo.version - #{repo.version}"
         else
           # Track the current commit version
           blueprint.version = repo.version

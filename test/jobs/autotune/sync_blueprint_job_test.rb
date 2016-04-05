@@ -207,21 +207,12 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     bp.update(:version => WITH_SUBMOD)
 
-    puts 'running update for: blueprint versioning with branch'
-    pp bp
-
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
     end
-    puts
-    puts 'after'
-    pp bp
 
     bp.reload
-    puts
-    puts 'after reload'
-    pp bp
-
+    
     assert_equal WITH_SUBMOD, bp.version,
                  'Repo should be checked out to the correct version'
 

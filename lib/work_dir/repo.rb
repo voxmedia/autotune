@@ -19,17 +19,7 @@ module WorkDir
 
     # Update the repo on disk
     def update
-      # working_dir do
-      #   git 'checkout', '.'
-      #   git 'clean', '-ffd'
-      #   git 'checkout', initial_branch
-      #   git 'pull', '--recurse-submodules=yes'
-      #   git 'fetch', 'origin'
-      #   git 'checkout', branch
-      #   git 'submodule', 'update', '--init'
-      #   git 'clean', '-ffd'
-      # end
-      puts "update, branch - #{branch}, version - #{version}, set_hash - #{set_hash}"
+      # puts "update, branch - #{branch}, version - #{version}, set_hash - #{set_hash}"
       working_dir do
         git 'checkout', '.'
         git 'clean', '-ffd'
