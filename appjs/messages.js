@@ -29,6 +29,7 @@ _.extend(Messages.prototype, Backbone.Events, {
       _.bind(this._check, this),
       this.config.checkInterval*1000
     );
+    this.trigger('open');
 
     return this;
   },
@@ -40,7 +41,7 @@ _.extend(Messages.prototype, Backbone.Events, {
     if ( !this.interval ) { return; }
 
     logger.debug('Stopping messages now');
-    window.clearInterval(this._interval);
+    window.clearInterval(this.interval);
     this.interval = undefined;
     this.trigger('stop');
     return this;
@@ -80,6 +81,7 @@ _.extend(Messages.prototype, Backbone.Events, {
     var ts = this.lastCheck, self = this;
     this.lastCheck = Date.now()/1000;
 
+    logger.debug('Checking messages... (app.messages.stop() to stop)')
     return Promise.resolve( $.get(
       '/messages', { since: ts }, null, 'json'
     ) ).then(function( data ) {

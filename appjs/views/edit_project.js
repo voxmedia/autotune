@@ -164,7 +164,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   listenForChanges: function() {
     if ( !this.model.isNew() && !this.listening ) {
-      this.listenTo(this.app.listener,
+      this.listenTo(this.app.messages,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
       this.listening = true;
@@ -172,11 +172,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   stopListeningForChanges: function() {
-    this.stopListening(this.app.listener);
+    this.stopListening(this.app.messages);
     this.listening = false;
   },
 
-  updateStatus: function(status) {
+  updateStatus: function(data) {
+    var status = data.status;
     // don't care about the updated step
     if ( status === 'updated' ) { return; }
 

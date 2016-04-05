@@ -16,7 +16,7 @@ var $ = require('jquery'),
     Spectrum = require('spectrum-colorpicker'),
     // Load our components and run the app
     Router = require('./router'),
-    Listener = require('./listener'),
+    Messages = require('./messages'),
     logger = require('./logger'),
     views = require('./views'),
     models = require('./models');
@@ -51,11 +51,11 @@ function App(config) {
   this.projects = new models.ProjectCollection();
 
   // Initialize server event listener
-  this.listener = new Listener();
-  this.listenTo(this.listener, 'stop', this.handleListenerStop);
-  this.listenTo(this.listener, 'error', this.handleListenerStop);
-  this.listenTo(this.listener, 'open', this.handleListenerStart);
-  this.listener.start();
+  this.messages = new Messages();
+  this.listenTo(this.messages, 'stop', this.handleListenerStop);
+  this.listenTo(this.messages, 'error', this.handleListenerStop);
+  this.listenTo(this.messages, 'open', this.handleListenerStart);
+  this.messages.start();
 
   this.config = config;
 
@@ -82,7 +82,7 @@ function App(config) {
       this.hasFocus = true;
       logger.debug('App has focus');
       // Tell the listener to cancel the timeout
-      this.listener.cancelStop();
+      this.messages.cancelStop();
       // Proxy the event on the app object
       this.trigger('focus');
     }, this));
@@ -93,7 +93,7 @@ function App(config) {
 
       if ( !this.isDev() ) {
         // Tell the listener to time out in 8mins
-        this.listener.stopAfter(8*60);
+        this.messages.stopAfter(8*60);
       }
 
       // Proxy the event on the app object
