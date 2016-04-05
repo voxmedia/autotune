@@ -9,7 +9,7 @@ module WorkDir
     attr_writer :branch
 
     def set_hash
-      @hash ||= 'HEAD'
+      @set_hash ||= 'HEAD'
     end
     attr_writer :set_hash
 
@@ -29,7 +29,7 @@ module WorkDir
       #   git 'submodule', 'update', '--init'
       #   git 'clean', '-ffd'
       # end
-      puts "update, branch - #{branch}, version - #{version}"
+      puts "update, branch - #{branch}, version - #{version}, set_hash - #{set_hash}"
       working_dir do
         git 'checkout', '.'
         git 'clean', '-ffd'
@@ -72,6 +72,13 @@ module WorkDir
       version.strip
     end
     alias_method :version, :commit_hash
+
+    def checkout_version(version_hash)
+      version = 'HEAD'
+      working_dir do
+        version = git 'checkout', version_hash || 'HEAD'
+      end
+    end
 
     # Get a tar archive of the repo as a string
     def archive(branch_or_tag = nil)

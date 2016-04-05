@@ -134,7 +134,7 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
 
       puts '2'
 
-      r.branch = with_submod
+      r.set_hash = with_submod
       r.update
       assert_equal with_submod, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
@@ -142,7 +142,7 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
 
       puts '3'
 
-      r.branch = no_submod
+      r.set_hash = no_submod
       r.update
       assert_equal no_submod, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
