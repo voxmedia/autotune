@@ -1,8 +1,8 @@
 require 'test_helper'
 
 module Autotune
-  # Testing for notifications
-  class NotificationsControllerTest < ActionController::TestCase
+  # Testing for messages
+  class MessagesControllerTest < ActionController::TestCase
     fixtures 'autotune/blueprints', 'autotune/projects'
     setup do
       skip 'Cannot run tests without Redis' if Autotune.redis.nil?
@@ -17,7 +17,7 @@ module Autotune
       assert_equal({ 'error' => 'Unauthorized' }, decoded_response)
     end
 
-    test 'should get notifications' do
+    test 'should get messages' do
       accept_json!
       valid_auth_header!
 
@@ -62,7 +62,7 @@ module Autotune
       end
     end
 
-    test 'should get notifications by type' do
+    test 'should get messages by type' do
       accept_json!
       valid_auth_header!
 
@@ -83,7 +83,7 @@ module Autotune
                    'Should have 1 message'
     end
 
-    test 'should send notification' do
+    test 'should send message' do
       accept_json!
       valid_auth_header!
 

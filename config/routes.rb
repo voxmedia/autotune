@@ -34,10 +34,10 @@ Autotune::Engine.routes.draw do
   post 'projects/create_spreadsheet',
        :to => 'projects#create_spreadsheet'
 
-  get '/changemessages' => 'changemessages#index'
+  get 'changemessages' => 'changemessages#index'
 
-  get '/notifications' => 'notifications#index'
-  post '/notifications/send' => 'notifications#send_message'
+  get 'messages' => 'messages#index'
+  post 'messages/send' => 'messages#send_message'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -2,7 +2,7 @@ require_dependency 'autotune/application_controller'
 
 module Autotune
   # Handle receiving, processing and returning notification messages
-  class NotificationsController < ApplicationController
+  class MessagesController < ApplicationController
     def index
       if params[:since].to_f.to_s == params[:since]
         # float timestamp

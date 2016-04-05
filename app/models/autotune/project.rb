@@ -240,8 +240,9 @@ module Autotune
 
     def pub_to_redis
       msg = { :id => id,
+              :model => 'project',
               :status => status }
-      Autotune.send_message('project', msg) if Autotune.can_message?
+      Autotune.send_message('change', msg) if Autotune.can_message?
     end
   end
 end

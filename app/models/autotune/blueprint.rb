@@ -132,9 +132,10 @@ module Autotune
 
     # Publishes status changes to redis
     def pub_to_redis
-      msg = { :id => id,
+      msg = { :model => 'blueprint',
+              :id => id,
               :status => status }
-      Autotune.send_message('blueprint', msg) if Autotune.can_message?
+      Autotune.send_message('change', msg) if Autotune.can_message?
     end
   end
 end

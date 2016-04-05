@@ -169,9 +169,9 @@ module Autotune
       end
 
       # make sure data doesn't contain title, slug or theme
-      @project.data.delete('title')
-      @project.data.delete('slug')
-      @project.data.delete('theme')
+      %w(title slug theme base_url asset_base_url).each do |k|
+        @project.data.delete(k)
+      end
 
       if @project.valid?
         @project.status = 'built' if @project.live?
