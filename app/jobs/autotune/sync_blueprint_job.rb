@@ -16,7 +16,7 @@ module Autotune
                           Rails.configuration.autotune.setup_environment)
 
       if repo.exist?
-        repo.set_branch(blueprint.repo_url)
+        repo.branch_from_repo_url(blueprint.repo_url)
         if update
           # Update the repo
           repo.update
@@ -29,14 +29,14 @@ module Autotune
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up
-          repo.set_hash = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         end
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
         if blueprint.version.present?
-          repo.set_hash = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         else
           # Track the current commit version

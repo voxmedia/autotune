@@ -8,25 +8,20 @@ module WorkDir
     end
     attr_writer :branch
 
-    def set_hash
-      @set_hash ||= 'HEAD'
+    def commit_hash_for_checkout
+      @commit_hash_for_checkout ||= 'HEAD'
     end
-    attr_writer :set_hash
-
-    # def initial_branch
-    #   /\w{40}/.match(branch) ? 'master' : branch
-    # end
+    attr_writer :commit_hash_for_checkout
 
     # Update the repo on disk
     def update
-      # puts "update, branch - #{branch}, version - #{version}, set_hash - #{set_hash}"
       working_dir do
         git 'checkout', '.'
         git 'clean', '-ffd'
         git 'checkout', branch
         git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
-        git 'checkout', set_hash
+        git 'checkout', commit_hash_for_checkout
         git 'submodule', 'update', '--init'
         git 'clean', '-ffd'
       end
@@ -37,11 +32,11 @@ module WorkDir
       update
     end
 
-    def set_branch(repo_url)
+    def branch_from_repo_url(repo_url)
       if repo_url =~ /#\S+[^\/]/
-        self.branch = repo_url.split('#')[1]
+        @branch = repo_url.split('#')[1]
       else
-        self.branch = 'master'
+        @branch = 'master'
       end
     end
 
@@ -49,7 +44,7 @@ module WorkDir
     def clone(repo_url)
       FileUtils.mkdir_p(File.dirname(working_dir))
       git 'clone', '--recursive', repo_url.split('#')[0], working_dir
-      self.set_branch(repo_url)
+      self.branch_from_repo_url(repo_url)
       update
     end
 

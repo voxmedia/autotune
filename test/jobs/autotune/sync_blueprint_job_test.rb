@@ -47,8 +47,6 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     repo = WorkDir.repo(bp.working_dir,
                         Rails.configuration.autotune.build_environment)
 
-    puts "repo.version - #{repo.version}"
-    puts "bp.version - #{bp.version}"
     assert_equal NO_SUBMOD, bp.version,
                  'Repo should be checked out to the correct version'
 
@@ -212,7 +210,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     end
 
     bp.reload
-    
+
     assert_equal WITH_SUBMOD, bp.version,
                  'Repo should be checked out to the correct version'
 

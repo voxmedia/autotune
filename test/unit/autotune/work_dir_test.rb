@@ -126,32 +126,24 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
       r = WorkDir.repo rdir
       r.clone repo_url
 
-      puts '1'
-
       assert_equal updated_submod, r.version
       assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
       assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
 
-      puts '2'
-
-      r.set_hash = with_submod
+      r.commit_hash_for_checkout = with_submod
       r.update
       assert_equal with_submod, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
       assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
 
-      puts '3'
-
-      r.set_hash = no_submod
+      r.commit_hash_for_checkout = no_submod
       r.update
       assert_equal no_submod, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
       refute r.exist?('submodule/test.rb'), 'Should not have submodule test.rb'
 
-      puts '4'
-
       r.branch = 'master'
-      r.set_hash = updated_submod
+      r.commit_hash_for_checkout = updated_submod
       r.update
       assert_equal updated_submod, r.version
       assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
