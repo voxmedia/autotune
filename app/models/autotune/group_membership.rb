@@ -17,7 +17,7 @@ module Autotune
     def self.get_best_role(roles)
       return if roles.nil?
       Autotune::ROLES.reverse.each do |r|
-        return r.to_sym if roles.include? r.to_sym
+        return r.to_sym if roles.include? r
       end
     end
 

@@ -2,7 +2,6 @@ module Autotune
   # Basic user account
   class User < ActiveRecord::Base
     include Searchable
-    has_many :authorizations, :dependent => :destroy
     has_many :projects
     has_many :group_memberships, -> {includes :group}
     has_many :groups, through: :group_memberships
@@ -17,70 +16,25 @@ module Autotune
     validates :api_key, :presence => true, :uniqueness => true
     after_initialize :defaults
 
+    has_many :authorizations, :dependent => :destroy do
+      def create_from_auth_hash(auth_hash)
+        Authorization.validate_auth_hash(auth_hash)
+        create(auth_hash.to_hash)
+      end
+
+      def create_from_auth_hash!(auth_hash)
+        Authorization.validate_auth_hash(auth_hash)
+        create!(auth_hash.to_hash)
+      end
+
+      def preferred
+        find_by_provider(Rails.configuration.omniauth_preferred_provider.to_s)
+      end
+    end
+
     def self.generate_api_key
       range = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
       20.times.map { range[rand(61)] }.join('')
-    end
-
-    def self.find_or_create_by_auth_hash(auth_hash)
-      raise ArgumentError, 'Auth hash is empty or nil' if auth_hash.nil? || auth_hash.empty?
-      raise ArgumentError, 'Auth hash is not a hash' unless auth_hash.is_a?(Hash)
-      raise ArgumentError, "Missing 'info' in auth hash" unless auth_hash.key?('info')
-      find_by_auth_hash(auth_hash) || create_from_auth_hash(auth_hash)
-    end
-
-    def self.create_from_auth_hash(auth_hash)
-      roles = verify_auth_hash(auth_hash)
-      return if roles.nil?
-      a = Authorization.new(
-        auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
-      if auth_hash['info'].blank? || auth_hash['info']['email'].blank?
-        a.user = User.new
-      else
-        a.user = User.find_or_initialize_by(:email => auth_hash['info']['email'])
-      end
-      a.user.attributes = {
-        :name => auth_hash['info']['name'],
-        :meta => { :roles => roles }
-      }
-      update_roles(a.user, roles)
-      a.user.save!
-      a.save!
-      a.user
-    end
-
-    def self.find_by_auth_hash(auth_hash)
-      roles = verify_auth_hash(auth_hash)
-      return if roles.nil?
-      a = Authorization.find_by(
-        :provider => auth_hash['provider'],
-        :uid => auth_hash['uid'])
-      return if a.nil?
-
-      # if this auth model is missing a user, delete it
-      if a.user.nil?
-        a.destroy
-        return false
-      end
-
-      a.update(auth_hash.is_a?(OmniAuth::AuthHash) ? auth_hash.to_hash : auth_hash)
-
-      update_roles a.user, roles
-      a.user.save
-
-
-      a.user
-    end
-
-    def self.verify_auth_hash(auth_hash)
-      if Rails.configuration.autotune.verify_omniauth.is_a?(Proc)
-        roles = Rails.configuration.autotune.verify_omniauth.call(auth_hash)
-        logger.debug "#{auth_hash['nickname']} roles: #{roles}"
-        return unless (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
-        return roles
-      else
-        return [:superuser]
-      end
     end
 
     # Check that the user has a role, optionally check that user has role for
@@ -91,7 +45,7 @@ module Autotune
     #   # is this user an editor who can use vox or theverge themes?
     #   user.role?(:editor => :vox, :editor => :theverge)
     def role?(*args, **kwargs)
-      return false if group_memberships.nil?
+      return false if !verified? || group_memberships.nil?
 
       if args.any?
         group_memberships.exists?(:role => args.flatten)
@@ -111,14 +65,14 @@ module Autotune
 
     # Return an array list of themes that this user is permitted to use in a project
     def author_themes
-      return [] if group_memberships.nil?
+      return [] if !verified? || group_memberships.nil?
       Theme.where('(group_id IN (?))',
               group_memberships.pluck(:group_id))
     end
 
     # Return an array list of themes that this user is permitted to modify
     def designer_themes
-      return [] if group_memberships.nil?
+      return [] if !verified? || group_memberships.nil?
       Theme.where('(group_id IN (?))',
               group_memberships.with_design_access.pluck(:group_id))
     end
@@ -144,15 +98,20 @@ module Autotune
       groups.merge(group_memberships)
     end
 
-    def is_superuser?
-        role? :superuser
+    def preferred_auth
+      authorizations.preferred
     end
 
-    private
+    def roles
+      meta['roles'] || preferred_auth.roles
+    end
 
-    def self.update_roles(user, roles)
+    def verified?
+      (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
+    end
+
+    def update_membership
       # make sure the user is saved before trying to update relations
-      user.save!
       if roles.nil?
         user.group_memberships.delete
         return
@@ -163,7 +122,7 @@ module Autotune
       if roles.is_a?(Array) && roles.any?
         role_to_assign = GroupMembership.get_best_role(roles)
         if role_to_assign.nil?
-          user.group_memberships.delete
+          group_memberships.delete
           return
         end
       # assign global superuser role if the user has superuser role for anything
@@ -178,7 +137,7 @@ module Autotune
           Theme.add_default_theme_for_group(group)
         end
         Group.all.each do |g|
-          membership = user.group_memberships.find_or_create_by(:group => g)
+          membership = group_memberships.find_or_create_by(:group => g)
           membership.role = role_to_assign.to_s
           membership.save!
         end
@@ -187,14 +146,14 @@ module Autotune
 
       # handle the case where it is a hash but not superuser
       if roles.is_a?(Hash) && roles.any?
-        stale_ids = user.group_memberships.pluck(:id)
+        stale_ids = group_memberships.pluck(:id)
         [:author, :editor, :designer].each do |r|
           next if roles[r.to_s].nil?
           roles[r.to_s].each do |g|
             group = Group.find_or_create_by(:name => g)
             group.save
             Theme.add_default_theme_for_group(group)
-            membership = user.group_memberships.find_or_create_by(:group => group)
+            membership = group_memberships.find_or_create_by(:group => group)
             membership.role = r.to_s
             membership.save!
             stale_ids.delete(membership.id)
@@ -202,13 +161,15 @@ module Autotune
         end
       end
       # delete all memberships that weren't updated
-      user.group_memberships.where("id in ?", stale_ids).delete_all unless stale_ids.empty?
-      user.save!
+      group_memberships.where("id in ?", stale_ids).delete_all unless stale_ids.empty?
+      self.save
     end
+
+    private
 
     def defaults
       self.api_key ||= User.generate_api_key
-      self.meta    ||= {}
+      self.meta ||= {}
     end
   end
 end

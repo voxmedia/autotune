@@ -204,6 +204,8 @@ module Autotune
         render_error @project.meta['error_message'], :bad_request
       else
         render_error exc.message
+        logger.error exc.message
+        logger.error exc.backtrace.join("\n")
       end
     end
 

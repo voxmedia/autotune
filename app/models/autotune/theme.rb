@@ -35,29 +35,17 @@ module Autotune
 
     def update_data
       update!(:status => "updating")
-      # testing with one blueprint first
-      themes_affected = get_children
+      update!(:status => "ready") if parent.nil?
+      jobs = Blueprint.all.each { |bp| SyncBlueprintJob.new(bp, build_themes:true)}
       ActiveJob::Chain.new(
         SyncThemeJob.new(self),
-        SyncBlueprintJob.new(Blueprint.first, build_themes:true, themes:themes_affected)
+        jobs
       ).enqueue
     rescue
       update!(:status => 'broken')
       raise
     end
 
-    def update_blueprint_themes
-      update!(:status => "updating")
-      # testing with one blueprint first
-      Blueprint.first.update(:status => "updating")
-      themes_affected = get_children
-      ActiveJob::Chain.new(
-        SyncBlueprintJob.new(Blueprint.first, build_themes:true, themes:themes_affected)
-      ).enqueue
-    rescue
-      update!(:status => 'broken')
-      raise
-    end
 
     # Get default theme for group
     def self.get_default_theme_for_group(group_id)
@@ -87,6 +75,10 @@ module Autotune
       return config_data['twitter-handle']
     end
 
+    # get data for all themes
+    def self.full_theme_data
+      Theme.all.map { |theme| theme.config_data }
+    end
 
     private
     def defaults

@@ -33,8 +33,6 @@ module Autotune
     before_validation do
       # Get the type from the config
       self.type = config['type'].downcase if config && config['type']
-
-      update_tags_from_config
     end
 
     # Gets the thumbnail image url for the blueprint
@@ -77,6 +75,12 @@ module Autotune
       status != 'new' && version.present?
     end
 
+    # Check if the blueprint is ready for themeing
+    # @return [Boolean] `true` if the blueprint is not tied to specific themes, `false` otherwise
+    def is_themeable?
+      config['themes'].blank?
+    end
+
     # Queues a job to update the blueprint repo
     def update_repo
       final_status = ready? ? 'ready' : 'testing'
@@ -95,13 +99,6 @@ module Autotune
     end
 
     private
-
-     # Parses blueprint's config and updates the tags associated with the blueprint
-    def update_tags_from_config
-      self.tags = config['tags'].map do |t|
-        Tag.find_or_create_by(:title => t.humanize)
-      end if config.present? && config['tags'].present?
-    end
 
     def deploy_dir
       if config.present? && config['deploy_dir']

@@ -10,7 +10,7 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status: nil, update: false, build_themes: false, themes: nil)
+    def perform(blueprint, status: nil, update: false, build_themes: false)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
@@ -65,26 +65,33 @@ module Autotune
 
         # don't build a copy for each theme every time a project is updated
         if build_themes
-          # if no theme list is available, build everything
-          if themes.nil? && blueprint.config['themes'].blank?
-            themes = Theme.all
-          elsif themes.nil?
-            themes = Theme.find_by(:slug => blueprint.config['themes'] + ['generic'])
-          end
-
           sample_data = repo.read(blueprint.config['sample_data'])
           sample_data.delete('base_url')
           sample_data.delete('asset_base_url')
 
+          # if no theme list is available, pick the first theme
+          if blueprint.is_themeable?
+            themes = [Theme.first]
+            sample_data.merge(
+               'available_themes' => Theme.all.pluck(:slug)
+            )
+          else # get supported themes
+            themes = Theme.where(:slug => blueprint.config['themes'] + ['generic'])
+          end
+
+
+
           themes.each do |theme|
-            slug = [blueprint.version, theme.slug].join('-')
+            slug = blueprint.is_themeable? ? blueprint.version :
+               [blueprint.version, theme.slug].join('-')
+
             # Use this as dummy build data for the moment
             build_data = sample_data.merge(
               'title' => blueprint.title,
               'slug' => slug,
               'group' => theme.group.slug,
               'theme' => theme.slug,
-              'theme_data' => theme.config_data)
+              'theme_data' => Theme.full_theme_data)
 
             # Get the deployer object
             # probably don't want this to always be preview
