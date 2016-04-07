@@ -55,6 +55,7 @@ function App(config) {
   this.listenTo(this.messages, 'stop', this.handleListenerStop);
   this.listenTo(this.messages, 'error', this.handleListenerStop);
   this.listenTo(this.messages, 'open', this.handleListenerStart);
+  this.listenTo(this.messages, 'alert', this.handleAlertMessage);
   this.messages.start();
 
   this.config = config;
@@ -142,6 +143,13 @@ _.extend(App.prototype, Backbone.Events, {
       this.reloadNotification.remove();
       this.reloadNotification = null;
     }
+  },
+
+  /**
+   * Display an alert message to the user
+   **/
+  handleAlertMessage: function(data) {
+    this.view.alert(data.text, data.level);
   },
 
   /**

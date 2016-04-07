@@ -111,4 +111,10 @@ namespace :autotune do
       puts "API key: #{u.api_key}"
     end
   end
+
+  desc 'Send a message to users'
+  task :alert_users, [:level, :text] => [:environment] do |_, args|
+    Autotune.send_message('alert', :level => args[:level], :text => args[:text])
+    puts "Sent #{args[:level]} alert to everyone: #{args[:text]}"
+  end
 end
