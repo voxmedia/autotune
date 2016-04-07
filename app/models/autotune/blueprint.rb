@@ -78,7 +78,7 @@ module Autotune
     # Check if the blueprint is ready for themeing
     # @return [Boolean] `true` if the blueprint is not tied to specific themes, `false` otherwise
     def is_themeable?
-      config['themes'].blank?
+      !config['theme_type'].blank? && config['theme_type'] == "dynamic"
     end
 
     # Queues a job to update the blueprint repo
