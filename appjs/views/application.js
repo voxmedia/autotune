@@ -81,27 +81,33 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     return this;
   },
 
-  error: function(message) {
-    return this.alert(message, 'error');
+  error: function(message, wait) {
+    return this.alert(message, 'error', wait);
   },
 
-  warning: function(message) {
-    return this.alert(message, 'notice');
+  warning: function(message, wait) {
+    return this.alert(message, 'notice', wait);
   },
 
-  success: function(message) {
-    return this.alert(message, 'success');
+  success: function(message, wait) {
+    return this.alert(message, 'success', wait);
   },
 
-  alert: function(message, level, permanent, wait) {
+  info: function(message, wait) {
+    return this.alert(message, 'info', wait);
+  },
+
+  alert: function(message, level, wait) {
     var noti,
         opts = _.defaults({
           text: message,
           type: level || 'info',
-          delay: wait || 8000
+          delay: 8000
         }, this.alertDefaults);
 
-    if ( permanent ) {
+    if ( _.isNumber(wait) && wait > 0 ) {
+      opts['delay'] = wait;
+    } else if ( wait === true || wait === 'permanent' || wait === 0 ) {
       _.extend(opts, {
         buttons: { closer: false, sticker: false },
         hide: false

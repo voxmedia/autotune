@@ -12,17 +12,25 @@ module Autotune
   class GoogleDocs
     attr_reader :client
 
-    def initialize(current_auth)
-      @client = Google::APIClient.new
-      auth = client.authorization
-      auth.client_id = ENV['GOOGLE_CLIENT_ID']
-      auth.client_secret = ENV['GOOGLE_CLIENT_SECRET']
-      auth.scope =
-        'https://www.googleapis.com/auth/drive ' \
-        'https://spreadsheets.google.com/feeds/'
-      # auth.redirect_uri = "http://example.com/redirect"
-      auth.refresh_token = current_auth.credentials['refresh_token']
-      auth.fetch_access_token!
+    def self.key_from_url(url)
+      url.match(/[-\w]{25,}/).to_s
+    end
+
+    def initialize(options)
+      if options[:refresh_token].present?
+        @client = Google::APIClient.new
+        auth = client.authorization
+        auth.client_id = ENV['GOOGLE_CLIENT_ID']
+        auth.client_secret = ENV['GOOGLE_CLIENT_SECRET']
+        auth.scope =
+          'https://www.googleapis.com/auth/drive ' \
+          'https://spreadsheets.google.com/feeds/'
+        auth.refresh_token = options[:refresh_token]
+        auth.grant_type = 'refresh_token'
+        auth.fetch_access_token!
+      else
+        raise ConfigurationError, 'Refresh token is missing'
+      end
 
       @_files = {}
       @_spreadsheets = {}

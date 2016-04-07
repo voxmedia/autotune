@@ -81,7 +81,7 @@ _.extend(Messages.prototype, Backbone.Events, {
     var ts = this.lastCheck, self = this;
     this.lastCheck = Date.now()/1000;
 
-    logger.debug('Checking messages... (app.messages.stop() to stop)')
+    logger.debug('Checking messages... (app.messages.stop() to stop)');
     return Promise.resolve( $.get(
       '/messages', { since: ts }, null, 'json'
     ) ).then(function( data ) {

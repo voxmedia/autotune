@@ -188,7 +188,7 @@ module Autotune
       @project = instance
       @build_data = request.POST
       if @build_data['google_doc_url'] && request.GET[:force_update]
-        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
+        cache_key = "googledoc#{GoogleDocs.key_from_url(@build_data['google_doc_url'])}"
         Rails.cache.delete(cache_key)
       end
 
@@ -201,16 +201,18 @@ module Autotune
     rescue => exc
       if @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
+      elsif exc.is_a?(Signet::AuthorizationError)
+        render_error 'There was an error authenticating your Google account', :bad_request
+        logger.error "Google Auth error: #{exc.message}"
       else
-        render_error exc.message
-        logger.error exc.message
-        logger.error exc.backtrace.join("\n")
+        raise
       end
     end
 
     def create_spreadsheet
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
-      google_client = GoogleDocs.new(current_auth)
+      google_client = GoogleDocs.new(
+        :refresh_token => current_auth.credentials['refresh_token'])
       spreadsheet_copy = google_client.copy(request.POST['_json'])
 
       if Autotune.configuration.google_auth_domain.present?
@@ -219,8 +221,9 @@ module Autotune
       end
 
       render :json => { :google_doc_url => spreadsheet_copy[:url] }
-    rescue => exc
-      render_error exc.message
+    rescue Signet::AuthorizationError => exc
+      render_error 'There was an error authenticating your Google account', :bad_request
+      logger.error "Google Auth error: #{exc.message}"
     end
 
     def update_snapshot

@@ -328,39 +328,6 @@ var Project = Backbone.Model.extend({
   },
 
   /**
-   * Create a new spreadsheet from a template
-   * @returns {Promise} Promise to provide the Google Doc URL
-   **/
-  createSpreadsheet: function() {
-    if ( !this.getConfig().spreadsheet_template ) { return Promise.resolve(); }
-
-    var ss_key = this.getConfig().spreadsheet_template.match(/[-\w]{25,}/)[0];
-
-    return Promise.resolve( $.ajax({
-      type: "POST",
-      url: this.urlRoot + "/create_spreadsheet",
-      data: JSON.stringify(ss_key),
-      contentType: 'application/json',
-      dataType: 'json'
-    }) ).then(
-      function( data ) {
-        var $input = $( "input[name='google_doc_url']" );
-        if( $input.val().length > 0 ){
-          var msg = 'This will replace the spreadsheet link currenlty associated with this project. Click "OK" to confirm the replacement.';
-          if( window.confirm(msg) ) {
-            $input.val(data.google_doc_url);
-          }
-        } else {
-          $input.val(data.google_doc_url);
-        }
-      },
-      function(err) {
-        console.log('There was an error authenticating your Google account.', err);
-      }
-    );
-  },
-
-  /**
    * Get the url to the published project.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
    * @param {string} path - include this path in the URL

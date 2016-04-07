@@ -55,13 +55,13 @@ module.exports = {
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
         if(action_message){
-          app.view.alert(action_message, 'success', false, 4000);
+          app.view.success(action_message, 4000);
         }
 
         switch (action) {
           case 'build':
-            app.view.alert(
-              'Building... This might take a moment.', 'notice', false, 16000);
+            app.view.warning(
+              'Building... This might take a moment.', 16000);
             break;
           case 'destroy':
             if ( view.collection ) {

@@ -12,7 +12,7 @@ var BaseView = Backbone.View.extend({
   loaded: true,
   firstRender: true,
   events: {
-    'click button[data-hook], a[data-hook]': 'handleHook'
+    'click button[data-hook],a[data-hook]': 'handleHook'
   },
 
   initialize: function(options) {
@@ -24,6 +24,9 @@ var BaseView = Backbone.View.extend({
   },
 
   handleHook: function(eve) {
+    eve.preventDefault();
+    eve.stopPropagation();
+
     var $btn = $(eve.currentTarget);
 
     if ( $btn.hasClass('btn') ) { $btn.button( 'loading' ); }
