@@ -79,7 +79,8 @@ module Autotune
     end
 
     def has_google_auth?
-      current_user.authorizations.find_by(:provider => 'google_oauth2').present?
+      gauth = current_user.authorizations.find_by(:provider => 'google_oauth2')
+      gauth.present? && gauth.valid_credentials?
     end
 
     def any_roles?

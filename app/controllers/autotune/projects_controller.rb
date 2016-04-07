@@ -212,7 +212,9 @@ module Autotune
     def create_spreadsheet
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
       google_client = GoogleDocs.new(
-        :refresh_token => current_auth.credentials['refresh_token'])
+        :refresh_token => current_auth.credentials['refresh_token'],
+        :access_token => current_auth.credentials['token'],
+        :expires_at => current_auth.credentials['expires_at'])
       spreadsheet_copy = google_client.copy(request.POST['_json'])
 
       if Autotune.configuration.google_auth_domain.present?

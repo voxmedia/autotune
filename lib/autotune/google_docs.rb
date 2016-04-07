@@ -17,20 +17,19 @@ module Autotune
     end
 
     def initialize(options)
-      if options[:refresh_token].present?
-        @client = Google::APIClient.new
-        auth = client.authorization
-        auth.client_id = ENV['GOOGLE_CLIENT_ID']
-        auth.client_secret = ENV['GOOGLE_CLIENT_SECRET']
-        auth.scope =
-          'https://www.googleapis.com/auth/drive ' \
-          'https://spreadsheets.google.com/feeds/'
-        auth.refresh_token = options[:refresh_token]
-        auth.grant_type = 'refresh_token'
-        auth.fetch_access_token!
-      else
-        raise ConfigurationError, 'Refresh token is missing'
-      end
+      @client = Google::APIClient.new
+
+      auth = client.authorization
+      auth.client_id = ENV['GOOGLE_CLIENT_ID']
+      auth.client_secret = ENV['GOOGLE_CLIENT_SECRET']
+      auth.scope =
+        'https://www.googleapis.com/auth/drive ' \
+        'https://spreadsheets.google.com/feeds/'
+
+      auth.refresh_token = options[:refresh_token] if options[:refresh_token].present?
+      auth.access_token = options[:access_token] if options[:access_token].present?
+      auth.expires_at = options[:expires_at] if options[:expires_at].present?
+      auth.expires_in = options[:expires_in] if options[:expires_in].present?
 
       @_files = {}
       @_spreadsheets = {}

@@ -32,7 +32,9 @@ module Autotune
         if current_auth
           logger.error current_auth.credentials
           google_client = GoogleDocs.new(
-            :refresh_token => current_auth.credentials['refresh_token'])
+            :refresh_token => current_auth.credentials['refresh_token'],
+            :access_token => current_auth.credentials['token'],
+            :expires_at => current_auth.credentials['expires_at'])
           spreadsheet_key = GoogleDocs.key_from_url(build_data['google_doc_url'])
           resp = google_client.find(spreadsheet_key)
           cache_key = "googledoc#{spreadsheet_key}"
