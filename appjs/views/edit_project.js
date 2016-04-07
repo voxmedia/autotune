@@ -117,8 +117,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             view.theme = data.theme;
           }
           var version = view.model.getVersion(),
-              previewUrl = view.model.blueprint.getMediaUrl(
-                [version, view.theme].join('-') + '/preview');
+            previewSlug = view.model.isThemeable() ?
+                version :[version, view.theme].join('-'),
+            previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
           if ( view.pym ) { view.pym.remove(); }
 
@@ -256,7 +257,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       .then(function() {
         var formData = view.alpaca.getValue(),
             buildData = view.model.buildData(),
-            previewUrl = '', iframeLoaded;
+            previewUrl = '', iframeLoaded,
+            previewSlug = '';
 
         // Callback for when iframe loads
         iframeLoaded = _.once(function() {
@@ -275,8 +277,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           // if the project has live preview enabled
           view.theme = view.model.get('theme') || formData['theme'] || 'custom';
 
-          previewUrl = view.model.blueprint.getMediaUrl(
-            [view.model.getVersion(), view.theme].join('-') + '/preview');
+          previewSlug = view.model.isThemeable() ? view.model.getVersion() :
+            [view.model.getVersion(), view.theme].join('-');
+          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
           if ( !view.copyProject && !view.model.hasInitialBuild() ){
             previewUrl = previewUrl + '#new';
@@ -351,13 +354,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     form_config = this.model.getConfig().form;
-    themes = this.model.getConfig().themes || ['generic'];
+    themes = this.model.isThemeable && !this.model.getConfig().themes ?
+      pluckAttr(this.app.themes.models, 'slug') :
+      _.intersection(pluckAttr(this.app.themes.models, 'slug'), this.model.getConfig().themes );
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-      var availableThemes = this.app.themes.models,
+      var availableThemes = _.filter(this.app.themes.models, function(t) {
+          return _.contains(themes, t.get('slug') );
+        }),
           schema_properties = {
             "title": {
               "title": "Title",
@@ -422,7 +429,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       // if there is only one theme option, hide the dropdown
 
-      if ( themes.length === 1 ) {
+      if ( availableThemes.length === 1 ) {
         options_fields['theme']['fieldClass'] = 'hidden';
       }
 

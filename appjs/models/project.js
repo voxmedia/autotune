@@ -300,6 +300,11 @@ var Project = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
+  isThemeable: function(){
+    return true;
+    //return this.has('config') && this.getConfig()['dynamic_themes'];
+  },
+
   /**
    * Get the url of the preview.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
