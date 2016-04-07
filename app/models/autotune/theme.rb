@@ -77,7 +77,7 @@ module Autotune
 
     # get data for all themes
     def self.full_theme_data
-      Theme.all.map { |theme| theme.config_data }
+      Hash[Theme.all.map { |theme| [theme.slug, theme.config_data] }]
     end
 
     private
