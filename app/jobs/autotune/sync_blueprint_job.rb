@@ -68,18 +68,23 @@ module Autotune
           sample_data = repo.read(blueprint.config['sample_data'])
           sample_data.delete('base_url')
           sample_data.delete('asset_base_url')
+          sample_data.delete('available_themes') unless sample_data['available_themes'].blank?
+          sample_data.delete('theme_data') unless sample_data['theme_data'].blank?
+
+          # add themes data if this blueprint support themeing
+          if blueprint.is_themeable?
+            sample_data.merge!(
+              'available_themes' => Theme.all.pluck(:slug),
+              'theme_data' => Theme.full_theme_data
+            )
+          end
 
           # if no theme list is available, pick the first theme
-          if blueprint.is_themeable?
+          if blueprint.config['themes'].blank?
             themes = [Theme.first]
-            sample_data.merge(
-               'available_themes' => Theme.all.pluck(:slug)
-            )
           else # get supported themes
             themes = Theme.where(:slug => blueprint.config['themes'] + ['generic'])
           end
-
-
 
           themes.each do |theme|
             slug = blueprint.is_themeable? ? blueprint.version :
@@ -90,8 +95,7 @@ module Autotune
               'title' => blueprint.title,
               'slug' => slug,
               'group' => theme.group.slug,
-              'theme' => theme.slug,
-              'theme_data' => Theme.full_theme_data)
+              'theme' => theme.slug)
 
             # Get the deployer object
             # probably don't want this to always be preview
