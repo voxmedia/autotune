@@ -3,7 +3,7 @@
 example:
   slug: example-blueprint
   title: Example blueprint
-  repo_url: <%= File.expand_path('../test/repos/autotune-example-blueprint.git', __FILE__) %>
+  repo_url: <%= Autotune.root.join('test', 'repos', 'autotune-example-blueprint.git') %>
   updated_at: <%= 5.day.ago.to_s(:db) %>
 
 example_two:

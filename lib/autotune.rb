@@ -33,6 +33,10 @@ module Autotune
       @redis_sub ||= configuration.redis.dup
     end
 
+    def root
+      Pathname.new(File.expand_path('../..', __FILE__))
+    end
+
     def register_deployer(scheme, deployer_class)
       @deployers ||= {}
       @deployers[scheme.to_sym] = deployer_class
