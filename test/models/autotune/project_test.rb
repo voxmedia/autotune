@@ -245,5 +245,35 @@ module Autotune
       assert_operator project.output, :end_with?, msg,
                       'missing truncate message'
     end
+
+    test 'build and publish' do
+      project = autotune_projects(:example_one)
+
+      assert_performed_jobs 3 do
+        project.build_and_publish
+      end
+    end
+
+    test 'build' do
+      project = autotune_projects(:example_one)
+
+      assert_performed_jobs 3 do
+        project.build
+      end
+    end
+
+    test 'upgrayyyyyde' do
+      project = autotune_projects(:example_one)
+
+      assert_performed_jobs 3 do
+        project.update_snapshot
+      end
+    end
+
+    test 'live' do
+      project = autotune_projects(:example_one)
+
+      refute project.live?
+    end
   end
 end

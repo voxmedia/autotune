@@ -27,7 +27,6 @@ module Autotune
 
     def index
       @projects = Project
-      # a user can have multiple authorizations
       # Filter and search query
       query = {}
 

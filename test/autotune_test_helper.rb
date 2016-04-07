@@ -88,9 +88,9 @@ class ActiveSupport::TestCase
     OmniAuth.config.mock_auth
   end
 
-  def repo_url
-    File.expand_path('../repos/autotune-example-blueprint.git', __FILE__).to_s
-  end
+  #def repo_url
+    #File.expand_path('../repos/autotune-example-blueprint.git', __FILE__).to_s
+  #end
 end
 
 # Helpers for controller tests

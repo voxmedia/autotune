@@ -33,8 +33,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     no_submod = 'fdb4b18d01461574f68cbd763731499af2da561d'
 
     bp = autotune_blueprints(:example)
-    bp.update(
-      :repo_url => repo_url, :version => no_submod)
+    bp.update(:version => no_submod)
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'

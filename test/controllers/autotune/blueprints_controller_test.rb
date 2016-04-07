@@ -53,6 +53,7 @@ module Autotune
 
     test 'create blueprint' do
       # make sure we remove the example blueprint
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 
@@ -90,6 +91,7 @@ module Autotune
 
     test 'delete blueprint' do
       # make sure we remove the example blueprint
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 

@@ -80,7 +80,7 @@ module Autotune
     # Checks if the project supports live preview
     # @return [Boolean] `true` if the project supports live preview, `false` otherwise.
     def live?
-      blueprint_config['preview_type'] == 'live'
+      blueprint_config.present? && blueprint_config['preview_type'] == 'live'
     end
 
     # Updates blueprint version and builds the project.
@@ -90,7 +90,7 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build
     # @see build_and_publish
-    def update_snapshot
+    def update_snapshot(current_user = nil)
       if blueprint_version == blueprint.version
         update!(:status => 'building')
       else
@@ -143,7 +143,7 @@ module Autotune
     # @see build
     # @see update_snapshot
     # @raise The original exception when the update fails
-    def build_and_publish
+    def build_and_publish(current_user = nil)
       update(:status => 'building')
       ActiveJob::Chain.new(
         SyncBlueprintJob.new(blueprint, :current_user => current_user),
@@ -215,13 +215,6 @@ module Autotune
       elsif blueprint_id
         Blueprint.find(blueprint_id).type
       end
-    end
-
-    # Gets the embed code for the project
-    # @return [String] embed html as string
-    def embed_html
-      ac = Autotune::ProjectsController.new
-      ac.embed_html
     end
 
     def deployed?

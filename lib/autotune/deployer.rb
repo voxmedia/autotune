@@ -29,7 +29,7 @@ module Autotune
     def before_build(build_data, _env, current_user = nil)
       if build_data['google_doc_url'] && current_user
         current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
-        if current_auth
+        if current_auth.present?
           google_client = GoogleDocs.new(
             :refresh_token => current_auth.credentials['refresh_token'],
             :access_token => current_auth.credentials['token'],
