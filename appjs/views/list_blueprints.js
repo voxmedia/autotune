@@ -14,12 +14,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   },
 
   listenForChanges: function() {
-    this.listenTo(this.app.listener, 'change:blueprint',
+    this.listenTo(this.app.messages, 'change:blueprint',
                   this.updateStatus, this);
   },
 
   stopListeningForChanges: function() {
-    this.stopListening(this.app.listener);
+    this.stopListening(this.app.messages);
   },
 
   updateStatus: function(data) {

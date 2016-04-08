@@ -15,7 +15,7 @@ module Autotune
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
   BLUEPRINT_TYPES = %w(graphic app)
   EDITABLE_SLUG_BLUEPRINT_TYPES = %w(app)
-  ROLES = %w(author editor superuser)
+  ROLES = %w(none author editor superuser)
 
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
@@ -76,6 +76,51 @@ module Autotune
       end
     end
     alias_method :config, :configuration
+
+    def can_message?
+      Autotune.redis.present?
+    end
+
+    def send_message(type, data)
+      ensure_redis
+      dt = DateTime.current
+      payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
+      redis.zadd('messages', dt.utc.to_f, payload.to_json)
+      redis.publish type, data.to_json
+    end
+
+    def purge_messages(older_than: nil)
+      ensure_redis
+      if older_than.nil?
+        redis.del('messages')
+      else
+        redis.zremrangebyscore('messages', '-inf', older_than.utc.to_f)
+      end
+    end
+
+    def messages(since: nil, type: nil)
+      ensure_redis
+
+      if since.nil?
+        results = redis.zrange('messages', 0, 1000)
+      else
+        results = redis.zrangebyscore('messages', since.utc.to_f, '+inf')
+      end
+
+      results.map! { |d| ActiveSupport::JSON.decode(d) }
+
+      if type.is_a?(String)
+        results.select { |m| m['type'] == type }
+      else
+        results
+      end
+    end
+
+    private
+
+    def ensure_redis
+      raise 'Redis is not configured' if redis.nil?
+    end
   end
 end
 

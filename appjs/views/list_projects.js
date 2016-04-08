@@ -14,12 +14,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   },
 
   listenForChanges: function() {
-    this.listenTo(this.app.listener, 'change:project',
+    this.listenTo(this.app.messages, 'change:project',
                   this.updateStatus, this);
   },
 
   stopListeningForChanges: function() {
-    this.stopListening(this.app.listener);
+    this.stopListening(this.app.messages);
   },
 
   updateStatus: function(data) {
