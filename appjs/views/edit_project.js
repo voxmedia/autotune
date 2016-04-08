@@ -20,8 +20,8 @@ function pluckAttr(models, attribute) {
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
-  forceUpdateDataFlag: false,
-  previousData: null,
+  buildData: null,
+  dataCache: null,
   events: {
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
@@ -37,6 +37,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if(options.query){
       this.togglePreview = options.query.togglePreview ? true : false;
     }
+
+    this.buildData = new Backbone.Model();
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
@@ -55,16 +57,20 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   focusPollChange: function(){
-    this.forceUpdateDataFlag = true;
-    this.pollChange();
+    this.pollChange({forceUpdate:true});
   },
 
-  pollChange: _.debounce(function(){
+  pollChange: _.debounce(function(opts){
+    opts = _.defaults(opts || {}, {
+      forceUpdate: false
+    });
+
     var view = this,
         $form = this.$('#projectForm'),
         config_themes = this.model.getConfig().themes || ['generic'],
         query = '',
-        data = $form.alpaca('get').getValue();
+        data = $form.alpaca('get').getValue(),
+        changedAttributes = false;
 
     if ( !this.model.hasPreviewType('live') ) {
       data['slug'] = [data['theme'], data['slug']].join('-');
@@ -83,19 +89,28 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       return;
     }
 
-    if( this.forceUpdateDataFlag ){
+    if( opts.forceUpdate ){
       // Check the flag in case we want to force an update
       query = '?force_update=true';
-      this.forceUpdateDataFlag = false;
-    } else if ( _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
+    } else if ( buildData {
+      changedAttributes = this.formDataModel.changedAttributes( data );
+
       // If data hasn't changed, bail
-      return;
+      if ( changedAttributes === false && !$('#embed-preview').hasClass('loading') ) {
+        return;
+      }
+
+      // Check if we have to make an ajax call, or if we can just update.
+      if ( _.intersection( changedAttributes, this.model.attributesProcessedByServer() ).length === 0 ) {
+        view.pym.sendMessage('updateData', JSON.stringify(data));
+        return;
+      }
     }
 
     logger.debug('pollchange');
 
     // stash data so we can see if it changed
-    this.previousData = data;
+    this.formDataModel.set(data);
 
     // Show some sort of loading indicator:
     $('#embed-preview').addClass('loading');
@@ -109,6 +124,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }).then(function( data ) {
       logger.debug('Updating live preview...');
       var iframeLoaded = _.once(function() {
+        (this.model.formData());
+        view.dataCache = data;
         view.pym.sendMessage('updateData', JSON.stringify(data));
         $('#embed-preview').removeClass('loading');
       });
@@ -298,10 +315,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
           // In case some dumb script hangs the loading process
           setTimeout(iframeLoaded, 20000);
-
-          if ( view.togglePreview ){
-            $( "#draft-preview" ).trigger( "click" );
-          }
         }
       }).catch(function(err) {
         console.error(err);

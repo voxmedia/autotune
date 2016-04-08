@@ -209,7 +209,7 @@ module Autotune
     end
 
     def create_spreadsheet
-      current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
+      current_auth = current_user.authorizations.find_by_provider!('google_oauth2')
       google_client = GoogleDocs.new(
         :refresh_token => current_auth.credentials['refresh_token'],
         :access_token => current_auth.credentials['token'],

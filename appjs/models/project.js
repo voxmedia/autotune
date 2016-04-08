@@ -7,6 +7,18 @@ var Backbone = require('backbone'),
     utils = require('../utils'),
     markdown = require('markdown').markdown;
 
+var FormData = Backbone.Model.extend({
+  needsUpdate: function() {
+    return _.intersection(
+      this.changedAttributes(),
+      ['google_doc_url']).length > 0;
+  }
+});
+
+var BuildData = Backbone.Model.extend({
+
+});
+
 var Project = Backbone.Model.extend({
   urlRoot: '/projects',
 
@@ -117,7 +129,7 @@ var Project = Backbone.Model.extend({
    * @returns {object} Blueprint build data
    **/
   buildData: function() {
-    return _.extend({ 'base_url': this.baseUrl() }, this.formData());
+    return this.formData();
   },
 
   /**
@@ -142,6 +154,14 @@ var Project = Backbone.Model.extend({
       'slug': this.get('slug'),
       'theme': this.get('theme')
     }, this.get('data'));
+  },
+
+  /**
+   * Get the names of fields that need to be sent to the server for processing.
+   * Used by live preview to decide if an ajax call is necessary.
+   **/
+  attributesProcessedByServer: function() {
+    return ['google_doc_url'];
   },
 
   /**
