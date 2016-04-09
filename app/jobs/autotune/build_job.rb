@@ -42,7 +42,8 @@ module Autotune
         'slug' => project.slug,
         'group' => project.group.slug,
         'theme' => project.theme.slug,
-        'theme_data' => project.theme.config_data)
+        'available_themes' => Theme.all.pluck(:slug),
+        'theme_data' => Theme.full_theme_data)
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
