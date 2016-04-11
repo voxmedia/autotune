@@ -118,6 +118,10 @@ module Autotune
         @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
       end
 
+      if request.POST.key? 'blueprint_version'
+        @project.blueprint_version = request.POST['blueprint_version']
+      end
+
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_value request.POST['theme']
 

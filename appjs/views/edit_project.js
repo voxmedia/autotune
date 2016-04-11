@@ -544,7 +544,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       title: data['title'],
       theme: data['theme'],
       data:  data,
-      blueprint_id: this.model.blueprint.get('id')
+      blueprint_id: this.model.blueprint.get('id'),
+      blueprint_version: this.model.getVersion()
     };
 
     if ( data.slug && data.slug.indexOf(data['theme']) !== 0 ) {

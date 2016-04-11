@@ -16,28 +16,32 @@ module Autotune
                           Rails.configuration.autotune.setup_environment)
 
       if repo.exist?
+        repo.branch_from_repo_url(blueprint.repo_url)
         if update
           # Update the repo
           repo.update
           # Track the current commit version
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
-          # if we're not updating, bail if we have the files
+          # run update to ensure that repo is on correct branch
+          repo.update
+          blueprint.version = repo.version
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up
-          repo.branch = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         end
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
         if blueprint.version.present?
-          repo.branch = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         else
           # Track the current commit version
           blueprint.version = repo.version
+          repo.update
         end
       end
 
