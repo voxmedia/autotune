@@ -114,15 +114,22 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
       });
     }
 
-    noti = _.find(PNotify.notices, function(notify) {
-      return notify.options.text === message;
-    } );
-
+    noti = this.findNotification( message );
     return noti || new PNotify(opts);
   },
 
-  clearAlerts: function() {
-    return PNotify.removeAll();
+  findNotification: function(message) {
+    return _.find(PNotify.notices, function(notify) {
+      return notify.options.text === message;
+    } );
+  },
+
+  clearNotification: function(message) {
+    if ( message ) {
+      return this.findNotification( message );
+    } else {
+      return PNotify.removeAll();
+    }
   }
 });
 
