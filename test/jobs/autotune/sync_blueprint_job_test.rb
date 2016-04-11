@@ -90,7 +90,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
   test 'blueprint branches' do
     bp = autotune_blueprints(:example)
-    bp.update(:repo_url => "#{repo_url}#test")
+    bp.update(:repo_url => "#{bp.repo_url}#test")
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
@@ -122,7 +122,6 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
   test 'blueprint change branches' do
     bp = autotune_blueprints(:example)
-    bp.update(:repo_url => repo_url)
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
@@ -151,7 +150,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert repo.exist?('submodule/testfile'),
            'Should have submodule testfile'
 
-    bp.update(:repo_url => "#{repo_url}#test")
+    bp.update(:repo_url => "#{bp.repo_url}#test")
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
@@ -181,7 +180,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
   test 'blueprint versioning with branch' do
     bp = autotune_blueprints(:example)
     bp.update(
-      :repo_url => "#{repo_url}#master", :version => NO_SUBMOD)
+      :repo_url => "#{bp.repo_url}#master", :version => NO_SUBMOD)
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
