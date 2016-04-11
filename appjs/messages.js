@@ -10,9 +10,10 @@ var _ = require('underscore'),
  */
 function Messages(opts) {
   this.config = _.defaults(opts || {}, {
-    url: '/messages', checkInterval: 3
+    url: '/messages', checkInterval: 3, errorRetry: 3
   });
 
+  this.errorStop = false;
   this.lastCheck = Date.now()/1000;
 }
 
@@ -23,6 +24,7 @@ _.extend(Messages.prototype, Backbone.Events, {
   start: function(){
     if ( this.paused ) { this.paused = false; }
     if ( this.interval ) { return; }
+    if ( this.errorStop ) { return; }
 
     logger.debug('Starting messages now');
     this.interval = window.setInterval(
@@ -30,6 +32,8 @@ _.extend(Messages.prototype, Backbone.Events, {
       this.config.checkInterval*1000
     );
     this.trigger('open');
+
+    this.errorCount = 0;
 
     return this;
   },
@@ -82,9 +86,11 @@ _.extend(Messages.prototype, Backbone.Events, {
     this.lastCheck = Date.now()/1000;
 
     logger.debug('Checking messages... (app.messages.stop() to stop)');
-    return Promise.resolve( $.get(
+    $.get(
       '/messages', { since: ts }, null, 'json'
-    ) ).then(function( data ) {
+    ).then(function( data ) {
+      self.errorCount = 0;
+
       data.forEach(function(item) {
         logger.debug('message', item);
 
@@ -104,8 +110,19 @@ _.extend(Messages.prototype, Backbone.Events, {
 
       });
     }, function( jqxhr, textStatus, error ) {
-      logger.error('Connection error', error);
-      self.trigger('error', error);
+      if ( jqxhr.status === 401 || jqxhr.status === 403 ) {
+        self.stop();
+        self.trigger('error', 'auth');
+        self.errorStop = true;
+      } else {
+        self.errorCount++;
+        if ( self.errorCount >= self.errorRetry ) {
+          self.stop();
+          self.trigger('error', error);
+          self.errorStop = true;
+        }
+        logger.error('Connection error', error);
+      }
     });
   }
 });

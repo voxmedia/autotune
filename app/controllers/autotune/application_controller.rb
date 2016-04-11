@@ -124,6 +124,7 @@ module Autotune
 
       respond_to do |format|
         format.html { render 'google_auth' }
+        format.json { render_error 'Unauthorized', :unauthorized }
       end
     end
 

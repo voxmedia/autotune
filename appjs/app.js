@@ -50,10 +50,13 @@ function App(config) {
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
 
+  // Initialize top-level view
+  this.view = new views.Application({ app: this });
+
   // Initialize server event listener
   this.messages = new Messages();
   this.listenTo(this.messages, 'stop', this.handleListenerStop);
-  this.listenTo(this.messages, 'error', this.handleListenerStop);
+  this.listenTo(this.messages, 'error', this.handleListenerError);
   this.listenTo(this.messages, 'open', this.handleListenerStart);
   this.listenTo(this.messages, 'alert', this.handleAlertMessage);
   this.messages.start();
@@ -61,9 +64,6 @@ function App(config) {
   this.config = config;
 
   if ( this.isDev() ) { logger.level = 'debug'; }
-
-  // Initialize top-level view
-  this.view = new views.Application({ app: this });
 
   // Initialize routing
   this.router = new Router({ app: this });
@@ -129,9 +129,20 @@ _.extend(App.prototype, Backbone.Events, {
    * Do something when the listener shuts down
    **/
   handleListenerStop: function() {
-    if ( !this.reloadNotification ) {
-      this.reloadNotification = this.view.alert(
-        'Reload to see changes', 'notice', true);
+    this.view.warning('Reload to see changes', true);
+  },
+
+  /**
+   * Do something when the listener errors out
+   **/
+  handleListenerError: function(error) {
+    this.view.clearNotification( 'Reload to see changes' );
+    if ( error === 'auth' ) {
+      this.view.error(
+        'Your session has expired. Please reload your browser.', true);
+    } else {
+      this.view.error(
+        'There was a problem connecting to the server ('+error+').', true);
     }
   },
 
@@ -139,10 +150,7 @@ _.extend(App.prototype, Backbone.Events, {
    * Do something when the listener starts
    **/
   handleListenerStart: function() {
-    if ( this.reloadNotification ) {
-      this.reloadNotification.remove();
-      this.reloadNotification = null;
-    }
+    this.view.clearNotification( 'Reload to see changes' );
   },
 
   /**
