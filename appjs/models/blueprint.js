@@ -58,10 +58,6 @@ var Blueprint = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
-  isThemeable: function(){
-    return this.has('config') && this.get('config')['dynamic_themes'];
-  },
-
   /**
    * Does this project have a form?
    * @returns {boolean}

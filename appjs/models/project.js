@@ -300,9 +300,18 @@ var Project = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
-  isThemeable: function(){
-    return true;
-    //return this.has('config') && this.getConfig()['dynamic_themes'];
+  hasThemeType: function() {
+    if ( !this.getConfig()['theme_type'] ) {
+      return false;
+    }
+    var iteratee = function(m, i) {
+      return m || this.getConfig()['theme_type'] === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  isThemeable: function() {
+    return this.hasThemeType('dynamic');
   },
 
   /**

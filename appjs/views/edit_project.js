@@ -354,7 +354,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     form_config = this.model.getConfig().form;
-    themes = this.model.isThemeable && !this.model.getConfig().themes ?
+    themes = this.model.isThemeable() && !this.model.getConfig().themes ?
       pluckAttr(this.app.themes.models, 'slug') :
       _.intersection(pluckAttr(this.app.themes.models, 'slug'), this.model.getConfig().themes );
 
