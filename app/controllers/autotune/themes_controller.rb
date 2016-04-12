@@ -76,6 +76,7 @@ module Autotune
       if @theme.valid?
         @theme.status = "ready"
         @theme.save
+        Blueprint.rebuild_themes
         render :show, :status => :created
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request
@@ -88,7 +89,7 @@ module Autotune
       if @theme.valid?
         @theme.status = "ready"
         @theme.save
-        @theme.update_blueprint_themes
+        Blueprint.rebuild_themes
         render :show
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request

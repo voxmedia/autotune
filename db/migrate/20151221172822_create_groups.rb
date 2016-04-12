@@ -54,14 +54,13 @@ class CreateGroups < ActiveRecord::Migration
           group = Autotune::Group.find_or_create_by :name => g['name']
           theme.group = group
           theme.save!
-          theme.update_data
-        else
-          puts "Skipping group #{g['name']}. Creating theme #{g['name']}"
-          Autotune::Theme.find_or_create_by :title => g['name'],
-                                            :group => theme.group,
-                                            :parent => theme
+
+          # update data but delay blueprint rebuilding
+          theme.update_data(build_blueprints: false )
         end
       end
+      # now that all the themes are created, rebuild all the blueprints
+      Autotune::Blueprint.rebuild_themes
 
       Autotune::Project.all.each do |project|
         project.group = project.theme.group

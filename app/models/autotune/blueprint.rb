@@ -92,6 +92,13 @@ module Autotune
       raise
     end
 
+    # Rebuild all themeable blueprints. Used when themes are updated
+    def self.rebuild_themes
+      jobs = Blueprint.all.select {|bp| bp.is_themeable? }
+               .collect { |bp| SyncBlueprintJob.new( bp, build_themes:true ) }
+      ActiveJob::Chain.new( *jobs ).enqueue
+    end
+
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
     # different name.
     def self.inheritance_column

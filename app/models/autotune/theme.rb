@@ -33,21 +33,16 @@ module Autotune
       parent.data.deep_merge(data)
     end
 
-    def update_data
+    def update_data (build_blueprints: true)
       update!(:status => "updating")
-      update!(:status => "ready") if parent.nil?
-      jobs = Blueprint.all.each { |bp| SyncBlueprintJob.new(bp, build_themes:true)}
-      ActiveJob::Chain.new(
-        SyncThemeJob.new(self),
-        jobs
-      ).enqueue
-    rescue
+      SyncThemeJob.perform_later(self)
+      Blueprint.rebuild_themes if build_blueprints
+     rescue => error
       update!(:status => 'broken')
       raise
     end
 
-
-    # Get default theme for group
+   # Get default theme for group
     def self.get_default_theme_for_group(group_id)
       Theme.find_by(
         :parent_id => nil,
