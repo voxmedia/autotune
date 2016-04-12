@@ -1,5 +1,10 @@
 require 'test_helper'
 
+# All the tests involving a repo use a git repo in the test/repos directory. If
+# you need to make adjustments to this repo, clone it locally by doing
+# something like:
+#   git clone ../autotune/test/repos/autotune-example-blueprint.git
+
 module Autotune
   # Test blueprint api
   class BlueprintsControllerTest < ActionController::TestCase
