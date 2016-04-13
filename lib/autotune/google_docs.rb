@@ -153,8 +153,9 @@ module Autotune
 
       has_permission = false
       cp_resp.data.items.each do |item|
-        # need to set domain somewhere else - maybe in config
         if item['type'] == 'domain' && item['domain'] == domain
+          has_permission = true
+        elsif item['type'] == 'anyone'
           has_permission = true
         end
       end
@@ -166,6 +167,7 @@ module Autotune
       end
     end
 
+    # May not work if our domain and domain associated with file don't match
     def insert_permission(file_id, value, perm_type, role)
       drive = @client.discovered_api('drive', 'v2')
       new_permission = {
