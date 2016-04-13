@@ -10,8 +10,8 @@ json.blueprint_title project.blueprint.title
 json.theme project.theme.slug
 json.created_by project.user.name
 
-if project.built?
-  if project.publishable?
+if project.built? && (!project.live? || project.published?)
+  if project.publishable? && !project.live?
     deployer = project.deployer(:preview)
   else
     deployer = project.deployer(:publish)

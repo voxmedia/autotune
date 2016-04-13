@@ -54,6 +54,15 @@ OmniAuth.config.add_mock(:google_oauth2, OmniAuth::AuthHash.new(
   }
 ))
 
+# Commit hashs for the test repo
+TEST_REPO = Autotune.root.join('test', 'repos', 'autotune-example-blueprint.git')
+MASTER_HEAD = 'e03176388c7d1f6dd91a5856b0197d80168a57a2'
+MASTER_HEAD1 = WITH_SUBMOD = '4d3dc6432b464f4d42b0e30b891824ad72ef6abb'
+MASTER_HEAD2 = NO_SUBMOD = 'fdb4b18d01461574f68cbd763731499af2da561d'
+TEST_HEAD = 'b36b32c97fa027d4f86b64559377d9dd47a3530b'
+LIVE_HEAD = '23eed13c4713da0516af6ad0d33a99ee9c582fa4'
+LIVE_HEAD1 = 'c4e5571fd259be57f7e2d0ab8cc0f93a46ab9460'
+
 # Reset themes for testing
 Rails.configuration.autotune.generic_theme = {
   'primary-color' => '#292929',
@@ -93,9 +102,9 @@ class ActiveSupport::TestCase
     OmniAuth.config.mock_auth
   end
 
-  def repo_url
-    File.expand_path('../repos/autotune-example-blueprint.git', __FILE__).to_s
-  end
+  #def repo_url
+    #File.expand_path('../repos/autotune-example-blueprint.git', __FILE__).to_s
+  #end
 end
 
 # Helpers for controller tests

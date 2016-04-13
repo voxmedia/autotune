@@ -107,44 +107,42 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).then(function( data ) {
-        var iframeLoaded = _.once(function() {
-          view.pym.sendMessage('updateData', JSON.stringify(data));
-          $('#embed-preview').removeClass('loading');
-        });
+      logger.debug('Updating live preview...');
+      var iframeLoaded = _.once(function() {
+        view.pym.sendMessage('updateData', JSON.stringify(data));
+        $('#embed-preview').removeClass('loading');
+      });
 
-        if(data.theme !== view.theme){
-          if(typeof data.theme !== 'undefined'){
-            view.theme = data.theme;
-          }
-          var version = view.model.getVersion(),
-            previewSlug = view.model.isThemeable() ?
-                version :[version, view.theme].join('-'),
-            previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
-
-          if ( view.pym ) { view.pym.remove(); }
-
-          $('#embed-preview').empty();
-          view.pym = new pym.Parent('embed-preview', previewUrl);
-          view.pym.iframe.onload = iframeLoaded;
-
-          // In case some dumb script hangs the loading process
-          setTimeout(iframeLoaded, 20000);
-        } else {
-          iframeLoaded();
+      if(data.theme !== view.theme){
+        if(typeof data.theme !== 'undefined'){
+          view.theme = data.theme;
         }
-      },
-      function(err) {
-        if ( err.status < 500 ) {
-          var dat = err.responseJSON;
-          var errMsg = dat && dat.error ? dat.error : "Could not read preview data.";
-          view.app.view.error(errMsg);
-        } else {
-          view.app.view.error(
-            "There was a problem updating the preview, please contact support" );
-          logger.error(err);
-        }
+        var version = view.model.getVersion(),
+          previewSlug = view.model.isThemeable() ?
+              version :[version, view.theme].join('-'),
+          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
+
+        if ( view.pym ) { view.pym.remove(); }
+
+        $('#embed-preview').empty();
+        view.pym = new pym.Parent('embed-preview', previewUrl);
+        view.pym.iframe.onload = iframeLoaded;
+
+        // In case some dumb script hangs the loading process
+        setTimeout(iframeLoaded, 20000);
+      } else {
+        iframeLoaded();
       }
-    );
+    }, function(err) {
+      if ( err.status < 500 ) {
+        view.app.view.error(
+          "Can't update live preview (" +err.responseJSON.error+").", 'permanent');
+      } else {
+        view.app.view.error(
+          "Could not update live preview, please contact support.", 'permanent' );
+        logger.error(err);
+      }
+    });
   }, 500),
 
   savePreview: function(){
@@ -165,7 +163,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   listenForChanges: function() {
     if ( !this.model.isNew() && !this.listening ) {
-      this.listenTo(this.app.listener,
+      this.listenTo(this.app.messages,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
       this.listening = true;
@@ -173,7 +171,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   stopListeningForChanges: function() {
-    this.stopListening(this.app.listener);
+    this.stopListening(this.app.messages);
     this.listening = false;
   },
 
@@ -322,7 +320,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         $('#embed-preview').addClass('loading');
       }
       this.app.view.alert(
-        'Building... This might take a moment.', 'notice', false, 16000);
+        'Building... This might take a moment.', 'notice', 16000);
     }
   },
 
@@ -445,7 +443,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
         var googleText = form_config.schema.properties.google_doc_url.title;
-        var newText = googleText + '<br><button type="button" data-action="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
+        var newText = googleText + '<br><button type="button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
         form_config.schema.properties.google_doc_url.title = newText;
       }
 
@@ -467,8 +465,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           "fields": options_fields,
           "focus": this.firstRender
         },
-        "postRender": _.bind(function(control) {
-          this.alpaca = control;
+        "postRender": function(control) {
+          view.alpaca = control;
 
           var theme = control.childrenByPropertyId["theme"],
              social = control.childrenByPropertyId["tweet_text"],
@@ -493,14 +491,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             }
           }
 
-          this.alpaca.childrenByPropertyId["slug"].setValue(
-            this.model.get('slug_sans_theme') );
+          view.alpaca.childrenByPropertyId["slug"].setValue(
+            view.model.get('slug_sans_theme') );
 
           control.form.form.append(
-            helpers.render(button_tmpl, this.templateData()) );
+            helpers.render(button_tmpl, view.templateData()) );
 
           resolve();
-        }, this)
+        }
       };
 
       if( form_config['view'] ) {
@@ -546,7 +544,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       title: data['title'],
       theme: data['theme'],
       data:  data,
-      blueprint_id: this.model.blueprint.get('id')
+      blueprint_id: this.model.blueprint.get('id'),
+      blueprint_version: this.model.getVersion()
     };
 
     if ( data.slug && data.slug.indexOf(data['theme']) !== 0 ) {
@@ -588,7 +587,44 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.$("#embed textarea").select();
     document.execCommand('copy');
     this.app.view.alert('Embed code copied to clipboard!');
-  }
+  },
+
+  /**
+   * Create a new spreadsheet from a template
+   * @returns {Promise} Promise to provide the Google Doc URL
+   **/
+  createSpreadsheet: function() {
+    var model = this.model, view = this;
+    if ( !model.getConfig().spreadsheet_template ) { return Promise.resolve(); }
+
+    var ss_key = model.getConfig().spreadsheet_template.match(/[-\w]{25,}/)[0];
+
+    var $input = $( "input[name='google_doc_url']" );
+    if( $input.val().length > 0 ) {
+      var msg = 'This will replace the spreadsheet link currently associated with this project. Click "OK" to confirm the replacement.';
+      if ( !window.confirm(msg) ) { return Promise.resolve(); }
+    }
+
+    return Promise.resolve( $.ajax({
+      type: "POST",
+      url: model.urlRoot + "/create_spreadsheet",
+      data: JSON.stringify(ss_key),
+      contentType: 'application/json',
+      dataType: 'json'
+    }) ).then(
+      function( data ) {
+        $input
+          .val(data.google_doc_url)
+          .focus();
+        view.alpaca.form.refreshValidationState(true);
+      },
+      function(err) {
+        var msg = 'There was an error authenticating your Google account.';
+        view.app.view.error(msg);
+        logger.error(msg, err);
+      }
+    );
+  },
 } );
 
 module.exports = EditProject;

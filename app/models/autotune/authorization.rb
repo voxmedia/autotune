@@ -46,6 +46,22 @@ module Autotune
       provider == Rails.configuration.omniauth_preferred_provider.to_s
     end
 
+    def valid_credentials?
+      # Make sure we have credentials
+      return false if credentials.blank?
+      # We're gtg if we have a refresh token
+      return true if credentials['refresh_token'].present?
+      # If we don't have a refresh token, we must have a token
+      return false if credentials['token'].blank?
+      # We're gtg if the token does not expire
+      return true if credentials['expires'].blank?
+      # If the token does expire, make sure it's not expired right now
+      return true if credentials['expires_at'].present? &&
+                     Time.now.to_i < credentials['expires_at'].to_i
+
+      false
+    end
+
     def to_auth_hash
       OmniAuth::AuthHash.new(as_json)
     end

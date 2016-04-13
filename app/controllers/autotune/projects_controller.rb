@@ -28,7 +28,6 @@ module Autotune
 
     def index
       @projects = Project
-      # a user can have multiple authorizations
       # Filter and search query
       query = {}
 
@@ -120,6 +119,10 @@ module Autotune
         @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
       end
 
+      if request.POST.key? 'blueprint_version'
+        @project.blueprint_version = request.POST['blueprint_version']
+      end
+
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_slug request.POST['theme']
         @project.group = @project.theme.group
@@ -170,9 +173,9 @@ module Autotune
       end
 
       # make sure data doesn't contain title, slug or theme
-      @project.data.delete('title')
-      @project.data.delete('slug')
-      @project.data.delete('theme')
+      %w(title slug theme base_url asset_base_url).each do |k|
+        @project.data.delete(k)
+      end
 
       if @project.valid?
         @project.status = 'built' if @project.live?
@@ -189,7 +192,7 @@ module Autotune
       @project = instance
       @build_data = request.POST
       if @build_data['google_doc_url'] && request.GET[:force_update]
-        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
+        cache_key = "googledoc#{GoogleDocs.key_from_url(@build_data['google_doc_url'])}"
         Rails.cache.delete(cache_key)
       end
 
@@ -200,18 +203,22 @@ module Autotune
       deployer.before_build(@build_data, {}, current_user)
       render :json => @build_data
     rescue => exc
-      if @project.meta['error_message'].present?
+      if @project.present? && @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
+      elsif exc.is_a?(Signet::AuthorizationError)
+        render_error 'There was an error authenticating your Google account', :bad_request
+        logger.error "Google Auth error: #{exc.message}"
       else
-        render_error exc.message
-        logger.error exc.message
-        logger.error exc.backtrace.join("\n")
+        raise
       end
     end
 
     def create_spreadsheet
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
-      google_client = GoogleDocs.new(current_auth)
+      google_client = GoogleDocs.new(
+        :refresh_token => current_auth.credentials['refresh_token'],
+        :access_token => current_auth.credentials['token'],
+        :expires_at => current_auth.credentials['expires_at'])
       spreadsheet_copy = google_client.copy(request.POST['_json'])
 
       if Autotune.configuration.google_auth_domain.present?
@@ -220,8 +227,9 @@ module Autotune
       end
 
       render :json => { :google_doc_url => spreadsheet_copy[:url] }
-    rescue => exc
-      render_error exc.message
+    rescue Signet::AuthorizationError => exc
+      render_error 'There was an error authenticating your Google account', :bad_request
+      logger.error "Google Auth error: #{exc.message}"
     end
 
     def update_snapshot
@@ -247,7 +255,5 @@ module Autotune
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
     end
-
-    private
   end
 end

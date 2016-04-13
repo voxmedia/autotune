@@ -125,7 +125,17 @@ module Autotune
       assert_project_data!
 
       new_p = Project.find decoded_response['id']
-      assert_equal project_data[:title], new_p.title
+      project_data.keys.each do |k|
+        if k == :theme
+          assert_equal Autotune::Theme.find_by_value(project_data[k]), new_p.send(k)
+        elsif k == :preview_url
+          assert_equal '/preview/generic-new-project', new_p.send(k)
+        elsif k == :data
+          assert_equal({ 'google_doc_id' => '1234' }, new_p.send(k))
+        else
+          assert_equal project_data[k], new_p.send(k)
+        end
+      end
     end
 
     test 'create project not allowed' do
@@ -312,6 +322,52 @@ module Autotune
                    decoded_response.length
     end
 
+    test 'project versioning' do
+      accept_json!
+      valid_auth_header!
+
+      bp = autotune_blueprints(:example)
+      bp.update :version => MASTER_HEAD2
+
+      assert_performed_jobs 3 do
+        post :create, project_data
+      end
+
+      assert_response :created, decoded_response['error']
+      assert_project_data!
+
+      bp.reload
+      assert_equal MASTER_HEAD2, bp.version,
+                   'Repo should be checked out to the correct version'
+      assert_equal MASTER_HEAD2, decoded_response['blueprint_version']
+
+      new_p = Project.find decoded_response['id']
+      assert_equal MASTER_HEAD2, new_p.blueprint_version
+    end
+
+    test 'project versioning with live preview' do
+      accept_json!
+      valid_auth_header!
+
+      bp = autotune_blueprints(:example)
+      bp.update(:repo_url => "#{bp.repo_url}#live", :version => LIVE_HEAD1)
+
+      assert_performed_jobs 3 do
+        post :create, project_data
+      end
+
+      assert_response :created, decoded_response['error']
+      assert_project_data!
+
+      bp.reload
+      assert_equal LIVE_HEAD1, bp.version,
+                   'Repo should be checked out to the correct version'
+      assert_equal LIVE_HEAD1, decoded_response['blueprint_version']
+
+      new_p = Project.find decoded_response['id']
+      assert_equal LIVE_HEAD1, new_p.blueprint_version
+    end
+
     private
 
     def assert_project_data!
@@ -321,7 +377,7 @@ module Autotune
     def project_data
       @project_data ||= {
         :title => 'New project',
-        :slug => 'New project'.parameterize,
+        :slug => "#{autotune_themes(:generic).value} New project".parameterize,
         :blueprint_id => autotune_blueprints(:example).id,
         :user_id => autotune_users(:developer).id,
         :theme => autotune_themes(:theverge).slug,

@@ -81,7 +81,7 @@ module Autotune
     # Checks if the project supports live preview
     # @return [Boolean] `true` if the project supports live preview, `false` otherwise.
     def live?
-      blueprint_config['preview_type'] == 'live'
+      blueprint_config.present? && blueprint_config['preview_type'] == 'live'
     end
 
     # Updates blueprint version and builds the project.
@@ -91,7 +91,7 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build
     # @see build_and_publish
-    def update_snapshot
+    def update_snapshot(current_user = nil)
       if blueprint_version == blueprint.version
         update!(:status => 'building')
       else
@@ -101,9 +101,13 @@ module Autotune
           :blueprint_config => blueprint.config)
       end
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :current_user => current_user),
         SyncProjectJob.new(self, :update => true),
-        BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
+        BuildJob.new(
+          self,
+          :target => publishable? ? 'preview' : 'publish',
+          :current_user => current_user
+        )
       ).enqueue
     rescue
       update!(:status => 'broken')
@@ -117,12 +121,16 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build_and_publish
     # @see update_snapshot
-    def build
+    def build(current_user = nil)
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :current_user => current_user),
         SyncProjectJob.new(self),
-        BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
+        BuildJob.new(
+          self,
+          :target => publishable? ? 'preview' : 'publish',
+          :current_user => current_user
+        )
       ).enqueue
     rescue
       update!(:status => 'broken')
@@ -136,12 +144,16 @@ module Autotune
     # @see build
     # @see update_snapshot
     # @raise The original exception when the update fails
-    def build_and_publish
+    def build_and_publish(current_user = nil)
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :current_user => current_user),
         SyncProjectJob.new(self),
-        BuildJob.new(self, :target => 'publish')
+        BuildJob.new(
+          self,
+          :target => 'publish',
+          :current_user => current_user
+        )
       ).enqueue
     rescue
       update!(:status => 'broken')
@@ -206,13 +218,6 @@ module Autotune
       end
     end
 
-    # Gets the embed code for the project
-    # @return [String] embed html as string
-    def embed_html
-      ac = Autotune::ProjectsController.new
-      ac.embed_html
-    end
-
     def deployed?
       status != 'new' && blueprint_version.present?
     end
@@ -240,10 +245,10 @@ module Autotune
     end
 
     def pub_to_redis
-      return if Autotune.redis.nil?
       msg = { :id => id,
+              :model => 'project',
               :status => status }
-      Autotune.redis.publish 'project', msg.to_json
+      Autotune.send_message('change', msg) if Autotune.can_message?
     end
   end
 end

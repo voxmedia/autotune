@@ -126,4 +126,10 @@ class Autotune::AuthorizationTest < ActiveSupport::TestCase
 
     assert auth.verified?, 'Should be verified'
   end
+
+  test 'check creds' do
+    auth = Autotune::Authorization.initialize_from_auth_hash mock_auth[:google_oauth2]
+
+    assert auth.valid_credentials?, 'Credentials should be valid'
+  end
 end

@@ -10,33 +10,36 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status: nil, update: false, build_themes: false)
+    def perform(blueprint, status: nil, update: false, build_themes: false, current_user: nil)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
 
       if repo.exist?
+        repo.branch_from_repo_url(blueprint.repo_url)
         if update
           # Update the repo
           repo.update
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version && !build_themes
-          # if we're not updating, bail if we have the files
+          # The correct blueprint files are on disk, and the blueprint is not
+          # broken. And we are not rebuilding themes.Nothing to do.
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up
-          repo.branch = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         end
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
         if blueprint.version.present?
-          repo.branch = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         else
           # Track the current commit version
           blueprint.version = repo.version
+          repo.update
         end
       end
 
@@ -103,7 +106,7 @@ module Autotune
               :media, blueprint, :extra_slug => slug)
 
             # Run the before build deployer hook
-            deployer.before_build(build_data, repo.env)
+            deployer.before_build(build_data, repo.env, current_user)
 
             # Run the build
             repo.working_dir do
