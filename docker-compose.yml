@@ -1,0 +1,13 @@
+version: '2'
+services:
+  redis:
+    image: redis:3.0
+  app:
+    build: .
+    links:
+        - redis
+    environment:
+        - REDIS_URL=redis://redis
+    volumes:
+        - ${SSH_KEY_PATH}:/root/.ssh/id_rsa
+        - .:/app
