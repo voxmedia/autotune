@@ -62,7 +62,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   pollChange: _.debounce(function(){
     var view = this,
         $form = this.$('#projectForm'),
-        themes = this.model.getConfig().themes || ['generic'],
+        themeSlugs = this.model.getConfig().themes || ['generic'],
         query = '',
         data = $form.alpaca('get').getValue();
 
@@ -330,7 +330,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         view = this,
-        form_config, themes, newProject, populateForm = false;
+        form_config, themeSlugs, newProject, populateForm = false;
 
     if ( this.disableForm ) {
       $form.append(
@@ -354,7 +354,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     form_config = this.model.getConfig().form;
-    themes = this.model.isThemeable() && !this.model.getConfig().themes ?
+    themeSlugs = this.model.isThemeable() && !this.model.getConfig().themes ?
       pluckAttr(this.app.themes.models, 'slug') :
       _.intersection(pluckAttr(this.app.themes.models, 'slug'), this.model.getConfig().themes );
 
@@ -363,7 +363,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       reject('This blueprint does not have a form!');
     } else {
       var availableThemes = _.filter(this.app.themes.models, function(t) {
-          return _.contains(themes, t.get('slug') );
+          return _.contains(themeSlugs, t.get('slug') );
         }),
           schema_properties = {
             "title": {
@@ -399,7 +399,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           options_fields = {
             "theme": {
               "type": "select",
-              "optionLabels": pluckAttr(availableThemes, 'title'),
+              "optionLabels": pluckAttr(availableThemes, 'title')
             },
             "slug": {
               "label": "Slug",
