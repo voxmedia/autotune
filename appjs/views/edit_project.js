@@ -399,7 +399,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           options_fields = {
             "theme": {
               "type": "select",
-              "optionLabels": pluckAttr(availableThemes, 'title')
+              "optionLabels": _.map(availableThemes, function(t){
+                   if (t.get('title') == t.get('group_name')) {
+                     return t.get('group_name');
+                   }
+                   return t.get('group_name') + ' - ' + t.get('title');
+                 })
             },
             "slug": {
               "label": "Slug",

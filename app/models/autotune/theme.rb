@@ -59,11 +59,9 @@ module Autotune
       default_theme.update_data
     end
 
-    def get_children
-      ret =[].push self
-      return ret if parent.nil?
-      ret + Theme.find_by(:parent_id => id)
-    end
+   def group_name
+     group.name
+   end
 
     # add a function to return twitter handle
     def twitter_handle
