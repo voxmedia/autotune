@@ -20,7 +20,6 @@ function pluckAttr(models, attribute) {
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
-  buildData: null,
   dataCache: null,
   events: {
     'change :input': 'stopListeningForChanges',
@@ -37,8 +36,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if(options.query){
       this.togglePreview = options.query.togglePreview ? true : false;
     }
-
-    this.buildData = new Backbone.Model();
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
@@ -69,11 +66,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         $form = this.$('#projectForm'),
         config_themes = this.model.getConfig().themes || ['generic'],
         query = '',
-        data = $form.alpaca('get').getValue(),
+        data = this.formValues($form),
         changedAttributes = false;
 
     if ( !this.model.hasPreviewType('live') ) {
-      data['slug'] = [data['theme'], data['slug']].join('-');
       if( !_.isEqual(this.model.formData(), data) ){
         $('#save-warning').show();
       } else {
@@ -89,43 +85,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       return;
     }
 
-    if( opts.forceUpdate ){
-      // Check the flag in case we want to force an update
-      query = '?force_update=true';
-    } else if ( buildData {
-      changedAttributes = this.formDataModel.changedAttributes( data );
-
+    if ( !opts.forceUpdate && _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
       // If data hasn't changed, bail
-      if ( changedAttributes === false && !$('#embed-preview').hasClass('loading') ) {
-        return;
-      }
-
-      // Check if we have to make an ajax call, or if we can just update.
-      if ( _.intersection( changedAttributes, this.model.attributesProcessedByServer() ).length === 0 ) {
-        view.pym.sendMessage('updateData', JSON.stringify(data));
-        return;
-      }
+      return;
     }
 
     logger.debug('pollchange');
 
-    // stash data so we can see if it changed
-    this.formDataModel.set(data);
-
     // Show some sort of loading indicator:
     $('#embed-preview').addClass('loading');
 
-    return $.ajax({
-      type: "POST",
-      url: this.model.url() + "/preview_build_data" + query,
-      data: JSON.stringify(data),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).then(function( data ) {
+    return this.model.fetchBuildData(
+      opts.forceUpdate
+    ).then(function( data ) {
       logger.debug('Updating live preview...');
       var iframeLoaded = _.once(function() {
-        (this.model.formData());
-        view.dataCache = data;
         view.pym.sendMessage('updateData', JSON.stringify(data));
         $('#embed-preview').removeClass('loading');
       });

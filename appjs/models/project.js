@@ -7,20 +7,9 @@ var Backbone = require('backbone'),
     utils = require('../utils'),
     markdown = require('markdown').markdown;
 
-var FormData = Backbone.Model.extend({
-  needsUpdate: function() {
-    return _.intersection(
-      this.changedAttributes(),
-      ['google_doc_url']).length > 0;
-  }
-});
-
-var BuildData = Backbone.Model.extend({
-
-});
-
 var Project = Backbone.Model.extend({
   urlRoot: '/projects',
+  cachedBuildData: '',
 
   /**
    * Constructor. Looks for `blueprint` or `blueprint_name` in the object passed in.
@@ -130,6 +119,19 @@ var Project = Backbone.Model.extend({
    **/
   buildData: function() {
     return this.formData();
+  },
+
+  fetchBuildData: function(force) {
+    var self = this;
+    return Promise.resolve( $.ajax({
+      type: "POST",
+      url: this.url() + "/preview_build_data" + (force ? '?force_update=true' : ''),
+      data: JSON.stringify( this.formData() ),
+      contentType: 'application/json',
+      dataType: 'json'
+    }).then(function( data ) {
+      self.cachedBuildData = data;
+    }) );
   },
 
   /**
@@ -355,6 +357,12 @@ var Project = Backbone.Model.extend({
    **/
   getPublishUrl: function(preferredProto, path) {
     return utils.buildUrl(this.get('publish_url'), path, preferredProto);
+  },
+
+  buildDataNeedsUpdate: function() {
+  },
+
+  dataDiff: function(newData) {
   }
 });
 

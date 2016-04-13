@@ -30,57 +30,45 @@ module.exports = {
     logger.debug('handleForm');
 
     var values = this.formValues($form),
-        model_class = $form.data('model'),
-        model_id = $form.data('model-id'),
-        action = $form.data('action'),
-        next = $form.data('next');
+        meta = this.formMeta($form);
 
     $form.find('[type=submit]').button('loading');
 
-    if(model_class && action === 'new') {
-      inst = new models[model_class]();
-    } else if(_.isObject(this.model) && action === 'edit') {
-      inst = this.model;
-    } else if ($form.attr('method').toLowerCase() === 'get') {
-      // if the method attr is `get` then we can navigate to that new
-      // url and avoid any posting
-      var basepath = $form.attr('action') || window.location.pathname;
-      Backbone.history.navigate(
-        basepath + '?' + $form.serialize(),
-        {trigger: true});
+    if ( meta.redirectUrl ) {
+      Backbone.history.navigate( meta.redirectUrl, {trigger: true} );
       return;
-    } else { throw "Don't know how to handle this form"; }
+    }
 
-    return this.hook('beforeSubmit', $form, values, action, inst)
+    return this.hook('beforeSubmit', $form, values, meta.action, meta.inst)
       .then(function() {
         logger.debug('saving values', values);
         inst.set(values);
-        if(!view.formValidate(inst, $form)) {
+        if(!view.formValidate(meta.inst, $form)) {
           logger.debug('form is not valid');
           throw 'Form is not valid';
         }
 
         logger.debug('form is valid, saving...');
 
-        return inst.save();
+        return meta.inst.save();
       }).then(function() {
         logger.debug('form finished saving');
 
-        if ( action === 'new' ) {
-          app.view.success('New '+model_class+' saved');
+        if ( meta.action === 'new' ) {
+          app.view.success('New '+meta.model_class+' saved');
         } else {
-          app.view.success(model_class+' updates saved');
+          app.view.success(meta.model_class+' updates saved');
         }
 
         return view.hook('afterSubmit');
       }).then(function() {
-        logger.debug('next: '+next);
-        if ( next === 'show' && action === 'new' ) {
-          Backbone.history.navigate(inst.url(), {trigger: true});
-        } else if ( next === 'show' ) {
+        logger.debug('next: '+meta.next);
+        if ( meta.next === 'show' && meta.action === 'new' ) {
+          Backbone.history.navigate( meta.inst.url(), {trigger: true});
+        } else if ( meta.next === 'show' ) {
           view.render();
-        } else if ( next ) {
-          Backbone.history.navigate(next, {trigger: true});
+        } else if ( meta.next ) {
+          Backbone.history.navigate(meta.next, {trigger: true});
         } else {
           view.render();
         }
@@ -104,8 +92,37 @@ module.exports = {
     );
   },
 
+  formMeta: function($form) {
+    var meta = {
+      model_class: $form.data('model'),
+      model_id: $form.data('model-id'),
+      action: $form.data('action'),
+      next: $form.data('next')
+    };
+
+    if(meta.model_class && meta.action === 'new') {
+      meta.inst = new models[meta.model_class]();
+    } else if(_.isObject(this.model) && meta.action === 'edit') {
+      meta.inst = this.model;
+    } else if ($form.attr('method').toLowerCase() === 'get') {
+      // if the method attr is `get` then we can navigate to that new
+      // url and avoid any posting
+      var base = $form.attr('action') || window.location.pathname;
+      meta.redirectUrl = base + '?' + $form.serialize();
+    } else { throw "Don't know how to handle this form"; }
+
+    return meta;
+  },
+
   formValidate: function(inst, $form) {
     return inst.isValid();
+  },
+
+  formHasChanged: function($form) {
+    var meta = this.formMeta($form);
+
+    if ( meta.redirectUrl !=
+
   },
 
   submitForm: function(eve) {

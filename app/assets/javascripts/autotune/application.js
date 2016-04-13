@@ -1,1 +1,1 @@
-console.error("SyntaxError: Unexpected token (96:26) while parsing /Users/ryanmark/Code/Vox/vox-autotune/autotune/appjs/views/edit_project.js while parsing file: /Users/ryanmark/Code/Vox/vox-autotune/autotune/appjs/views/edit_project.js");
+console.error("Error: Parsing file /Users/ryanmark/Code/Vox/vox-autotune/autotune/appjs/views/mixins/form.js: Unexpected token (126:2)");
