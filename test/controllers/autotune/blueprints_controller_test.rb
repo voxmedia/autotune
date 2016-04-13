@@ -84,9 +84,11 @@ module Autotune
 
       title = 'Updated blueprint'
 
-      put(:update,
-          :id => autotune_blueprints(:example).id,
-          :title => title)
+      assert_no_performed_jobs do
+        put(:update,
+            :id => autotune_blueprints(:example).id,
+            :title => title)
+      end
       assert_response :success
       assert_blueprint_data!
 
@@ -139,6 +141,27 @@ module Autotune
       assert_response :success
       assert_instance_of Array, decoded_response
       assert_equal 0, decoded_response.length
+    end
+
+    test 'update blueprint repo url' do
+      accept_json!
+      valid_auth_header!
+
+      bp = autotune_blueprints(:example)
+
+      title = 'Updated blueprint'
+
+      assert_performed_jobs 1 do
+        put(:update,
+            :id => bp.id,
+            :title => title,
+            :repo_url => "#{bp.repo_url}#live")
+      end
+      assert_response :success
+      assert_blueprint_data!
+
+      new_bp = Blueprint.find decoded_response['id']
+      assert_equal title, new_bp.title
     end
 
     private

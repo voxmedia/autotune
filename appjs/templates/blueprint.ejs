@@ -57,7 +57,9 @@
                 <label for="repo_url">Repo url</label>
                 <input type="text" required class="form-control"
                        <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
-                       id="repo_url" name="repo_url" placeholder="Enter repo url">
+                       id="repo_url" name="repo_url" placeholder="https://github.com/username/reponame.git#branchname">
+                <p class="help-block">You can target a branch by adding <code>#branchname</code> to the url.<p>
+                <p class="help-block">Changing the repo url will trigger an automatic upgrade of the blueprint.</p>
               </div>
               <% if(!model.isNew()) { %>
               <div class="form-group">
