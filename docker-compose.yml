@@ -1,8 +1,6 @@
-version: '2'
-services:
-  redis:
+redis:
     image: redis:3.0
-  app:
+app:
     build: .
     links:
         - redis
