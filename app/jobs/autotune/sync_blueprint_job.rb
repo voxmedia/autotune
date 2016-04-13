@@ -23,9 +23,8 @@ module Autotune
           # Track the current commit version
           blueprint.version = repo.version
         elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
-          # run update to ensure that repo is on correct branch
-          repo.update
-          blueprint.version = repo.version
+          # The correct blueprint files are on disk, and the blueprint is not
+          # broken. Nothing to do.
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up

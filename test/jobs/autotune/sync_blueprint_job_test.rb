@@ -1,11 +1,5 @@
 require 'test_helper'
 
-MASTER_HEAD = 'e03176388c7d1f6dd91a5856b0197d80168a57a2'
-TEST_HEAD = 'b36b32c97fa027d4f86b64559377d9dd47a3530b'
-LIVE_HEAD = 'c4e5571fd259be57f7e2d0ab8cc0f93a46ab9460'
-WITH_SUBMOD = '4d3dc6432b464f4d42b0e30b891824ad72ef6abb'
-NO_SUBMOD = 'fdb4b18d01461574f68cbd763731499af2da561d'
-
 # Test the install blueprint job
 class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
   fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes'
@@ -154,7 +148,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp.update(:repo_url => "#{bp.repo_url}#test")
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+      Autotune::SyncBlueprintJob.perform_later(
+        bp, :update => true, :status => 'testing')
     end
 
     bp.reload
@@ -284,6 +279,38 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
       assert wd.exist?('index.html')
       assert wd.exist?('preview/index.html')
     end
+  end
+
+  test 'blueprint versioning with existing files' do
+    bp = autotune_blueprints(:example)
+    bp.update(:repo_url => "#{bp.repo_url}", :version => MASTER_HEAD2)
+
+    repo = WorkDir.repo(bp.working_dir,
+                        Rails.configuration.autotune.build_environment)
+
+    assert_performed_jobs 1 do
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+    end
+
+    bp.reload
+
+    assert_equal MASTER_HEAD2, repo.version,
+                 'Repo should be checked out to the correct version'
+
+    assert_equal MASTER_HEAD2, bp.version,
+                 'Model should have correct version saved'
+
+    assert_performed_jobs 1 do
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+    end
+
+    bp.reload
+
+    assert_equal MASTER_HEAD2, repo.version,
+                 'Repo should be checked out to the correct version'
+
+    assert_equal MASTER_HEAD2, bp.version,
+                 'Model should have correct version saved'
   end
 
   test 'update repo' do

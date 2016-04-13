@@ -254,7 +254,5 @@ module Autotune
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
     end
-
-    private
   end
 end
