@@ -153,8 +153,9 @@ module Autotune
 
       has_permission = false
       cp_resp.data.items.each do |item|
-        # need to set domain somewhere else - maybe in config
         if item['type'] == 'domain' && item['domain'] == domain
+          has_permission = true
+        elsif item['type'] == 'anyone'
           has_permission = true
         end
       end
