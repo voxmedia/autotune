@@ -62,7 +62,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   pollChange: _.debounce(function(){
     var view = this,
         $form = this.$('#projectForm'),
-        themeSlugs = this.model.getConfig().themes || ['generic'],
         query = '',
         data = $form.alpaca('get').getValue();
 
@@ -328,7 +327,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         view = this,
-        form_config, themeSlugs, availableThemes, twitterHandles, newProject, populateForm = false;
+        form_config, availableThemes, twitterHandles, newProject, populateForm = false;
 
     if ( this.disableForm ) {
       $form.append(
@@ -352,13 +351,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     form_config = this.model.getConfig().form;
-    themeSlugs = this.model.isThemeable() && !this.model.getConfig().themes ?
-      pluckAttr(this.app.themes.models, 'slug') :
-      _.intersection(pluckAttr(this.app.themes.models, 'slug'), this.model.getConfig().themes ),
-    availableThemes = _.filter(this.app.themes.models, function(t) {
-      return _.contains(themeSlugs, t.get('slug') );
-    }),
-      twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
+
+    if( this.model.isThemeable() ) {
+      if ( !this.model.getConfig().themes) {
+        availableThemes = this.app.themes.models;
+      } else {
+        availableThemes =  _.filter(this.app.themes.models, function(t) {
+          return _.contains(this.model.getConfig().themes, t.get('slug') );
+        })
+      }
+    }
+
+    availableThemes = this.model.getConfig().themes ?
+      _.filter(this.app.themes.models, function(t) {
+        return _.contains(this.model.getConfig().themes, t.get('slug'))
+      }) : this.app.themes.models;
+    availableThemes = availableThemes || this.app.themes.where({slug : 'generic'});
+    twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
