@@ -357,9 +357,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     form_config = this.model.getConfig().form;
 
     availableThemes = this.model.getConfig().themes ?
-      _.filter(this.app.themes.models, function(t) {
-        return _.contains(this.model.getConfig().themes, t.get('slug'))
-      }) : this.app.themes.models;
+      _.filter(this.app.themes.models, _.bind(function(t) {
+        return _.contains(this.model.getConfig().themes, t.get('slug'));
+      }, this)) : this.app.themes.models;
     availableThemes = availableThemes || this.app.themes.where({slug : 'generic'});
     twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
 

@@ -113,7 +113,7 @@
     </td>
     <td>
       <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
-      <%=app.themes.findWhere({slug: item.get('theme')}).get('label') %>
+      <%=app.themes.findWhere({slug: item.get('theme')}).get('title') %>
       <% } else { %>
       <em class="text-muted"><%=item.get('theme') %></em>
       <% } %>
