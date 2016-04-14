@@ -65,7 +65,8 @@ module Autotune
 
     # add a function to return twitter handle
     def twitter_handle
-      return config_data['twitter-handle']
+      return nil if config_data['social'].blank?
+      config_data['social']['twitter-handle']
     end
 
     # get data for all themes
