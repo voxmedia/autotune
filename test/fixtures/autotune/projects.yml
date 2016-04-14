@@ -3,7 +3,7 @@
 example_one:
   title: Example build one
   slug: example-build-one
-  theme: theverge
+  theme: theme1
   status: new
   data: '{"title": "Example build one"}'
   blueprint: example
@@ -13,7 +13,7 @@ example_one:
 example_two:
   title: Example build two
   slug: example-build-two
-  theme: sbn
+  theme: theme2
   status: new
   data: '{"title": "Example build two"}'
   blueprint: example
@@ -23,7 +23,7 @@ example_two:
 example_three:
   title: Example build three
   slug: example-build-three
-  theme: sbn
+  theme: theme2
   status: new
   data: '{"title": "Example build three"}'
   blueprint: example_two
@@ -33,7 +33,7 @@ example_three:
 example_four:
   title: Example build four
   slug: example-build-four
-  theme: sbn
+  theme: theme2
   status: broken
   data: '{"title": "Example build four"}'
   blueprint: example_two

@@ -24,7 +24,7 @@ module Autotune
 
       group = autotune_groups(:group1)
 
-      theme = autotune_themes(:theverge)
+      theme = autotune_themes(:theme1)
 
       b = Project.create!(
         :title => 'new project', :blueprint => bp, :user => user, :theme => theme, :group => group)

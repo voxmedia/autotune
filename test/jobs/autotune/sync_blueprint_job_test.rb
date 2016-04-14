@@ -17,7 +17,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp.reload
 
     assert bp.installed?, 'Blueprint should be installed'
-    assert_equal 'testing', bp.status    
+    assert_equal 'testing', bp.status
 
     assert_equal '/media/example-blueprint/thumbnail.jpg', bp.thumb_url
   end
@@ -263,8 +263,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal LIVE_HEAD, bp.version,
                  'Repo should be checked out to the correct version'
 
-    Autotune.config.themes.keys.each do |theme|
-      slug = [bp.version, theme].join('-')
+    Autotune::Theme.all.each do |theme|
+      slug = [bp.version, theme.slug].join('-')
       deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
 
       skip unless deployer.is_a?(Autotune::Deployers::File)
@@ -345,8 +345,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal LIVE_HEAD, bp.version,
                  'Repo should be checked out to the correct version'
 
-    Autotune.config.themes.keys.each do |theme|
-      slug = [bp.version, theme].join('-')
+    Autotune::Theme.all.each do |theme|
+      slug = [bp.version, theme.slug].join('-')
       deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
 
       skip unless deployer.is_a?(Autotune::Deployers::File)

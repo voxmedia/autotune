@@ -127,9 +127,9 @@ module Autotune
       new_p = Project.find decoded_response['id']
       project_data.keys.each do |k|
         if k == :theme
-          assert_equal Autotune::Theme.find_by_value(project_data[k]), new_p.send(k)
+          assert_equal Autotune::Theme.find_by_slug(project_data[k]), new_p.send(k)
         elsif k == :preview_url
-          assert_equal '/preview/generic-new-project', new_p.send(k)
+          assert_equal '/preview/theme1-new-project', new_p.send(k)
         elsif k == :data
           assert_equal({ 'google_doc_id' => '1234' }, new_p.send(k))
         else
@@ -142,7 +142,7 @@ module Autotune
       accept_json!
       valid_auth_header! :group2_author
 
-      post :create, project_data.update(:theme => autotune_themes(:theverge).slug)
+      post :create, project_data.update(:theme => autotune_themes(:theme1).slug)
       assert_response :bad_request, decoded_response['error']
     end
 
@@ -318,7 +318,7 @@ module Autotune
       get :index, :status => 'new'
       assert_response :success
       assert_instance_of Array, decoded_response
-      assert_equal Project.where(:theme => autotune_themes(:theverge)).count,
+      assert_equal Project.where(:theme => autotune_themes(:theme1)).count,
                    decoded_response.length
     end
 
@@ -377,10 +377,10 @@ module Autotune
     def project_data
       @project_data ||= {
         :title => 'New project',
-        :slug => "#{autotune_themes(:generic).value} New project".parameterize,
+        :slug => "#{autotune_themes(:theme1).slug} New project".parameterize,
         :blueprint_id => autotune_blueprints(:example).id,
         :user_id => autotune_users(:developer).id,
-        :theme => autotune_themes(:theverge).slug,
+        :theme => autotune_themes(:theme1).slug,
         :preview_url => '',
         :data => {
           :title => 'New project',

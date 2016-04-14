@@ -11,7 +11,7 @@ module Autotune
       assert_equal({ 'error' => 'Unauthorized' }, decoded_response)
     end
 
-    test 'that superuser has access to are listed' do
+    test 'themes superuser has access to are listed' do
       accept_json!
       valid_auth_header! :developer
 
@@ -22,7 +22,7 @@ module Autotune
       assert_equal 2, decoded_response.length
     end
 
-    test 'that designer has access to theme' do
+    test 'themes designer has access to theme' do
       accept_json!
       valid_auth_header! :designer
       get :index

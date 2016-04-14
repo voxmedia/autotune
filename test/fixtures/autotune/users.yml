@@ -31,19 +31,19 @@ designer:
   meta: '{"roles": ["designer"]}'
 
 group1_editor:
-  name: group1 editor
+  name: group1_editor
   email: editor@example.com
   api_key: thenhflZiLJIcHv3jDe
   meta: '{"roles": {"editor": ["group1"]}}'
 
 group2_author:
-  name: group2 author
+  name: group2_author
   email: author@example.com
   api_key: s2drSdfrsdasfkdjalsjf
   meta: '{"roles": {"author": ["group2"]}}'
 
 group1_designer:
-  name: group1 designer
+  name: group1_designer
   email: editor@example.com
   api_key: Q32dc4lZiLJIcHv3jDe
   meta: '{"roles": {"designer": ["group1"]}}'

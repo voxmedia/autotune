@@ -14,7 +14,7 @@ class Autotune::ThemeTest < ActiveSupport::TestCase
     group = autotune_groups(:group1)
     t = Autotune::Theme.create!(:title => 'foo', :data => {}, :group => group)
     p = autotune_projects(:example_one)
-    assert_equal p.theme, autotune_themes(:theverge)
+    assert_equal p.theme, autotune_themes(:theme1)
     p.theme = t
     assert_equal p.theme, t
   end

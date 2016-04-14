@@ -1,13 +1,13 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-theverge:
-  title: The Verge
-  slug: theverge
+theme1:
+  title: Theme 1
+  slug: theme1
   status: ready
   group: group1
 
-sbn:
-  title: SBNation
-  slug: sbnation
+theme2:
+  title: Theme 2
+  slug: theme2
   status: ready
   group: group2
