@@ -328,7 +328,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         view = this,
-        form_config, themeSlugs, newProject, populateForm = false;
+        form_config, themeSlugs, availableThemes, twitterHandles, newProject, populateForm = false;
 
     if ( this.disableForm ) {
       $form.append(
@@ -354,16 +354,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     form_config = this.model.getConfig().form;
     themeSlugs = this.model.isThemeable() && !this.model.getConfig().themes ?
       pluckAttr(this.app.themes.models, 'slug') :
-      _.intersection(pluckAttr(this.app.themes.models, 'slug'), this.model.getConfig().themes );
+      _.intersection(pluckAttr(this.app.themes.models, 'slug'), this.model.getConfig().themes ),
+    availableThemes = _.filter(this.app.themes.models, function(t) {
+      return _.contains(themeSlugs, t.get('slug') );
+    }),
+      twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-      var availableThemes = _.filter(this.app.themes.models, function(t) {
-          return _.contains(themeSlugs, t.get('slug') );
-        }),
-          schema_properties = {
+          var schema_properties = {
             "title": {
               "title": "Title",
               "type": "string",
@@ -398,7 +399,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             "theme": {
               "type": "select",
               "optionLabels": _.map(availableThemes, function(t){
-                   if (t.get('title') == t.get('group_name')) {
+                   if (t.get('title') === t.get('group_name')) {
                      return t.get('group_name');
                    }
                    return t.get('group_name') + ' - ' + t.get('title');
@@ -469,12 +470,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           view.alpaca = control;
 
           var theme = control.childrenByPropertyId["theme"],
-             social = control.childrenByPropertyId["tweet_text"],
-             indexedThemes = this.app.themes.indexBy('slug');
+             social = control.childrenByPropertyId["tweet_text"];
 
           var getTwitterHandleLength = function(slug){
-            var twitter = indexedThemes[slug].get('twitter_handle');
-            return twitter ? twitter.length : 0;
+           return twitterHandles[slug] ? twitterHandles[slug].length : 0;
           };
 
           if ( social && social.type !== 'hidden' ) {
