@@ -59,6 +59,11 @@ class CreateGroups < ActiveRecord::Migration
           theme.update_data(build_blueprints: false )
         end
       end
+
+      # delete all unused themes
+      unusedThemes = Autotune::Theme.find_by :group => nil
+      unusedThemes.delete unless unusedThemes.nil?
+
       # now that all the themes are created, rebuild all the blueprints
       Autotune::Blueprint.rebuild_themes
 
