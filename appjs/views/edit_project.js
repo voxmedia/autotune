@@ -18,6 +18,10 @@ function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
 
+function isVisible(control) {
+  return $(control.domEl).is(':visible');
+}
+
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
   forceUpdateDataFlag: false,
@@ -352,16 +356,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     form_config = this.model.getConfig().form;
 
-    if( this.model.isThemeable() ) {
-      if ( !this.model.getConfig().themes) {
-        availableThemes = this.app.themes.models;
-      } else {
-        availableThemes =  _.filter(this.app.themes.models, function(t) {
-          return _.contains(this.model.getConfig().themes, t.get('slug') );
-        })
-      }
-    }
-
     availableThemes = this.model.getConfig().themes ?
       _.filter(this.app.themes.models, function(t) {
         return _.contains(this.model.getConfig().themes, t.get('slug'))
@@ -485,12 +479,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
            return twitterHandles[slug] ? twitterHandles[slug].length : 0;
           };
 
-          if ( social && social.type !== 'hidden' ) {
+          if ( social && isVisible(social) ) {
             social.schema.maxLength = 140 - ( 26 + getTwitterHandleLength(theme.getValue()));
             social.updateMaxLengthIndicator();
 
-            if ( theme && theme.type !== 'hidden' ) {
-              $('#' + theme.domEl.attr('id')).on('change', function(){
+            if ( theme && isVisible(theme) ) {
+              $(theme.domEl).on('change', function(){
                 theme = control.childrenByPropertyId["theme"];
                 social.schema.maxLength = 140 -
                         ( 26 + getTwitterHandleLength(theme.getValue()) );
