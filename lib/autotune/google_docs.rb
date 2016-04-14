@@ -167,7 +167,6 @@ module Autotune
       end
     end
 
-    # May not work if our domain and domain associated with file don't match
     def insert_permission(file_id, value, perm_type, role)
       drive = @client.discovered_api('drive', 'v2')
       new_permission = {
