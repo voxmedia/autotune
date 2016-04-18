@@ -3,8 +3,8 @@ module Autotune
   class User < ActiveRecord::Base
     include Searchable
     has_many :projects
-    has_many :group_memberships, -> {includes :group}
-    has_many :groups, through: :group_memberships
+    has_many :group_memberships, -> { includes :group }
+    has_many :groups, :through => group_memberships
 
     serialize :meta, JSON
     serialize :group_memberships, JSON
@@ -67,14 +67,14 @@ module Autotune
     def author_themes
       return [] if !verified? || group_memberships.nil?
       Theme.where('(group_id IN (?))',
-              group_memberships.pluck(:group_id))
+                  group_memberships.pluck(:group_id))
     end
 
     # Return an array list of themes that this user is permitted to modify
     def designer_themes
       return [] if !verified? || group_memberships.nil?
       Theme.where('(group_id IN (?))',
-              group_memberships.with_design_access.pluck(:group_id))
+                  group_memberships.with_design_access.pluck(:group_id))
     end
 
     # Return an array list of groups that this user has at least editor privileges for
@@ -111,7 +111,7 @@ module Autotune
     end
 
     def update_membership
-      # make sure the user is saved before trying to update relations
+      # remove user's memberships if no roles are provided
       if roles.nil?
         user.group_memberships.delete
         return
@@ -133,10 +133,10 @@ module Autotune
       unless role_to_assign.nil?
         # create a generic group if for some reason no group exists
         if Group.all.empty?
-          group = Group.create!(:name => "generic")
+          group = Group.create!(:name => 'generic')
           Theme.add_default_theme_for_group(group)
         end
-        Group.all.each do |g|
+        Group.all.find_each do |g|
           membership = group_memberships.find_or_create_by(:group => g)
           membership.role = role_to_assign.to_s
           membership.save!
@@ -161,8 +161,8 @@ module Autotune
         end
       end
       # delete all memberships that weren't updated
-      group_memberships.where("id in ?", stale_ids).delete_all unless stale_ids.empty?
-      self.save
+      group_memberships.where('id in ?', stale_ids).delete_all unless stale_ids.empty?
+      save
     end
 
     private
