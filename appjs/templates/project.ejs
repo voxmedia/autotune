@@ -144,9 +144,24 @@
         </div>
       </div>
 
+      <% if ( model.hasThemeType('dynamic') && model.hasPreviewType('live') && !model.isCurrentVersion() ) { %>
+      <p class="text-warning">
+        <span class="m-status status-info">
+          <i class="icon-info"></i>
+          This preview may be outdated. Please upgrade the project to see the latest version.
+        </span>
+      </p>
+      <% } %>
+
       <% if ( model.hasPreviewType('live') ) { %>
       <button type="submit" class="btn btn-default"
               id="savePreview" data-loading-text="Saving...">Save</button>
+      <% } %>
+
+      <% if ( model.hasThemeType('dynamic') && model.hasPreviewType('live') && !model.isCurrentVersion() ) { %>
+      <button type="button" class="btn btn-warning"
+              data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
+              data-action="update-snapshot" data-action-next="reload">Upgrade</button>
       <% } %>
 
     </div>

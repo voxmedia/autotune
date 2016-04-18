@@ -6,14 +6,13 @@ module Autotune
   # API for projects
   class ProjectsController < ApplicationController
     before_action :respond_to_html
-    before_action :require_superuser, :only => [:update_snapshot]
     model Project
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update, :destroy, :build, :build_and_publish] do
+    before_action :only => [:show, :update,:update_snapshot, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
              current_user.role?(:editor => instance.group.slug) ||

@@ -289,6 +289,17 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Checks if project is using the current version of blueprint
+   * @returns {boolean}
+   **/
+  isCurrentVersion: function() {
+    if ( !this.get('blueprint_version') ){
+      return true;
+    }
+    return this.get('blueprint_version') === this.blueprint.get('version');
+  },
+
+  /**
    * Does this project belong to a preview type?
    * @param {string} type Check for this type
    * @returns {boolean}
