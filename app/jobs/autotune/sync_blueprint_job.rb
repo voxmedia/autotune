@@ -75,7 +75,7 @@ module Autotune
           sample_data.delete('theme_data') unless sample_data['theme_data'].blank?
 
           # add themes data if this blueprint support themeing
-          if blueprint.is_themeable?
+          if blueprint.themable?
             sample_data.merge!(
               'available_themes' => Theme.all.pluck(:slug),
               'theme_data' => Theme.full_theme_data
@@ -90,7 +90,7 @@ module Autotune
           end
 
           themes.each do |theme|
-            slug = blueprint.is_themeable? ? blueprint.version :
+            slug = blueprint.themable? ? blueprint.version :
                [blueprint.version, theme.slug].join('-')
 
             # Use this as dummy build data for the moment

@@ -4,7 +4,7 @@ module Autotune
     include Searchable
     has_many :projects
     has_many :group_memberships, -> { includes :group }
-    has_many :groups, :through => group_memberships
+    has_many :groups, :through => :group_memberships
 
     serialize :meta, JSON
     serialize :group_memberships, JSON

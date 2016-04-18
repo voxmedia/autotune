@@ -5,7 +5,8 @@ module Autotune
     belongs_to :group
 
     validates :user, :group, :presence => true
-    validates :role, :presence => true,
+    validates :role,
+              :presence => true,
               :inclusion => { :in => Autotune::ROLES }
     validates :group_id, :uniqueness => { :scope => :user_id }
 
@@ -16,12 +17,11 @@ module Autotune
     # Get the highest privileged role from a list of roles
     def self.get_best_role(roles)
       return if roles.nil?
-      Autotune::ROLES.reverse.each do |r|
+      Autotune::ROLES.reverse_each do |r|
         return r.to_sym if roles.include? r
       end
     end
 
-    private
     SUPERUSER_ROLES = [:superuser]
     EDITOR_ROLES = [:editor, :designer, :superuser]
     DESIGNER_ROLES = [:designer, :superuser]

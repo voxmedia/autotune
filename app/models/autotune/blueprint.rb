@@ -26,7 +26,7 @@ module Autotune
 
     after_initialize do
       self.status ||= 'new'
-      self.type   ||= 'app'
+      self.type ||= 'app'
       self.config ||= {}
     end
 
@@ -77,8 +77,8 @@ module Autotune
 
     # Check if the blueprint is ready for themeing
     # @return [Boolean] `true` if the blueprint is not tied to specific themes, `false` otherwise
-    def is_themeable?
-      !config['theme_type'].blank? && config['theme_type'] == "dynamic"
+    def themable?
+      !config['theme_type'].blank? && config['theme_type'] == 'dynamic'
     end
 
     # Queues a job to update the blueprint repo
@@ -94,9 +94,11 @@ module Autotune
 
     # Rebuild all themeable blueprints. Used when themes are updated
     def self.rebuild_themes
-      jobs = Blueprint.all.select {|bp| bp.is_themeable? }
-               .collect { |bp| SyncBlueprintJob.new( bp, build_themes:true ) }
-      ActiveJob::Chain.new( *jobs ).enqueue
+      jobs = Blueprint.all
+                      .select(&:themable?)
+                      .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true) }
+
+      ActiveJob::Chain.new(*jobs).enqueue
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
