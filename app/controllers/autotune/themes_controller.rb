@@ -1,6 +1,7 @@
-require_dependency "autotune/application_controller"
+require_dependency 'autotune/application_controller'
 
 module Autotune
+  # API for themes
   class ThemesController < ApplicationController
     before_action :respond_to_html
     model Theme
@@ -35,9 +36,7 @@ module Autotune
       query[:status] = params[:status] if params.key? :status
       query[:group_id] = params[:group] if params.key? :group
 
-      if params.key? :search
-        @themes = @themes.search(params[:search], :title)
-      end
+      @themes = @themes.search(params[:search], :title) if params.key? :search
 
       @themes = @themes.where(query)
 
@@ -74,7 +73,7 @@ module Autotune
       @theme.attributes = select_from_post :title, :data, :group_id, :slug
       @theme.parent = Theme.get_default_theme_for_group(@theme.group_id)
       if @theme.valid?
-        @theme.status = "ready"
+        @theme.status = 'ready'
         @theme.save
         Blueprint.rebuild_themes
         render :show, :status => :created
@@ -87,7 +86,7 @@ module Autotune
       @theme = instance
       @theme.attributes = select_from_post :title, :data
       if @theme.valid?
-        @theme.status = "ready"
+        @theme.status = 'ready'
         @theme.save
         Blueprint.rebuild_themes
         render :show

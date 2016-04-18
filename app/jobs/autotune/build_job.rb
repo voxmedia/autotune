@@ -55,8 +55,8 @@ module Autotune
 
       # Run the build
       repo.working_dir do
-        outlogger.info(repo.cmd(
-          BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+        outlogger.info(repo.cmd(BLUEPRINT_BUILD_COMMAND,
+                                :stdin_data => build_data.to_json))
       end
 
       # Upload build

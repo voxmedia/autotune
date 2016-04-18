@@ -21,7 +21,9 @@ module Autotune
           # Update the repo
           repo.update
           blueprint.version = repo.version
-        elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version && !build_themes
+        elsif blueprint.status.in?(%w(testing ready)) &&
+              blueprint.version == repo.version &&
+              !build_themes
           # The correct blueprint files are on disk, and the blueprint is not
           # broken. And we are not rebuilding themes.Nothing to do.
           return
@@ -64,8 +66,6 @@ module Autotune
         repo = WorkDir.repo(blueprint.working_dir,
                             Rails.configuration.autotune.build_environment)
 
-
-
         # don't build a copy for each theme every time a project is updated
         if build_themes
           sample_data = repo.read(blueprint.config['sample_data'])
@@ -90,8 +90,7 @@ module Autotune
           end
 
           themes.each do |theme|
-            slug = blueprint.themable? ? blueprint.version :
-               [blueprint.version, theme.slug].join('-')
+            slug = blueprint.themable? ? blueprint.version : [blueprint.version, theme.slug].join('-')
 
             # Use this as dummy build data for the moment
             build_data = sample_data.merge(
