@@ -1,3 +1,6 @@
+require 'net/https'
+require 'uri'
+
 namespace :autotune do
   desc 'Update all the blueprints'
   task :update_blueprints => :environment do
@@ -70,6 +73,38 @@ namespace :autotune do
         proj.blueprint_config['type'] = blueprint.type
         proj.save!
         puts "'#{proj.title}' type changed from '#{original_type}' to '#{proj.type}'"
+      end
+    end
+  end
+
+  desc 'Correct project preview type'
+  task :correct_project_preview_type => :environment do
+    Autotune::Project.all.each do |proj|
+      if proj.blueprint_config['preview_type']
+        # request the preview
+        test_themes = proj.blueprint_config['themes']
+        if test_themes
+          slug_string = "#{proj.blueprint_version}-#{test_themes[0]}s/preview/"
+        else
+          slug_string = "#{proj.blueprint_version}/preview/"
+        end
+        blueprint = Autotune::Blueprint.find(proj.blueprint_id)
+        deployer = Autotune.new_deployer(
+          :media, blueprint, :extra_slug => slug_string)
+        uri = URI.parse(deployer.project_asset_url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        if uri.scheme === 'http'
+          http.use_ssl = false
+        end
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        request = Net::HTTP::Get.new(uri.request_uri)
+        response = http.request(request)
+        unless response.code === 200
+          # proj.blueprint_config['preview_type'] = 'static'
+          # proj.save!
+          puts "#{proj.title}, #{blueprint.title}, #{proj.created_at}"
+        end
       end
     end
   end
