@@ -81,10 +81,9 @@ namespace :autotune do
   task :correct_project_preview_type => :environment do
     Autotune::Project.all.each do |proj|
       if proj.blueprint_config['preview_type']
-        # request the preview
         test_themes = proj.blueprint_config['themes']
         if test_themes
-          slug_string = "#{proj.blueprint_version}-#{test_themes[0]}s/preview/"
+          slug_string = "#{proj.blueprint_version}-#{test_themes[0]}/preview/"
         else
           slug_string = "#{proj.blueprint_version}/preview/"
         end
