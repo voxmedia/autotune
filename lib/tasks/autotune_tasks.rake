@@ -80,13 +80,9 @@ namespace :autotune do
   desc 'Correct project preview type'
   task :correct_project_preview_type => :environment do
     Autotune::Project.all.each do |proj|
-      if proj.blueprint_config['preview_type']
-        test_themes = proj.blueprint_config['themes']
-        if test_themes
-          slug_string = "#{proj.blueprint_version}-#{test_themes[0]}/preview/"
-        else
-          slug_string = "#{proj.blueprint_version}/preview/"
-        end
+      if proj.blueprint_config['preview_type'] && proj.blueprint_config['preview_type'] === 'live'
+        test_theme = Autotune::Theme.find(proj.theme_id)['value']
+        slug_string = "#{proj.blueprint_version}-#{test_theme}/preview/"
         blueprint = Autotune::Blueprint.find(proj.blueprint_id)
         deployer = Autotune.new_deployer(
           :media, blueprint, :extra_slug => slug_string)
@@ -99,10 +95,9 @@ namespace :autotune do
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         request = Net::HTTP::Get.new(uri.request_uri)
         response = http.request(request)
-        unless response.code === 200
-          # proj.blueprint_config['preview_type'] = 'static'
-          # proj.save!
-          puts "#{proj.title}, #{blueprint.title}, #{proj.created_at}"
+        unless response.code === '200'
+          puts "#{blueprint.title} - #{proj.title}"
+          proj.update_snapshot
         end
       end
     end
