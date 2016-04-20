@@ -370,6 +370,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             "eater": 5,
             "vox": 9,
             "curbed": 6,
+            "recode": 6,
             "custom": 0
           },
           schema_properties = {

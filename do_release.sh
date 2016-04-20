@@ -26,5 +26,5 @@ command -v jq >/dev/null 2>&1 || { echo >&2 "Missing jq. Please install jq."; ex
 
 read -p "Do you wish to commit the new version, tag and push? [y/N] " yn
 if echo "$yn" | grep -iq "^y"; then
-  git commit -am "bump to $version" && git tag v$version && git push --tags
+  git commit -am "bump to $version" && git tag v$version && git push && git push --tags
 fi
