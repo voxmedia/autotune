@@ -70,13 +70,26 @@ Autotune.configure do |conf|
 
   # Generic theme data
   conf.generic_theme = {
-    'primary-color' => '#292929',
-    'secondary-color' => '#e6e6e6',
+    'colors' => {
+      'primary_color' => ' #444444',
+      'secondary_color' => ' #444444',
+      'arrow_color' => ' #444444',
+      'button_bg_color' => ' #444444',
+      'button_font_color' => 'white'
 
-    'body-font-family' => 'Verdana, Helvetica, Roboto, Arial, sans-serif',
-    'header-font-family' => "Georgia, Cambria, 'Times New Roman', Times, serif",
-
-    'twitter-handle' => '@newsorg'
+    },
+    'fonts' => {
+      'font_url' => '',
+      'body_font_family' => 'Georgia Regular, serif',
+      'header_font_family' => 'Georgia Bold, serif',
+      'button_font_family' => 'Georgia Regular, serif',
+      'header_font_weight' => '700'
+    },
+    'social' => {
+      'twitter_handle' => 'voxmediainc'
+    },
+    'homepage_redirect' => 'voxmedia.com',
+    'chorus_api_domain' => 'sbnation.com.sb4.sbndev.net'
   }
 end
 
