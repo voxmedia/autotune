@@ -19,7 +19,7 @@ function pluckAttr(models, attribute) {
 }
 
 function isVisible(control) {
-  return $(control.domEl).is(':visible');
+  return control.type != 'hidden' && $(control.domEl).is(':visible');
 }
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
