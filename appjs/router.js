@@ -230,7 +230,7 @@ module.exports = Backbone.Router.extend({
   },
 
   listThemes: function(params) {
-    var themes = this.app.edittableThemes,
+    var themes = this.app.editableThemes,
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }

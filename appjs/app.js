@@ -53,7 +53,7 @@ function App(config) {
 
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
-  this.edittableThemes = new models.ThemeCollection();
+  this.editableThemes = new models.ThemeCollection();
 
   // Initialize top-level view
   this.view = new views.Application({ app: this });
