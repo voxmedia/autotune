@@ -367,72 +367,72 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-          var schema_properties = {
-            "title": {
-              "title": "Title",
-              "type": "string",
-              "required": true
-            },
-            "theme": {
-              "title": "Theme",
-              "type": "string",
-              "required": true,
-              "default": pluckAttr(availableThemes, 'slug')[0],
-              "enum": pluckAttr(availableThemes, 'slug')
-            },
-            "slug": {
-              "title": "Slug",
-              "type": "string"
-            },
-            "tweet_text":{
-              "type": "string",
-              "minLength": 0
+      var schema_properties = {
+        "title": {
+          "title": "Title",
+          "type": "string",
+          "required": true
+        },
+        "theme": {
+          "title": "Theme",
+          "type": "string",
+          "required": true,
+          "default": pluckAttr(availableThemes, 'slug')[0],
+          "enum": pluckAttr(availableThemes, 'slug')
+        },
+        "slug": {
+          "title": "Slug",
+          "type": "string"
+        },
+        "tweet_text":{
+          "type": "string",
+          "minLength": 0
+        }
+      },
+      options_form = {
+        "attributes": {
+          "data-model": "Project",
+          "data-model-id": this.model.isNew() ? '' : this.model.id,
+          "data-action": this.model.isNew() ? 'new' : 'edit',
+          "data-next": 'show',
+          "method": 'post'
+        }
+      },
+      options_fields = {
+        "theme": {
+          "type": "select",
+          "optionLabels": _.map(availableThemes, function(t){
+               if (t.get('title') === t.get('group_name')) {
+                 return t.get('group_name');
+               }
+               return t.get('group_name') + ' - ' + t.get('title');
+             })
+        },
+        "slug": {
+          "label": "Slug",
+          "validator": function(callback){
+            var slugPattern = /^[0-9a-z\-_]{0,60}$/;
+            var slug = this.getValue();
+            if ( slugPattern.test(slug) ){
+              callback({ "status": true });
+            } else if (slugPattern.test(slug.substring(0,60))){
+              this.setValue(slug.substr(0,60));
+              callback({ "status": true });
+            } else {
+              callback({
+                "status": false,
+                "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
+              });
             }
-          },
-          options_form = {
-            "attributes": {
-              "data-model": "Project",
-              "data-model-id": this.model.isNew() ? '' : this.model.id,
-              "data-action": this.model.isNew() ? 'new' : 'edit',
-              "data-next": 'show',
-              "method": 'post'
-            }
-          },
-          options_fields = {
-            "theme": {
-              "type": "select",
-              "optionLabels": _.map(availableThemes, function(t){
-                   if (t.get('title') === t.get('group_name')) {
-                     return t.get('group_name');
-                   }
-                   return t.get('group_name') + ' - ' + t.get('title');
-                 })
-            },
-            "slug": {
-              "label": "Slug",
-              "validator": function(callback){
-                var slugPattern = /^[0-9a-z\-_]{0,60}$/;
-                var slug = this.getValue();
-                if ( slugPattern.test(slug) ){
-                  callback({ "status": true });
-                } else if (slugPattern.test(slug.substring(0,60))){
-                  this.setValue(slug.substr(0,60));
-                  callback({ "status": true });
-                } else {
-                  callback({
-                    "status": false,
-                    "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
-                  });
-                }
-              }
-            },
-            "tweet_text":{
-              "label": "Social share text",
-              "constrainMaxLength": true,
-              "constrainMinLength": true,
-              "showMaxLengthIndicator": true
-            }
-          };
+          }
+        },
+        "tweet_text":{
+          "label": "Social share text",
+          "constrainMaxLength": true,
+          "constrainMinLength": true,
+          "showMaxLengthIndicator": true
+        }
+      };
 
       // if there is only one theme option, hide the dropdown
 
