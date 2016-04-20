@@ -9,5 +9,6 @@ else
 fi
 
 docker-compose build
-docker-compose run -e GEM_PATH=/usr/local/bundle:/root/.gem/ruby/2.2.0:/usr/local/lib/ruby/gems/2.2.0 app bin/test_run.sh
-#docker-compose run app bin/test_run.sh
+# Force GEM_PATH so that down the line, _ORIGINAL_GEM_PATH is available in WorkDir::Base
+# for making bundler available to subcommands from the main Rails environment
+docker-compose run -e GEM_PATH=/usr/local/bundle app bin/test_run.sh
