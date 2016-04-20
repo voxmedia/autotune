@@ -1,7 +1,6 @@
 require 'work_dir'
 require 'date'
 require 'logger'
-require 'json'
 require 'stringio'
 
 module Autotune
