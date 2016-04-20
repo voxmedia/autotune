@@ -9,4 +9,5 @@ else
 fi
 
 docker-compose build
-docker-compose run app bin/test_run.sh
+docker-compose run -e GEM_PATH=/usr/local/bundle:/root/.gem/ruby/2.2.0:/usr/local/lib/ruby/gems/2.2.0 app bin/test_run.sh
+#docker-compose run app bin/test_run.sh

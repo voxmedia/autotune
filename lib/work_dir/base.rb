@@ -12,6 +12,9 @@ module WorkDir
     def initialize(path, env = {})
       @working_dir = path.to_s
       @env = ENV.select { |k, _| WorkDir::ALLOWED_ENV.include? k }
+      if ENV['_ORIGINAL_GEM_PATH'].present? 
+        @env['GEM_PATH'] = ENV['_ORIGINAL_GEM_PATH']
+      end
       @env.update env
     end
 
@@ -68,7 +71,12 @@ module WorkDir
     # Setup a ruby environment
     def setup_ruby_environment
       return false unless ruby?
+      puts "ENV outside working dir"
+      puts ENV.inspect
       working_dir do
+        puts "ENV inside working dir"
+        cmd `env`
+        cmd 'gem', 'env'
         cmd 'bundle', 'install', '--path', '.bundle', '--deployment'
       end
     end
