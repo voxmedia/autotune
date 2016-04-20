@@ -1,0 +1,13 @@
+version: '2'
+services:
+  redis:
+    image: redis:3.0
+  app:
+    image: voxmedia/docker_base_images:ruby_2.2-0.1
+    links:
+        - redis
+    environment:
+        - REDIS_URL=redis://redis
+    volumes:
+        - ${SSH_KEY_PATH}:/root/.ssh/id_rsa
+        - .:/app
