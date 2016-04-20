@@ -5,7 +5,9 @@ var Backbone = require('backbone'),
     _ = require('underscore'),
     moment = require('moment'),
     utils = require('../utils'),
-    markdown = require('markdown').markdown;
+    markdown = require('markdown').markdown,
+    merge = require('deepmerge'),
+    diff = require('deep-diff').observableDiff;
 
 var Project = Backbone.Model.extend({
   urlRoot: '/projects',
@@ -122,16 +124,33 @@ var Project = Backbone.Model.extend({
   },
 
   fetchBuildData: function(force) {
-    var self = this;
-    return Promise.resolve( $.ajax({
-      type: "POST",
-      url: this.url() + "/preview_build_data" + (force ? '?force_update=true' : ''),
-      data: JSON.stringify( this.formData() ),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).then(function( data ) {
-      self.cachedBuildData = data;
-    }) );
+    var self = this, needsUpdate = false,
+        fieldsRequiringUpdate = ['google_doc_url'];
+
+    if ( force || !this.cachedData ) {
+      needsUpdate = true;
+    } else if ( this.hasChanged('data') ) {
+      diff( this.get('data'), this.previous('data'), function(d) {
+        if ( _.contains(fieldsRequiringUpdate, d.path[d.path.length-1]) ) {
+          needsUpdate = true;
+        }
+      } );
+    }
+
+    if ( needsUpdate ) {
+      return Promise.resolve( $.ajax({
+        type: "POST",
+        url: this.url() + "/preview_build_data" + (force ? '?force_update=true' : ''),
+        data: JSON.stringify( this.formData() ),
+        contentType: 'application/json',
+        dataType: 'json'
+      }).then(function( data ) {
+        self.cachedBuildData = data;
+      }) );
+    } else {
+      this.cachedBuildData = merge(this.cachedBuildData, this.get('data'));
+      return Promise.resolve(this.cachedBuildData);
+    }
   },
 
   /**

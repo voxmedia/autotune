@@ -39,6 +39,8 @@
     "brace": "0.5.1",
     "browserify": "5.12.1",
     "browserify-shim": "3.8.0",
+    "deep-diff": "^0.3.3",
+    "deepmerge": "^0.2.10",
     "eonasdan-bootstrap-datetimepicker": "^4.15.35",
     "escape-html": "^1.0.3",
     "handlebars": "4.0.5",

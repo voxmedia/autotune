@@ -118,11 +118,14 @@ module.exports = {
     return inst.isValid();
   },
 
-  formHasChanged: function($form) {
+  formChanged: function($form) {
     var meta = this.formMeta($form);
 
-    if ( meta.redirectUrl !=
-
+    if ( meta.inst ) {
+      return meta.inst.changedAttributes( this.formValues($form) );
+    } else {
+      return false;
+    }
   },
 
   submitForm: function(eve) {

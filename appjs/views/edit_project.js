@@ -85,7 +85,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       return;
     }
 
-    if ( !opts.forceUpdate && _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
+    if ( !opts.forceUpdate && !this.formChanged( $form ) && !$('#embed-preview').hasClass('loading') ) {
       // If data hasn't changed, bail
       return;
     }
