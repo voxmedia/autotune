@@ -7,7 +7,6 @@ module Autotune
     has_many :groups, :through => :group_memberships
 
     serialize :meta, JSON
-    serialize :group_memberships, JSON
 
     default_scope { order('updated_at DESC') }
 
