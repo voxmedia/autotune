@@ -3,7 +3,7 @@ services:
   redis:
     image: redis:3.0
   app:
-    build: .
+    image: voxmedia/docker_base_images:ruby_2.2-0.1
     links:
         - redis
     environment:
