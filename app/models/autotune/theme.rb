@@ -83,10 +83,10 @@ module Autotune
     end
 
     def pub_to_redis
-      return if Autotune.redis.nil?
-      msg = { :id => id,
+      msg = { :model => 'theme',
+              :id => id,
               :status => status }
-      Autotune.redis.publish 'theme', msg.to_json
+      Autotune.send_message('change', msg) if Autotune.can_message?
     end
   end
 end
