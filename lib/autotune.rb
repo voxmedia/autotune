@@ -24,7 +24,7 @@ module Autotune
                       :verify_omniauth, :verify_authorization_header,
                       :google_auth_enabled, :google_auth_domain,
                       :git_ssh, :git_askpass,
-                      :redis, :faq_url, :generic_theme)
+                      :redis, :faq_url, :generic_theme, :get_theme_data)
 
   class << self
     delegate :redis, :to => :configuration
