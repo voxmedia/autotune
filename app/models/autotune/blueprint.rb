@@ -93,7 +93,7 @@ module Autotune
     end
 
     # Rebuild all themeable blueprints. Used when themes are updated
-    def self.rebuild_themes
+    def self.rebuild_themed_blueprints
       jobs = Blueprint.all
                       .select(&:themable?)
                       .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true) }

@@ -88,7 +88,7 @@ module Autotune
       if @theme.valid?
         @theme.status = 'ready'
         @theme.save
-        Blueprint.rebuild_themes
+        Blueprint.rebuild_themed_blueprints
         render :show
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request
