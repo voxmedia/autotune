@@ -7,21 +7,21 @@ module Autotune
       arguments.first.to_gid_param
     end
 
-    def perform(theme)
-      external_data = get_theme_data(theme)
+    def perform(theme, build_blueprints: true)
+      if Rails.configuration.autotune.get_theme_data.is_a?(Proc)
+        external_data = Rails.configuration.autotune.get_theme_data.call(theme)
+      end
       theme.data = external_data unless external_data.nil?
       theme.status = 'ready'
       theme.save!
+
+      # Queue blueprint rebuild if the theme saved successfully
+      Blueprint.rebuild_themed_blueprints if build_blueprints
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
       theme.update!(:status => 'broken')
       raise
-    end
-
-    # This can be overridden in the app to pull data from an external source
-    def get_theme_data(theme)
-      Autotune.configuration.generic_theme
     end
   end
 end
