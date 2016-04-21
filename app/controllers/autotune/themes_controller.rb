@@ -71,11 +71,10 @@ module Autotune
     def create
       @theme = Theme.new
       @theme.attributes = select_from_post :title, :data, :group_id, :slug
-      @theme.parent = Theme.get_default_theme_for_group(@theme.group_id)
       if @theme.valid?
         @theme.status = 'ready'
         @theme.save
-        Blueprint.rebuild_themes
+        Blueprint.rebuild_themed_blueprints
         render :show, :status => :created
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request

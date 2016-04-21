@@ -12,6 +12,7 @@ module Autotune
     belongs_to :parent, :class_name => 'Theme'
     has_many :children, :class_name => 'Theme', :foreign_key => 'parent_id'
 
+    before_validation :assign_parent
     validates :slug, :title, :group, :presence => true
     validates :title,
               :uniqueness => true
@@ -27,6 +28,11 @@ module Autotune
 
     after_save :pub_to_redis
 
+    def assign_parent
+      parent_theme = get_default_theme_for_group(group.id)
+      self.parent = parent_theme unless parent_theme == self
+    end
+
     # Merge data with parent theme
     def config_data
       return data if parent.nil?
@@ -41,15 +47,8 @@ module Autotune
       raise
     end
 
-    # Get default theme for group
-    def self.get_default_theme_for_group(group_id)
-      Theme.find_by(
-        :parent_id => nil,
-        :group_id => group_id)
-    end
-
     def self.add_default_theme_for_group(group)
-      default_theme = Theme.get_default_theme_for_group(group.id)
+      default_theme = get_default_theme_for_group(group.id)
       return default_theme unless default_theme.nil?
       default_theme = Theme.create(
         :title => group.name,
@@ -79,6 +78,13 @@ module Autotune
     def defaults
       self.data ||= {}
       self.status ||= 'new'
+    end
+
+    # Get default theme for group
+    def get_default_theme_for_group(group_id)
+      Theme.find_by(
+        :parent_id => nil,
+        :group_id => group_id)
     end
 
     def pub_to_redis
