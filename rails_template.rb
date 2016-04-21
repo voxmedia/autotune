@@ -163,6 +163,17 @@ Autotune.config.verify_omniauth = lambda do |omniauth|
   # give editor access to specific themes
   # return :editor => ['My newsorg', 'Generic']
 end
+
+# -------------------------------
+# Theme data customization
+# -------------------------------
+# Getting data for themes is defined as a callback here that you can customize
+# It is recommended that you merge the final theme data with generic theme to
+# make sure that all theme variables are available in all themes
+
+Autotune.config.get_theme_data = lambda do |theme|
+   Autotune.config.generic_theme
+end
 CODE
 
 file 'config/unicorn.rb', <<-CODE
