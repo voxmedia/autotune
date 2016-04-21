@@ -35,8 +35,7 @@ module Autotune
 
     def update_data(build_blueprints: true)
       update!(:status => 'updating')
-      SyncThemeJob.perform_later(self)
-      Blueprint.rebuild_themes if build_blueprints
+      SyncThemeJob.perform_later(self, :build_blueprints => build_blueprints)
     rescue
       update!(:status => 'broken')
       raise
