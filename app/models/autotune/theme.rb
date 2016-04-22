@@ -12,7 +12,7 @@ module Autotune
     belongs_to :parent, :class_name => 'Theme'
     has_many :children, :class_name => 'Theme', :foreign_key => 'parent_id'
 
-    before_validation :assign_parent
+    before_validation :assign_parent, :on => :create
     validates :slug, :title, :group, :presence => true
     validates :title,
               :uniqueness => true
@@ -29,6 +29,7 @@ module Autotune
     after_save :pub_to_redis
 
     def assign_parent
+      return if group.nil?
       parent_theme = get_default_theme_for_group(group.id)
       self.parent = parent_theme unless parent_theme == self
     end
