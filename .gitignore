@@ -30,6 +30,7 @@
 /working
 /test/dummy/working
 /node_modules/
+vendor/bundle
 
 dump.rdb
 
