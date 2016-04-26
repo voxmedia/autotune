@@ -7,7 +7,7 @@ class Autotune::SyncProjectJobTest < ActiveJob::TestCase
   test 'update snapshot' do
     b = autotune_projects(:example_one)
 
-    assert_equal autotune_themes(:generic), b.theme
+    assert_equal autotune_themes(:theme1), b.theme
     assert_equal autotune_blueprints(:example), b.blueprint
 
     assert_performed_jobs 0

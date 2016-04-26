@@ -66,7 +66,8 @@ module Autotune
         end
       elsif auth.persisted?
         # Visitor is trying to log in and they're already in the database
-        # Log the user in!
+        # Update group permissions and log the user in!
+        auth.user.update_membership
         self.current_user = auth.user
       else
         # First timer. Set them up.
@@ -76,6 +77,9 @@ module Autotune
           :meta => { 'roles' => auth.roles })
 
         auth.user.save
+
+        # Update user's roles in groups
+        auth.user.update_membership
         auth.save
 
         # Log the user in!

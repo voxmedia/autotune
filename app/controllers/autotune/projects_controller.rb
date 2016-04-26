@@ -6,17 +6,17 @@ module Autotune
   # API for projects
   class ProjectsController < ApplicationController
     before_action :respond_to_html
-    before_action :require_superuser, :only => [:update_snapshot]
     model Project
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update, :destroy, :build, :build_and_publish] do
+    before_action :only => [:show, :update,:update_snapshot, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
-             current_user.role?(:editor => instance.theme.value)
+             current_user.role?(:editor => instance.group.slug) ||
+             current_user.role?(:designer => instance.group.slug)
         render_error 'Forbidden', :forbidden
       end
     end
@@ -60,15 +60,15 @@ module Autotune
       end
 
       if params.key? :theme
-        theme = Theme.find_by_value(params[:theme])
+        theme = Theme.find_by_slug(params[:theme])
         query[:theme_id] = theme.id
       end
 
       unless current_user.role? :superuser
-        if current_user.role? :editor
+        if current_user.role? [:editor, :designer]
           @projects = @projects.where(
-            '(user_id = ? OR theme_id IN (?))',
-            current_user.id, current_user.editor_themes.pluck(:id))
+            '(user_id = ? OR group_id IN (?))',
+            current_user.id, current_user.editor_groups.pluck(:id))
         else
           query[:user_id] = current_user.id
         end
@@ -123,13 +123,13 @@ module Autotune
       end
 
       if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_value request.POST['theme']
-
+        @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.group = @project.theme.group
         # is this user allowed to use this theme?
         unless @project.theme.nil? ||
-               current_user.author_themes.include?(@project.theme)
+               current_user.author_groups.include?(@project.group)
           return render_error(
-            "You can't use the #{@project.theme.label} theme. Please " \
+            "You can't use the #{@project.theme.title} theme. Please " \
             'choose another theme or contact support',
             :bad_request)
         end
@@ -159,13 +159,13 @@ module Autotune
       @project.attributes = select_from_post :title, :slug, :data
 
       if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_value request.POST['theme']
+        @project.theme = Theme.find_by_slug request.POST['theme']
 
         # is this user allowed to use this theme?
         unless @project.theme.nil? ||
                current_user.author_themes.include?(@project.theme)
           return render_error(
-            "You can't use the #{@project.theme.label} theme. Please " \
+            "You can't use the #{@project.theme.title} theme. Please " \
             'choose another theme or contact support',
             :bad_request)
         end

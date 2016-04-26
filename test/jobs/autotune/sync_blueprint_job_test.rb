@@ -5,8 +5,6 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
   fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes'
   test 'install blueprint' do
     bp = autotune_blueprints(:example)
-    # the fixture has 5 themes
-    assert_equal 5, bp.themes.count
 
     assert_performed_jobs 0
 
@@ -20,9 +18,6 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     assert bp.installed?, 'Blueprint should be installed'
     assert_equal 'testing', bp.status
-    # only `generic` and `vox` themes are enabled for the test suite
-    # the sync should have reset all the themes to just the one available
-    assert_equal 2, bp.themes.count
 
     assert_equal '/media/example-blueprint/thumbnail.jpg', bp.thumb_url
   end
@@ -268,8 +263,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal LIVE_HEAD, bp.version,
                  'Repo should be checked out to the correct version'
 
-    Autotune.config.themes.keys.each do |theme|
-      slug = [bp.version, theme].join('-')
+    Autotune::Theme.all.each do |theme|
+      slug = [bp.version, theme.slug].join('-')
       deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
 
       skip unless deployer.is_a?(Autotune::Deployers::File)
@@ -350,8 +345,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal LIVE_HEAD, bp.version,
                  'Repo should be checked out to the correct version'
 
-    Autotune.config.themes.keys.each do |theme|
-      slug = [bp.version, theme].join('-')
+    Autotune::Theme.all.each do |theme|
+      slug = [bp.version, theme.slug].join('-')
       deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
 
       skip unless deployer.is_a?(Autotune::Deployers::File)

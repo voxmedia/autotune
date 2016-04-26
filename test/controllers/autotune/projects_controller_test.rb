@@ -3,7 +3,7 @@ require 'test_helper'
 module Autotune
   # Test project api
   class ProjectsControllerTest < ActionController::TestCase
-    fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes', 'autotune/users'
+    fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes', 'autotune/users', 'autotune/groups'
     test 'that listing projects requires authentication' do
       accept_json!
 
@@ -42,24 +42,24 @@ module Autotune
       assert_equal Project.all.count, decoded_response.length
     end
 
-    test 'listing projects as generic author' do
+    test 'listing projects as group author' do
       accept_json!
-      valid_auth_header! :generic_author
+      valid_auth_header! :group2_author
 
       get :index
       assert_response :success
       assert_instance_of Array, decoded_response
-      assert_equal autotune_users(:generic_author).projects.count, decoded_response.length
+      assert_equal autotune_users(:group2_author).projects.count, decoded_response.length
     end
 
-    test 'listing projects as generic editor' do
+    test 'listing projects as group editor' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
       get :index
       assert_response :success
       assert_instance_of Array, decoded_response
-      assert_equal Project.where(:theme => autotune_themes(:generic)).count, decoded_response.length
+      assert_equal Project.where(:group => autotune_groups(:group1)).count, decoded_response.length
     end
 
     test 'show project' do
@@ -88,17 +88,17 @@ module Autotune
       assert_response :success
     end
 
-    test 'show project as theme editor' do
+    test 'show project as group editor' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
       get :show, :id => autotune_projects(:example_one).id
       assert_response :success
     end
 
-    test 'show project as theme editor not allowed' do
+    test 'show project as group editor not allowed' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
       get :show, :id => autotune_projects(:example_four).id
       assert_response :forbidden
@@ -127,9 +127,9 @@ module Autotune
       new_p = Project.find decoded_response['id']
       project_data.keys.each do |k|
         if k == :theme
-          assert_equal Autotune::Theme.find_by_value(project_data[k]), new_p.send(k)
+          assert_equal Autotune::Theme.find_by_slug(project_data[k]), new_p.send(k)
         elsif k == :preview_url
-          assert_equal '/preview/generic-new-project', new_p.send(k)
+          assert_equal '/preview/theme1-new-project', new_p.send(k)
         elsif k == :data
           assert_equal({ 'google_doc_id' => '1234' }, new_p.send(k))
         else
@@ -140,9 +140,9 @@ module Autotune
 
     test 'create project not allowed' do
       accept_json!
-      valid_auth_header! :generic_author
+      valid_auth_header! :group2_author
 
-      post :create, project_data.update(:theme => autotune_themes(:vox).value)
+      post :create, project_data.update(:theme => autotune_themes(:theme1).slug)
       assert_response :bad_request, decoded_response['error']
     end
 
@@ -173,7 +173,7 @@ module Autotune
 
       assert_performed_jobs 3 do
         put(:update,
-            :id => autotune_projects(:example_six).id,
+            :id => autotune_projects(:example_four).id,
             :title => title)
       end
       assert_response :success, decoded_response['error']
@@ -213,9 +213,9 @@ module Autotune
       assert_equal title, new_p.title
     end
 
-    test 'update project as theme editor' do
+    test 'update project as group editor' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
       title = 'Updated project'
 
@@ -231,9 +231,9 @@ module Autotune
       assert_equal title, new_p.title
     end
 
-    test 'update project as theme editor not allowed' do
+    test 'update project as group editor not allowed' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
       title = 'Updated project'
 
@@ -263,7 +263,7 @@ module Autotune
       accept_json!
       valid_auth_header! :author
 
-      delete :destroy, :id => autotune_projects(:example_six).id
+      delete :destroy, :id => autotune_projects(:example_four).id
       assert_response :no_content
     end
 
@@ -271,23 +271,23 @@ module Autotune
       accept_json!
       valid_auth_header! :editor
 
-      delete :destroy, :id => autotune_projects(:example_six).id
+      delete :destroy, :id => autotune_projects(:example_four).id
       assert_response :no_content
     end
 
-    test 'delete project as theme editor' do
+    test 'delete project as group editor' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
       delete :destroy, :id => autotune_projects(:example_one).id
       assert_response :no_content
     end
 
-    test 'delete project as theme editor not allowed' do
+    test 'delete project as group editor not allowed' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
-      delete :destroy, :id => autotune_projects(:example_four).id
+      delete :destroy, :id => autotune_projects(:example_two).id
       assert_response :forbidden
     end
 
@@ -311,14 +311,14 @@ module Autotune
       assert_equal Project.where(:status => 'new').count, decoded_response.length
     end
 
-    test 'filter projects as theme editor' do
+    test 'filter projects as group editor' do
       accept_json!
-      valid_auth_header! :generic_editor
+      valid_auth_header! :group1_editor
 
       get :index, :status => 'new'
       assert_response :success
       assert_instance_of Array, decoded_response
-      assert_equal Project.where(:theme => autotune_themes(:generic)).count,
+      assert_equal Project.where(:theme => autotune_themes(:theme1)).count,
                    decoded_response.length
     end
 
@@ -377,10 +377,10 @@ module Autotune
     def project_data
       @project_data ||= {
         :title => 'New project',
-        :slug => "#{autotune_themes(:generic).value} New project".parameterize,
+        :slug => "#{autotune_themes(:theme1).slug} New project".parameterize,
         :blueprint_id => autotune_blueprints(:example).id,
         :user_id => autotune_users(:developer).id,
-        :theme => autotune_themes(:generic).value,
+        :theme => autotune_themes(:theme1).slug,
         :preview_url => '',
         :data => {
           :title => 'New project',

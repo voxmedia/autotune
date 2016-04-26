@@ -64,7 +64,12 @@ LIVE_HEAD = '23eed13c4713da0516af6ad0d33a99ee9c582fa4'
 LIVE_HEAD1 = 'c4e5571fd259be57f7e2d0ab8cc0f93a46ab9460'
 
 # Reset themes for testing
-Rails.configuration.autotune.themes = { :vox => 'Vox', :generic => 'Generic' }
+Rails.configuration.autotune.generic_theme = {
+  'primary-color' => '#292929',
+  'secondary-color' => '#e6e6e6',
+
+  'twitter-handle' => '@testhandle'
+}
 
 # Display work_dir commands
 # require 'work_dir'

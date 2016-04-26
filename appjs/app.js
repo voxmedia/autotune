@@ -37,8 +37,8 @@ Backbone.$ = $;
  */
 function App(config) {
   this.themes = new Backbone.Collection();
-  this.themes.reset(config.themes);
-  delete config.themes;
+  this.themes.reset(config.available_themes);
+  delete config.available_themes;
 
   this.tags = new Backbone.Collection();
   this.tags.reset(config.tags);
@@ -47,8 +47,13 @@ function App(config) {
   this.user = new Backbone.Model(config.user);
   delete config.user;
 
+  this.designerGroups = new Backbone.Collection();
+  this.designerGroups.reset(config.designer_groups);
+  delete config.designer_groups;
+
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
+  this.editableThemes = new models.ThemeCollection();
 
   // Initialize top-level view
   this.view = new views.Application({ app: this });
@@ -166,7 +171,8 @@ _.extend(App.prototype, Backbone.Events, {
    * @returns {boolean}
    **/
   hasRole: function(role) {
-    return _.contains(this.user.get('meta').roles, role);
+    return _.contains(this.user.get('meta').roles, role) ||
+          this.user.get('meta').roles[role];
   }
 });
 

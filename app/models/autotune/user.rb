@@ -3,6 +3,9 @@ module Autotune
   class User < ActiveRecord::Base
     include Searchable
     has_many :projects
+    has_many :group_memberships, -> { includes :group }
+    has_many :groups, :through => :group_memberships
+
     serialize :meta, JSON
 
     default_scope { order('updated_at DESC') }
@@ -41,52 +44,57 @@ module Autotune
     #   # is this user an editor who can use vox or theverge themes?
     #   user.role?(:editor => :vox, :editor => :theverge)
     def role?(*args, **kwargs)
-      return false unless verified?
+      return false if !verified? || group_memberships.nil?
+
       if args.any?
-        args.reduce(false) { |a, e| a || roles.include?(e.to_s) }
+        group_memberships.exists?(:role => args.flatten)
       else
         kwargs.reduce(false) do |a, (k, v)|
+          group = Group.find_by_slug v
           a ||
-            (roles.is_a?(Array) && roles.include?(k.to_s)) ||
-            (roles.include?(k.to_s) && roles[k.to_s].include?(v.to_s))
+            (!group.nil? &&
+              group_memberships.exists?(
+                :role => k.to_s,
+                :group_id => group.id
+              )
+            )
         end
       end
     end
 
     # Return an array list of themes that this user is permitted to use in a project
     def author_themes
-      return [] unless verified?
-      # if this is a superuser, return all available themes
-      # if we only have an array of roles, all themes are available
-      if role?(:superuser) || (roles.is_a?(Array) && role?(:author, :editor))
-        themes = Rails.configuration.autotune.themes.keys
-      else
-        # otherwise get all the themes for all the roles and make an array
-        themes = []
-        Autotune::ROLES.each do |r|
-          themes += roles[r] if roles[r].present?
-        end
-        themes.uniq!
-      end
-      # return an array list of theme objects
-      Theme.where :value => themes
+      return [] if !verified? || group_memberships.nil?
+      Theme.where('(group_id IN (?))',
+                  group_memberships.pluck(:group_id))
     end
 
-    # Return an array of themes that this user is allowed to edit. Editors can see and change other
-    # users' projects. This user will be limited to projects that use these themes.
-    def editor_themes
-      # authors can't edit other projects
-      return [] unless verified? || role?(:editor, :superuser)
-      # if we only have an array, superusers and editors can edit all themes
-      # also, superusers can always edit all the themes, even if we have a hash of roles
-      if roles.is_a?(Array) || role?(:superuser)
-        themes = Rails.configuration.autotune.themes.keys
-      else
-        # otherwise get all the themes for editor
-        themes = roles['editor']
-      end
-      # return an array list of theme objects
-      Theme.where :value => themes
+    # Return an array list of themes that this user is permitted to modify
+    def designer_themes
+      return [] if !verified? || group_memberships.nil?
+      Theme.where('(group_id IN (?))',
+                  group_memberships.with_design_access.pluck(:group_id))
+    end
+
+    # Return an array list of groups that this user has at least editor privileges for
+    def editor_groups
+      return if group_memberships.nil?
+
+      groups.merge(group_memberships.with_editor_access)
+    end
+
+    # Return an array list of groups that this user has at least designer privileges for
+    def designer_groups
+      return if group_memberships.nil?
+
+      groups.merge(group_memberships.with_design_access)
+    end
+
+    # Return an array list of groups that this user has access to
+    def author_groups
+      return if group_memberships.nil?
+
+      groups.merge(group_memberships)
     end
 
     def preferred_auth
@@ -99,6 +107,61 @@ module Autotune
 
     def verified?
       (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
+    end
+
+    def update_membership
+      # remove user's memberships if no roles are provided
+      if roles.nil?
+        user.group_memberships.delete
+        return
+      end
+
+      # Global role assignment
+      # If roles is an array , assign the highest privileges to all groups
+      if roles.is_a?(Array) && roles.any?
+        role_to_assign = GroupMembership.get_best_role(roles)
+        if role_to_assign.nil?
+          group_memberships.delete
+          return
+        end
+      # assign global superuser role if the user has superuser role for anything
+      elsif roles.is_a?(Hash) && !roles[:superuser].nil?
+        role_to_assign = :superuser
+      end
+
+      unless role_to_assign.nil?
+        # create a generic group if for some reason no group exists
+        if Group.all.empty?
+          group = Group.create!(:name => 'generic')
+          Theme.add_default_theme_for_group(group)
+        end
+        Group.all.find_each do |g|
+          membership = group_memberships.find_or_create_by(:group => g)
+          membership.role = role_to_assign.to_s
+          membership.save!
+        end
+        return
+      end
+
+      # handle the case where it is a hash but not superuser
+      if roles.is_a?(Hash) && roles.any?
+        stale_ids = group_memberships.pluck(:id)
+        [:author, :editor, :designer].each do |r|
+          next if roles[r.to_s].nil?
+          roles[r.to_s].each do |g|
+            group = Group.find_or_create_by(:name => g)
+            group.save
+            Theme.add_default_theme_for_group(group)
+            membership = group_memberships.find_or_create_by(:group => group)
+            membership.role = r.to_s
+            membership.save!
+            stale_ids.delete(membership.id)
+          end
+        end
+      end
+      # delete all memberships that weren't updated
+      group_memberships.where('id in ?', stale_ids).delete_all unless stale_ids.empty?
+      save
     end
 
     private

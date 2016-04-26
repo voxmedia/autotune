@@ -7,7 +7,7 @@ json.extract!(
 json.built project.built?
 json.type project.type
 json.blueprint_title project.blueprint.title
-json.theme project.theme.value
+json.theme project.theme.slug
 json.created_by project.user.name
 
 if project.built? && (!project.live? || project.published?)

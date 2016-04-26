@@ -14,9 +14,10 @@ module Autotune
     belongs_to :blueprint
     belongs_to :user
     belongs_to :theme
+    belongs_to :group
 
     validates_length_of :output, :maximum => 64.kilobytes - 1
-    validates :title, :blueprint, :user, :theme, :presence => true
+    validates :title, :blueprint, :user, :group, :theme, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
 
@@ -34,10 +35,9 @@ module Autotune
     end
 
     before_validation do
-
       # Make sure our slug includes the theme
       if theme && (theme_changed? || slug_changed?)
-        self.slug = self.class.unique_slug(theme.value + '-' + slug_sans_theme, id)
+        self.slug = self.class.unique_slug(theme.slug + '-' + slug_sans_theme, id)
       end
 
       # Truncate output field so we can save without error
@@ -186,9 +186,9 @@ module Autotune
     # @return [String] slyg of the project without the theme.
     def slug_sans_theme
       if theme_changed? && theme_was
-        slug.sub(/^(#{theme.value}|#{theme_was.value})-/, '')
+        slug.sub(/^(#{theme.slug}|#{theme_was.slug})-/, '')
       else
-        slug.sub(/^#{theme.value}-/, '')
+        slug.sub(/^#{theme.slug}-/, '')
       end
     end
 

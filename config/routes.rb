@@ -1,6 +1,13 @@
 require 'resque/server'
 
 Autotune::Engine.routes.draw do
+
+  resources :themes,
+            :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  get 'themes/:id/reset',
+      :to => 'themes#reset',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+
   resources :blueprints,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
 

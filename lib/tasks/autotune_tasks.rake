@@ -16,15 +16,6 @@ namespace :autotune do
     end
   end
 
-  desc 'Reset all the blueprints themes'
-  task :reset_blueprint_themes => :environment do
-    puts 'Updating all blueprints'
-    Autotune::Blueprint.all.each do |b|
-      b.initialize_themes_from_config
-      b.save!
-    end
-  end
-
   desc 'Rebuild previews for all projects'
   task :rebuild_previews => :environment do
     puts 'Rebuilding all previews'

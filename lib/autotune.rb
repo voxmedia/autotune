@@ -13,10 +13,10 @@ module Autotune
   PROJECT_STATUSES = %w(new building updated built broken)
   PROJECT_PUB_STATUSES = %w(draft published)
   BLUEPRINT_STATUSES = %w(new updating testing ready broken)
+  THEME_STATUSES = %w(new updating ready broken)
   BLUEPRINT_TYPES = %w(graphic app)
   EDITABLE_SLUG_BLUEPRINT_TYPES = %w(app)
-  ROLES = %w(none author editor superuser)
-
+  ROLES = %w(none author editor designer superuser)
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
 
@@ -24,7 +24,7 @@ module Autotune
                       :verify_omniauth, :verify_authorization_header,
                       :google_auth_enabled, :google_auth_domain,
                       :git_ssh, :git_askpass,
-                      :redis, :faq_url, :themes)
+                      :redis, :faq_url, :generic_theme, :get_theme_data)
 
   class << self
     delegate :redis, :to => :configuration

@@ -68,11 +68,28 @@ Autotune.configure do |conf|
     'ENV' => Rails.env
   }
 
-  # Enabled blueprint themes
-  conf.themes = {
-  # :theme_name  => 'Nice display name',
-    :generic     => 'Generic',
-    :mynewsorg   => 'My news organization'
+  # Generic theme data
+  conf.generic_theme = {
+    'colors' => {
+      'primary_color' => ' #444444',
+      'secondary_color' => ' #444444',
+      'arrow_color' => ' #444444',
+      'button_bg_color' => ' #444444',
+      'button_font_color' => 'white'
+
+    },
+    'fonts' => {
+      'font_url' => '',
+      'body_font_family' => 'Georgia Regular, serif',
+      'header_font_family' => 'Georgia Bold, serif',
+      'button_font_family' => 'Georgia Regular, serif',
+      'header_font_weight' => '700'
+    },
+    'social' => {
+      'twitter_handle' => 'voxmediainc'
+    },
+    'homepage_redirect' => 'voxmedia.com',
+    'chorus_api_domain' => 'sbnation.com.sb4.sbndev.net'
   }
 end
 
@@ -133,20 +150,41 @@ Autotune.config.verify_omniauth = lambda do |omniauth|
   return [:superuser] # or return true
   # refuse access to a user
   # return false
+  # give designer access
+  # return [:designer]
   # give editor access
   # return [:editor]
   # give author access
   # return [:author]
+  # give designer access to specific themes
+  # return :designer => ['My newsorg']
   # give author access to specific themes
-  # return :author => [:mynewsorg]
+  # return :author => ['My newsorg']
   # give editor access to specific themes
-  # return :editor => [:mynewsorg, :generic]
+  # return :editor => ['My newsorg', 'Generic']
+end
+
+# -------------------------------
+# Theme data customization
+# -------------------------------
+# Getting data for themes is defined as a callback here that you can customize
+# It is recommended that you merge the final theme data with generic theme to
+# make sure that all theme variables are available in all themes
+
+Autotune.config.get_theme_data = lambda do |theme|
+   Autotune.config.generic_theme
 end
 CODE
 
 file 'config/unicorn.rb', <<-CODE
 worker_processes 6
 timeout 90
+CODE
+
+file 'config/theme_map.yml', <<-CODE
+---
+- name: Generic
+  theme: generic
 CODE
 
 # add engine routes

@@ -38,7 +38,10 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme.value)
+        'group' => project.group.slug,
+        'theme' => project.theme.slug,
+        'available_themes' => Theme.all.pluck(:slug),
+        'theme_data' => Theme.full_theme_data)
 
       current_user ||= project.user
 
@@ -51,8 +54,8 @@ module Autotune
 
       # Run the build
       repo.working_dir do
-        outlogger.info(repo.cmd(
-          BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+        outlogger.info(repo.cmd(BLUEPRINT_BUILD_COMMAND,
+                                :stdin_data => build_data.to_json))
       end
 
       # Upload build
