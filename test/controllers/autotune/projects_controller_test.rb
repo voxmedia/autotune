@@ -104,7 +104,7 @@ module Autotune
       assert_response :forbidden
     end
 
-    test 'show non-existant project' do
+    test 'show non-existent project' do
       accept_json!
       valid_auth_header!
 
