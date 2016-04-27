@@ -30,7 +30,7 @@ module Autotune
 
     def assign_parent
       return if group.nil?
-      parent_theme = get_default_theme_for_group(group.id)
+      parent_theme = Theme.get_default_theme_for_group(group.id)
       self.parent = parent_theme unless parent_theme == self
     end
 
@@ -49,7 +49,7 @@ module Autotune
     end
 
     def self.add_default_theme_for_group(group)
-      default_theme = get_default_theme_for_group(group.id)
+      default_theme = Theme.get_default_theme_for_group(group.id)
       return default_theme unless default_theme.nil?
       default_theme = Theme.create(
         :title => group.name,
@@ -82,7 +82,7 @@ module Autotune
     end
 
     # Get default theme for group
-    def get_default_theme_for_group(group_id)
+    def self.get_default_theme_for_group(group_id)
       Theme.find_by(
         :parent_id => nil,
         :group_id => group_id)
