@@ -169,7 +169,7 @@ module Autotune
       accept_json!
       valid_auth_header! :author
 
-      title = 'Updated project'
+      title = 'Updated project as author'
 
       assert_performed_jobs 3 do
         put(:update,

@@ -3,7 +3,7 @@ require 'test_helper'
 module Autotune
   # Testing for messages
   class MessagesControllerTest < ActionController::TestCase
-    fixtures 'autotune/blueprints', 'autotune/projects'
+    fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes', 'autotune/groups'
     setup do
       skip 'Cannot run tests without Redis' if Autotune.redis.nil?
       Autotune.purge_messages
