@@ -3,7 +3,7 @@ require 'test_helper'
 # test the job for updating projects
 class Autotune::SyncProjectJobTest < ActiveJob::TestCase
   fixtures 'autotune/blueprints', 'autotune/projects',
-           'autotune/users', 'autotune/themes'
+           'autotune/users', 'autotune/themes', 'autotune/groups', 'autotune/group_memberships'
   test 'update snapshot' do
     b = autotune_projects(:example_one)
 

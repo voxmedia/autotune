@@ -100,7 +100,7 @@ module Autotune
       accept_json!
       valid_auth_header! :group1_editor
 
-      get :show, :id => autotune_projects(:example_four).id
+      get :show, :id => autotune_projects(:example_three).id
       assert_response :forbidden
     end
 
@@ -238,7 +238,7 @@ module Autotune
       title = 'Updated project'
 
       put(:update,
-          :id => autotune_projects(:example_four).id,
+          :id => autotune_projects(:example_three).id,
           :title => title)
       assert_response :forbidden, decoded_response['error']
     end
