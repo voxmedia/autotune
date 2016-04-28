@@ -84,7 +84,7 @@ module Autotune
 
           # if no theme list is available, pick the first theme
           if blueprint.config['themes'].blank?
-            themes = [Theme.first]
+            themes = blueprint.themable? ? [Theme.first] : Theme.where(:parent => nil)
           else # get supported themes
             themes = Theme.where(:slug => blueprint.config['themes'])
           end

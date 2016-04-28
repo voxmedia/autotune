@@ -233,7 +233,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                         Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing', :build_themes => true
     end
 
     assert repo.exist?('autotune-config.json'),
@@ -263,7 +263,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal LIVE_HEAD, bp.version,
                  'Repo should be checked out to the correct version'
 
-    Autotune::Theme.all.each do |theme|
+    Autotune::Theme.where(:parent => nil).each do |theme|
       slug = [bp.version, theme.slug].join('-')
       deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
 
@@ -271,8 +271,10 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
       wd = WorkDir.new deployer.deploy_path
 
-      assert wd.exist?('index.html')
-      assert wd.exist?('preview/index.html')
+      assert wd.exist?('index.html'),
+             wd
+      assert wd.exist?('preview/index.html'),
+             'Preview page is missing'
     end
   end
 
@@ -316,7 +318,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                         Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing'
+      Autotune::SyncBlueprintJob.perform_later bp, :status => 'testing', :build_themes => true
     end
 
     assert repo.exist?('autotune-config.json'),
@@ -345,7 +347,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal LIVE_HEAD, bp.version,
                  'Repo should be checked out to the correct version'
 
-    Autotune::Theme.all.each do |theme|
+    Autotune::Theme.where(:parent => nil).each do |theme|
       slug = [bp.version, theme.slug].join('-')
       deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
 
@@ -353,8 +355,11 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
       wd = WorkDir.new deployer.deploy_path
 
-      assert wd.exist?('index.html')
-      assert wd.exist?('preview/index.html')
+      assert wd.exist?('index.html'),
+             'Index.html is missing'
+      assert wd.exist?('preview/index.html'),
+            'Preview page is missing'
+
     end
   end
 end
