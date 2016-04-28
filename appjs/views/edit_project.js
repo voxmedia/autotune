@@ -64,24 +64,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }, this);
   },
 
-  // should abstract this to be used by checker and in pollChange
   detectUnsavedChanges: function(){
-    var $form = this.$('#projectForm'),
-        data = $form.alpaca('get').getValue();
-
-    data['slug'] = [data['theme'], data['slug']].join('-');
-    data = _.mapObject(data, function(val, key) {
-            if(val.length === 0){
-              return null;
-            } else {
-              return val;
-            }
-           });
-    if( !_.isEqual(this.model.formData(), data) ){
+    if(!this.upToDate){
       window.alert('stop - out of date!');
     }
-    // app.trigger( 'loadingStop' );
-    // this.app.trigger('loadingStop');
   },
 
   focusPollChange: function(){
@@ -95,15 +81,26 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         query = '',
         data = $form.alpaca('get').getValue();
 
-    if ( !this.model.hasPreviewType('live') ) {
-      data['slug'] = [data['theme'], data['slug']].join('-');
-      if( !_.isEqual(this.model.formData(), data) ){
-        $('#save-warning').show();
-      } else {
-        $('#save-warning').hide();
-      }
-      return;
+    // if ( !this.model.hasPreviewType('live') ) {
+    logger.debug('up to date', view.upToDate);
+    data['slug'] = [data['theme'], data['slug']].join('-');
+    data = _.mapObject(data, function(val, key) {
+            if(val.length === 0){
+              return null;
+            } else {
+              return val;
+            }
+           });
+    if( !_.isEqual(this.model.formData(), data) ){
+      view.upToDate = false;
+      $('.project-save-warning').show().css('display', 'inline-block');
+    } else {
+      view.upToDate = true;
+      $('.project-save-warning').hide();
     }
+    logger.debug('up to date', view.upToDate);
+      // return;
+    // }
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form

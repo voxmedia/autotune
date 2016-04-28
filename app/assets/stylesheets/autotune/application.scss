@@ -84,6 +84,22 @@ label.block {
   display: none;
 }
 
+.project-save-warning{
+  display: none;
+  background-color: lighten($darkgrey, 20%);
+  padding: 5px;
+  color: #ffffff;
+  .text-save-alert{
+
+  }
+  button{
+    border-width: 0px;
+    text-decoration: underline;
+    font-weight: bold;
+    background-color: transparent;
+  }
+}
+
 #embed-preview {
   position:relative;
   border: 2px dashed #ccc;
