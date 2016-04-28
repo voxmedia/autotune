@@ -2,7 +2,9 @@ require 'test_helper'
 
 # test the project job
 class Autotune::BuildJobTest < ActiveJob::TestCase
-  fixtures 'autotune/users', 'autotune/blueprints', 'autotune/projects', 'autotune/themes'
+  fixtures 'autotune/users', 'autotune/blueprints', 'autotune/projects',
+           'autotune/themes', 'autotune/groups'
+
   test 'building' do
     b = autotune_projects(:example_one)
 

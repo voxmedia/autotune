@@ -2,7 +2,8 @@ require 'test_helper'
 
 # Test the install blueprint job
 class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
-  fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes'
+  fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes',
+           'autotune/groups'
   test 'install blueprint' do
     bp = autotune_blueprints(:example)
 
