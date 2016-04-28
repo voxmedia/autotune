@@ -110,7 +110,65 @@ module Autotune
       assert_response :created, decoded_response['error']
       assert_theme_data! new_theme_data
 
-      # TODO: Update this to deal with themed blueprints
+      # TODO: Update this to deal with themed blueprints update jobs
+    end
+
+    test 'create theme as designer' do
+      accept_json!
+      valid_auth_header! :designer
+
+      post :create, new_theme_data
+
+      assert_response :created, decoded_response['error']
+      assert_theme_data! new_theme_data
+
+      # TODO: Update this to deal with themed blueprints update jobs
+    end
+
+    test 'create theme as group designer not allowed' do
+      accept_json!
+      valid_auth_header! :group1_designer
+
+      post :create, new_theme_data
+
+      assert_response :forbidden
+
+      # TODO: Update this to deal with themed blueprints update jobs
+    end
+
+    test 'create theme as editor not allowed' do
+      accept_json!
+      valid_auth_header! :editor
+
+      post :create, new_theme_data
+
+      assert_response :forbidden
+    end
+
+    test 'create theme as author not allowed' do
+      accept_json!
+      valid_auth_header! :author
+
+      post :create, new_theme_data
+
+      assert_response :forbidden
+    end
+
+    test 'update theme' do
+      accept_json!
+      valid_auth_header!
+
+      title = 'Updated theme 1'
+
+      put(:update,
+          :id => autotune_themes(:theme1).id,
+          :title => title)
+
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme = Theme.find decoded_response['id']
+      assert_equal title, updated_theme.title
     end
 
     private
