@@ -19,7 +19,7 @@ function pluckAttr(models, attribute) {
 }
 
 function isVisible(control) {
-  return control.type != 'hidden' && $(control.domEl).is(':visible');
+  return control.type !== 'hidden' && $(control.domEl).is(':visible');
 }
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
@@ -45,17 +45,43 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
+      this.listenTo(this.app, 'loadingStart', this.detectUnsavedChanges, this);
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
         this.listenTo(this.app, 'focus', this.focusPollChange, this);
       }
     }, this);
 
+    // this.on('beforeunload', function(){
+    //   logger.debug('HALLLPPPP');
+    //   window.alert('make sure to save!');
+    // });
+
     this.on('unload', function() {
       this.stopListening(this.app);
       this.stopListeningForChanges();
       if ( this.pym ) { this.pym.remove(); }
     }, this);
+  },
+
+  // should abstract this to be used by checker and in pollChange
+  detectUnsavedChanges: function(){
+    var $form = this.$('#projectForm'),
+        data = $form.alpaca('get').getValue();
+
+    data['slug'] = [data['theme'], data['slug']].join('-');
+    data = _.mapObject(data, function(val, key) {
+            if(val.length === 0){
+              return null;
+            } else {
+              return val;
+            }
+           });
+    if( !_.isEqual(this.model.formData(), data) ){
+      window.alert('stop - out of date!');
+    }
+    // app.trigger( 'loadingStop' );
+    // this.app.trigger('loadingStop');
   },
 
   focusPollChange: function(){
