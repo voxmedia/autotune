@@ -2,8 +2,8 @@ require 'test_helper'
 
 module Autotune
   class ThemesControllerTest < ActionController::TestCase
-    fixtures 'autotune/themes', 'autotune/users', 'autotune/group_memberships'
-    test 'that listing themes requires authentication' do
+    fixtures 'autotune/themes', 'autotune/users', 'autotune/groups', 'autotune/group_memberships'
+    test 'listing themes requires authentication' do
       accept_json!
 
       get :index
@@ -11,7 +11,7 @@ module Autotune
       assert_equal({ 'error' => 'Unauthorized' }, decoded_response)
     end
 
-    test 'themes superuser has access to are listed' do
+    test 'list themes as superuser' do
       accept_json!
       valid_auth_header! :developer
 
@@ -22,7 +22,7 @@ module Autotune
       assert_equal 2, decoded_response.length
     end
 
-    test 'themes designer has access to theme' do
+    test 'list themes as designer' do
       accept_json!
       valid_auth_header! :designer
       get :index
