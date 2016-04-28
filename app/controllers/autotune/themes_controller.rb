@@ -71,6 +71,10 @@ module Autotune
     def create
       @theme = Theme.new
       @theme.attributes = select_from_post :title, :data, :group_id, :slug
+      unless current_user.role?(:superuser => @theme.group.slug, :designer => @theme.group.slug)
+        render_error 'User does not have permission to create a theme for this group', :forbidden
+        return
+      end
       if @theme.valid?
         @theme.status = 'ready'
         @theme.save
