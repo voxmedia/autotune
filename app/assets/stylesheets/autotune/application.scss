@@ -89,6 +89,7 @@ label.block {
   background-color: lighten($darkgrey, 20%);
   padding: 5px;
   color: #ffffff;
+  margin: -5px 10px;
   .text-save-alert{
 
   }
@@ -97,6 +98,8 @@ label.block {
     text-decoration: underline;
     font-weight: bold;
     background-color: transparent;
+    padding: 0px 5px;;
+    font-size: 12px;
   }
 }
 
