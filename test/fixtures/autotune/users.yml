@@ -25,8 +25,8 @@ author:
   meta: '{"roles": ["author"]}'
 
 designer:
-  name: author
-  email: author@example.com
+  name: designer
+  email: deisgner@example.com
   api_key: abcdB0LkspAakCmxmbB
   meta: '{"roles": ["designer"]}'
 
@@ -44,6 +44,6 @@ group2_author:
 
 group1_designer:
   name: group1_designer
-  email: editor@example.com
+  email: group1_designer@example.com
   api_key: Q32dc4lZiLJIcHv3jDe
   meta: '{"roles": {"designer": ["group1"]}}'
