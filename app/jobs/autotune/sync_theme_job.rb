@@ -8,7 +8,8 @@ module Autotune
     end
 
     def perform(theme, build_blueprints: true)
-      if Rails.configuration.autotune.get_theme_data.is_a?(Proc)
+      # get external data only for default themes
+      if theme.is_default? && Rails.configuration.autotune.get_theme_data.is_a?(Proc)
         external_data = Rails.configuration.autotune.get_theme_data.call(theme)
       end
       theme.data = external_data unless external_data.nil?
