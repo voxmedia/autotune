@@ -173,7 +173,7 @@ module Autotune
 
       assert_performed_jobs 3 do
         put(:update,
-            :id => autotune_projects(:example_one).id,
+            :id => autotune_projects(:example_four).id,
             :title => title)
       end
       assert_response :success, decoded_response['error']

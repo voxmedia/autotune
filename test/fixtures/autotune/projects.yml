@@ -7,7 +7,7 @@ example_one:
   status: new
   data: '{"title": "Example build one"}'
   blueprint: example
-  user: author
+  user: developer
   group: group1
 
 example_two:
@@ -33,9 +33,9 @@ example_three:
 example_four:
   title: Example build four
   slug: example-build-four
-  theme: theme2
-  status: broken
+  theme: theme1
+  status: new
   data: '{"title": "Example build four"}'
-  blueprint: example_two
+  blueprint: example
   user: author
-  group: group2
+  group: group1
