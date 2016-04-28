@@ -36,10 +36,8 @@ module Autotune
 
     # Merge data with parent and generic themes
     def config_data
-      generic_theme_data = Rails.configuration.autotune.generic_theme
-      return generic_theme_data.deep_merge(data) if parent.nil?
-      inherited_data = generic_theme_data.deep_merge(parent.data)
-      inherited_data.deep_merge(data)
+      return Rails.configuration.autotune.generic_theme.deep_merge(data) if parent.nil?
+      parent.config_data.deep_merge(data)
     end
 
     def update_data(build_blueprints: true)
