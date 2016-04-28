@@ -7,7 +7,7 @@ example_one:
   status: new
   data: '{"title": "Example build one"}'
   blueprint: example
-  user: developer
+  user: author
   group: group1
 
 example_two:
