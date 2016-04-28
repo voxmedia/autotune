@@ -3,7 +3,7 @@ require 'test_helper'
 module Autotune
   # Test project api
   class ProjectsControllerTest < ActionController::TestCase
-    fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes', 'autotune/users', 'autotune/groups'
+    fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes', 'autotune/users', 'autotune/groups', 'autotune/group_memberships'
     test 'that listing projects requires authentication' do
       accept_json!
 
