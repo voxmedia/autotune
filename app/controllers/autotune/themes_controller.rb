@@ -10,14 +10,14 @@ module Autotune
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :create, :update, :destroy] do
+    before_action :only => [:show, :update, :destroy] do
       unless current_user.role?(:superuser) ||
-             current_user.role?(:designer => instance.group.name)
+             current_user.role?(:designer => instance.group.slug)
         render_error 'Forbidden', :forbidden
       end
     end
 
-    before_action :only => [:new, :create] do
+    before_action :only => [:new, :create, :index] do
       unless current_user.role? [:superuser, :designer]
         render_error 'Forbidden', :forbidden
       end
