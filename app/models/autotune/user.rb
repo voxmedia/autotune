@@ -110,7 +110,7 @@ module Autotune
     end
 
     def update_roles (new_roles)
-      self.meta['roles'] = new_roles
+      self.meta= { 'roles' => new_roles }
       save!
     end
 
