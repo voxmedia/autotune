@@ -2,7 +2,8 @@ require 'test_helper'
 
 module Autotune
   class ThemesControllerTest < ActionController::TestCase
-    fixtures 'autotune/themes', 'autotune/users', 'autotune/groups', 'autotune/group_memberships'
+    fixtures 'autotune/themes', 'autotune/users',
+             'autotune/groups', 'autotune/group_memberships'
 
     test 'listing themes requires authentication' do
       accept_json!
@@ -170,6 +171,211 @@ module Autotune
       updated_theme = Theme.find decoded_response['id']
       assert_equal title, updated_theme.title
     end
+
+    test 'update theme as designer' do
+      accept_json!
+      valid_auth_header! :designer
+
+      title = 'Updated theme 1'
+
+      put(:update,
+          :id => autotune_themes(:theme1).id,
+          :title => title)
+
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme = Theme.find decoded_response['id']
+      assert_equal title, updated_theme.title
+    end
+
+    test 'update theme as group designer' do
+      accept_json!
+      valid_auth_header! :group1_designer
+
+      title = 'Updated theme 1'
+
+      put(:update,
+          :id => autotune_themes(:theme1).id,
+          :title => title)
+
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme = Theme.find decoded_response['id']
+      assert_equal title, updated_theme.title
+    end
+
+    test 'update theme as group designer not allowed' do
+      accept_json!
+      valid_auth_header! :group1_designer
+
+      title = 'Updated theme 2'
+
+      put(:update,
+          :id => autotune_themes(:theme2).id,
+          :title => title)
+
+
+      assert_response :forbidden
+    end
+
+    test 'update theme as author not allowed' do
+      accept_json!
+      valid_auth_header! :author
+
+      title = 'Updated theme 1'
+
+      put(:update,
+          :id => autotune_themes(:theme1).id,
+          :title => title)
+
+
+      assert_response :forbidden
+    end
+
+    test 'delete theme' do
+      accept_json!
+      valid_auth_header!
+
+      delete :destroy, :id => autotune_themes(:child_theme1).id
+      assert_response :no_content
+    end
+
+    test 'delete theme as designer' do
+      accept_json!
+      valid_auth_header! :designer
+
+      delete :destroy, :id => autotune_themes(:child_theme1).id
+      assert_response :no_content
+    end
+
+    test 'delete theme as group designer' do
+      accept_json!
+      valid_auth_header! :group1_designer
+
+      delete :destroy, :id => autotune_themes(:child_theme1).id
+      assert_response :no_content
+    end
+
+    test 'delete theme as author not allowed' do
+      accept_json!
+      valid_auth_header! :author
+
+      delete :destroy, :id => autotune_themes(:child_theme1).id
+      assert_response :forbidden
+    end
+
+    test 'default theme can not be deleted' do
+      accept_json!
+      valid_auth_header!
+
+      delete :destroy, :id => autotune_themes(:theme1).id
+      assert_response :bad_request
+    end
+
+    test 'reset theme' do
+      accept_json!
+      valid_auth_header!
+
+      data = {'test' => 'value'}
+
+      put(:update,
+          :id => autotune_themes(:theme1).id,
+          :data => data)
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme = Theme.find decoded_response['id']
+      assert_equal data, updated_theme.data
+
+      assert_performed_jobs 1 do
+        put :reset, :id => autotune_themes(:theme1).id
+      end
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme.reload
+      assert_equal RESET_THEME_DATA, updated_theme.data
+    end
+
+    test 'reset theme as designer' do
+      accept_json!
+      valid_auth_header! :designer
+
+      data = {'test' => 'value'}
+
+      put(:update,
+          :id => autotune_themes(:theme1).id,
+          :data => data)
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme = Theme.find decoded_response['id']
+      assert_equal data, updated_theme.data
+
+      assert_performed_jobs 1 do
+        put :reset, :id => autotune_themes(:theme1).id
+      end
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme.reload
+      assert_equal RESET_THEME_DATA, updated_theme.data
+    end
+
+    test 'reset theme as group designer' do
+      accept_json!
+      valid_auth_header! :group1_designer
+
+      data = {'test' => 'value'}
+
+      put(:update,
+          :id => autotune_themes(:theme1).id,
+          :data => data)
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme = Theme.find decoded_response['id']
+      assert_equal data, updated_theme.data
+
+      assert_performed_jobs 1 do
+        put :reset, :id => autotune_themes(:theme1).id
+      end
+
+      assert_response :success, decoded_response['error']
+
+      updated_theme.reload
+      assert_equal RESET_THEME_DATA, updated_theme.data
+    end
+
+    test 'reset theme as author not allowed' do
+      accept_json!
+      valid_auth_header! :author
+
+      put :reset, :id => autotune_themes(:theme1).id
+
+      assert_response :forbidden, decoded_response['error']
+    end
+
+    test 'reset theme as editor not allowed' do
+      accept_json!
+      valid_auth_header! :editor
+
+      put :reset, :id => autotune_themes(:theme1).id
+
+      assert_response :forbidden, decoded_response['error']
+    end
+
+    test 'reset theme as group designer not allowed' do
+      accept_json!
+      valid_auth_header! :group1_designer
+
+      put :reset, :id => autotune_themes(:theme2).id
+
+      assert_response :forbidden, decoded_response['error']
+    end
+
 
     private
 
