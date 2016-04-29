@@ -62,6 +62,7 @@ MASTER_HEAD2 = NO_SUBMOD = 'fdb4b18d01461574f68cbd763731499af2da561d'
 TEST_HEAD = 'b36b32c97fa027d4f86b64559377d9dd47a3530b'
 LIVE_HEAD = '23eed13c4713da0516af6ad0d33a99ee9c582fa4'
 LIVE_HEAD1 = 'c4e5571fd259be57f7e2d0ab8cc0f93a46ab9460'
+RESET_THEME_DATA = { 'updated' =>'data'}
 
 # Reset themes for testing
 Rails.configuration.autotune.generic_theme = {
@@ -71,6 +72,10 @@ Rails.configuration.autotune.generic_theme = {
     'twitter-handle' => '@testhandle'
   }
 }
+
+Rails.configuration.autotune.get_theme_data = lambda do |theme|
+  RESET_THEME_DATA
+end
 
 # Display work_dir commands
 # require 'work_dir'
