@@ -10,7 +10,7 @@ module Autotune
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update, :destroy] do
+    before_action :only => [:show, :update, :destroy, :reset] do
       unless current_user.role?(:superuser) ||
              current_user.role?(:designer => instance.group.slug)
         render_error 'Forbidden', :forbidden
@@ -75,6 +75,7 @@ module Autotune
         render_error 'User does not have permission to create a theme for this group', :forbidden
         return
       end
+
       if @theme.valid?
         @theme.status = 'ready'
         @theme.save
