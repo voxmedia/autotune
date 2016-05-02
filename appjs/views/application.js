@@ -21,6 +21,9 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
     buttons: { sticker: false }
   },
+  events: {
+    'click #savePreview': 'savePreview'
+  },
 
   afterInit: function() {
     // Show or hide spinner on loading events
@@ -130,6 +133,13 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     } else {
       return PNotify.removeAll();
     }
+  },
+
+  // Probably should not be located here, but not sure how to incorporate
+  // elsewhere since this action is located in the nav bar.
+  savePreview: function(){
+    logger.debug('savePreview!!!!', this);
+    this.$('#projectForm form').submit();
   }
 });
 
