@@ -1739,9 +1739,9 @@
       "resolved": "git://github.com/bgrins/spectrum.git#587ced96a051677ce25e774867c06756cb5a7b4c"
     },
     "underscore": {
-      "version": "1.7.0",
-      "from": "underscore@1.7.0",
-      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.7.0.tgz"
+      "version": "1.8.3",
+      "from": "underscore@1.8.3",
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.8.3.tgz"
     },
     "underscore.string": {
       "version": "3.0.3",

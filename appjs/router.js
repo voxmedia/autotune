@@ -37,10 +37,13 @@ module.exports = Backbone.Router.extend({
 
   // This is called for every route
   everyRoute: function(route, params) {
+    // logger.debug('route params', route, params);
     this.app.trigger( 'loadingStart' );
+    // if(params[])
     this.app.analyticsEvent( 'pageview' );
     this.app.messages.start();
     if ( params ) {
+      this.app.trigger('leavePage');
       logger.debug(route, params);
     } else {
       logger.debug(route);

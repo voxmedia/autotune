@@ -45,7 +45,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-      this.listenTo(this.app, 'loadingStart', this.detectUnsavedChanges, this);
+      this.listenTo(this.app, 'leavePage', this.detectUnsavedChanges, this);
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
         this.listenTo(this.app, 'focus', this.focusPollChange, this);
@@ -90,6 +90,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     // if ( !this.model.hasPreviewType('live') ) {
     logger.debug('up to date', view.upToDate);
+    logger.debug(this.model.formData(), data);
     data['slug'] = [data['theme'], data['slug']].join('-');
     data = _.mapObject(data, function(val, key) {
             if(val.length === 0){
@@ -244,6 +245,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   beforeRender: function() {
+    $('.project-save-warning').hide();
     this.stopListeningForChanges();
   },
 
