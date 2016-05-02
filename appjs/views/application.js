@@ -139,6 +139,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   // elsewhere since this action is located in the nav bar.
   savePreview: function(){
     logger.debug('savePreview!!!!', this);
+    this.upToDate = true;
     this.$('#projectForm form').submit();
   }
 });

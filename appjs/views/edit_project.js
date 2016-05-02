@@ -52,11 +52,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     }, this);
 
-    // this.on('beforeunload', function(){
-    //   logger.debug('HALLLPPPP');
-    //   window.alert('make sure to save!');
-    // });
-
     this.on('unload', function() {
       this.stopListening(this.app);
       this.stopListeningForChanges();
@@ -64,10 +59,22 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }, this);
   },
 
-  detectUnsavedChanges: function(){
+  detectUnsavedChanges: function(event){
+    console.log('detect', this, this.upToDate);
     if(!this.upToDate){
-      window.alert('stop - out of date!');
+      var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
+      if(result){
+        console.log('Ok, save my changes.');
+        // this.upToDate = true;
+        this.savePreview();
+
+        // this.$('#projectForm form').submit();
+      } else {
+        console.log('Nah, I\'m good.');
+      }
+      // this.upToDate = true;
     }
+    $('.project-save-warning').hide();
   },
 
   focusPollChange: function(){
@@ -172,6 +179,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   }, 500),
 
   savePreview: function(){
+    this.upToDate = true;
     this.$('#projectForm form').submit();
   },
 
@@ -245,6 +253,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
+
+    view.upToDate = true;
 
     // autoselect embed code on focus
     this.$("#embed textarea").focus( function() { $(this).select(); } );
