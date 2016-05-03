@@ -86,19 +86,24 @@ label.block {
 
 .project-save-warning{
   display: none;
-  background-color: lighten($darkgrey, 20%);
-  padding: 21px 10px;
+  padding: 17px 10px 13px 10px;
   color: #ffffff;
   margin: -5px 10px;
+  .icon-alert{
+    width: 26px;
+    height: 22px;
+    vertical-align: top;
+  }
   .text-save-alert{
 
   }
-  button{
+  button.btn-primary{
     border-width: 0px;
-    text-decoration: underline;
-    font-weight: bold;
-    background-color: transparent;
-    padding: 0px 5px;;
+    margin: 0 5px;
+    text-transform: none;
+    border-radius: 5px;
+    padding: 6px 10px;
+    letter-spacing: normal;
     font-size: 12px;
   }
 }
