@@ -59,19 +59,29 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }, this);
   },
 
-  detectUnsavedChanges: function(event){
+  detectUnsavedChanges: function(){
     console.log('detect', this, this.upToDate);
+    // figure out how to prevent navigation away from the page
+    var view = this;
     if(!this.upToDate){
-      var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
-      if(result){
-        console.log('Ok, save my changes.');
-        // this.upToDate = true;
-        this.savePreview();
+      var notice = this.app.view.alert('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes? \n\n<button type="submit" class="btn btn-primary" type="submit" id="savePreview" data-loading-text="Saving...">Save now</button>', 'notice', 0);
+      notice.get().find('#savePreview').on('click', function() {
+          view.savePreview();
+          notice.remove();
+      }).submit(function(){
+        return;
+      });
 
-        // this.$('#projectForm form').submit();
-      } else {
-        console.log('Nah, I\'m good.');
-      }
+      // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
+      // if(result){
+      //   console.log('Ok, save my changes.');
+      //   // this.upToDate = true;
+      //   this.savePreview();
+      //
+      //   // this.$('#projectForm form').submit();
+      // } else {
+      //   console.log('Nah, I\'m good.');
+      // }
       // this.upToDate = true;
     }
     $('.project-save-warning').hide();
