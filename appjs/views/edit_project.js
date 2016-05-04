@@ -7,6 +7,7 @@ var $ = require('jquery'),
     helpers = require('../helpers'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
+    SaveModal = require('./save_modal'),
     ace = require('brace'),
     pym = require('pym.js'),
     slugify = require("underscore.string/slugify");
@@ -69,14 +70,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   askToSave: function() {
-    var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
+
+    // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
+    var modalView = new SaveModal();
+    modalView.show();
     this.upToDate = true;
     $('.project-save-warning').hide();
-    if(result){
-      this.savePreview();
-    } else {
-      return false;
-    }
+    // if(result){
+    //   this.savePreview();
+    // } else {
+    //   return false;
+    // }
   },
 
   hasUnsavedChanges: function(){
