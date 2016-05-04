@@ -43,6 +43,7 @@ class CreateGroups < ActiveRecord::Migration
       group_theme_map = YAML.load_file(group_theme_map_file)
 
       group_theme_map.each do |g|
+        next if g['theme'].nil?
         puts "Mapping group #{g['name']} and #{g['theme']}..."
         theme = Autotune::Theme.find_by(:slug => g['theme'])
         if theme.nil?
