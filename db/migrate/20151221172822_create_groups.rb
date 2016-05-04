@@ -68,10 +68,13 @@ class CreateGroups < ActiveRecord::Migration
       # now that all the themes are created, rebuild all the blueprints
       Autotune::Blueprint.rebuild_themed_blueprints
 
+
+      ActiveRecord::Base.record_timestamps = false
       Autotune::Project.all.each do |project|
         project.group = project.theme.group
         project.save!
       end
+      ActiveRecord::Base.record_timestamps = true
     end
 
     # remove relation between blueprints and themes
