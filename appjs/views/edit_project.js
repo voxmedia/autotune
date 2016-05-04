@@ -36,16 +36,25 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
+    var view = this;
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
     if(options.query){
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
+    if(view.hasUnsavedChanges()){
+      window.onbeforeunload = function(e) {
+        // view.askToSave();
+        return 'Looks like your project form is out-of-date with the most recent save.';
+      };
+    }
+
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-      this.listenTo(this.app, 'leavePage', this.detectUnsavedChanges, this);
+      this.listenTo(this.app.router, 'route', this.hasUnsavedChanges, this);
+
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
         this.listenTo(this.app, 'focus', this.focusPollChange, this);
@@ -59,32 +68,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }, this);
   },
 
-  detectUnsavedChanges: function(){
-    console.log('detect', this, this.upToDate);
-    // figure out how to prevent navigation away from the page
-    var view = this;
-    if(!this.upToDate){
-      var notice = this.app.view.alert('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes? \n\n<button type="submit" class="btn btn-primary" type="submit" id="savePreview" data-loading-text="Saving...">Save now</button>', 'notice', 0);
-      notice.get().find('#savePreview').on('click', function() {
-          view.savePreview();
-          notice.remove();
-      }).submit(function(){
-        return;
-      });
-
-      // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
-      // if(result){
-      //   console.log('Ok, save my changes.');
-      //   // this.upToDate = true;
-      //   this.savePreview();
-      //
-      //   // this.$('#projectForm form').submit();
-      // } else {
-      //   console.log('Nah, I\'m good.');
-      // }
-      // this.upToDate = true;
-    }
+  askToSave: function() {
+    var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
+    this.upToDate = true;
     $('.project-save-warning').hide();
+    if(result){
+      this.savePreview();
+    } else {
+      return false;
+    }
+  },
+
+  hasUnsavedChanges: function(){
+    if(!this.upToDate){
+      return true;
+    } else {
+      return false;
+    }
   },
 
   focusPollChange: function(){

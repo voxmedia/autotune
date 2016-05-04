@@ -35,15 +35,28 @@ module.exports = Backbone.Router.extend({
     "themes/:slug/edit": "editTheme"
   },
 
+  execute: function(callback, args, name){
+    logger.debug(callback, args, name);
+    var view = this.app.view.currentView,
+        hasCallback = true;
+    if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+      var saveProj = view.askToSave();
+      if(saveProj){
+        hasCallback = false;
+      }
+    }
+    if(hasCallback){
+      if (callback){ callback.apply(this, args); }
+    }
+  },
+
   // This is called for every route
   everyRoute: function(route, params) {
-    // logger.debug('route params', route, params);
     this.app.trigger( 'loadingStart' );
-    // if(params[])
     this.app.analyticsEvent( 'pageview' );
     this.app.messages.start();
     if ( params ) {
-      this.app.trigger('leavePage');
+      // this.app.trigger('leavePage');
       logger.debug(route, params);
     } else {
       logger.debug(route);
