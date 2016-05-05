@@ -26,7 +26,22 @@ function isVisible(control) {
 
 var Modal = Backbone.Modal.extend({
        template: require('../templates/modal.ejs'),
-       cancelEl: '.bbm-button'
+       cancelEl: '#dismiss',
+       submitEl: '#save',
+
+       cancel: function(){
+         this.upToDate = true;
+         $('.project-save-warning').hide();
+         Backbone.history.navigate( window.location.pathname, {trigger: true} );
+        //  $( "#draft-preview" ).trigger( "click" );
+       },
+
+       submit: function(){
+        this.$('#projectForm form').submit();
+        this.upToDate = true;
+        $('.project-save-warning').hide();
+        Backbone.history.navigate( window.location.pathname, {trigger: true} );
+       }
      });
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
@@ -76,8 +91,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   askToSave: function() {
-    logger.debug('ASK TO SAVE');
-
     // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
     var modalView = new Modal();
     $('.col-xs-12').html(modalView.render().el);

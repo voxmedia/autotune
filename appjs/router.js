@@ -40,16 +40,14 @@ module.exports = Backbone.Router.extend({
     var view = this.app.view.currentView,
         hasCallback = true;
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
-      // var saveProj = view.askToSave();
-      // if(saveProj){
-      //   hasCallback = false;
-      // }
-      hasCallback = false;
+      // hasCallback = false;
       view.askToSave();
+      return false;
     }
-    if(hasCallback){
-      if (callback){ callback.apply(this, args); }
-    }
+    if (callback){ callback.apply(this, args); }
+    // if(hasCallback){
+    //   if (callback){ callback.apply(this, args); }
+    // }
   },
 
   // This is called for every route
