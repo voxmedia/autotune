@@ -34,6 +34,7 @@
   "dependencies": {
     "alpaca": "voxmedia/alpaca",
     "backbone": "1.2.3",
+    "backbone.modal": "^1.1.5",
     "backbone.paginator": "^2.0.2",
     "bootstrap": "3.3.2",
     "brace": "0.5.1",

@@ -7,7 +7,8 @@ var $ = require('jquery'),
     helpers = require('../helpers'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
-    SaveModal = require('./save_modal'),
+    // SaveModal = require('./save_modal'),
+    BackboneModal = require('backbone.modal/backbone.modal.js'),
     ace = require('brace'),
     pym = require('pym.js'),
     slugify = require("underscore.string/slugify");
@@ -22,6 +23,11 @@ function pluckAttr(models, attribute) {
 function isVisible(control) {
   return control.type !== 'hidden' && $(control.domEl).is(':visible');
 }
+
+var Modal = Backbone.Modal.extend({
+       template: require('../templates/modal.ejs'),
+       cancelEl: '.bbm-button'
+     });
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
@@ -70,12 +76,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   askToSave: function() {
+    logger.debug('ASK TO SAVE');
 
     // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
-    var modalView = new SaveModal();
-    modalView.show();
-    this.upToDate = true;
-    $('.project-save-warning').hide();
+    var modalView = new Modal();
+    $('.col-xs-12').html(modalView.render().el);
+    // this.upToDate = true;
+    // $('.project-save-warning').hide();
     // if(result){
     //   this.savePreview();
     // } else {
