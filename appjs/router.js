@@ -41,6 +41,14 @@ module.exports = Backbone.Router.extend({
         hasCallback = true;
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
       // hasCallback = false;
+      // Promise
+      //   .resolve(view.askToSave())
+      //   .then(function() {
+      //     return view.upToDate;
+      //   }).catch(function(jqXHR) {
+      //     view.app.view.displayError(
+      //       jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+      //   });
       view.askToSave();
       return false;
     }
@@ -56,7 +64,6 @@ module.exports = Backbone.Router.extend({
     this.app.analyticsEvent( 'pageview' );
     this.app.messages.start();
     if ( params ) {
-      // this.app.trigger('leavePage');
       logger.debug(route, params);
     } else {
       logger.debug(route);

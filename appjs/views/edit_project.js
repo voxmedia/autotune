@@ -25,24 +25,30 @@ function isVisible(control) {
 }
 
 var Modal = Backbone.Modal.extend({
-       template: require('../templates/modal.ejs'),
-       cancelEl: '#dismiss',
-       submitEl: '#save',
+  template: require('../templates/modal.ejs'),
+  cancelEl: '#dismiss',
+  submitEl: '#save',
 
-       cancel: function(){
-         this.upToDate = true;
-         $('.project-save-warning').hide();
-         Backbone.history.navigate( window.location.pathname, {trigger: true} );
-        //  $( "#draft-preview" ).trigger( "click" );
-       },
+  cancel: function(){
+    logger.debug('cancel', this);
+    this.upToDate = true;
+    $('.project-save-warning').hide();
+    //  Backbone.history.navigate( window.location.pathname, {trigger: true} );
+    //  $( "#draft-preview" ).trigger( "click" );
+    //  this.render();
+    this.model.render();
+    return false;
+  },
 
-       submit: function(){
-        this.$('#projectForm form').submit();
-        this.upToDate = true;
-        $('.project-save-warning').hide();
-        Backbone.history.navigate( window.location.pathname, {trigger: true} );
-       }
-     });
+  submit: function(){
+    logger.debug('submit this', this);
+    $('#projectForm form').submit();
+    this.upToDate = true;
+    $('.project-save-warning').hide();
+    this.model.render();
+    // this.navigate( window.location.pathname, {trigger: true} );
+  }
+});
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
@@ -75,7 +81,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-      this.listenTo(this.app.router, 'route', this.hasUnsavedChanges, this);
+      // this.listenTo(this.app.router, 'route', this.hasUnsavedChanges, this);
 
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
@@ -92,9 +98,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   askToSave: function() {
     // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
-    var modalView = new Modal();
+    var modalView = new Modal({model: this.model});
     $('.col-xs-12').html(modalView.render().el);
-    // this.upToDate = true;
+    // modalView.on('click', this.render(), this);
+    this.upToDate = true;
     // $('.project-save-warning').hide();
     // if(result){
     //   this.savePreview();
