@@ -28,25 +28,24 @@ var Modal = Backbone.Modal.extend({
   template: require('../templates/modal.ejs'),
   cancelEl: '#dismiss',
   submitEl: '#save',
+  events: {
+    'click #closeModal': 'destroy'
+  },
 
   cancel: function(){
     logger.debug('cancel', this);
-    this.upToDate = true;
     $('.project-save-warning').hide();
     //  Backbone.history.navigate( window.location.pathname, {trigger: true} );
     //  $( "#draft-preview" ).trigger( "click" );
     //  this.render();
-    this.model.render();
+    // $( "a[href='"+window.location.pathname+"']" ).trigger( "click" );
     return false;
   },
 
   submit: function(){
     logger.debug('submit this', this);
     $('#projectForm form').submit();
-    this.upToDate = true;
     $('.project-save-warning').hide();
-    this.model.render();
-    // this.navigate( window.location.pathname, {trigger: true} );
   }
 });
 

@@ -108,6 +108,45 @@ label.block {
   }
 }
 
+.bbm-wrapper{
+  position: absolute;
+  z-index: 1;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+}
+
+.modal-dialog{
+  width: 100%;
+  max-width: 400px;
+  i, p{
+    display: table-cell;
+  }
+  p{
+    padding-top: 7px;
+  }
+  .icon-alert{
+    width: 50px;
+    height: 28px;
+    vertical-align: top;
+    margin-right: 10px;
+  }
+  .modal-footer{
+    border-width: 0px;
+    padding-top: 0px;
+    button.btn{
+      border-width: 0px;
+      // margin: 0 5px;
+      text-transform: none;
+      border-radius: 5px;
+      padding: 6px 10px;
+      letter-spacing: normal;
+      font-size: 12px;
+    }
+  }
+}
+
 #saveModal{
   // display: none;
 }
