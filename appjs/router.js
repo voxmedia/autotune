@@ -35,28 +35,34 @@ module.exports = Backbone.Router.extend({
     "themes/:slug/edit": "editTheme"
   },
 
-  execute: function(callback, args, name){
-    logger.debug(callback, args, name);
+  navigate: function(fragment, options) {
+    // logger.debug(callback, args, name);
     var view = this.app.view.currentView,
         hasCallback = true;
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
-      // hasCallback = false;
-      // Promise
-      //   .resolve(view.askToSave())
-      //   .then(function() {
-      //     return view.upToDate;
-      //   }).catch(function(jqXHR) {
-      //     view.app.view.displayError(
-      //       jqXHR.status, jqXHR.statusText, jqXHR.responseText);
-      //   });
-      view.askToSave();
-      return false;
+      view.askToSave().then(function(okToContinue) {
+        if ( okToContinue ) {
+          Backbone.Router.prototype.navigate.call(this, fragment, options);                    
+        }
+      });
+    } else {
+      Backbone.Router.prototype.navigate.call(this, fragment, options);
     }
-    if (callback){ callback.apply(this, args); }
-    // if(hasCallback){
-    //   if (callback){ callback.apply(this, args); }
-    // }
   },
+  //
+  // execute: function(callback, args, name){
+  //   logger.debug(callback, args, name);
+  //   var view = this.app.view.currentView,
+  //       hasCallback = true;
+  //   if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+  //     view.askToSave();
+  //     return false;
+  //   }
+  //   if (callback){ callback.apply(this, args); }
+  //   // if(hasCallback){
+  //   //   if (callback){ callback.apply(this, args); }
+  //   // }
+  // },
 
   // This is called for every route
   everyRoute: function(route, params) {

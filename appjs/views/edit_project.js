@@ -32,9 +32,21 @@ var Modal = Backbone.Modal.extend({
     'click #closeModal': 'destroy'
   },
 
+  initialize: function(options) {
+    if (_.isObject(options)) {
+      _.extend(this, _.pick(options, 'app', 'parentView'));
+    }
+  },
+
+  close: function(eve) {
+    this.trigger('close');
+    this.destroy(eve);
+  },
+
   cancel: function(){
     logger.debug('cancel', this);
     $('.project-save-warning').hide();
+    this.trigger('cancel');
     //  Backbone.history.navigate( window.location.pathname, {trigger: true} );
     //  $( "#draft-preview" ).trigger( "click" );
     //  this.render();
@@ -43,9 +55,13 @@ var Modal = Backbone.Modal.extend({
   },
 
   submit: function(){
+    var self = this;
     logger.debug('submit this', this);
-    $('#projectForm form').submit();
-    $('.project-save-warning').hide();
+    this.parentView
+      .doSubmit( this.parentView.$('#projectForm form') )
+      .then(function() {
+        self.trigger('submit');
+      });
   }
 });
 
@@ -97,16 +113,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   askToSave: function() {
     // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
-    var modalView = new Modal({model: this.model});
-    $('.col-xs-12').html(modalView.render().el);
+    var modalView = new Modal({app: this.app, parentView: this}),
+        ret = new Promise(function(resolve, reject) {
+          modalView.once('cancel submit', function() {
+            resolve(true);
+          });
+          modalView.once('close', function() {
+            resolve(false);
+          });
+        });
+
+    $('body').append(modalView.render().el);
     // modalView.on('click', this.render(), this);
     this.upToDate = true;
-    // $('.project-save-warning').hide();
-    // if(result){
-    //   this.savePreview();
-    // } else {
-    //   return false;
-    // }
+
+    return ret;
   },
 
   hasUnsavedChanges: function(){

@@ -15,7 +15,7 @@ module.exports = {
   },
 
   handleForm: function(eve) {
-    var inst, Model, view = this, app = this.app, $form;
+    var $form;
 
     eve.preventDefault();
     eve.stopPropagation();
@@ -25,6 +25,13 @@ module.exports = {
     } else {
       $form = $(eve.currentTarget).parents('form');
     }
+
+    return this.doSubmit($form);
+  },
+
+  doSubmit: function(formEle) {
+    var inst, Model, view = this, app = this.app,
+        $form = this.$(formEle);
 
     this.app.trigger('loadingStart');
     logger.debug('handleForm');
