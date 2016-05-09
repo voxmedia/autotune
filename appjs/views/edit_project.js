@@ -29,10 +29,11 @@ var Modal = Backbone.Modal.extend({
   cancelEl: '#dismiss',
   submitEl: '#save',
   events: {
-    'click #closeModal': 'destroy'
+    'click #closeModal': 'close'
   },
 
   initialize: function(options) {
+    logger.debug('init options', options);
     if (_.isObject(options)) {
       _.extend(this, _.pick(options, 'app', 'parentView'));
     }
@@ -47,7 +48,7 @@ var Modal = Backbone.Modal.extend({
     logger.debug('cancel', this);
     $('.project-save-warning').hide();
     this.trigger('cancel');
-    //  Backbone.history.navigate( window.location.pathname, {trigger: true} );
+    //  this.app.router.navigate( window.location.pathname, {trigger: true} );
     //  $( "#draft-preview" ).trigger( "click" );
     //  this.render();
     // $( "a[href='"+window.location.pathname+"']" ).trigger( "click" );
@@ -86,7 +87,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
-    if(view.hasUnsavedChanges()){
+    // this doesn't work, but everything else appears to
+    if(!this.upToDate){
       window.onbeforeunload = function(e) {
         // view.askToSave();
         return 'Looks like your project form is out-of-date with the most recent save.';
@@ -112,21 +114,20 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   askToSave: function() {
+    logger.debug('ask to save');
     // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
     var modalView = new Modal({app: this.app, parentView: this}),
         ret = new Promise(function(resolve, reject) {
           modalView.once('cancel submit', function() {
+            this.upToDate = true;
             resolve(true);
           });
-          modalView.once('close', function() {
+          modalView.on('close', function() {
             resolve(false);
           });
         });
 
-    $('body').append(modalView.render().el);
-    // modalView.on('click', this.render(), this);
-    this.upToDate = true;
-
+    $('#projectEditor').append(modalView.render().el);
     return ret;
   },
 

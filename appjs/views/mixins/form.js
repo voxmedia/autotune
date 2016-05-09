@@ -52,7 +52,7 @@ module.exports = {
       // if the method attr is `get` then we can navigate to that new
       // url and avoid any posting
       var basepath = $form.attr('action') || window.location.pathname;
-      Backbone.history.navigate(
+      this.app.router.navigate(
         basepath + '?' + $form.serialize(),
         {trigger: true});
       return;
@@ -83,11 +83,11 @@ module.exports = {
       }).then(function() {
         logger.debug('next: '+next);
         if ( next === 'show' && action === 'new' ) {
-          Backbone.history.navigate(inst.url(), {trigger: true});
+          this.app.router.navigate(inst.url(), {trigger: true});
         } else if ( next === 'show' ) {
           view.render();
         } else if ( next ) {
-          Backbone.history.navigate(next, {trigger: true});
+          this.app.router.navigate(next, {trigger: true});
         } else {
           view.render();
         }

@@ -37,7 +37,7 @@ module.exports = {
         eve.preventDefault();
         eve.stopPropagation();
         logger.debug( 'handleLink', href );
-        Backbone.history.navigate( href, { trigger: true } );
+        this.app.router.navigate( href, { trigger: true } );
       }
     }
   }

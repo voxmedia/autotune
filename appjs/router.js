@@ -36,33 +36,18 @@ module.exports = Backbone.Router.extend({
   },
 
   navigate: function(fragment, options) {
-    // logger.debug(callback, args, name);
     var view = this.app.view.currentView,
         hasCallback = true;
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
       view.askToSave().then(function(okToContinue) {
         if ( okToContinue ) {
-          Backbone.Router.prototype.navigate.call(this, fragment, options);                    
+          Backbone.Router.prototype.navigate.call(this, fragment, options);
         }
       });
     } else {
       Backbone.Router.prototype.navigate.call(this, fragment, options);
     }
   },
-  //
-  // execute: function(callback, args, name){
-  //   logger.debug(callback, args, name);
-  //   var view = this.app.view.currentView,
-  //       hasCallback = true;
-  //   if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
-  //     view.askToSave();
-  //     return false;
-  //   }
-  //   if (callback){ callback.apply(this, args); }
-  //   // if(hasCallback){
-  //   //   if (callback){ callback.apply(this, args); }
-  //   // }
-  // },
 
   // This is called for every route
   everyRoute: function(route, params) {
