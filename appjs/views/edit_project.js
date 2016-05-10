@@ -19,7 +19,7 @@ function pluckAttr(models, attribute) {
 }
 
 function isVisible(control) {
-  return control.type != 'hidden' && $(control.domEl).is(':visible');
+  return control.type !== 'hidden' && $(control.domEl).is(':visible');
 }
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
@@ -436,9 +436,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       // if there is only one theme option, hide the dropdown
 
-      if ( availableThemes.length === 1 ) {
-        options_fields['theme']['fieldClass'] = 'hidden';
-      }
+      // Temporarily disabling theme drop down hiding to fix custom color bug
+      //if ( availableThemes.length === 1 ) {
+      //  options_fields['theme']['fieldClass'] = 'hidden';
+      //}
 
       // hide slug for blueprint types that are not apps
       if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {
