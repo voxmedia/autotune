@@ -38,7 +38,9 @@ module.exports = Backbone.Router.extend({
   navigate: function(fragment, options) {
     var view = this.app.view.currentView,
         hasCallback = true;
+        logger.debug('nav', fragment, options);
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+      logger.debug('second!!!', view);
       view.askToSave().then(function(okToContinue) {
         if ( okToContinue ) {
           Backbone.Router.prototype.navigate.call(this, fragment, options);

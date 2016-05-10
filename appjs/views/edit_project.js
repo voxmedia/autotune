@@ -87,13 +87,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
-    // this doesn't work, but everything else appears to
-    if(!this.upToDate){
-      window.onbeforeunload = function(e) {
-        // view.askToSave();
-        return 'Looks like your project form is out-of-date with the most recent save.';
-      };
-    }
+    window.onpopstate = function(event) {
+      this.app.router.navigate( event.currentTarget.window.location.pathname, { trigger: true } );
+    };
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
@@ -114,8 +110,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   askToSave: function() {
-    logger.debug('ask to save');
-    // var result = window.confirm('Wait! You haven\'t saved your most recent changes. \n\nDo you want to save these changes?');
+    logger.debug('got to ask to save');
     var modalView = new Modal({app: this.app, parentView: this}),
         ret = new Promise(function(resolve, reject) {
           modalView.once('cancel submit', function() {
@@ -163,9 +158,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
            });
     if( !_.isEqual(this.model.formData(), data) ){
       view.upToDate = false;
+      // am not going to want to execute this more than once!
+      window.history.pushState({upToDate: false}, "proj page", "/projects/"+data['slug']);
+      window.onbeforeunload = function(event) {
+        return 'You have unsaved changes!';
+      };
       $('.project-save-warning').show().css('display', 'inline-block');
     } else {
       view.upToDate = true;
+      // window.history.replaceState({upToDate: true}, "proj page", "/projects");
+      window.onbeforeunload = null;
+      // will need to check history here
       $('.project-save-warning').hide();
     }
     logger.debug('up to date', view.upToDate);
