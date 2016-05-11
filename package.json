@@ -32,7 +32,7 @@
     "test": "./bin/run_test_server"
   },
   "dependencies": {
-    "alpaca": "voxmedia/alpaca",
+    "alpaca": "voxmedia/alpaca#dev",
     "backbone": "1.2.3",
     "backbone.paginator": "^2.0.2",
     "bootstrap": "3.3.2",
