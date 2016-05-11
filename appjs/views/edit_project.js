@@ -88,7 +88,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     window.onpopstate = function(event) {
+      // logger.debug('####', view.model.get('slug'));
+      // window.history.replaceState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
       this.app.router.navigate( event.currentTarget.window.location.pathname, { trigger: true } );
+      // this.app.router.navigate( "/projects/"+view.model.get('slug'), { trigger: true } );
     };
 
     this.on('load', function() {
@@ -145,9 +148,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         query = '',
         data = $form.alpaca('get').getValue();
 
-    // if ( !this.model.hasPreviewType('live') ) {
-    logger.debug('up to date', view.upToDate);
-    logger.debug(this.model.formData(), data);
     data['slug'] = [data['theme'], data['slug']].join('-');
     data = _.mapObject(data, function(val, key) {
             if(val.length === 0){
@@ -159,21 +159,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if( !_.isEqual(this.model.formData(), data) ){
       view.upToDate = false;
       // am not going to want to execute this more than once!
-      window.history.pushState({upToDate: false}, "proj page", "/projects/"+data['slug']);
+      window.history.pushState("changed", "proj page", "/projects/" + this.model.get('slug'));
       window.onbeforeunload = function(event) {
         return 'You have unsaved changes!';
       };
       $('.project-save-warning').show().css('display', 'inline-block');
     } else {
       view.upToDate = true;
-      // window.history.replaceState({upToDate: true}, "proj page", "/projects");
+      if(window.history['state'] === 'changed'){
+        window.history.go(-1);
+      }
       window.onbeforeunload = null;
-      // will need to check history here
       $('.project-save-warning').hide();
     }
-    logger.debug('up to date', view.upToDate);
-      // return;
-    // }
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
@@ -322,6 +320,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var view = this, promises = [];
 
     view.upToDate = true;
+    view.pageState = window.history.state;
 
     // autoselect embed code on focus
     this.$("#embed textarea").focus( function() { $(this).select(); } );
