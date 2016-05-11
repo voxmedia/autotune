@@ -48,11 +48,9 @@ var Modal = Backbone.Modal.extend({
     logger.debug('cancel', this);
     $('.project-save-warning').hide();
     this.trigger('cancel');
-    //  this.app.router.navigate( window.location.pathname, {trigger: true} );
-    //  $( "#draft-preview" ).trigger( "click" );
-    //  this.render();
-    // $( "a[href='"+window.location.pathname+"']" ).trigger( "click" );
-    return false;
+    if(window.location.href === '/projects/'+this.parentView.model.get('slug')){
+      // window.history.go(-1);
+    }
   },
 
   submit: function(){
@@ -80,6 +78,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
+    logger.debug('INIT', document.cookie, document);
     var view = this;
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
@@ -88,10 +87,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     window.onpopstate = function(event) {
-      // logger.debug('####', view.model.get('slug'));
-      // window.history.replaceState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
-      this.app.router.navigate( event.currentTarget.window.location.pathname, { trigger: true } );
-      // this.app.router.navigate( "/projects/"+view.model.get('slug'), { trigger: true } );
+      if(!view.upToDate){
+        // window.history.replaceState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
+        logger.debug('asdfew!!', Backbone.history.location, event.currentTarget.window.location.pathname);
+        view.app.router.navigate( Backbone.history.location.pathname, { trigger: true } );
+      }
     };
 
     this.on('load', function() {
@@ -158,7 +158,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
            });
     if( !_.isEqual(this.model.formData(), data) ){
       view.upToDate = false;
-      // am not going to want to execute this more than once!
+      // look into backbone.history
       window.history.pushState("changed", "proj page", "/projects/" + this.model.get('slug'));
       window.onbeforeunload = function(event) {
         return 'You have unsaved changes!';

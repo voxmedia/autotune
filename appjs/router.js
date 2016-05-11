@@ -36,8 +36,7 @@ module.exports = Backbone.Router.extend({
   },
 
   navigate: function(fragment, options) {
-    var view = this.app.view.currentView,
-        hasCallback = true;
+    var view = this.app.view.currentView;
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
       view.askToSave().then(function(okToContinue) {
         if ( okToContinue ) {
@@ -55,7 +54,7 @@ module.exports = Backbone.Router.extend({
     this.app.analyticsEvent( 'pageview' );
     this.app.messages.start();
     if ( params ) {
-      logger.debug(route, params);
+      logger.debug('RTE', route, params);
     } else {
       logger.debug(route);
     }
