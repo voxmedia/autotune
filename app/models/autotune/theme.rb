@@ -76,7 +76,12 @@ module Autotune
 
     # get data for all themes
     def self.full_theme_data
-      Hash[Theme.all.map { |theme| [theme.slug, theme.config_data] }]
+      Hash[Theme.all.map { |theme|
+             [
+               theme.slug,
+               theme.config_data.merge({:group_slug => theme.group.slug})
+             ]
+           }]
     end
 
     private
