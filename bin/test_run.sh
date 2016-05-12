@@ -1,4 +1,4 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "Hello world"
+echo "Hello again"
