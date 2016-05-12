@@ -21,6 +21,7 @@ module.exports = {
 
       if ( /^#[\w-_]+$/.test( href ) ) {
         // handle a current page anchor link
+        window.onpopstate = null;
         var $tab = this.$('.nav-tabs a[href='+href+']');
         logger.debug( 'handleLink', href );
         window.location.hash = href;

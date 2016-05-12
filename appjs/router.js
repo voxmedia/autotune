@@ -37,10 +37,13 @@ module.exports = Backbone.Router.extend({
 
   navigate: function(fragment, options) {
     var view = this.app.view.currentView;
+    logger.debug('NAV', fragment, options);
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
       view.askToSave().then(function(okToContinue) {
         if ( okToContinue ) {
           Backbone.Router.prototype.navigate.call(this, fragment, options);
+          view.upToDate = true;
+          window.onbeforeunload = null;
         }
       });
     } else {

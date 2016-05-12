@@ -103,6 +103,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     window.onpopstate = function(event) {
+      logger.debug('pop state', event);
       if(!view.upToDate){
         // window.history.replaceState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
         logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
