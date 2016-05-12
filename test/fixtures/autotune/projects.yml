@@ -23,7 +23,7 @@ example_two:
 example_three:
   title: Example build three
   slug: example-build-three
-  theme: theme2
+  theme: child_theme2
   status: new
   data: '{"title": "Example build three"}'
   blueprint: example_two

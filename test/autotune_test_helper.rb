@@ -62,14 +62,20 @@ MASTER_HEAD2 = NO_SUBMOD = 'fdb4b18d01461574f68cbd763731499af2da561d'
 TEST_HEAD = 'b36b32c97fa027d4f86b64559377d9dd47a3530b'
 LIVE_HEAD = '23eed13c4713da0516af6ad0d33a99ee9c582fa4'
 LIVE_HEAD1 = 'c4e5571fd259be57f7e2d0ab8cc0f93a46ab9460'
+RESET_THEME_DATA = { 'updated' =>'data'}
 
 # Reset themes for testing
 Rails.configuration.autotune.generic_theme = {
   'primary-color' => '#292929',
   'secondary-color' => '#e6e6e6',
-
-  'twitter-handle' => '@testhandle'
+  'social' => {
+    'twitter-handle' => '@testhandle'
+  }
 }
+
+Rails.configuration.autotune.get_theme_data = lambda do |theme|
+  RESET_THEME_DATA
+end
 
 # Display work_dir commands
 # require 'work_dir'
@@ -132,12 +138,29 @@ class ActionController::TestCase
     assert_keys decoded_response, *args
   end
 
+  # Take a data hash and an array of keys and assert that those keys exist and have the correct value in decoded_response
+  def assert_data_values(data, *args)
+    assert_keys data, *args
+  end
+
   # Take a hash and an array of keys and assert that those keys exist
   def assert_keys(data, *args)
     assert_instance_of Hash, data
     keys = args.first.is_a?(Array) ? args.first : args
     keys.each do |k|
       assert decoded_response.key?(k.to_sym) || decoded_response.key?(k.to_s), "Should have #{k}"
+    end
+  end
+
+  # Take a hash and an array of keys and assert that the values for those keys match with response
+  def assert_values(expected_data, *args)
+    assert_instance_of Hash, expected_data
+    keys = args.first.is_a?(Array) ? args.first : args
+    keys.each do |k|
+      assert decoded_response.key?(k.to_sym) || decoded_response.key?(k.to_s), "Should have #{k}"
+      expected_val = expected_data[k.to_sym] || expected_data[k.to_s]
+      actual_value = decoded_response[k.to_sym] || decoded_response[k.to_s]
+      assert_equal expected_val, actual_value
     end
   end
 end

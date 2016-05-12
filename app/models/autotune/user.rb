@@ -109,6 +109,11 @@ module Autotune
       (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
     end
 
+    def update_roles (new_roles)
+      self.meta= { 'roles' => new_roles }
+      save!
+    end
+
     def update_membership
       # remove user's memberships if no roles are provided
       if roles.nil?

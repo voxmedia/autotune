@@ -11,3 +11,17 @@ theme2:
   slug: theme2
   status: ready
   group: group2
+
+child_theme1:
+  title: Child of 1
+  slug: child1
+  status: ready
+  group: group1
+  parent: theme1
+
+child_theme2:
+  title: Child of 2
+  slug: child2
+  status: ready
+  group: group2
+  parent: theme2

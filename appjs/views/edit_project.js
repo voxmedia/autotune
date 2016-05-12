@@ -54,7 +54,6 @@ var BaseModalView = Backbone.View.extend({
     },
 
     render: function() {
-      // this.getTemplate(this.template, this.renderView);
       this.renderView(this.template);
       return this;
     },
@@ -144,6 +143,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         });
 
     modalView.show();
+
+    // this is not great, but I also don't know where it's coming from
+    $('.modal-backdrop').on('click', function(){
+      modalView.teardown();
+    });
 
     return ret;
   },
@@ -554,9 +558,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       // if there is only one theme option, hide the dropdown
 
-      if ( availableThemes.length === 1 ) {
-        options_fields['theme']['fieldClass'] = 'hidden';
-      }
+      // Temporarily disabling theme drop down hiding to fix custom color bug
+      //if ( availableThemes.length === 1 ) {
+      //  options_fields['theme']['fieldClass'] = 'hidden';
+      //}
 
       // hide slug for blueprint types that are not apps
       if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {

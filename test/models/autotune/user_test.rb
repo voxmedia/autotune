@@ -74,15 +74,19 @@ class Autotune::UserTest < ActiveSupport::TestCase
   end
 
   test 'themes access' do
-    assert_equal autotune_users(:group2_author).author_themes.first, autotune_themes(:theme2)
+    assert autotune_users(:group2_author).author_themes.include? autotune_themes(:theme2)
     assert autotune_users(:group2_author).designer_themes.empty?
-    assert_equal autotune_users(:group2_author).author_themes.first, autotune_themes(:theme2)
+    assert autotune_users(:group2_author).author_themes.include? autotune_themes(:theme2)
 
-    assert_equal autotune_users(:group1_editor).author_themes.first, autotune_themes(:theme1)
+    assert autotune_users(:group1_editor).author_themes.include? autotune_themes(:theme1)
+    assert autotune_users(:group1_editor).author_themes.include? autotune_themes(:child_theme1)
     assert autotune_users(:group1_editor).designer_themes.empty?
 
-    assert_equal autotune_users(:group1_designer).designer_themes.first, autotune_themes(:theme1)
-    assert_equal autotune_users(:group1_designer).author_themes.first, autotune_themes(:theme1)
+
+    assert autotune_users(:group1_designer).designer_themes.include? autotune_themes(:theme1)
+    assert autotune_users(:group1_designer).designer_themes.include? autotune_themes(:child_theme1)
+    assert autotune_users(:group1_designer).author_themes.include? autotune_themes(:theme1)
+    assert autotune_users(:group1_designer).author_themes.include? autotune_themes(:child_theme1)
   end
 
 end

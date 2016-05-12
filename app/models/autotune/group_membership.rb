@@ -20,6 +20,7 @@ module Autotune
       Autotune::ROLES.reverse_each do |r|
         return r.to_sym if roles.include? r
       end
+      return nil
     end
 
     SUPERUSER_ROLES = [:superuser]

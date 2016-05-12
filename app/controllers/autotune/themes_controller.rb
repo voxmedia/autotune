@@ -10,14 +10,14 @@ module Autotune
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :create, :update, :destroy] do
+    before_action :only => [:show, :update, :destroy, :reset] do
       unless current_user.role?(:superuser) ||
-             current_user.role?(:designer => instance.group.name)
+             current_user.role?(:designer => instance.group.slug)
         render_error 'Forbidden', :forbidden
       end
     end
 
-    before_action :only => [:new, :create] do
+    before_action :only => [:new, :create, :index] do
       unless current_user.role? [:superuser, :designer]
         render_error 'Forbidden', :forbidden
       end
@@ -71,6 +71,11 @@ module Autotune
     def create
       @theme = Theme.new
       @theme.attributes = select_from_post :title, :data, :group_id, :slug
+      unless current_user.role?(:superuser => @theme.group.slug, :designer => @theme.group.slug)
+        render_error 'User does not have permission to create a theme for this group', :forbidden
+        return
+      end
+
       if @theme.valid?
         @theme.status = 'ready'
         @theme.save
