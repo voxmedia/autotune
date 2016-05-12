@@ -7,8 +7,6 @@ var $ = require('jquery'),
     helpers = require('../helpers'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
-    // SaveModal = require('./save_modal'),
-    BackboneModal = require('backbone.modal/backbone.modal.js'),
     ace = require('brace'),
     pym = require('pym.js'),
     slugify = require("underscore.string/slugify");
@@ -24,45 +22,65 @@ function isVisible(control) {
   return control.type !== 'hidden' && $(control.domEl).is(':visible');
 }
 
-var Modal = Backbone.Modal.extend({
-  template: require('../templates/modal.ejs'),
-  cancelEl: '#dismiss',
-  submitEl: '#save',
-  events: {
-    'click #closeModal': 'close'
-  },
+var BaseModalView = Backbone.View.extend({
 
-  initialize: function(options) {
-    logger.debug('init options', options);
-    if (_.isObject(options)) {
-      _.extend(this, _.pick(options, 'app', 'parentView'));
+    id: 'base-modal',
+    className: 'modal show',
+    template: require('../templates/modal.ejs'),
+
+    events: {
+      'hidden': 'teardown',
+      'click #closeModal': 'teardown',
+      'click #dismiss': 'cancel',
+      'click #save': 'submit'
+    },
+
+    initialize: function(options) {
+      _.bindAll(this, 'show', 'teardown', 'render', 'renderView');
+      logger.debug('init options', options);
+      if (_.isObject(options)) {
+        _.extend(this, _.pick(options, 'app', 'parentView'));
+      }
+      this.render();
+    },
+
+    show: function() {
+      this.$el.modal('show');
+    },
+
+    teardown: function() {
+      this.$el.data('modal', null);
+      this.remove();
+    },
+
+    render: function() {
+      // this.getTemplate(this.template, this.renderView);
+      this.renderView(this.template);
+      return this;
+    },
+
+    renderView: function(template) {
+      this.$el.html(template());
+      this.$el.modal({show:false}); // dont show modal on instantiation
+    },
+
+    cancel: function(){
+      logger.debug('cancel', this);
+      $('.project-save-warning').hide();
+      this.trigger('cancel');
+      this.teardown();
+    },
+
+    submit: function(){
+      var self = this;
+      this.parentView
+        .doSubmit( this.parentView.$('#projectForm form') )
+        .then(function() {
+          self.trigger('submit');
+          self.teardown();
+        });
     }
-  },
-
-  close: function(eve) {
-    this.trigger('close');
-    this.destroy(eve);
-  },
-
-  cancel: function(){
-    logger.debug('cancel', this);
-    $('.project-save-warning').hide();
-    this.trigger('cancel');
-    if(window.location.href === '/projects/'+this.parentView.model.get('slug')){
-      // window.history.go(-1);
-    }
-  },
-
-  submit: function(){
-    var self = this;
-    logger.debug('submit this', this);
-    this.parentView
-      .doSubmit( this.parentView.$('#projectForm form') )
-      .then(function() {
-        self.trigger('submit');
-      });
-  }
-});
+ });
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
@@ -78,7 +96,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
-    logger.debug('INIT', document.cookie, document);
     var view = this;
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
@@ -89,8 +106,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     window.onpopstate = function(event) {
       if(!view.upToDate){
         // window.history.replaceState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
-        logger.debug('asdfew!!', Backbone.history.location, event.currentTarget.window.location.pathname);
-        view.app.router.navigate( Backbone.history.location.pathname, { trigger: true } );
+        logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
+        view.app.router.navigate( '/projects', { trigger: true } );
       }
     };
 
@@ -114,7 +131,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   askToSave: function() {
     logger.debug('got to ask to save');
-    var modalView = new Modal({app: this.app, parentView: this}),
+    var view = this;
+    var modalView = new BaseModalView({app: this.app, parentView: this}),
         ret = new Promise(function(resolve, reject) {
           modalView.once('cancel submit', function() {
             this.upToDate = true;
@@ -125,7 +143,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           });
         });
 
-    $('#projectEditor').append(modalView.render().el);
+    modalView.show();
+
     return ret;
   },
 

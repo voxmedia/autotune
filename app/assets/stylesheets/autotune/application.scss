@@ -120,6 +120,8 @@ label.block {
 .modal-dialog{
   width: 100%;
   max-width: 400px;
+  margin: 200px auto 0 auto;
+  z-index: 1051;
   i, p{
     display: table-cell;
   }
