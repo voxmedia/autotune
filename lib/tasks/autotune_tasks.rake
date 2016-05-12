@@ -137,4 +137,13 @@ namespace :autotune do
     Autotune.send_message('alert', :level => args[:level], :text => args[:text])
     puts "Sent #{args[:level]} alert to everyone: #{args[:text]}"
   end
+
+  desc 'Reset all themes'
+  task :reset_themes => :environment do
+    puts 'Resetting all themes'
+    Autotune::Theme.all.each_with_index { |t, i|
+      build_bp = i == (Autotune::Theme.count - 1)
+      t.update_data(:build_blueprints => build_bp)
+    }
+  end
 end
