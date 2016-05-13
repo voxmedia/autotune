@@ -24,6 +24,24 @@ var $ = require('jquery'),
 // required to make Backbone work in browserify
 Backbone.$ = $;
 
+var oldLoadUrl = Backbone.history.loadUrl;
+Backbone.history.loadUrl = function(fragment) {
+  var view = window.app.view.currentView;
+  logger.debug('NAV', fragment);
+  if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+    view.askToSave().then(function(okToContinue) {
+      if ( okToContinue ) {
+        oldLoadUrl.call(this, fragment);
+        view.upToDate = true;
+        window.onbeforeunload = null;
+        $('body').removeClass('modal-open');
+      }
+    });
+  } else {
+    oldLoadUrl.call(this, fragment);
+  }
+};
+
 /**
  * Autotune admin UI
  * @constructor

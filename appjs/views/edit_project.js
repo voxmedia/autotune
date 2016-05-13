@@ -102,12 +102,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
+    window.onbeforeunload = function(event) {
+      return 'You have unsaved changes!';
+    };
+
     window.onpopstate = function(event) {
       logger.debug('pop state', event);
       if(!view.upToDate){
+        // window.history.go(1);
         // window.history.replaceState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
         logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
-        view.app.router.navigate( '/projects', { trigger: true } );
+        view.app.router.navigate( window.location.pathname, { trigger: true } );
       }
     };
 
@@ -123,6 +128,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }, this);
 
     this.on('unload', function() {
+      logger.debug('%%%%% unloading');
       this.stopListening(this.app);
       this.stopListeningForChanges();
       if ( this.pym ) { this.pym.remove(); }
@@ -135,7 +141,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var modalView = new BaseModalView({app: this.app, parentView: this}),
         ret = new Promise(function(resolve, reject) {
           modalView.once('cancel submit', function() {
-            this.upToDate = true;
             resolve(true);
           });
           modalView.on('close', function() {
@@ -168,18 +173,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     // even though they really are equal
     if(_.isEqual(view.formDataOnLoad, newData) ){
       view.upToDate = true;
-      if(window.history['state'] === 'changed'){
-        window.history.go(-1);
-      }
-      window.onbeforeunload = null;
+      // window.onbeforeunload = null;
       $('.project-save-warning').hide();
     } else {
       view.upToDate = false;
-      // look into backbone.history
-      window.history.pushState("changed", "proj page", window.location.pathname);
-      window.onbeforeunload = function(event) {
-        return 'You have unsaved changes!';
-      };
+      // window.onbeforeunload = function(event) {
+      //   return 'You have unsaved changes!';
+      // };
       $('.project-save-warning').show().css('display', 'inline-block');
     }
   },
