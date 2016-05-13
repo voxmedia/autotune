@@ -176,7 +176,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     } else {
       view.upToDate = false;
       // look into backbone.history
-      window.history.pushState("changed", "proj page", "/projects/" + this.model.get('slug'));
+      window.history.pushState("changed", "proj page", window.location.pathname);
       window.onbeforeunload = function(event) {
         return 'You have unsaved changes!';
       };
