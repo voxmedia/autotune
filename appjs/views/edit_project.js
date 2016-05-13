@@ -180,6 +180,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
               return val;
             }
            });
+    logger.debug('--Are these equal?--', this.model.formData(), data);
     if( !_.isEqual(this.model.formData(), data) ){
       view.upToDate = false;
       // look into backbone.history
