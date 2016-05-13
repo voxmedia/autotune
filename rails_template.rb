@@ -73,23 +73,22 @@ Autotune.configure do |conf|
     'colors' => {
       'primary_color' => ' #444444',
       'secondary_color' => ' #444444',
-      'arrow_color' => ' #444444',
       'button_bg_color' => ' #444444',
+      'button_bg_color_hover' => 'darken($button-bg-color, 4%)',
       'button_font_color' => 'white'
 
     },
     'fonts' => {
-      'font_url' => '',
+      'font_css' => '',
       'body_font_family' => 'Georgia Regular, serif',
       'header_font_family' => 'Georgia Bold, serif',
       'button_font_family' => 'Georgia Regular, serif',
-      'header_font_weight' => '700'
+      'header_font_weight' => 700
+      'button_font_weight' => 'normal'
     },
     'social' => {
       'twitter_handle' => 'voxmediainc'
-    },
-    'homepage_redirect' => 'voxmedia.com',
-    'chorus_api_domain' => 'sbnation.com.sb4.sbndev.net'
+    }
   }
 end
 
