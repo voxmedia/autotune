@@ -161,6 +161,29 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
   },
 
+  determineEquality: function(newData){
+    var view = this;
+    // set view.formDataOnLoad in afterRender - form validation (view.model.formData())
+    // converts [0] values to null, which causes the objects to validate as unequal
+    // even though they really are equal
+    if(_.isEqual(view.formDataOnLoad, newData) ){
+      view.upToDate = true;
+      if(window.history['state'] === 'changed'){
+        window.history.go(-1);
+      }
+      window.onbeforeunload = null;
+      $('.project-save-warning').hide();
+    } else {
+      view.upToDate = false;
+      // look into backbone.history
+      window.history.pushState("changed", "proj page", "/projects/" + this.model.get('slug'));
+      window.onbeforeunload = function(event) {
+        return 'You have unsaved changes!';
+      };
+      $('.project-save-warning').show().css('display', 'inline-block');
+    }
+  },
+
   focusPollChange: function(){
     this.forceUpdateDataFlag = true;
     this.pollChange();
@@ -172,31 +195,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         query = '',
         data = $form.alpaca('get').getValue();
 
-    data['slug'] = [data['theme'], data['slug']].join('-');
-    data = _.mapObject(data, function(val, key) {
-            if(val.length === 0){
-              return null;
-            } else {
-              return val;
-            }
-           });
-    logger.debug('--Are these equal?--', this.model.formData(), data);
-    if( !_.isEqual(this.model.formData(), data) ){
-      view.upToDate = false;
-      // look into backbone.history
-      window.history.pushState("changed", "proj page", "/projects/" + this.model.get('slug'));
-      window.onbeforeunload = function(event) {
-        return 'You have unsaved changes!';
-      };
-      $('.project-save-warning').show().css('display', 'inline-block');
-    } else {
-      view.upToDate = true;
-      if(window.history['state'] === 'changed'){
-        window.history.go(-1);
-      }
-      window.onbeforeunload = null;
-      $('.project-save-warning').hide();
-    }
+    this.determineEquality(data);
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
@@ -384,6 +383,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             buildData = view.model.buildData(),
             previewUrl = '', iframeLoaded,
             previewSlug = '';
+
+        view.formDataOnLoad = formData;
 
         // Callback for when iframe loads
         iframeLoaded = _.once(function() {

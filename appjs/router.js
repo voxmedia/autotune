@@ -44,6 +44,7 @@ module.exports = Backbone.Router.extend({
           Backbone.Router.prototype.navigate.call(this, fragment, options);
           view.upToDate = true;
           window.onbeforeunload = null;
+          $('body').removeClass('modal-open');
         }
       });
     } else {
