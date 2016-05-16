@@ -41,7 +41,7 @@ module.exports = Backbone.Router.extend({
     this.app.analyticsEvent( 'pageview' );
     this.app.messages.start();
     if ( params ) {
-      logger.debug('RTE', route, params);
+      logger.debug(route, params);
     } else {
       logger.debug(route);
     }

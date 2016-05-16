@@ -135,8 +135,8 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     }
   },
 
-  // Probably should not be located here, but not sure how to incorporate
-  // elsewhere since this action is located in the nav bar.
+  // Not sure if there is a different way to include this so that it isn't in
+  // edit_project and application
   savePreview: function(){
     this.upToDate = true;
     this.$('#projectForm form').submit();
