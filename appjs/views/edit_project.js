@@ -103,23 +103,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     window.onbeforeunload = function(event) {
-      return 'You have unsaved changes!';
+      if(!view.upToDate){
+        return 'You have unsaved changes!';
+      }
     };
 
-    // window.onpopstate = function(event) {
-    //   logger.debug('pop state', event);
-    //   if(!view.upToDate){
-    //     // window.history.go(1);
-    //     // window.history.pushState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
-    //     // logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
-    //     view.app.router.navigate( window.location.pathname, { trigger: true, backButton: true } );
-    //   }
-    // };
+    window.onpopstate = function(event) {
+      logger.debug('pop state', event);
+      if(!view.upToDate){
+        view.app.router.navigate( window.location.pathname, { trigger: true, pathName: "/projects/"+view.model.get('slug') } );
+      }
+    };
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-      // this.listenTo(this.app.router, 'route', this.hasUnsavedChanges, this);
 
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
@@ -147,7 +145,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           });
         });
 
-    logger.debug($('#base-modal'), $('#base-modal').length);
     if($('#base-modal').length === 0){
       modalView.show();
     }
@@ -175,23 +172,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     // even though they really are equal
     if(_.isEqual(view.formDataOnLoad, newData) ){
       view.upToDate = true;
-      // window.onbeforeunload = null;
       $('.project-save-warning').hide();
-      window.onpopstate = null;
     } else {
       view.upToDate = false;
-      // window.onbeforeunload = function(event) {
-      //   return 'You have unsaved changes!';
-      // };
-      window.onpopstate = function(event) {
-        logger.debug('pop state', event);
-        // if(!view.upToDate){
-          // window.history.go(1);
-          // window.history.pushState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
-          // logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
-          view.app.router.navigate( window.location.pathname, { trigger: true, pathName: "/projects/"+view.model.get('slug') } );
-        // }
-      };
       $('.project-save-warning').show().css('display', 'inline-block');
     }
   },

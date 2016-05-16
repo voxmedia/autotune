@@ -35,33 +35,6 @@ module.exports = Backbone.Router.extend({
     "themes/:slug/edit": "editTheme"
   },
 
-  // navigate: function(fragment, options) {
-  //   var view = this.app.view.currentView;
-  //   logger.debug('NAV', fragment, options);
-  //   if(options['pathName']){
-  //     logger.debug('hi', options['pathName']);
-  //     var pathName = options['pathName'];
-  //     delete options['pathName'];
-  //     // window.history.go(1);
-  //     // view.app.router.navigate( window.location.pathname, { trigger: true } );
-  //     view.app.router.navigate(pathName, options);
-  //   }
-  //   else {
-  //   if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
-  //     view.askToSave().then(function(okToContinue) {
-  //       if ( okToContinue ) {
-  //         Backbone.Router.prototype.navigate.call(this, fragment, options);
-  //         view.upToDate = true;
-  //         window.onbeforeunload = null;
-  //         $('body').removeClass('modal-open');
-  //       }
-  //     });
-  //   } else {
-  //     Backbone.Router.prototype.navigate.call(this, fragment, options);
-  //   }
-  //   }
-  // },
-
   // This is called for every route
   everyRoute: function(route, params) {
     this.app.trigger( 'loadingStart' );

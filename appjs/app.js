@@ -24,12 +24,6 @@ var $ = require('jquery'),
 // required to make Backbone work in browserify
 Backbone.$ = $;
 
-// Backbone.history.matchRoot = function() {
-//   var path = Backbone.history.decodeFragment(Backbone.history.location.pathname);
-//   var rootPath = path.slice(0, Backbone.history.root.length - 1) + '/';
-//   return rootPath === Backbone.history.root;
-// };
-
 var oldLoadUrl = function(){
   if (!Backbone.history.matchRoot()) {
     return false;
@@ -44,7 +38,7 @@ var oldLoadUrl = function(){
   }
 };
 
-var loadUrl = Backbone.history.loadUrl = function(fragment) {
+Backbone.history.loadUrl = function(fragment) {
   var view = window.app.view.currentView;
   logger.debug('NAV', fragment);
   if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
@@ -58,64 +52,8 @@ var loadUrl = Backbone.history.loadUrl = function(fragment) {
     });
   } else {
     oldLoadUrl.call(this, fragment);
-    // view.app.router.navigate.call(this, fragment, {trigger: true});
-    // Backbone.Router.prototype.navigate.call(this, fragment, {trigger: true});
   }
 };
-
-Backbone.history.checkUrl = function(e) {
-  var current = Backbone.history.getFragment();
-  logger.debug('checkUrl', current, Backbone.history.fragment, Backbone.history.iframe);
-  if (current === Backbone.history.fragment && Backbone.history.iframe) {
-    current = Backbone.history.getHash(Backbone.history.iframe.contentWindow);
-  }
-
-  if (current === Backbone.history.fragment) {
-    return false;
-  }
-  if (Backbone.history.iframe) {
-    Backbone.history.navigate(current);
-  }
-  loadUrl();
-};
-
-
-
-// var History = Backbone.History = function() {
-//     this.handlers = [];
-//     this.checkUrl = _.bind(this.checkUrl, this);
-//
-//     if (typeof window !== 'undefined') {
-//       this.location = window.location;
-//       this.history = window.history;
-//     }
-//   };
-//
-// var Events = Backbone.Events = {};
-// var oldLoadUrl = History.loadUrl;
-//
-// _.extend(History.prototype, Events, {
-//
-//   loadUrl: function(fragment) {
-//     var view = window.app.view.currentView;
-//     logger.debug('NAV', fragment);
-//     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
-//       view.askToSave().then(function(okToContinue) {
-//         if ( okToContinue ) {
-//           oldLoadUrl.call(this, fragment);
-//           view.upToDate = true;
-//           window.onbeforeunload = null;
-//           $('body').removeClass('modal-open');
-//         }
-//       });
-//     } else {
-//       oldLoadUrl.call(this, fragment);
-//     }
-//   }
-//
-// });
-//
-// Backbone.history = new History();
 
 /**
  * Autotune admin UI
