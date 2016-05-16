@@ -106,15 +106,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       return 'You have unsaved changes!';
     };
 
-    window.onpopstate = function(event) {
-      logger.debug('pop state', event);
-      if(!view.upToDate){
-        // window.history.go(1);
-        // window.history.replaceState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
-        logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
-        view.app.router.navigate( window.location.pathname, { trigger: true } );
-      }
-    };
+    // window.onpopstate = function(event) {
+    //   logger.debug('pop state', event);
+    //   if(!view.upToDate){
+    //     // window.history.go(1);
+    //     // window.history.pushState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
+    //     // logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
+    //     view.app.router.navigate( window.location.pathname, { trigger: true, backButton: true } );
+    //   }
+    // };
 
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
@@ -128,7 +128,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }, this);
 
     this.on('unload', function() {
-      logger.debug('%%%%% unloading');
       this.stopListening(this.app);
       this.stopListeningForChanges();
       if ( this.pym ) { this.pym.remove(); }
@@ -148,7 +147,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           });
         });
 
-    modalView.show();
+    logger.debug($('#base-modal'), $('#base-modal').length);
+    if($('#base-modal').length === 0){
+      modalView.show();
+    }
 
     // this is not great, but I also don't know where it's coming from
     $('.modal-backdrop').on('click', function(){
@@ -175,11 +177,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       view.upToDate = true;
       // window.onbeforeunload = null;
       $('.project-save-warning').hide();
+      window.onpopstate = null;
     } else {
       view.upToDate = false;
       // window.onbeforeunload = function(event) {
       //   return 'You have unsaved changes!';
       // };
+      window.onpopstate = function(event) {
+        logger.debug('pop state', event);
+        // if(!view.upToDate){
+          // window.history.go(1);
+          // window.history.pushState(view.pageState, "proj page", "/projects/"+view.model.get('slug'));
+          // logger.debug(Backbone.history.location.pathname, event.currentTarget.window.location.pathname);
+          view.app.router.navigate( window.location.pathname, { trigger: true, pathName: "/projects/"+view.model.get('slug') } );
+        // }
+      };
       $('.project-save-warning').show().css('display', 'inline-block');
     }
   },

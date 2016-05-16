@@ -20,6 +20,7 @@ module.exports = {
          !/^(\w+:)?\/\//.test(href) ) {
 
       if ( /^#[\w-_]+$/.test( href ) ) {
+        logger.debug('----if--', eve);
         // handle a current page anchor link
         window.onpopstate = null;
         var $tab = this.$('.nav-tabs a[href='+href+']');
@@ -34,6 +35,7 @@ module.exports = {
           });
         }
       } else {
+        logger.debug('----else--', eve);
         // handle a partial url
         eve.preventDefault();
         eve.stopPropagation();
