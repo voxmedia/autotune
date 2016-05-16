@@ -30,9 +30,10 @@ var BaseModalView = Backbone.View.extend({
 
     events: {
       'hidden': 'teardown',
-      'click #closeModal': 'teardown',
+      'click #closeModal': 'closeModal',
       'click #dismiss': 'cancel',
-      'click #save': 'submit'
+      'click #save': 'submit',
+      'click': 'closeModal'
     },
 
     initialize: function(options) {
@@ -61,6 +62,7 @@ var BaseModalView = Backbone.View.extend({
     renderView: function(template) {
       this.$el.html(template());
       this.$el.modal({show:false}); // dont show modal on instantiation
+      logger.debug('modal', this);
     },
 
     cancel: function(){
@@ -78,7 +80,14 @@ var BaseModalView = Backbone.View.extend({
           self.trigger('submit');
           self.teardown();
         });
-    }
+    },
+
+    closeModal: function(eve){
+      if($(eve.target).hasClass('modal-backdrop')){
+        this.teardown();
+        this.trigger('close');
+      }
+    },
  });
 
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
@@ -108,13 +117,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     };
 
-    window.onpopstate = function(event) {
-      logger.debug('pop state', event);
-      if(!view.upToDate){
-        view.app.router.navigate( window.location.pathname, { trigger: true, pathName: "/projects/"+view.model.get('slug') } );
-      }
-    };
-
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
@@ -141,6 +143,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             resolve(true);
           });
           modalView.on('close', function() {
+            logger.debug('~~~~ got close');
             resolve(false);
           });
         });
@@ -148,11 +151,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if($('#base-modal').length === 0){
       modalView.show();
     }
-
-    // this is not great, but I also don't know where it's coming from
-    $('.modal-backdrop').on('click', function(){
-      modalView.teardown();
-    });
 
     return ret;
   },

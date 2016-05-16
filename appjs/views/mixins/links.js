@@ -21,7 +21,6 @@ module.exports = {
 
       if ( /^#[\w-_]+$/.test( href ) ) {
         // handle a current page anchor link
-        window.onpopstate = null;
         var $tab = this.$('.nav-tabs a[href='+href+']');
         logger.debug( 'handleLink', href );
         window.location.hash = href;
@@ -38,6 +37,9 @@ module.exports = {
         eve.preventDefault();
         eve.stopPropagation();
         logger.debug( 'handleLink', href );
+        if(href === window.location.pathname){
+          this.app.router.navigate( href+'?', { trigger: true } );
+        }
         this.app.router.navigate( href, { trigger: true } );
       }
     }

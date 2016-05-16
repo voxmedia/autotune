@@ -23,7 +23,7 @@ var $ = require('jquery'),
 
 // required to make Backbone work in browserify
 Backbone.$ = $;
-
+//
 var oldLoadUrl = function(){
   if (!Backbone.history.matchRoot()) {
     return false;
@@ -204,11 +204,8 @@ _.extend(App.prototype, Backbone.Events, {
   hasRole: function(role) {
     return _.contains(this.user.get('meta').roles, role) ||
           this.user.get('meta').roles[role];
-  },
-
-  matchRoot: function(){
-    return true;
   }
+
 });
 
 module.exports = App;
