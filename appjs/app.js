@@ -16,7 +16,7 @@ var $ = require('jquery'),
     Spectrum = require('spectrum-colorpicker'),
     // Load our components and run the app
     Router = require('./router'),
-    Listener = require('./listener'),
+    Messages = require('./messages'),
     logger = require('./logger'),
     views = require('./views'),
     models = require('./models');
@@ -37,8 +37,8 @@ Backbone.$ = $;
  */
 function App(config) {
   this.themes = new Backbone.Collection();
-  this.themes.reset(config.themes);
-  delete config.themes;
+  this.themes.reset(config.available_themes);
+  delete config.available_themes;
 
   this.tags = new Backbone.Collection();
   this.tags.reset(config.tags);
@@ -47,22 +47,28 @@ function App(config) {
   this.user = new Backbone.Model(config.user);
   delete config.user;
 
+  this.designerGroups = new Backbone.Collection();
+  this.designerGroups.reset(config.designer_groups);
+  delete config.designer_groups;
+
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
+  this.editableThemes = new models.ThemeCollection();
+
+  // Initialize top-level view
+  this.view = new views.Application({ app: this });
 
   // Initialize server event listener
-  this.listener = new Listener();
-  this.listenTo(this.listener, 'stop', this.handleListenerStop);
-  this.listenTo(this.listener, 'error', this.handleListenerStop);
-  this.listenTo(this.listener, 'open', this.handleListenerStart);
-  this.listener.start();
+  this.messages = new Messages();
+  this.listenTo(this.messages, 'stop', this.handleListenerStop);
+  this.listenTo(this.messages, 'error', this.handleListenerError);
+  this.listenTo(this.messages, 'open', this.handleListenerStart);
+  this.listenTo(this.messages, 'alert', this.handleAlertMessage);
+  this.messages.start();
 
   this.config = config;
 
   if ( this.isDev() ) { logger.level = 'debug'; }
-
-  // Initialize top-level view
-  this.view = new views.Application({ app: this });
 
   // Initialize routing
   this.router = new Router({ app: this });
@@ -82,7 +88,7 @@ function App(config) {
       this.hasFocus = true;
       logger.debug('App has focus');
       // Tell the listener to cancel the timeout
-      this.listener.cancelStop();
+      this.messages.cancelStop();
       // Proxy the event on the app object
       this.trigger('focus');
     }, this));
@@ -93,7 +99,7 @@ function App(config) {
 
       if ( !this.isDev() ) {
         // Tell the listener to time out in 8mins
-        this.listener.stopAfter(8*60);
+        this.messages.stopAfter(8*60);
       }
 
       // Proxy the event on the app object
@@ -128,9 +134,20 @@ _.extend(App.prototype, Backbone.Events, {
    * Do something when the listener shuts down
    **/
   handleListenerStop: function() {
-    if ( !this.reloadNotification ) {
-      this.reloadNotification = this.view.alert(
-        'Reload to see changes', 'notice', true);
+    this.view.warning('Reload to see changes', true);
+  },
+
+  /**
+   * Do something when the listener errors out
+   **/
+  handleListenerError: function(error) {
+    this.view.clearNotification( 'Reload to see changes' );
+    if ( error === 'auth' ) {
+      this.view.error(
+        'Your session has expired. Please reload your browser.', true);
+    } else {
+      this.view.error(
+        'There was a problem connecting to the server ('+error+').', true);
     }
   },
 
@@ -138,10 +155,14 @@ _.extend(App.prototype, Backbone.Events, {
    * Do something when the listener starts
    **/
   handleListenerStart: function() {
-    if ( this.reloadNotification ) {
-      this.reloadNotification.remove();
-      this.reloadNotification = null;
-    }
+    this.view.clearNotification( 'Reload to see changes' );
+  },
+
+  /**
+   * Display an alert message to the user
+   **/
+  handleAlertMessage: function(data) {
+    this.view.alert(data.text, data.level);
   },
 
   /**
@@ -150,7 +171,8 @@ _.extend(App.prototype, Backbone.Events, {
    * @returns {boolean}
    **/
   hasRole: function(role) {
-    return _.contains(this.user.get('meta').roles, role);
+    return _.contains(this.user.get('meta').roles, role) ||
+          this.user.get('meta').roles[role];
   }
 });
 

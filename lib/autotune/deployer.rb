@@ -29,17 +29,18 @@ module Autotune
     def before_build(build_data, _env, current_user = nil)
       if build_data['google_doc_url'] && current_user
         current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
-        if current_user
-          google_client = GoogleDocs.new(current_auth)
-          spreadsheet_key = build_data['google_doc_url'].match(/[-\w]{25,}/).to_s
+        if current_auth.present?
+          google_client = GoogleDocs.new(
+            :refresh_token => current_auth.credentials['refresh_token'],
+            :access_token => current_auth.credentials['token'],
+            :expires_at => current_auth.credentials['expires_at'])
+          spreadsheet_key = GoogleDocs.key_from_url(build_data['google_doc_url'])
           resp = google_client.find(spreadsheet_key)
           cache_key = "googledoc#{spreadsheet_key}"
-          needs_update = false
 
           if Rails.cache.exist?(cache_key)
-            if Rails.cache.read(cache_key)['version'] && resp['version'] != Rails.cache.read(cache_key)['version']
-              needs_update = true
-            end
+            cache_value = Rails.cache.read(cache_key)
+            needs_update = cache_value['version'] && resp['version'] != cache_value['version']
           else
             needs_update = true
           end
@@ -61,7 +62,7 @@ module Autotune
       build_data['asset_base_url'] = project_asset_url
     rescue GoogleDocs::GoogleDriveError => exc
       logger.error(exc)
-      project.meta['error_message'] = exc.message
+      project.meta['error_message'] = "Error retriving google doc data: #{exc.message}"
 
       raise
     end

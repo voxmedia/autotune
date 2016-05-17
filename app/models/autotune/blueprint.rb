@@ -14,7 +14,6 @@ module Autotune
     has_many :blueprint_tags, :dependent => :destroy
     has_many :tags, :through => :blueprint_tags
     has_many :projects
-    has_and_belongs_to_many :themes
 
     validates :title, :repo_url, :presence => true
     validates :repo_url, :uniqueness => { :case_sensitive => false }
@@ -27,16 +26,13 @@ module Autotune
 
     after_initialize do
       self.status ||= 'new'
-      self.type   ||= 'app'
+      self.type ||= 'app'
       self.config ||= {}
     end
 
     before_validation do
       # Get the type from the config
       self.type = config['type'].downcase if config && config['type']
-
-      update_tags_from_config
-      update_themes_from_config
     end
 
     # Gets the thumbnail image url for the blueprint
@@ -79,6 +75,12 @@ module Autotune
       status != 'new' && version.present?
     end
 
+    # Check if the blueprint is ready for themeing
+    # @return [Boolean] `true` if the blueprint is not tied to specific themes, `false` otherwise
+    def themable?
+      config['theme_type'].present? && config['theme_type'] == 'dynamic'
+    end
+
     # Queues a job to update the blueprint repo
     def update_repo
       final_status = ready? ? 'ready' : 'testing'
@@ -90,6 +92,15 @@ module Autotune
       raise
     end
 
+    # Rebuild all themeable blueprints. Used when themes are updated
+    def self.rebuild_themed_blueprints
+      jobs = Blueprint.all
+                      .select(&:themable?)
+                      .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true) }
+
+      ActiveJob::Chain.new(*jobs).enqueue
+    end
+
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
     # different name.
     def self.inheritance_column
@@ -97,30 +108,6 @@ module Autotune
     end
 
     private
-
-    def update_themes_from_config
-      # Associate themes
-      if config.present? && config['themes'].present?
-        tmp_themes = []
-        config['themes'].each do |t|
-          next unless Autotune.config.themes.include? t.to_sym
-          tmp_themes << Theme.find_or_create_by(
-            :value => t, :label => Autotune.config.themes[t.to_sym])
-        end
-        self.themes = tmp_themes
-      else
-        self.themes = Autotune.config.themes.map do |value, label|
-          Theme.find_or_create_by(:value => value, :label => label)
-        end
-      end
-    end
-
-    # Parses blueprint's config and updates the tags associated with the blueprint
-    def update_tags_from_config
-      self.tags = config['tags'].map do |t|
-        Tag.find_or_create_by(:title => t.humanize)
-      end if config.present? && config['tags'].present?
-    end
 
     def deploy_dir
       if config.present? && config['deploy_dir']
@@ -132,10 +119,10 @@ module Autotune
 
     # Publishes status changes to redis
     def pub_to_redis
-      return if Autotune.redis.nil?
-      msg = { :id => id,
+      msg = { :model => 'blueprint',
+              :id => id,
               :status => status }
-      Autotune.redis.publish 'blueprint', msg.to_json
+      Autotune.send_message('change', msg) if Autotune.can_message?
     end
   end
 end

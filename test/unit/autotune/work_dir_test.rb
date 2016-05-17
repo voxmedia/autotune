@@ -3,6 +3,7 @@ require 'work_dir'
 
 # Test the WorkDir classes; Repo and Snapshot
 class Autotune::WorkDirTest < ActiveSupport::TestCase
+  fixtures 'autotune/blueprints'
   test 'setup repo' do
     in_tmpdir do |dir|
       r = WorkDir.repo dir
@@ -17,7 +18,7 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
       assert r.read(Autotune::BLUEPRINT_CONFIG_FILENAME).nil?, 'Should not have a config file'
 
       # clone git url
-      r.clone repo_url
+      r.clone autotune_blueprints(:example).repo_url
 
       assert r.ruby?, 'Should have ruby'
       assert !r.python?, "Shouldn't have python"
@@ -51,7 +52,7 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
   test 'copy repo' do
     in_tmpdir do |rdir|
       r = WorkDir.repo rdir
-      r.clone repo_url
+      r.clone autotune_blueprints(:example).repo_url
       r.setup_environment
 
       in_tmpdir do |sdir|
@@ -124,25 +125,26 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
 
     in_tmpdir do |rdir|
       r = WorkDir.repo rdir
-      r.clone repo_url
+      r.clone autotune_blueprints(:example).repo_url
 
       assert_equal updated_submod, r.version
       assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
       assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
 
-      r.branch = with_submod
+      r.commit_hash_for_checkout = with_submod
       r.update
       assert_equal with_submod, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
       assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
 
-      r.branch = no_submod
+      r.commit_hash_for_checkout = no_submod
       r.update
       assert_equal no_submod, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
       refute r.exist?('submodule/test.rb'), 'Should not have submodule test.rb'
 
       r.branch = 'master'
+      r.commit_hash_for_checkout = updated_submod
       r.update
       assert_equal updated_submod, r.version
       assert r.exist?('submodule/testfile'), 'Should have submodule testfile'

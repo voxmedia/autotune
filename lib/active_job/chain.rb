@@ -8,6 +8,8 @@ module ActiveJob
     end
 
     def enqueue(options = {})
+      return self if jobs.nil?
+
       prev_job = jobs.first
       jobs.each do |job|
         next if job == jobs.first

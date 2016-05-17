@@ -14,8 +14,7 @@ module Autotune
 
     unique_job :with => :payload
 
-    def perform(project, target: 'preview')
-
+    def perform(project, target: 'preview', current_user: nil)
       # Setup a new logger that logs to a string. The resulting log will
       # be saved to the output field of the project.
       out = StringIO.new
@@ -39,19 +38,24 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme.value)
+        'group' => project.group.slug,
+        'theme' => project.theme.slug,
+        'available_themes' => Theme.all.pluck(:slug),
+        'theme_data' => Theme.full_theme_data)
+
+      current_user ||= project.user
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
         target.to_sym, project, :logger => outlogger)
 
       # Run the before build deployer hook
-      deployer.before_build(build_data, repo.env)
+      deployer.before_build(build_data, repo.env, current_user)
 
       # Run the build
       repo.working_dir do
-        outlogger.info(repo.cmd(
-          BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
+        outlogger.info(repo.cmd(BLUEPRINT_BUILD_COMMAND,
+                                :stdin_data => build_data.to_json))
       end
 
       # Upload build

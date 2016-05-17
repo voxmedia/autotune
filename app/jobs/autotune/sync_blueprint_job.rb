@@ -10,34 +10,38 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status: nil, update: false, build_themes: false)
+    def perform(blueprint, status: nil, update: false, build_themes: false, current_user: nil)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
 
       if repo.exist?
+        repo.branch_from_repo_url(blueprint.repo_url)
         if update
           # Update the repo
           repo.update
-          # Track the current commit version
           blueprint.version = repo.version
-        elsif blueprint.status.in?(%w(testing ready)) && blueprint.version == repo.version
-          # if we're not updating, bail if we have the files
+        elsif blueprint.status.in?(%w(testing ready)) &&
+              blueprint.version == repo.version &&
+              !build_themes
+          # The correct blueprint files are on disk, and the blueprint is not
+          # broken. And we are not rebuilding themes.Nothing to do.
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up
-          repo.branch = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         end
       else
         # Clone the repo
         repo.clone(blueprint.repo_url)
         if blueprint.version.present?
-          repo.branch = blueprint.version
+          repo.commit_hash_for_checkout = blueprint.version
           repo.update
         else
           # Track the current commit version
           blueprint.version = repo.version
+          repo.update
         end
       end
 
@@ -61,25 +65,42 @@ module Autotune
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
         repo = WorkDir.repo(blueprint.working_dir,
                             Rails.configuration.autotune.build_environment)
-        if blueprint.config['themes'].blank?
-          themes = Autotune.config.themes.keys
-        else
-          themes = blueprint.config['themes']
-        end
-
-        sample_data = repo.read(blueprint.config['sample_data'])
-        sample_data.delete('base_url')
-        sample_data.delete('asset_base_url')
 
         # don't build a copy for each theme every time a project is updated
         if build_themes
+          sample_data = repo.read(blueprint.config['sample_data'])
+          sample_data.delete('base_url')
+          sample_data.delete('asset_base_url')
+          sample_data.delete('available_themes') unless sample_data['available_themes'].blank?
+          sample_data.delete('theme_data') unless sample_data['theme_data'].blank?
+
+          # add themes data if this blueprint support themeing
+          if blueprint.themable?
+            sample_data.merge!(
+              'available_themes' => Theme.all.pluck(:slug),
+              'theme_data' => Theme.full_theme_data
+            )
+          end
+
+          # if no theme list is available, pick the first theme
+          if blueprint.config['themes'].blank?
+            themes = blueprint.themable? ? [Theme.first] : Theme.where(:parent => nil)
+          else # get supported themes
+            themes = Theme.where(:slug => blueprint.config['themes'])
+          end
+
+          # if no theme is selected at this point, use generic theme
+          themes = Theme.where(:slug => 'generic') if themes.empty?
+
           themes.each do |theme|
-            slug = [blueprint.version, theme].join('-')
+            slug = blueprint.themable? ? blueprint.version : [blueprint.version, theme.slug].join('-')
+
             # Use this as dummy build data for the moment
             build_data = sample_data.merge(
               'title' => blueprint.title,
               'slug' => slug,
-              'theme' => theme)
+              'group' => theme.group.slug,
+              'theme' => theme.slug)
 
             # Get the deployer object
             # probably don't want this to always be preview
@@ -87,7 +108,7 @@ module Autotune
               :media, blueprint, :extra_slug => slug)
 
             # Run the before build deployer hook
-            deployer.before_build(build_data, repo.env)
+            deployer.before_build(build_data, repo.env, current_user)
 
             # Run the build
             repo.working_dir do

@@ -46,7 +46,9 @@ module Autotune
       @blueprint = instance
       @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status
       if @blueprint.valid?
+        trigger_upgrade = @blueprint.repo_url_changed?
         @blueprint.save
+        @blueprint.update_repo if trigger_upgrade
         render :show
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request

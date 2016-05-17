@@ -28,14 +28,18 @@ module.exports = Backbone.Router.extend({
     "projects/new": "chooseBlueprint",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject",
-    "projects/:slug/duplicate": "duplicateProject"
+    "projects/:slug/duplicate": "duplicateProject",
+    "themes": "listThemes",
+    "themes/new": "newTheme",
+    "themes/:slug": "editTheme",
+    "themes/:slug/edit": "editTheme"
   },
 
   // This is called for every route
   everyRoute: function(route, params) {
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
-    this.app.listener.start();
+    this.app.messages.start();
     if ( params ) {
       logger.debug(route, params);
     } else {
@@ -223,5 +227,63 @@ module.exports = Backbone.Router.extend({
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
-  }
+  },
+
+  listThemes: function(params) {
+    var themes = this.app.editableThemes,
+        app = this.app, query = {}, view, jqxhr;
+
+    if(params) { query = querystring.parse(params); }
+
+    if (query.page) {
+      jqxhr = themes.getPage(parseInt(query.page), {data: query});
+    } else {
+      jqxhr = themes.getFirstPage({data: query});
+    }
+
+    Promise.resolve( jqxhr  ).then(function() {
+      view = new views.ListThemes({
+        collection: themes,
+        query: _.pick(query, 'status', 'group', 'search'),
+        app: app
+      });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+
+  editTheme: function(slug) {
+    var app = this.app, view,
+        theme = new models.Theme({ id: slug });
+
+    Promise.resolve( theme.fetch() ).then(function() {
+      var view = new views.EditTheme({ model: theme, app: app });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+
+  newTheme: function() {
+    var theme = new models.Theme(),
+        view = new views.EditTheme({ model: theme, app: this.app });
+
+    view.render();
+
+    this.app.view
+      .display( view )
+      .setTab('themes');
+
+  },
 });

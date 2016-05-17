@@ -18,6 +18,10 @@ function pluckAttr(models, attribute) {
   return _.map(models, function(t) { return t.get(attribute); });
 }
 
+function isVisible(control) {
+  return control.type !== 'hidden' && $(control.domEl).is(':visible');
+}
+
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
   forceUpdateDataFlag: false,
@@ -62,7 +66,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   pollChange: _.debounce(function(){
     var view = this,
         $form = this.$('#projectForm'),
-        config_themes = this.model.getConfig().themes || ['generic'],
         query = '',
         data = $form.alpaca('get').getValue();
 
@@ -107,42 +110,42 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       contentType: 'application/json',
       dataType: 'json'
     }).then(function( data ) {
-        var iframeLoaded = _.once(function() {
-          view.pym.sendMessage('updateData', JSON.stringify(data));
-          $('#embed-preview').removeClass('loading');
-        });
+      logger.debug('Updating live preview...');
+      var iframeLoaded = _.once(function() {
+        view.pym.sendMessage('updateData', JSON.stringify(data));
+        $('#embed-preview').removeClass('loading');
+      });
 
-        if(data.theme !== view.theme){
-          if(typeof data.theme !== 'undefined'){
-            view.theme = data.theme;
-          }
-          var version = view.model.getVersion(),
-              previewUrl = view.model.blueprint.getMediaUrl(
-                [version, view.theme].join('-') + '/preview');
-
-          if ( view.pym ) { view.pym.remove(); }
-
-          $('#embed-preview').empty();
-          view.pym = new pym.Parent('embed-preview', previewUrl);
-          view.pym.iframe.onload = iframeLoaded;
-
-          // In case some dumb script hangs the loading process
-          setTimeout(iframeLoaded, 20000);
-        } else {
-          iframeLoaded();
+      if(data.theme !== view.theme){
+        if(typeof data.theme !== 'undefined'){
+          view.theme = data.theme;
         }
-      },
-      function(err) {
-        if ( err.status < 500 ) {
-          var dat = err.responseJSON;
-          view.app.view.error( dat.error );
-        } else {
-          view.app.view.error(
-            "There was a problem updating the preview, please contact support" );
-          logger.error(err);
-        }
+        var version = view.model.getVersion(),
+          previewSlug = view.model.isThemeable() ?
+              version :[version, view.theme].join('-'),
+          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
+
+        if ( view.pym ) { view.pym.remove(); }
+
+        $('#embed-preview').empty();
+        view.pym = new pym.Parent('embed-preview', previewUrl);
+        view.pym.iframe.onload = iframeLoaded;
+
+        // In case some dumb script hangs the loading process
+        setTimeout(iframeLoaded, 20000);
+      } else {
+        iframeLoaded();
       }
-    );
+    }, function(err) {
+      if ( err.status < 500 ) {
+        view.app.view.error(
+          "Can't update live preview (" +err.responseJSON.error+").", 'permanent');
+      } else {
+        view.app.view.error(
+          "Could not update live preview, please contact support.", 'permanent' );
+        logger.error(err);
+      }
+    });
   }, 500),
 
   savePreview: function(){
@@ -163,7 +166,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   listenForChanges: function() {
     if ( !this.model.isNew() && !this.listening ) {
-      this.listenTo(this.app.listener,
+      this.listenTo(this.app.messages,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
       this.listening = true;
@@ -171,7 +174,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   stopListeningForChanges: function() {
-    this.stopListening(this.app.listener);
+    this.stopListening(this.app.messages);
     this.listening = false;
   },
 
@@ -255,7 +258,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       .then(function() {
         var formData = view.alpaca.getValue(),
             buildData = view.model.buildData(),
-            previewUrl = '', iframeLoaded;
+            previewUrl = '', iframeLoaded,
+            previewSlug = '';
 
         // Callback for when iframe loads
         iframeLoaded = _.once(function() {
@@ -274,8 +278,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           // if the project has live preview enabled
           view.theme = view.model.get('theme') || formData['theme'] || 'custom';
 
-          previewUrl = view.model.blueprint.getMediaUrl(
-            [view.model.getVersion(), view.theme].join('-') + '/preview');
+          previewSlug = view.model.isThemeable() ? view.model.getVersion() :
+            [view.model.getVersion(), view.theme].join('-');
+          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
           if ( !view.copyProject && !view.model.hasInitialBuild() ){
             previewUrl = previewUrl + '#new';
@@ -318,7 +323,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         $('#embed-preview').addClass('loading');
       }
       this.app.view.alert(
-        'Building... This might take a moment.', 'notice', false, 16000);
+        'Building... This might take a moment.', 'notice', 16000);
     }
   },
 
@@ -326,7 +331,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var $form = this.$('#projectForm'),
         button_tmpl = require('../templates/project_buttons.ejs'),
         view = this,
-        form_config, config_themes, newProject, populateForm = false;
+        form_config, availableThemes, twitterHandles, newProject, populateForm = false;
 
     if ( this.disableForm ) {
       $form.append(
@@ -350,99 +355,100 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     form_config = this.model.getConfig().form;
-    config_themes = this.model.getConfig().themes || ['generic'];
+
+    availableThemes = this.model.getConfig().themes ?
+      _.filter(this.app.themes.models, _.bind(function(t) {
+        return _.contains(this.model.getConfig().themes, t.get('slug'));
+      }, this)) : this.app.themes.models;
+    availableThemes = availableThemes || this.app.themes.where({slug : 'generic'});
+    twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
       reject('This blueprint does not have a form!');
     } else {
-      var themes = this.app.themes.filter(function(theme) {
-            if ( _.isEqual(config_themes, ['generic']) ) {
-              return true;
+      var schema_properties = {
+        "title": {
+          "title": "Title",
+          "type": "string",
+          "required": true
+        },
+        "theme": {
+          "title": "Theme",
+          "type": "string",
+          "required": true,
+          "default": pluckAttr(availableThemes, 'slug')[0],
+          "enum": pluckAttr(availableThemes, 'slug')
+        },
+        "slug": {
+          "title": "Slug",
+          "type": "string"
+        },
+        "tweet_text":{
+          "type": "string",
+          "minLength": 0
+        }
+      },
+      options_form = {
+        "attributes": {
+          "data-model": "Project",
+          "data-model-id": this.model.isNew() ? '' : this.model.id,
+          "data-action": this.model.isNew() ? 'new' : 'edit',
+          "data-next": 'show',
+          "method": 'post'
+        }
+      },
+      options_fields = {
+        "theme": {
+          "type": "select",
+          "optionLabels": _.map(availableThemes, function(t){
+               if (t.get('title') === t.get('group_name')) {
+                 return t.get('group_name');
+               }
+               return t.get('group_name') + ' - ' + t.get('title');
+             })
+        },
+        "slug": {
+          "label": "Slug",
+          "validator": function(callback){
+            var slugPattern = /^[0-9a-z\-_]{0,60}$/;
+            var slug = this.getValue();
+            if ( slugPattern.test(slug) ){
+              callback({ "status": true });
+            } else if (slugPattern.test(slug.substring(0,60))){
+              this.setValue(slug.substr(0,60));
+              callback({ "status": true });
             } else {
-              return _.contains(config_themes, theme.get('value'));
+              callback({
+                "status": false,
+                "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
+              });
             }
-          }),
-          social_chars = {
-            "sbnation": 8,
-            "theverge": 5,
-            "polygon": 7,
-            "racked": 6,
-            "eater": 5,
-            "vox": 9,
-            "curbed": 6,
-            "custom": 0
-          },
-          schema_properties = {
-            "title": {
-              "title": "Title",
-              "type": "string",
-              "required": true
-            },
-            "theme": {
-              "title": "Theme",
-              "type": "string",
-              "required": true,
-              "default": pluckAttr(themes, 'value')[0],
-              "enum": pluckAttr(themes, 'value')
-            },
-            "slug": {
-              "title": "Slug",
-              "type": "string"
-            },
-            "tweet_text":{
-              "type": "string",
-              "minLength": 0
-            }
-          },
-          options_form = {
-            "attributes": {
-              "data-model": "Project",
-              "data-model-id": this.model.isNew() ? '' : this.model.id,
-              "data-action": this.model.isNew() ? 'new' : 'edit',
-              "data-next": 'show',
-              "method": 'post'
-            }
-          },
-          options_fields = {
-            "theme": {
-              "type": "select",
-              "optionLabels": pluckAttr(themes, 'label'),
-            },
-            "slug": {
-              "label": "Slug",
-              "validator": function(callback){
-                var slugPattern = /^[0-9a-z\-_]{0,60}$/;
-                var slug = this.getValue();
-                if ( slugPattern.test(slug) ){
-                  callback({ "status": true });
-                } else if (slugPattern.test(slug.substring(0,60))){
-                  this.setValue(slug.substr(0,60));
-                  callback({ "status": true });
-                } else {
-                  callback({
-                    "status": false,
-                    "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
-                  });
-                }
-              }
-            },
-            "tweet_text":{
-              "label": "Social share text",
-              "constrainMaxLength": true,
-              "constrainMinLength": true,
-              "showMaxLengthIndicator": true
-            }
-          };
+          }
+        },
+        "tweet_text":{
+          "label": "Social share text",
+          "constrainMaxLength": true,
+          "constrainMinLength": true,
+          "showMaxLengthIndicator": true
+        }
+      };
 
       // if there is only one theme option, hide the dropdown
-      if ( themes.length === 1 ) {
-        options_fields['theme']['type'] = 'hidden';
+
+      // Temporarily disabling theme drop down hiding to fix custom color bug
+      //if ( availableThemes.length === 1 ) {
+      //  options_fields['theme']['fieldClass'] = 'hidden';
+      //}
+
+      // hide slug for blueprint types that are not apps
+      if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {
+        options_fields['slug']['fieldClass'] = 'hidden';
       }
 
       if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
         var googleText = form_config.schema.properties.google_doc_url.title;
-        var newText = googleText + '<br><button type="button" data-action="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
+        var newText = googleText + '<br><button type="button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
         form_config.schema.properties.google_doc_url.title = newText;
       }
 
@@ -464,37 +470,38 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           "fields": options_fields,
           "focus": this.firstRender
         },
-        "postRender": _.bind(function(control) {
-          this.alpaca = control;
+        "postRender": function(control) {
+          view.alpaca = control;
 
           var theme = control.childrenByPropertyId["theme"],
              social = control.childrenByPropertyId["tweet_text"];
 
-          if ( social && social.type !== 'hidden' ) {
-            if ( social_chars[theme.getValue()] ) {
-              social.schema.maxLength = 140-(26+social_chars[theme.getValue()]);
-            } else {
-              social.schema.maxLength = 140 - 26;
-            }
+          var getTwitterHandleLength = function(slug){
+           return twitterHandles[slug] ? twitterHandles[slug].length : 0;
+          };
+
+          if ( social && isVisible(social) ) {
+            social.schema.maxLength = 140 - ( 26 + getTwitterHandleLength(theme.getValue()));
             social.updateMaxLengthIndicator();
 
-            if ( theme && theme.type !== 'hidden' ) {
-              $(theme).on('change', function(){
-                social.schema.maxLength = 140 - (
-                  26 + social_chars[ theme.getValue() ] );
+            if ( theme && isVisible(theme) ) {
+              $(theme.domEl).on('change', function(){
+                theme = control.childrenByPropertyId["theme"];
+                social.schema.maxLength = 140 -
+                        ( 26 + getTwitterHandleLength(theme.getValue()) );
                 social.updateMaxLengthIndicator();
               });
             }
           }
 
-          this.alpaca.childrenByPropertyId["slug"].setValue(
-            this.model.get('slug_sans_theme') );
+          view.alpaca.childrenByPropertyId["slug"].setValue(
+            view.model.get('slug_sans_theme') );
 
           control.form.form.append(
-            helpers.render(button_tmpl, this.templateData()) );
+            helpers.render(button_tmpl, view.templateData()) );
 
           resolve();
-        }, this)
+        }
       };
 
       if( form_config['view'] ) {
@@ -512,8 +519,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       if(populateForm){
         opts.data = this.model.formData();
-        if ( !_.contains(pluckAttr(themes, 'value'), opts.data.theme) ) {
-          opts.data.theme = pluckAttr(themes, 'value')[0];
+        if ( !_.contains(pluckAttr(availableThemes, 'slug'), opts.data.theme) ) {
+          opts.data.theme = pluckAttr(availableThemes, 'slug')[0];
         }
       }
 
@@ -540,7 +547,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       title: data['title'],
       theme: data['theme'],
       data:  data,
-      blueprint_id: this.model.blueprint.get('id')
+      blueprint_id: this.model.blueprint.get('id'),
+      blueprint_version: this.model.getVersion()
     };
 
     if ( data.slug && data.slug.indexOf(data['theme']) !== 0 ) {
@@ -582,7 +590,44 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.$("#embed textarea").select();
     document.execCommand('copy');
     this.app.view.alert('Embed code copied to clipboard!');
-  }
+  },
+
+  /**
+   * Create a new spreadsheet from a template
+   * @returns {Promise} Promise to provide the Google Doc URL
+   **/
+  createSpreadsheet: function() {
+    var model = this.model, view = this;
+    if ( !model.getConfig().spreadsheet_template ) { return Promise.resolve(); }
+
+    var ss_key = model.getConfig().spreadsheet_template.match(/[-\w]{25,}/)[0];
+
+    var $input = $( "input[name='google_doc_url']" );
+    if( $input.val().length > 0 ) {
+      var msg = 'This will replace the spreadsheet link currently associated with this project. Click "OK" to confirm the replacement.';
+      if ( !window.confirm(msg) ) { return Promise.resolve(); }
+    }
+
+    return Promise.resolve( $.ajax({
+      type: "POST",
+      url: model.urlRoot + "/create_spreadsheet",
+      data: JSON.stringify(ss_key),
+      contentType: 'application/json',
+      dataType: 'json'
+    }) ).then(
+      function( data ) {
+        $input
+          .val(data.google_doc_url)
+          .focus();
+        view.alpaca.form.refreshValidationState(true);
+      },
+      function(err) {
+        var msg = 'There was an error authenticating your Google account.';
+        view.app.view.error(msg);
+        logger.error(msg, err);
+      }
+    );
+  },
 } );
 
 module.exports = EditProject;

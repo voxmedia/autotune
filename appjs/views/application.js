@@ -81,42 +81,55 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     return this;
   },
 
-  error: function(message) {
-    return this.alert(message, 'error');
+  error: function(message, wait) {
+    return this.alert(message, 'error', wait);
   },
 
-  warning: function(message) {
-    return this.alert(message, 'notice');
+  warning: function(message, wait) {
+    return this.alert(message, 'notice', wait);
   },
 
-  success: function(message) {
-    return this.alert(message, 'success');
+  success: function(message, wait) {
+    return this.alert(message, 'success', wait);
   },
 
-  alert: function(message, level, permanent, wait) {
+  info: function(message, wait) {
+    return this.alert(message, 'info', wait);
+  },
+
+  alert: function(message, level, wait) {
     var noti,
         opts = _.defaults({
           text: message,
           type: level || 'info',
-          delay: wait || 8000
+          delay: 8000
         }, this.alertDefaults);
 
-    if ( permanent ) {
+    if ( _.isNumber(wait) && wait > 0 ) {
+      opts['delay'] = wait;
+    } else if ( wait === true || wait === 'permanent' || wait === 0 ) {
       _.extend(opts, {
         buttons: { closer: false, sticker: false },
         hide: false
       });
     }
 
-    noti = _.find(PNotify.notices, function(notify) {
-      return notify.options.text === message;
-    } );
-
+    noti = this.findNotification( message );
     return noti || new PNotify(opts);
   },
 
-  clearAlerts: function() {
-    return PNotify.removeAll();
+  findNotification: function(message) {
+    return _.find(PNotify.notices, function(notify) {
+      return notify.options.text === message;
+    } );
+  },
+
+  clearNotification: function(message) {
+    if ( message ) {
+      return this.findNotification( message );
+    } else {
+      return PNotify.removeAll();
+    }
   }
 });
 

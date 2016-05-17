@@ -38,8 +38,8 @@ module Autotune
       end
 
       if project_dir.commit_hash != project.blueprint_version
-        # checkout the right git version
-        project_dir.switch(project.blueprint_version)
+        # Checkout correct version and branch
+        project_dir.checkout_version(project.blueprint_version)
         # Make sure the environment is correct for this version
         project_dir.setup_environment
         # update the status

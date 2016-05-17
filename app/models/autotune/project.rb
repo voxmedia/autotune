@@ -14,9 +14,10 @@ module Autotune
     belongs_to :blueprint
     belongs_to :user
     belongs_to :theme
+    belongs_to :group
 
     validates_length_of :output, :maximum => 64.kilobytes - 1
-    validates :title, :blueprint, :user, :theme, :presence => true
+    validates :title, :blueprint, :user, :group, :theme, :presence => true
     validates :status,
               :inclusion => { :in => Autotune::PROJECT_STATUSES }
 
@@ -34,10 +35,9 @@ module Autotune
     end
 
     before_validation do
-
       # Make sure our slug includes the theme
       if theme && (theme_changed? || slug_changed?)
-        self.slug = self.class.unique_slug(theme.value + '-' + slug_sans_theme, id)
+        self.slug = self.class.unique_slug(theme.slug + '-' + slug_sans_theme, id)
       end
 
       # Truncate output field so we can save without error
@@ -80,7 +80,7 @@ module Autotune
     # Checks if the project supports live preview
     # @return [Boolean] `true` if the project supports live preview, `false` otherwise.
     def live?
-      blueprint_config['preview_type'] == 'live'
+      blueprint_config.present? && blueprint_config['preview_type'] == 'live'
     end
 
     # Updates blueprint version and builds the project.
@@ -90,7 +90,7 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build
     # @see build_and_publish
-    def update_snapshot
+    def update_snapshot(current_user = nil)
       if blueprint_version == blueprint.version
         update!(:status => 'building')
       else
@@ -100,9 +100,13 @@ module Autotune
           :blueprint_config => blueprint.config)
       end
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :current_user => current_user),
         SyncProjectJob.new(self, :update => true),
-        BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
+        BuildJob.new(
+          self,
+          :target => publishable? ? 'preview' : 'publish',
+          :current_user => current_user
+        )
       ).enqueue
     rescue
       update!(:status => 'broken')
@@ -116,12 +120,16 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build_and_publish
     # @see update_snapshot
-    def build
+    def build(current_user = nil)
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :current_user => current_user),
         SyncProjectJob.new(self),
-        BuildJob.new(self, :target => publishable? ? 'preview' : 'publish')
+        BuildJob.new(
+          self,
+          :target => publishable? ? 'preview' : 'publish',
+          :current_user => current_user
+        )
       ).enqueue
     rescue
       update!(:status => 'broken')
@@ -135,12 +143,16 @@ module Autotune
     # @see build
     # @see update_snapshot
     # @raise The original exception when the update fails
-    def build_and_publish
+    def build_and_publish(current_user = nil)
       update(:status => 'building')
       ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint),
+        SyncBlueprintJob.new(blueprint, :current_user => current_user),
         SyncProjectJob.new(self),
-        BuildJob.new(self, :target => 'publish')
+        BuildJob.new(
+          self,
+          :target => 'publish',
+          :current_user => current_user
+        )
       ).enqueue
     rescue
       update!(:status => 'broken')
@@ -174,9 +186,9 @@ module Autotune
     # @return [String] slyg of the project without the theme.
     def slug_sans_theme
       if theme_changed? && theme_was
-        slug.sub(/^(#{theme.value}|#{theme_was.value})-/, '')
+        slug.sub(/^(#{theme.slug}|#{theme_was.slug})-/, '')
       else
-        slug.sub(/^#{theme.value}-/, '')
+        slug.sub(/^#{theme.slug}-/, '')
       end
     end
 
@@ -203,13 +215,6 @@ module Autotune
       elsif blueprint_id
         Blueprint.find(blueprint_id).type
       end
-    end
-
-    # Gets the embed code for the project
-    # @return [String] embed html as string
-    def embed_html
-      ac = Autotune::ProjectsController.new
-      ac.embed_html
     end
 
     def deployed?
@@ -239,10 +244,10 @@ module Autotune
     end
 
     def pub_to_redis
-      return if Autotune.redis.nil?
       msg = { :id => id,
+              :model => 'project',
               :status => status }
-      Autotune.redis.publish 'project', msg.to_json
+      Autotune.send_message('change', msg) if Autotune.can_message?
     end
   end
 end

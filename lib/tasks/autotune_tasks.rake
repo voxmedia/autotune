@@ -1,3 +1,6 @@
+require 'net/https'
+require 'uri'
+
 namespace :autotune do
   desc 'Update all the blueprints'
   task :update_blueprints => :environment do
@@ -10,15 +13,6 @@ namespace :autotune do
     puts 'Updating all blueprints'
     Autotune::Blueprint.all.each do |b|
       Autotune::SyncBlueprintJob.perform_later b
-    end
-  end
-
-  desc 'Reset all the blueprints themes'
-  task :reset_blueprint_themes => :environment do
-    puts 'Updating all blueprints'
-    Autotune::Blueprint.all.each do |b|
-      b.initialize_themes_from_config
-      b.save!
     end
   end
 
@@ -74,6 +68,32 @@ namespace :autotune do
     end
   end
 
+  desc 'Correct project preview type'
+  task :correct_project_preview_type => :environment do
+    Autotune::Project.all.each do |proj|
+      if proj.blueprint_config['preview_type'] && proj.blueprint_config['preview_type'] === 'live'
+        test_theme = Autotune::Theme.find(proj.theme_id)['value']
+        slug_string = "#{proj.blueprint_version}-#{test_theme}/preview/"
+        blueprint = Autotune::Blueprint.find(proj.blueprint_id)
+        deployer = Autotune.new_deployer(
+          :media, blueprint, :extra_slug => slug_string)
+        uri = URI.parse(deployer.project_asset_url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        if uri.scheme === 'http'
+          http.use_ssl = false
+        end
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        request = Net::HTTP::Get.new(uri.request_uri)
+        response = http.request(request)
+        unless response.code === '200'
+          puts "#{blueprint.title} - #{proj.title}"
+          proj.update_snapshot
+        end
+      end
+    end
+  end
+
   desc 'Create machine user'
   task :create_superuser, [:email] => [:environment] do |_, args|
     u = Autotune::User
@@ -110,5 +130,20 @@ namespace :autotune do
       puts "User ID: #{u.id}"
       puts "API key: #{u.api_key}"
     end
+  end
+
+  desc 'Send a message to users'
+  task :alert_users, [:level, :text] => [:environment] do |_, args|
+    Autotune.send_message('alert', :level => args[:level], :text => args[:text])
+    puts "Sent #{args[:level]} alert to everyone: #{args[:text]}"
+  end
+
+  desc 'Reset all themes'
+  task :reset_themes => :environment do
+    puts 'Resetting all themes'
+    Autotune::Theme.all.each_with_index { |t, i|
+      build_bp = i == (Autotune::Theme.count - 1)
+      t.update_data(:build_blueprints => build_bp)
+    }
   end
 end

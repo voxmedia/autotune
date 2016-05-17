@@ -205,18 +205,6 @@ var Project = Backbone.Model.extend({
   },
 
   /**
-   * Get the themes.
-   * @returns {array} Theme models
-   **/
-  getThemes: function() {
-    if ( this.hasConfig() ) {
-      return this.getConfig().themes || ['generic'];
-    } else {
-      return ['generic'];
-    }
-  },
-
-  /**
    * Does this project have any of these statuses?
    * @param {string} status Check for this status
    * @returns {boolean}
@@ -301,6 +289,17 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Checks if project is using the current version of blueprint
+   * @returns {boolean}
+   **/
+  isCurrentVersion: function() {
+    if ( !this.get('blueprint_version') ){
+      return true;
+    }
+    return this.get('blueprint_version') === this.blueprint.get('version');
+  },
+
+  /**
    * Does this project belong to a preview type?
    * @param {string} type Check for this type
    * @returns {boolean}
@@ -310,6 +309,20 @@ var Project = Backbone.Model.extend({
       return m || this.getConfig()['preview_type'] === i;
     };
     return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  hasThemeType: function() {
+    if ( !this.getConfig()['theme_type'] ) {
+      return false;
+    }
+    var iteratee = function(m, i) {
+      return m || this.getConfig()['theme_type'] === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  isThemeable: function() {
+    return this.hasThemeType('dynamic');
   },
 
   /**
@@ -325,39 +338,6 @@ var Project = Backbone.Model.extend({
   getPreviewSize: function() {
     console.log(this.model);
     console.log('getting preview size', this);
-  },
-
-  /**
-   * Create a new spreadsheet from a template
-   * @returns {Promise} Promise to provide the Google Doc URL
-   **/
-  createSpreadsheet: function() {
-    if ( !this.getConfig().spreadsheet_template ) { return Promise.resolve(); }
-
-    var ss_key = this.getConfig().spreadsheet_template.match(/[-\w]{25,}/)[0];
-
-    return Promise.resolve( $.ajax({
-      type: "POST",
-      url: this.urlRoot + "/create_spreadsheet",
-      data: JSON.stringify(ss_key),
-      contentType: 'application/json',
-      dataType: 'json'
-    }) ).then(
-      function( data ) {
-        var $input = $( "input[name='google_doc_url']" );
-        if( $input.val().length > 0 ){
-          var msg = 'This will replace the spreadsheet link currenlty associated with this project. Click "OK" to confirm the replacement.';
-          if( window.confirm(msg) ) {
-            $input.val(data.google_doc_url);
-          }
-        } else {
-          $input.val(data.google_doc_url);
-        }
-      },
-      function(err) {
-        console.log('There was an error authenticating your Google account.', err);
-      }
-    );
   },
 
   /**

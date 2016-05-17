@@ -36,8 +36,8 @@ module Autotune
     # For all responses, return the CORS access control headers.
     def cors_set_access_control_headers
       headers['Access-Control-Allow-Origin'] = '*'
-      headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
-      headers['Access-Control-Allow-Headers'] = 'accept, authorization'
+      headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, OPTIONS'
+      headers['Access-Control-Allow-Headers'] = 'accept, authorization, x-requested-with, content-type'
       headers['Access-Control-Max-Age'] = '1728000'
     end
 
@@ -45,18 +45,6 @@ module Autotune
     # (control headers will be included).
     def cors_preflight_check
       render :text => '', :content_type => 'text/plain'
-    end
-
-    protected
-
-    def omniauth_path(provider, origin = nil)
-      path = "/auth/#{provider}"
-      path += "?origin=#{CGI.escape(origin)}" unless origin.blank?
-      path
-    end
-
-    def login_path(origin = nil)
-      omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
     end
 
     def current_user
@@ -74,12 +62,16 @@ module Autotune
         end
     end
 
-    def current_user=(u)
-      if u.nil?
-        session.delete(:api_key)
-      else
-        session[:api_key] = u.api_key
-      end
+    protected
+
+    def omniauth_path(provider, origin = nil)
+      path = "/auth/#{provider}"
+      path += "?origin=#{CGI.escape(origin)}" unless origin.blank?
+      path
+    end
+
+    def login_path(origin = nil)
+      omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
     end
 
     def signed_in?
@@ -87,11 +79,12 @@ module Autotune
     end
 
     def has_google_auth?
-      current_user.authorizations.find_by(:provider => 'google_oauth2').present?
+      gauth = current_user.authorizations.find_by(:provider => 'google_oauth2')
+      gauth.present? && gauth.valid_credentials?
     end
 
     def any_roles?
-      !current_user.meta['roles'].nil? && !current_user.meta['roles'].empty?
+      current_user.meta['roles'].present? && current_user.meta['roles'].any?
     end
 
     def role?(*args)
@@ -128,12 +121,10 @@ module Autotune
 
     def require_google_login
       return true if has_google_auth?
-      if has_google_auth?
-        render_error 'Not allowed', :forbidden
-      else
-        respond_to do |format|
-          format.html { render 'google_auth' }
-        end
+
+      respond_to do |format|
+        format.html { render 'google_auth' }
+        format.json { render_error 'Unauthorized', :unauthorized }
       end
     end
 

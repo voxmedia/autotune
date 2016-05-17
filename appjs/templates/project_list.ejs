@@ -36,8 +36,8 @@
             <select name="theme" id="theme" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
             <% app.themes.each(function(theme) { %>
-              <option <% if(theme.get('value') == query.theme) { %>selected<% } %>
-                    value="<%=theme.get('value') %>"><%=theme.get('label') %></option>
+              <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
+                    value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>
             <% }) %>
             </select>
           </div>
@@ -111,8 +111,8 @@
       <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
     </td>
     <td>
-      <% if ( app.themes.findWhere({value: item.get('theme')}) ) { %>
-      <%=app.themes.findWhere({value: item.get('theme')}).get('label') %>
+      <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
+      <%=app.themes.findWhere({slug: item.get('theme')}).get('title') %>
       <% } else { %>
       <em class="text-muted"><%=item.get('theme') %></em>
       <% } %>
