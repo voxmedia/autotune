@@ -22,9 +22,9 @@ function isVisible(control) {
   return control.type !== 'hidden' && $(control.domEl).is(':visible');
 }
 
-var BaseModalView = Backbone.View.extend({
+var ProjectSaveModal = Backbone.View.extend({
 
-    id: 'base-modal',
+    id: 'save-modal',
     className: 'modal show',
     template: require('../templates/modal.ejs'),
 
@@ -135,21 +135,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   askToSave: function() {
-    logger.debug('got to ask to save');
     var view = this;
-    var modalView = new BaseModalView({app: this.app, parentView: this}),
+    var saveModal = new ProjectSaveModal({app: this.app, parentView: this}),
         ret = new Promise(function(resolve, reject) {
-          modalView.once('cancel submit', function() {
+          saveModal.once('cancel submit', function() {
             resolve(true);
           });
-          modalView.on('close', function() {
-            logger.debug('~~~~ got close');
+          saveModal.on('close', function() {
             resolve(false);
           });
         });
 
     if($('#base-modal').length === 0){
-      modalView.show();
+      saveModal.show();
     }
 
     return ret;
