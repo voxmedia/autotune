@@ -1,19 +1,19 @@
 <p class="margin-top">
-  <button type="submit" class="btn btn-default" id="saveBtn"
+  <button type="submit" class="btn btn-primary" id="saveBtn"
           data-loading-text="Saving...">Save</button>
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
     <% if ( model.hasType( 'graphic' ) ) { %>
-  <a class="btn btn-default" id="previewBtn"
+  <a class="btn btn-primary" id="previewBtn"
      <% if ( !model.hasPreviewType('live') && !model.hasInitialBuild()) { %>disabled="true"<% } %>
       href="#preview">Preview</a>
     <% } else { %>
-  <a class="btn btn-default" target="_blank" id="previewBtn"
+  <a class="btn btn-primary" target="_blank" id="previewBtn"
      href="<%=model.getPreviewUrl() %>">Preview</a>
     <% } %>
   <% } else { %>
-  <a class="btn btn-default" target="_blank" id="viewBtn"
+  <a class="btn btn-primary" target="_blank" id="viewBtn"
      href="<%=model.getPublishUrl() %>">View</a>
   <% } %>
 

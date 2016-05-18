@@ -17,8 +17,8 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   //className: 'container-fluid',
   template: require('../templates/application.ejs'),
   alertDefaults: {
-    addclass: "stack-bottomright",
-    stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
+    addclass: "center-notification",
+    width: '95%',
     buttons: { sticker: false }
   },
 

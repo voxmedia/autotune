@@ -3,13 +3,15 @@ $bootstrap-sass-asset-helper: false !default;
 // Variables
 // --------------------------------------------------
 
+$btn-border-radius-large: 3px;
+$btn-border-radius-small: 3px;
 
 //== Colors
 //
 //## Gray and brand colors for use across Bootstrap.
 
 //color
-// $black: #282828;
+$black: #000000;
 // $primary: #048AAF;
 // $green: #5CB85C; //success
 // $orange: #FFA039; //info
@@ -102,10 +104,6 @@ $headings-font-weight:    500 !default;
 $headings-line-height:    1.1 !default;
 $headings-color:          inherit !default;
 
-// Missing stuff
-$jumbotron-heading-font-size: $font-size-h1;
-$black: $dark-accent-bg;
-
 
 //== Iconography
 //
@@ -184,8 +182,6 @@ $table-border-color:            $gray-lighter !default;
 
 $border-radius: 3px;
 $btn-border-radius-base: $border-radius;
-$btn-border-radius-large: $border-radius;
-$btn-border-radius-small: $border-radius;
 
 $btn-font-weight:                normal !default;
 
@@ -528,6 +524,7 @@ $jumbotron-padding:              30px !default;
 $jumbotron-color:                inherit !default;
 $jumbotron-bg:                   $gray-lighter !default;
 $jumbotron-heading-color:        inherit !default;
+$jumbotron-heading-font-size:    $font-size-h1;
 $jumbotron-font-size:            ceil(($font-size-base * 1.5)) !default;
 
 
@@ -535,21 +532,21 @@ $jumbotron-font-size:            ceil(($font-size-base * 1.5)) !default;
 //
 //## Define colors for form feedback states and, by default, alerts.
 
-$state-success-text:             $positive-color !default;
-$state-success-bg:               #CCDE9B !default;
-$state-success-border:           darken(adjust-hue($state-success-bg, -10), 5%) !default;
+$state-success-text:             #ffffff !default;
+$state-success-bg:               $positive-color !default;
+$state-success-border:           rgba(0, 0, 0, 0) !default;
 
-$state-info-text:                $brand-info !default;
-$state-info-bg:                  darken($brand-info, 15%) !default;
-$state-info-border:              darken(adjust-hue($state-info-bg, -10), 7%) !default;
+$state-info-text:                #ffffff !default;
+$state-info-bg:                  $brand-info !default;
+$state-info-border:              rgba(0, 0, 0, 0) !default;
 
-$state-warning-text:             $brand-warning !default;
-$state-warning-bg:               darken($brand-warning, 15%) !default;
-$state-warning-border:           darken(adjust-hue($state-warning-bg, -10), 5%) !default;
+$state-warning-text:             #ffffff !default;
+$state-warning-bg:               $brand-warning !default;
+$state-warning-border:           rgba(0, 0, 0, 0) !default;
 
-$state-danger-text:              $negative-color !default;
-$state-danger-bg:                darken($negative-color, 30%) !default;
-$state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !default;
+$state-danger-text:              #ffffff !default;
+$state-danger-bg:                $negative-color !default;
+$state-danger-border:            rgba(0, 0, 0, 0) !default;
 
 
 //== Tooltips

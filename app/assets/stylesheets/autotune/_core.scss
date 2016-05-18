@@ -101,6 +101,12 @@ input[type="checkbox"] {
   margin: -10px 10px 0;
 }
 
+.ui-pnotify.center-notification{
+  right: 0;
+  left: 0;
+  margin: auto;
+}
+
 //status notifications and alerts
 .m-status {
   display: block;
