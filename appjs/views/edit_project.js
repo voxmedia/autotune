@@ -157,8 +157,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   hasUnsavedChanges: function(){
     var view = this,
-        $form = view.$('#projectForm'),
-        data = $form.alpaca('get').getValue();
+        data = view.alpaca.getValue();
 
     if(_.isEqual(view.formDataOnLoad, data) ){
       return false;
