@@ -37,9 +37,6 @@ module.exports = {
         eve.preventDefault();
         eve.stopPropagation();
         logger.debug( 'handleLink', href );
-        if(href === window.location.pathname){
-          this.app.router.navigate( href+'?', { trigger: true } );
-        }
         this.app.router.navigate( href, { trigger: true } );
       }
     }

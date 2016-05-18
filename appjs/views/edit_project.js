@@ -111,6 +111,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
+    window.onpopstate = function(event){
+      if(view.hasUnsavedChanges()){
+        // var stateObj = { page: 'projects/'+view.model.get('slug') };
+        // window.history.pushState(stateObj, "proj page", 'projects/'+view.model.get('slug'));
+        view.app.router.navigate('/projects/'+view.model.get('slug'), {trigger: false, replace: true});
+        // view.app.router.navigate('/projects/'+view.model.get('slug'), {trigger: true});
+      }
+    };
+
     window.onbeforeunload = function(event) {
       if(view.hasUnsavedChanges()){
         return 'You have unsaved changes!';

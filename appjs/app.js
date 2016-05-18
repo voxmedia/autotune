@@ -24,35 +24,29 @@ var $ = require('jquery'),
 // required to make Backbone work in browserify
 Backbone.$ = $;
 //
-var oldLoadUrl = function(){
-  if (!Backbone.history.matchRoot()) {
-    return false;
-  } else {
-    var fragment = Backbone.history.fragment = Backbone.history.getFragment(fragment);
-    return _.some(Backbone.history.handlers, function(handler) {
-      if (handler.route.test(fragment)) {
-        handler.callback(fragment);
-        return true;
-      }
-    });
-  }
-};
 
+
+
+var oldLoadUrl = Backbone.history.loadUrl;
 Backbone.history.loadUrl = function(fragment) {
   var view = window.app.view.currentView;
-  logger.debug('NAV', fragment);
-  if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+  logger.debug('NAV URL', fragment, view);
+  if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() && typeof fragment === 'undefined' ) {
+    // var stateObj = { page: 'projects/'+view.model.get('slug') };
+    // window.history.pushState(stateObj, "proj page", 'projects/'+view.model.get('slug'));
     view.askToSave().then(function(okToContinue) {
       if ( okToContinue ) {
-        oldLoadUrl.call(this, fragment);
+        window.history.back();
+        oldLoadUrl.call(Backbone.history, fragment);
         window.onbeforeunload = null;
         $('body').removeClass('modal-open');
       }
     });
   } else {
-    oldLoadUrl.call(this, fragment);
+    oldLoadUrl.call(Backbone.history, fragment);
   }
 };
+
 
 /**
  * Autotune admin UI

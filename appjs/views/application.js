@@ -138,7 +138,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   // Not sure if there is a different way to include this so that it isn't in
   // edit_project and application
   savePreview: function(){
-    this.upToDate = true;
+    // this.currentView.doSubmit();
     this.$('#projectForm form').submit();
   }
 });
