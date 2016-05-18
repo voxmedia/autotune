@@ -112,7 +112,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     window.onbeforeunload = function(event) {
-      if(!view.upToDate){
+      if(view.hasUnsavedChanges()){
         return 'You have unsaved changes!';
       }
     };
@@ -155,25 +155,27 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return ret;
   },
 
-  hasUnsavedChanges: function(){
-    if(!this.upToDate){
-      return true;
-    } else {
-      return false;
-    }
-  },
+  // hasUnsavedChanges: function(){
+  //   if(!this.upToDate){
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // },
 
-  determineEquality: function(newData){
+  hasUnsavedChanges: function(newData){
     var view = this;
     // set view.formDataOnLoad in afterRender - form validation (view.model.formData())
     // converts [0] values to null, which causes the objects to validate as unequal
     // even though they really are equal
     if(_.isEqual(view.formDataOnLoad, newData) ){
-      view.upToDate = true;
-      $('.project-save-warning').hide();
+      // view.upToDate = true;
+      // $('.project-save-warning').hide();
+      return false;
     } else {
-      view.upToDate = false;
-      $('.project-save-warning').show().css('display', 'inline-block');
+      // view.upToDate = false;
+      // $('.project-save-warning').show().css('display', 'inline-block');
+      return true;
     }
   },
 
@@ -188,7 +190,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         query = '',
         data = $form.alpaca('get').getValue();
 
-    this.determineEquality(data);
+    if(this.hasUnsavedChanges(data)){
+      $('.project-save-warning').show().css('display', 'inline-block');
+    } else {
+      $('.project-save-warning').hide();
+    }
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
@@ -260,7 +266,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   }, 500),
 
   savePreview: function(){
-    this.upToDate = true;
+    // this.upToDate = true;
     this.$('#projectForm form').submit();
   },
 
@@ -336,7 +342,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    view.upToDate = true;
+    // view.upToDate = true;
     view.pageState = window.history.state;
 
     // autoselect embed code on focus

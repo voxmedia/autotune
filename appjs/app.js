@@ -45,7 +45,7 @@ Backbone.history.loadUrl = function(fragment) {
     view.askToSave().then(function(okToContinue) {
       if ( okToContinue ) {
         oldLoadUrl.call(this, fragment);
-        view.upToDate = true;
+        // view.upToDate = true;
         window.onbeforeunload = null;
         $('body').removeClass('modal-open');
       }
