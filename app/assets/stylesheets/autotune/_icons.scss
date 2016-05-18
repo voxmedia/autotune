@@ -13,7 +13,7 @@
   font-size: 20px;
   margin: 0 5px;
   &:not([disabled]):hover {
-    color: $primary;
+    color: $primary-color;
     text-decoration: none;
   }
   &[disabled] {
@@ -51,19 +51,18 @@
 .icon-ok {
   &:after {
     content: "\e013";
-    color: $green;
+    color: $positive-color;
   }
 }
 .icon-alert {
   &:after {
     content: "\e209";
-    color: $red;
+    color: $negative-color;
   }
 }
 .icon-info {
   &:after {
     content: "\e086";
-    color: $orange;
+    color: $cautionary-color;
   }
 }
-

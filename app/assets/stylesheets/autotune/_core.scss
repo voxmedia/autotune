@@ -107,24 +107,24 @@ input[type="checkbox"] {
   font-size: 11px;
   text-transform: capitalize;
   &.status-ok {
-    color: $green;
+    color: $positive-color;
   }
   &.status-info {
-    color: $orange;
+    color: $cautionary-color;
   }
   &.status-alert {
-    color: $red;
+    color: $negative-color;
   }
 }
 
 .status-ok {
-  color: $green;
+  color: $positive-color;
 }
 .status-info {
-  color: $orange;
+  color: $cautionary-color;
 }
 .status-alert {
-  color: $red;
+  color: $negative-color;
 }
 
 //alerts in tables
@@ -144,13 +144,13 @@ input[type="checkbox"] {
     }
   }
   &.ok-notice:before {
-    background-color: $green;
+    background-color: $positive-color;
   }
   &.info-notice:before {
-    background-color: $orange;
+    background-color: $cautionary-color;
   }
   &.alert-notice:before {
-    background-color: $red;
+    background-color: $negative-color;
   }
 }
 .table td:last-child {
@@ -333,7 +333,7 @@ label {
     border-radius: 0;
     &:before {
       content: "";
-      background-color: $primary;
+      background-color: $primary-color;
       opacity: 0.75;
       position: absolute;
       top: 0;
@@ -418,4 +418,3 @@ label {
   visibility: visible;
   opacity: 1;
 }
-

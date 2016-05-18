@@ -1,9 +1,10 @@
 //buttons
 .btn {
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border-width: 0 0 5px 0;
-  padding-bottom: $padding-base-vertical - 3;
+  box-sizing: border-box;
+  border-radius: $border-radius;
+  padding: .6rem .8rem;
+  border: 0px solid transparent;
+  white-space: pre;
 }
 .btn-sm,
 .btn-xs { letter-spacing:0; }
