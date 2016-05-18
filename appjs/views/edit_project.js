@@ -155,26 +155,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return ret;
   },
 
-  // hasUnsavedChanges: function(){
-  //   if(!this.upToDate){
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // },
+  hasUnsavedChanges: function(){
+    var view = this,
+        $form = view.$('#projectForm'),
+        data = $form.alpaca('get').getValue();
 
-  hasUnsavedChanges: function(newData){
-    var view = this;
-    // set view.formDataOnLoad in afterRender - form validation (view.model.formData())
-    // converts [0] values to null, which causes the objects to validate as unequal
-    // even though they really are equal
-    if(_.isEqual(view.formDataOnLoad, newData) ){
-      // view.upToDate = true;
-      // $('.project-save-warning').hide();
+    if(_.isEqual(view.formDataOnLoad, data) ){
       return false;
     } else {
-      // view.upToDate = false;
-      // $('.project-save-warning').show().css('display', 'inline-block');
       return true;
     }
   },
@@ -190,7 +178,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         query = '',
         data = $form.alpaca('get').getValue();
 
-    if(this.hasUnsavedChanges(data)){
+    if(this.hasUnsavedChanges()){
       $('.project-save-warning').show().css('display', 'inline-block');
     } else {
       $('.project-save-warning').hide();
@@ -266,7 +254,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   }, 500),
 
   savePreview: function(){
-    // this.upToDate = true;
     this.$('#projectForm form').submit();
   },
 
@@ -341,9 +328,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
-
-    // view.upToDate = true;
-    view.pageState = window.history.state;
 
     // autoselect embed code on focus
     this.$("#embed textarea").focus( function() { $(this).select(); } );
