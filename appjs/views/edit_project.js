@@ -146,7 +146,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           });
         });
 
-    if($('#base-modal').length === 0){
+    if($('#save-modal').length === 0){
       saveModal.show();
     }
 
