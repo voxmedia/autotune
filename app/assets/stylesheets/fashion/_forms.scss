@@ -1,39 +1,733 @@
-label {
-  font-weight: normal;
+/*doc
+---
+title: Form Elements
+name: form-elements
+category: Form elements
+---
+
+The goal of these styles is three-fold:
+
+- 1. They should, by default, be atomic, self-reliant. The form styles should,
+as much as possible, be independent, and should "just work".
+- 2. They should both reward and enforce semantic markup.
+An example: by following the best practice of wrapping a form field in a
+label element, you get a clean, simple, properly styled,
+properly-labelled, and accessible form field with no
+extra classes or project-specific markup necessary.
+- 3. When extra markup and/or classes are involved,
+they should be as unspecific as possible,
+so as to make the process of overriding
+them for custom widgets more like "let's
+have fun making custom styles and shapes with Sass"
+and less like "let's spend 30 minutes figuring out what's
+overriding my custom styles".
+
+*/
+
+/*doc
+---
+title: Inputs
+name: input
+category: Form elements
+parent: form-elements
+---
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">
+MDN HTML Reference for `<input>`
+</a>
+
+By default, an `<input>` element has very few styles.
+
+
+```html_example
+  <input>
+```
+
+Most of the styles are based on the `type` attribute.
+
+*/
+
+form {
+  display: table;
+  width: 100%;
 }
 
-.form-control {
-  padding: 0 8px;
-  border-width:2px;
+input,
+button,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  background: none;
+  color: inherit;
+  appearance: none;
+  border: 0;
+  padding: 0;
+}
 
-          transition: border-color ease-in-out 0.15s;
-       -o-transition: border-color ease-in-out 0.15s;
-  -webkit-transition: border-color ease-in-out 0.15s;
-
-  @include box-shadow(none);
-
-  &:focus {
-    outline: 0;
-    @include box-shadow(none);
+label,
+.label {
+  font-weight: 400;
+  color: color(actionable);
+  + label {
+    margin-top: 1rem;
+  }
+  .is-horizontal & {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  &.is-small {
+    font-size: type(-2);
   }
 }
-.has-success .form-control,
-.has-warning .form-control,
-.has-error .form-control { @include box-shadow(none); }
 
-select.form-control:not([multiple]) {
-  appearance: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  padding-right:30px;
-  background-repeat: no-repeat;
-  background-position: center right 10px;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAS1BMVEUAAABAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUBAQUD///9dFK4cAAAAF3RSTlMAAD5ubEc50dxI1uFGP9vlTUXg6lRQAjXkwAUAAAABYktHRBibaYUeAAAAOklEQVQYV23GNwLAIAwEsDsIpFBT/f+fBntGk4Ap5xfjA+IqZtvBeOhSJshSRVonMX5e96PT5/ezzfyBJQJHdhxNUAAAAABJRU5ErkJggg==");
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10px' height='10px' viewBox='0 0 57.572 57.572'><path fill-rule='evenodd' clip-rule='evenodd' fill='#404040' d='M54.124,14.262c0.558,0,0.964,0.267,1.2,0.813,c0.18,0.572,0.085,1.071-0.293,1.452L29.7,42.941c-0.331,0.246-0.633,0.368-0.913,0.368c-0.288,0-0.591-0.122-0.922-0.368,L2.534,16.527c-0.378-0.38-0.463-0.879-0.284-1.452c0.236-0.546,0.633-0.813,1.201-0.813H54.124z'/></svg>");
-}
-select.form-control::-ms-expand{
-  display:none;
+/*doc
+---
+title: Input - Text
+name: type="text"
+parent: input
+category: Form elements
+---
+
+```html_example
+  <input type="text">
+```
+
+Related: [buttoned inputs][buttoned-input]
+*/
+
+/*doc
+---
+title: Textarea
+name: textarea
+category: Form elements
+parent: form-elements
+---
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea">
+MDN HTML Reference for `<textarea>`
+</a>
+
+```html_example
+  <textarea></textarea>
+```
+*/
+
+
+[type='text'],
+[type='email'],
+[type='password'],
+textarea,
+textarea.form-control {
+  background-color: color(background);
+  color: color(text);
+  border: 2px solid color(border);
+  border-radius: $border-radius;
+  padding: .5em;
+  display: block;
+  width: 100%;
+  font-size: type(-1);
+  line-height: 1.3;
+  .p-ui-dark & {
+    border-color: color(border, dark);
+  }
+  &:focus {
+    border-color: color(primary);
+  }
+  &.is-large {
+    font-size: type(0);
+  }
+  &.is-small {
+    font-size: type(-2);
+  }
 }
 
-select.input-lg,
-select.input-sm { line-height:inherit; }
+textarea {
+  resize: vertical;
+}
+
+form.form-inline{
+  vertical-align: middle;
+  div, div.form-group{
+    margin-right: 10px;
+    vertical-align: bottom;
+    .input-group{
+      .input-group-addon{
+        border: 2px solid color(border);
+        border-right-width: 0px;
+        border-left-width: 0px;
+        &:first-of-type{
+          border-left-width: 2px;
+          border-radius: $border-radius 0 0 $border-radius;
+        }
+        &:last-of-type{
+          border-right-width: 2px;
+          border-radius: 0 $border-radius $border-radius 0;
+        }
+      }
+    }
+  }
+  .btn{
+    padding: 8px 15px;
+    margin-top: 0;
+  }
+}
+
+
+/*doc
+---
+title: Input - Checkbox and Radio
+name: checkbox
+parent: input
+category: Form elements
+---
+
+```html_example
+<input type="checkbox"><b></b>
+<input type="checkbox" checked><b></b>
+
+<input type="radio"><b></b>
+<input type="radio" checked><b></b>
+```
+
+Note the sibling `<b>` element.
+*/
+
+input[type='checkbox'],
+input[type='radio'] {
+  position: absolute;
+  left: -999px;
+  width: 1px;
+  height: 1px;
+  top: auto;
+  overflow: hidden;
+  + b {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin: 0 .2em -.1em;
+    border-radius: $border-radius;
+    border: 2px solid color(border);
+    cursor: pointer;
+    label:hover &,
+    &:hover {
+      border-color: color(primary);
+    }
+  }
+  &:checked + b {
+    background: color(primary);
+    box-shadow: inset 0 0 0 2px color(background);
+  }
+  &:disabled + b {
+    background-color: color(border);
+    border: none;
+    cursor: default;
+  }
+  &:focus + b {
+    border-color: color(primary);
+  }
+  .p-ui-dark & {
+    + b {
+      border: 2px solid color(border, dark);
+    }
+    &:checked + b {
+      background: color(primary);
+      box-shadow: inset 0 0 0 2px color(background, dark);
+    }
+    &:disabled + b {
+      background-color: color(border, dark);
+      border: none;
+    }
+  }
+}
+
+input[type='radio'] {
+  + b {
+    border-radius: 50%;
+  }
+}
+
+.radio-inline, .checkbox-inline{
+  display: inline;
+}
+
+/*doc
+---
+title: Select
+name: select
+parent: form-elements
+category: Form elements
+---
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select">
+MDN HTML Reference for `<select>`
+</a>
+
+```html_example
+<select>
+  <option>Abacus</option>
+  <option>Baccalaureate</option>
+  <option>Chrysalis</option>
+</select>
+```
+*/
+
+select, select.form-control {
+  display: inline-block;
+  margin: 0;
+  width: 100%;
+  border-radius: $border-radius;
+  border: 2px solid color(border);
+  cursor: pointer;
+  // height: 2.3em;
+  background-color: color(background);
+  color: color(text);
+  .p-ui-dark & {
+    border-color: color(border, dark);
+  }
+  &:hover, &:focus {
+    border-color: color(primary);
+  }
+  &[disabled] {
+    background-color: color(border);
+    cursor: default;
+    border-color: color(border);
+    color: color(actionable, dark);
+  }
+  &[type='list'] {
+    width: auto;
+  }
+  label + & {
+    margin-top: .5rem;
+  }
+}
+
+option {
+  font-weight: 400;
+  color: black;
+}
+
+
+/*doc
+---
+title: Label
+name: label
+parent: form-elements
+category: Form elements
+---
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label">
+MDN HTML Reference for `<label>`
+</a>
+
+Form fields should be labeled. This can happen in one of three ways.
+
+The first two involve the `<label>` element:
+
+<b>1</b>. Wrap the form field with the label element.
+
+N.B.: The only labellable element contained within the label should be the
+labelled control. i.e.: don't put two inputs inside of one label.
+
+```html_example
+<label>Field title
+  <input type="text">
+</label>
+```
+
+<b>2</b>. Associate the label with the labelled control via the `for` attribute.
+
+```html_example
+<label for="favorite-color">Field title</label>
+<input type="text" id="favorite-color">
+```
+
+<b>N.B.</b>: When `label` elements are either undesirable (some textareas or
+small ui control elements) or unsemantic ('inputs' that are actually
+quill contenteditables) and therefore lose their raisons d'être vis-a-vis
+browser functionality, fields should instead be labelled for accessibility
+purposes via the `aria-label` or `aria-labelledby`attributes.
+
+```html_example
+<div aria-label="Favorite Movies" contenteditable></div>
+```
+
+```html_example
+<span id="icecream">Favorite Ice Cream Flavors?</span>
+<div contenteditable aria-labelledby="#icecream"></div>
+```
+
+*/
+label {
+  display: table;
+  width: 100%;
+}
+
+/*doc
+---
+title: Buttons
+name: buttons
+category: Buttons
+---
+
+The basic button styles are extremely minimal. A `button`,
+semantically, is simply something that can be clicked, and that
+will cause some action upon being clicked.
+
+```html_example
+<button type="button">A Button!</button>
+<button type="button" class="p-ui-dark">A Button!</button>
+```
+
+To get boxy, colorful buttons, use state classes.
+
+Note that without type="button" or type="submit", these are not styled at all.
+
+```html_example
+<button>An unsemantic button!</button>
+```
+*/
+
+/*doc
+---
+title: State Buttons
+name: state-buttons
+category: Buttons
+parent: buttons
+---
+
+`is-primary` suggests that the button reprents the primary action of a form,
+or otherwise one of several major actions. This action could be, for instance,
+submitting a form or changing the view in some important way. Its use should be
+limited to preserve its semantic meatiness.
+
+```html_example
+<button type="button" class="is-primary">Primary</button>
+```
+
+`is-secondary` suggests that the button represents a secondary or less-important
+form action.
+
+```html_example
+<button type="submit" class="is-secondary">Secondary</button>
+```
+
+`is-positive` suggests that the button represents a confirmation,
+or something joyous or friendly, or turning something important
+to an 'on' or boolean 'true' state.
+
+```html_example
+<button type="button" class="is-positive">Positive</button>
+```
+
+`is-cautionary` suggests that the button represents a confirmation
+of something that the user should pay close attention to; this could
+be, for instance, an action that is not undoable or inherently deletrious,
+but could nonetheless have negative consequences if done in error.
+
+```html_example
+<button type="submit" class="is-cautionary">Cautionary</button>
+```
+
+`is-negative` suggests that the button represents a deletion, or an
+action with important consequences that involve removal, or turning something
+important to an 'off' or boolean 'false' state. Should be used sparingly if at all;
+this is appropriate to use for an action like 'deleting a story', but not for something
+like 'removing a main image from an unpublished story'.
+
+```html_example
+<button type="button" class="is-negative">Negative</button>
+```
+
+The `disabled` attribute both suggests and mechanically enforces that
+a form control cannot be used.
+
+```html_example
+<button type="button" disabled>Disabled</button>
+<button type="button" class="is-primary" disabled>Disabled</button>
+```
+*/
+
+/*doc
+---
+title: Buttons
+name: button
+parent: form-elements
+category: Form elements
+---
+See [the button category][buttons] for details on styling elements
+with `type="button"` and `type="submit"`.
+*/
+
+[type="submit"],
+[type="button"] {
+  cursor: pointer;
+  border: none;
+  color: color(actionable);
+  display: inline-block;
+  text-align: left;
+
+  &.is-small {
+    font-size: type(-1);
+  }
+
+  &:hover, &:focus {
+    color: darken(color(actionable), 20%);
+  }
+
+  &:focus {
+    background-color: rgba(color(primary), .2);
+  }
+
+  &:active,
+  &.is-active,
+  &.ql-active {
+    color: color(primary);
+  }
+
+  .p-ui-dark & {
+    color: color(actionable, dark);
+    &:hover,
+    &:active,
+    &.is-active {
+      color: lighten(color(actionable, dark), 20%)
+    }
+  }
+
+  &.btn-default,
+  &.btn-primary,
+  &.btn-success,
+  &.btn-secondary,
+  &.btn-danger,
+  &.btn-info,
+  &.btn-warning,
+  &.btn-disabled {
+    box-sizing: border-box;
+    border-radius: $border-radius;
+    padding: .6rem .8rem;
+    color: white;
+    border: 1px solid transparent;
+
+    &:focus {
+      border-color: color(actionable);
+    }
+  }
+
+  // @each $type, $color in (
+  //     primary    color(primary),
+  //     secondary  color(secondary),
+  //     success   color(positive),
+  //     danger   color(negative),
+  //     warning color(cautionary)) {
+  //   &.btn-#{$type} {
+  //     background-color: $color;
+  //     &:hover, &:active, &:focus {
+  //       background: darken($color, 10%);
+  //     }
+  //   }
+  // }
+
+  &.btn-disabled,
+  &[disabled] {
+    background-color: color(disabled);
+    opacity: .5;
+    cursor: default;
+    &:hover {
+      background-color: color(disabled);
+    }
+  }
+}
+
+form [type="submit"] {
+  margin-top: 1rem;
+}
+
+.radio label, .checkbox label{
+  padding-left: 0px;
+}
+
+/*doc
+---
+title: Output
+name: output
+category: Form elements
+parent: form-elements
+---
+
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/output">
+MDN HTML Reference for `<output>`
+</a>
+
+Used to represent the result of a calculation or user action.
+
+```html_example
+<output>105/100 Minimum Words</output>
+<output class="is-negative">18/120 Minimum Words</output>
+```
+*/
+
+output {
+  display: block;
+  font-size: type(-2);
+  color: color(disabled);
+  &.danger {
+    color: color(negative);
+  }
+}
+
+/*doc
+---
+title: Fieldset
+name: fieldset
+category: Form elements
+parent: form-elements
+---
+See the entry for [fieldsets and legends][fieldsets-and-legends] in the Form patterns category.
+*/
+
+/*doc
+---
+title: Legend
+name: legend
+category: Form elements
+parent: form-elements
+---
+See the entry for [fieldsets and legends][fieldsets-and-legends] in the Form patterns category.
+*/
+
+
+/*doc
+---
+title: Fieldset and Legend
+name: fieldsets-and-legends
+category: Form patterns
+parent: form-grouping
+---
+
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset">
+MDN HTML Reference for `<fieldset>`.
+</a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/legend">
+MDN HTML Reference for `<legend>`.
+</a>
+
+
+A fieldset is used to contain a group of related fields.
+
+```html_example
+<fieldset>
+  <label>Favorite kind of cat
+    <input type="text">
+  </label>
+  <label>Favorite kind of dog
+    <select>
+      <option>Good Dogs</option>
+      <option>Happy Dogs</option>
+      <option>Every Dog</option>
+    </select>
+  </label>
+</fieldset>
+
+```
+
+It can optionally have, as the first contained element,
+a `<legend>`, used to label the fieldset as a whole.
+
+A fieldset is used to contain a group of related fields.
+
+```html_example
+<fieldset>
+  <legend>Types of Animals You Like</legend>
+  <label>Favorite kind of cat
+    <input type="text">
+  </label>
+  <label>Favorite kind of dog
+    <select>
+      <option>Good Dogs</option>
+      <option>Happy Dogs</option>
+      <option>Every Dog</option>
+    </select>
+  </label>
+</fieldset>
+
+```
+
+*/
+
+fieldset {
+  border: none;
+  padding-top: 0;
+  margin-bottom: 2em;
+  & ~ fieldset {
+    margin-top: 1em;
+  }
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+  > button {
+    margin-bottom: 1em;
+  }
+  &.is-horizontal {
+    // ideally would be done with flexbox
+    // however, there are various browser bugs
+    // that prevent fieldset's display property
+    // from changing
+    margin-top: 1em;
+    > * {
+      float: left;
+    }
+    &.has-two {
+      > * {
+        width: 48%;
+      }
+      > *:nth-of-type(1) {
+        margin-right: 2%;
+      }
+      > *:nth-of-type(2) {
+        margin-left: 2%;
+      }
+    }
+    &.has-three {
+      > * {
+        width: 30%;
+        margin: 0 2%;
+      }
+      > *:first-of-type {
+        margin-left: 0;
+      }
+      > *:last-of-type {
+        margin-right: 0;
+      }
+    }
+    &.has-four {
+      > * {
+        width: 20%;
+        margin: 0 3%;
+      }
+      > *:first-of-type {
+        margin-left: 0;
+      }
+      > *:last-of-type {
+        margin-right: 0;
+      }
+    }
+    &.has-two,
+    &.has-three,
+    &.has-four {
+      legend:first-child {
+        width: 100%;
+        margin-bottom: .5rem;
+      }
+    }
+  }
+  > legend:first-child {
+    color: color(text);
+    font-weight: 600;
+    margin-bottom: .5em;
+    margin-top: 1em;
+  }
+}
+
+legend {
+  color: rgba(color(text), .7);
+  margin: .5em 0;
+  padding: 0;
+  font-size: type(-1);
+}

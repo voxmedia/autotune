@@ -1,0 +1,16 @@
+p {
+  margin: 0 0 1em;
+}
+
+hr {
+  border: none;
+  height: 2px;
+  background-color: color(border);
+  .p-ui-dark & {
+    background-color: color(border, dark);
+  }
+}
+
+time {
+  font-size: type(-3);
+}

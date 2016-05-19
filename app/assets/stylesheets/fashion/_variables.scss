@@ -41,6 +41,34 @@ $disabled-color:    #C2C2C2;
 // Semantic Colors
 $secondary-actionable-color: #666666;
 
+$_colors: (
+  background: $light-bg,
+  text: $light-color,
+  actionable: $light-actionable,
+  border: $light-border,
+  accent: $light-accent-bg,
+  dark-background: $dark-bg,
+  dark-text: $dark-color,
+  dark-actionable: $dark-actionable,
+  dark-border: $dark-border,
+  dark-accent: $dark-accent-bg,
+  primary: $primary-color,
+  positive: $positive-color,
+  secondary: $secondary-color,
+  danger: $negative-color,
+  warning: $cautionary-color,
+  disabled: $disabled-color
+);
+
+@function color($color, $variant: light) {
+  @if $variant == dark {
+    @return map-get($_colors, dark-#{$color});
+  }
+  @else {
+    @return map-get($_colors, $color);
+  }
+}
+
 $gray-base:             $dark-accent-bg !default;
 $gray-darker:           #3F3F3F !default;
 $gray-dark:             #787878 !default;
@@ -524,8 +552,8 @@ $jumbotron-padding:              30px !default;
 $jumbotron-color:                inherit !default;
 $jumbotron-bg:                   $gray-lighter !default;
 $jumbotron-heading-color:        inherit !default;
-$jumbotron-heading-font-size:    $font-size-h1;
 $jumbotron-font-size:            ceil(($font-size-base * 1.5)) !default;
+$jumbotron-heading-font-size:    $jumbotron-font-size;
 
 
 //== Form states and alerts
