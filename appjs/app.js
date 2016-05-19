@@ -26,26 +26,38 @@ Backbone.$ = $;
 //
 
 
-
-var oldLoadUrl = Backbone.history.loadUrl;
-Backbone.history.loadUrl = function(fragment) {
-  var view = window.app.view.currentView;
-  logger.debug('NAV URL', fragment, view);
-  if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() && typeof fragment === 'undefined' ) {
-    // var stateObj = { page: 'projects/'+view.model.get('slug') };
-    // window.history.pushState(stateObj, "proj page", 'projects/'+view.model.get('slug'));
-    view.askToSave().then(function(okToContinue) {
-      if ( okToContinue ) {
-        window.history.back();
-        oldLoadUrl.call(Backbone.history, fragment);
-        window.onbeforeunload = null;
-        $('body').removeClass('modal-open');
-      }
-    });
-  } else {
-    oldLoadUrl.call(Backbone.history, fragment);
-  }
-};
+//
+// var oldLoadUrl = Backbone.history.loadUrl;
+// Backbone.history.loadUrl = function(fragment) {
+//   var view = window.app.view.currentView;
+//   logger.debug('NAV URL', fragment, view);
+//   if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+//     // var stateObj = { page: 'projects/'+view.model.get('slug') };
+//     // window.history.pushState(stateObj, "proj page", 'projects/'+view.model.get('slug'));
+//     view.askToSave().then(function(okToContinue) {
+//       if ( okToContinue ) {
+//         // window.history.back();
+//         oldLoadUrl.call(Backbone.history, fragment);
+//         window.onbeforeunload = null;
+//         $('body').removeClass('modal-open');
+//       }
+//     });
+//   } else {
+//     oldLoadUrl.call(Backbone.history, fragment);
+//   }
+// };
+//
+// var oldNavigate = Backbone.history.navigate;
+// Backbone.history.navigate = function(fragment, options){
+//   logger.debug('**new navigate', fragment, options);
+//   logger.debug(Backbone.history._usePushState, Backbone.history.pushState);
+//   var view = window.app.view.currentView;
+//   if(view && view.hasUnsavedChanges && view.hasUnsavedChanges()){
+//     return false;
+//   } else {
+//     oldNavigate.call(Backbone.history, fragment, options);
+//   }
+// };
 
 
 /**

@@ -111,12 +111,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
+    // window.addEventListener('popstate', function(e) {
+    //   logger.debug('addeventlistener');
+    //   // logger.debug('@@@', Backbone.history.getFragment(), e, this);
+    //   // this.hasPopstate = true;
+    //   // view.app.router.navigate(Backbone.history.getFragment(), { trigger: false });
+    // });
+
     window.onpopstate = function(event){
       if(view.hasUnsavedChanges()){
-        // var stateObj = { page: 'projects/'+view.model.get('slug') };
-        // window.history.pushState(stateObj, "proj page", 'projects/'+view.model.get('slug'));
-        view.app.router.navigate('/projects/'+view.model.get('slug'), {trigger: false, replace: true});
-        // view.app.router.navigate('/projects/'+view.model.get('slug'), {trigger: true});
+      //   // window.confirm('Are you sure you want to leave without saving?');
+        // var stateObj = { page: this.app.router.currentUrl };
+        // window.history.pushState(stateObj, "proj page", this.currentUrl);
+        // // window.history.back();
+        // logger.debug('pop state', this.app.router.currentUrl);
+        view.app.router.navigate(this.app.router.currentUrl, { trigger: true, replace: true });
+        // view.app.router.navigate(this.app.router.currentUrl, { trigger: true });
+      //   // view.app.router.navigate('/projects/'+view.model.get('slug'), {trigger: true});
       }
     };
 
