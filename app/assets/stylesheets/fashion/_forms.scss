@@ -68,7 +68,7 @@ select {
 label,
 .label {
   font-weight: 400;
-  color: color(actionable);
+  // color: color(actionable);
   + label {
     margin-top: 1rem;
   }
@@ -501,9 +501,9 @@ with `type="button"` and `type="submit"`.
   &.btn-disabled {
     box-sizing: border-box;
     border-radius: $border-radius;
-    padding: .6rem .8rem;
+    // padding: .6rem .8rem;
     color: white;
-    border: 1px solid transparent;
+    // border: 1px solid transparent;
 
     &:focus {
       border-color: color(actionable);
@@ -533,10 +533,6 @@ with `type="button"` and `type="submit"`.
       background-color: color(disabled);
     }
   }
-}
-
-form [type="submit"] {
-  margin-top: 1rem;
 }
 
 .radio label, .checkbox label{

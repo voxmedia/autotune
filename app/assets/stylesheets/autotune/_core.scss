@@ -168,8 +168,8 @@ input[type="checkbox"] {
 
 #nav {
   .navbar-brand {
-    font-weight: bold;
-    font-size: 37px;
+    // font-weight: bold;
+    font-size: 23px;
     padding: 5px 0;
     height: auto;
     line-height: 1;
@@ -181,9 +181,10 @@ input[type="checkbox"] {
       background-repeat: no-repeat;
       display: inline-block;
       height: 33px;
-      margin-bottom: -5px;
+      // margin-bottom: -5px;
       margin-right: 8px;
       width: 30px;
+      vertical-align: text-top;
     }
   }
 }
