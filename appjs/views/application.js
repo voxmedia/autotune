@@ -21,6 +21,9 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
     buttons: { sticker: false }
   },
+  events: {
+    'click #savePreview': 'savePreview'
+  },
 
   afterInit: function() {
     // Show or hide spinner on loading events
@@ -130,6 +133,11 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     } else {
       return PNotify.removeAll();
     }
+  },
+
+  savePreview: function(){
+    // this.currentView.doSubmit();
+    this.$('#projectForm form').submit();
   }
 });
 

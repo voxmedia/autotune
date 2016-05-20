@@ -72,11 +72,11 @@ module.exports = {
         }
 
         if ( next === 'show' ) {
-          Backbone.history.navigate( inst.url(), {trigger: true} );
+          this.app.router.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
           return view.render();
         } else if ( next ) {
-          Backbone.history.navigate( next, {trigger: true} );
+          this.app.router.navigate( next, {trigger: true} );
         } else {
           if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
           app.trigger( 'loadingStop' );

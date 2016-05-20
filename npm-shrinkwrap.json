@@ -1744,9 +1744,9 @@
       "resolved": "https://registry.npmjs.org/tinycolor2/-/tinycolor2-1.3.0.tgz"
     },
     "underscore": {
-      "version": "1.7.0",
-      "from": "https://registry.npmjs.org/underscore/-/underscore-1.7.0.tgz",
-      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.7.0.tgz"
+      "version": "1.8.3",
+      "from": "https://registry.npmjs.org/underscore/-/underscore-1.8.3.tgz",
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.8.3.tgz"
     },
     "underscore.string": {
       "version": "3.0.3",

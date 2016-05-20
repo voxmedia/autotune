@@ -84,6 +84,53 @@ label.block {
   display: none;
 }
 
+.project-save-warning{
+  display: none;
+  padding: 17px 10px 13px 10px;
+  color: #ffffff;
+  margin: -5px 10px;
+  .icon-alert{
+    width: 26px;
+    height: 22px;
+    vertical-align: bottom;
+  }
+}
+
+.bbm-wrapper{
+  position: absolute;
+  z-index: 1;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+}
+
+.modal-dialog{
+  width: 100%;
+  max-width: 400px;
+  margin: 200px auto 0 auto;
+  z-index: 1051;
+  i, p{
+    display: table-cell;
+  }
+  p{
+    padding-top: 7px;
+  }
+  .icon-alert{
+    width: 50px;
+    height: 28px;
+    vertical-align: top;
+    margin-right: 10px;
+  }
+  .modal-footer{
+    border-width: 0px;
+    padding-top: 0px;
+    #dismiss.btn{
+      border-bottom-color: #5E5E5E;
+    }
+  }
+}
+
 #embed-preview {
   position:relative;
   border: 2px dashed #ccc;
