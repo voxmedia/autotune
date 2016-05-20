@@ -111,29 +111,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
-    // window.onpopstate = function(event){
-    //   if(view.hasUnsavedChanges()){
-    //     // var stateObj = { page: this.app.router.currentUrl };
-    //     // window.history.pushState(stateObj, "proj page", this.app.router.currentUrl);
-    //     // window.history.forward();
-    //     view.app.router.navigate(this.app.router.currentUrl, { trigger: true });
-    //     // var r = window.confirm("Leave without saving?");
-    //     // if (r === true) {
-    //     //   logger.debug("You pressed OK!");
-    //     // } else {
-    //     //   logger.debug("You pressed Cancel!");
-    //     // }
-    //     //   // window.confirm('Are you sure you want to leave without saving?');
-    //     // var stateObj = { page: this.app.router.currentUrl };
-    //     // window.history.pushState(stateObj, "proj page", this.currentUrl);
-    //     // // window.history.back();
-    //     // logger.debug('pop state', this.app.router.currentUrl);
-    //     // view.app.router.navigate(this.app.router.currentUrl, { trigger: true, replace: true });
-    //     // view.app.router.navigate(this.app.router.currentUrl, { trigger: true });
-    //   //   // view.app.router.navigate('/projects/'+view.model.get('slug'), {trigger: true});
-    //   }
-    // };
-
     window.onbeforeunload = function(event) {
       if(view.hasUnsavedChanges()){
         return 'You have unsaved changes!';
