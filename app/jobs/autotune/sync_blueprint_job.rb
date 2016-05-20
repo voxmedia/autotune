@@ -100,7 +100,8 @@ module Autotune
               'title' => blueprint.title,
               'slug' => slug,
               'group' => theme.group.slug,
-              'theme' => theme.slug)
+              'theme' => theme.slug,
+              'build_type' => 'preview')
 
             # Get the deployer object
             # probably don't want this to always be preview
