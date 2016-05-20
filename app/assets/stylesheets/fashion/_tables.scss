@@ -1,63 +1,64 @@
-// //tables
-// caption {
-//   margin-bottom:5px;
-// }
-//
-// th { font-weight: normal; }
-//
-// .table > tbody > tr > td {
-//   vertical-align: middle;
-// }
-//
-// .table > thead > tr {
-//   color: $navbar-inverse-color;
-//   background-color: $navbar-inverse-bg;
-// }
-//
-// .table > thead > tr > th { border-width:0; }
-// .table > tbody > tr:first-child {
-//   td,
-//   th { border-width:0; }
-// }
-// .table > thead > tr > th {
-//   padding-top: $table-condensed-cell-padding;
-//   padding-bottom: $table-condensed-cell-padding;
-// }
-//
-// .table-striped {
-//   > thead > tr > th,
-//   > thead > tr > td,
-//   > tbody > tr > th,
-//   > tbody > tr > td,
-//   > tfoot > tr > th,
-//   > tfoot > tr > td { border-width:0; }
-// }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
+//tables
+caption {
+  margin-bottom:5px;
 }
 
-tr {
-  border-bottom: 1px solid color(border);
-  &:hover {
-    background-color: mix(color(primary), white, 10%);
-  }
+th { font-weight: normal; }
+
+.table > tbody > tr > td {
+  vertical-align: middle;
 }
 
-th,
-td {
-  padding: (type(-2)) type(-2);
-  font-size: type(-1);
-}
-
-th {
-  text-transform: uppercase;
-  font-weight: 400;
-  letter-spacing: .1em;
-  font-size: type(-2);
-  text-align: left;
-  border-bottom: 3px solid color(border);
-  color: color(actionable);
+.table > thead > tr {
+  color: color(text);
   background-color: color(background);
 }
+
+.table > thead > tr > th { border-width:0; }
+.table > tbody > tr:first-child {
+  td,
+  th { border-width:0; }
+}
+.table > thead > tr > th {
+  background-color: color(accent);
+  padding-top: $table-condensed-cell-padding;
+  padding-bottom: $table-condensed-cell-padding;
+}
+
+.table-striped {
+  > thead > tr > th,
+  > thead > tr > td,
+  > tbody > tr > th,
+  > tbody > tr > td,
+  > tfoot > tr > th,
+  > tfoot > tr > td { border-width:0; }
+}
+//
+// table {
+//   width: 100%;
+//   border-collapse: collapse;
+// }
+//
+// tr {
+//   border-bottom: 1px solid color(border);
+//   &:hover {
+//     background-color: mix(color(primary), white, 10%);
+//   }
+// }
+//
+// th,
+// td {
+//   padding: (type(-2)) type(-2);
+//   font-size: type(-1);
+// }
+//
+// th {
+//   text-transform: uppercase;
+//   font-weight: 400;
+//   letter-spacing: .1em;
+//   font-size: type(-2);
+//   text-align: left;
+//   border-bottom: 3px solid color(border);
+//   color: color(actionable);
+//   background-color: color(background);
+// }

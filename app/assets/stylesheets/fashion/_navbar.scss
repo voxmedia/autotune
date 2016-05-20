@@ -1,6 +1,10 @@
 .navbar {
   margin-bottom: 0;
   border: none;
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  border-radius: 0;
 }
 .navbar-header {
   float: left;
@@ -25,17 +29,14 @@
   @media (min-width: $grid-float-breakpoint) {
     .navbar > .container &,
     .navbar > .container-fluid & {
-      margin-left: 0;
+      // margin-left: 0;
+      margin: auto;
     }
   }
 }
 .navbar-nav {
-  float: none;
-  padding: 0px;
-  margin: auto;
-  max-width: 230px;
   > li > a {
-    padding: 10px 0;
+    padding: 10px 0 10px 0;
     margin-left: 10px;
     margin-right: 10px;
     text-transform: uppercase;

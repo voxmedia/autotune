@@ -14,3 +14,29 @@ main {
 .column {
   margin-bottom: 25px;
 }
+
+.alert .alert-link{
+  color: $alert-success-text;
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+.label{
+  padding: .2em .6em;
+  @each $type, $color in (
+      default    color(default),
+      primary    color(primary),
+      success   color(positive),
+      secondary  color(secondary),
+      danger   color(negative),
+      info color(cautionary),
+      warning color(cautionary),
+      disabled color(disabled),
+      link color(link)) {
+    &.label-#{$type} {
+      background-color: color(background);
+      border: 1px solid $color;
+      color: $color;
+    }
+  }
+}

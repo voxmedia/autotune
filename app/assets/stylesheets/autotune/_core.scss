@@ -14,7 +14,6 @@
 
 #nav {
   margin: 0;
-  padding: 5px 0;
 }
 
 label.block {
@@ -240,23 +239,30 @@ input[type="checkbox"] {
   #blueprint_title { width:120px; }
 }
 
-.m-table-heading {
-  background-color: $gray-darker;
-}
-.table > tbody > tr.m-table-heading > td {
-  padding: 5px 15px;
-  color: #FFF;
-}
+// .m-table-heading {
+//   background-color: $gray-darker;
+// }
+// .table > tbody > tr.m-table-heading > td {
+//   padding: 5px 15px;
+//   color: #FFF;
+// }
 .table {
-  &> thead > tr {
-    background-color: $gray-lighter;
-    color: $gray-darker;
-  }
-  tbody > tr:nth-of-type(even) {
-    background: $gray-lighter;
-  }
+  // &> thead > tr {
+  //   background-color: color(actionable);
+  //   // color: $gray-darker;
+  //   color: #fff;
+  // }
+  // tbody > tr:nth-of-type(even) {
+  //   background: $gray-lighter;
+  // }
   &.projects {
+    tr.m-table-heading{
+      // background-color: color(actionable);
+      // color: #fff;
+      border-bottom-width: 1px;
+    }
     tbody > tr > td {
+      padding: 10px 15px;
       &:nth-child(1) {
         width: 35%;
       }

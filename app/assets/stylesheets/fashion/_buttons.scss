@@ -1,13 +1,13 @@
 //buttons
 .btn {
-  border: 0px solid rgba(0, 0, 0, .2);
+  // border-color: color(actionable);
 }
 .btn-sm,
 .btn-xs { letter-spacing:0; }
 
-.btn-lg { padding-bottom: $padding-large-vertical - 5; }
-.btn-sm { padding-bottom: $padding-small-vertical - 2; }
-.btn-xs { padding-bottom: $padding-xs-vertical - 1; }
+// .btn-lg { padding-bottom: $padding-large-vertical - 5; }
+// .btn-sm { padding-bottom: $padding-small-vertical - 2; }
+// .btn-xs { padding-bottom: $padding-xs-vertical - 1; }
 
 .btn .caret { display:inline-block; margin-top: -2px; }
 

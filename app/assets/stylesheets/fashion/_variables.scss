@@ -5,7 +5,7 @@ $bootstrap-sass-asset-helper: false !default;
 
 $btn-border-radius-large: 3px;
 $btn-border-radius-small: 3px;
-
+$jumbotron-heading-font-size: 30px;
 //== Colors
 //
 //## Gray and brand colors for use across Bootstrap.
@@ -33,6 +33,7 @@ $dark-accent-bg:    #000000;
 // State Colors
 $primary-color:     #27AAE1;
 $secondary-color:   #999999;
+$default-color:     $secondary-color;
 $positive-color:    #88B716;
 $negative-color:    #DF4B27;
 $cautionary-color:  #EEC600;
@@ -52,12 +53,15 @@ $_colors: (
   dark-actionable: $dark-actionable,
   dark-border: $dark-border,
   dark-accent: $dark-accent-bg,
+  default: $secondary-color,
   primary: $primary-color,
   positive: $positive-color,
   secondary: $secondary-color,
-  danger: $negative-color,
-  warning: $cautionary-color,
-  disabled: $disabled-color
+  negative: $negative-color,
+  info: $cautionary-color,
+  cautionary: $cautionary-color,
+  disabled: $disabled-color,
+  link: #ffffff
 );
 
 @function color($color, $variant: light) {
@@ -166,11 +170,11 @@ $padding-xs-vertical:       1px !default;
 $padding-xs-horizontal:     5px !default;
 
 $line-height-large:         1.3333333 !default; // extra decimals for Win 8.1 Chrome
-$line-height-small:         1.5 !default;
+$line-height-small:         $line-height-base !default;
 
-$border-radius-base:        0 !default;
-$border-radius-large:       0 !default;
-$border-radius-small:       0 !default;
+$border-radius-base:        3px !default;
+$border-radius-large:       3px !default;
+$border-radius-small:       3px !default;
 
 //** Global color for active items (e.g., navs or dropdowns).
 $component-active-color:    #fff !default;
@@ -195,13 +199,13 @@ $table-condensed-cell-padding:  5px !default;
 //** Default background color used for all tables.
 $table-bg:                      transparent !default;
 //** Background color used for `.table-striped`.
-$table-bg-accent:               $gray-lighter !default;
+$table-bg-accent:               color(accent) !default;
 //** Background color used for `.table-hover`.
-$table-bg-hover:                #f5f5f5 !default;
-$table-bg-active:               $table-bg-hover !default;
+$table-bg-hover:                color(accent) !default;
+$table-bg-active:               color(accent) !default;
 
 //** Border color for table and cell borders.
-$table-border-color:            $gray-lighter !default;
+$table-border-color:            color(border) !default;
 
 
 //== Buttons
@@ -553,26 +557,25 @@ $jumbotron-color:                inherit !default;
 $jumbotron-bg:                   $gray-lighter !default;
 $jumbotron-heading-color:        inherit !default;
 $jumbotron-font-size:            ceil(($font-size-base * 1.5)) !default;
-$jumbotron-heading-font-size:    $jumbotron-font-size;
 
 
 //== Form states and alerts
 //
 //## Define colors for form feedback states and, by default, alerts.
 
-$state-success-text:             #ffffff !default;
+$state-success-text:             $positive-color !default;
 $state-success-bg:               $positive-color !default;
 $state-success-border:           rgba(0, 0, 0, 0) !default;
 
-$state-info-text:                #ffffff !default;
+$state-info-text:                $brand-info !default;
 $state-info-bg:                  $brand-info !default;
 $state-info-border:              rgba(0, 0, 0, 0) !default;
 
-$state-warning-text:             #ffffff !default;
+$state-warning-text:             $brand-warning !default;
 $state-warning-bg:               $brand-warning !default;
 $state-warning-border:           rgba(0, 0, 0, 0) !default;
 
-$state-danger-text:              #ffffff !default;
+$state-danger-text:              $negative-color !default;
 $state-danger-bg:                $negative-color !default;
 $state-danger-border:            rgba(0, 0, 0, 0) !default;
 
@@ -689,19 +692,19 @@ $alert-border-radius:         $border-radius-base !default;
 $alert-link-font-weight:      bold !default;
 
 $alert-success-bg:            $state-success-bg !default;
-$alert-success-text:          $state-success-text !default;
+$alert-success-text:          #ffffff !default;
 $alert-success-border:        $state-success-border !default;
 
 $alert-info-bg:               $state-info-bg !default;
-$alert-info-text:             $state-info-text !default;
+$alert-info-text:             #ffffff !default;
 $alert-info-border:           $state-info-border !default;
 
 $alert-warning-bg:            $state-warning-bg !default;
-$alert-warning-text:          $state-warning-text !default;
+$alert-warning-text:          #ffffff !default;
 $alert-warning-border:        $state-warning-border !default;
 
 $alert-danger-bg:             $state-danger-bg !default;
-$alert-danger-text:           $state-danger-text !default;
+$alert-danger-text:           #ffffff !default;
 $alert-danger-border:         $state-danger-border !default;
 
 
@@ -785,20 +788,20 @@ $panel-primary-border:        $brand-primary !default;
 $panel-primary-heading-bg:    $brand-primary !default;
 
 $panel-success-text:          $state-success-text !default;
-$panel-success-border:        $state-success-border !default;
-$panel-success-heading-bg:    $state-success-bg !default;
+$panel-success-border:        $positive-color !default;
+$panel-success-heading-bg:    $positive-color !default;
 
 $panel-info-text:             $state-info-text !default;
-$panel-info-border:           $state-info-border !default;
-$panel-info-heading-bg:       $state-info-bg !default;
+$panel-info-border:           $brand-info !default;
+$panel-info-heading-bg:       $brand-info !default;
 
 $panel-warning-text:          $state-warning-text !default;
-$panel-warning-border:        $state-warning-border !default;
-$panel-warning-heading-bg:    $state-warning-bg !default;
+$panel-warning-border:        $brand-warning !default;
+$panel-warning-heading-bg:    $brand-warning !default;
 
 $panel-danger-text:           $state-danger-text !default;
-$panel-danger-border:         $state-danger-border !default;
-$panel-danger-heading-bg:     $state-danger-bg !default;
+$panel-danger-border:         $negative-color !default;
+$panel-danger-heading-bg:     $negative-color !default;
 
 
 //== Thumbnails
