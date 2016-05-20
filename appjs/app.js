@@ -23,11 +23,13 @@ var $ = require('jquery'),
 
 // required to make Backbone work in browserify
 Backbone.$ = $;
-//
 
 var oldLoadUrl = Backbone.history.loadUrl;
 Backbone.history.loadUrl = function(fragment) {
   var view = window.app.view.currentView;
+  // This is used to override the default back button functionality. If the project has unsaved changes,
+  // this will push the user back to the edit_project page and then trigger navigate, which will display
+  // the save notification modal. Fragment only comes back as undefined when the back button is clicked.
   if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() && typeof fragment === 'undefined' ) {
     window.history.forward();
     view.app.router.navigate(window.location.pathname, { trigger: true });

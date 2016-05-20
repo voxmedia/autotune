@@ -220,7 +220,6 @@ module.exports = Backbone.Router.extend({
       return project.blueprint.fetch();
     }).then(function() {
       old_attributes = _.clone(project.attributes);
-      logger.debug('oldies', old_attributes);
       new_attributes.blueprint_config = old_attributes.blueprint_config;
       new_attributes.blueprint_id = old_attributes.blueprint_id;
       new_attributes.blueprint_title = old_attributes.blueprint_title;

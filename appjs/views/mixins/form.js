@@ -32,10 +32,8 @@ module.exports = {
   },
 
   doSubmit: function(formEle) {
-    logger.debug(formEle, this);
     var inst, Model, view = this, app = this.app,
         $form = this.$(formEle);
-        logger.debug('22222', view, this);
 
     app.trigger('loadingStart');
     logger.debug('handleForm');
