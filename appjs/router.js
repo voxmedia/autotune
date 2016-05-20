@@ -13,7 +13,6 @@ module.exports = Backbone.Router.extend({
   initialize: function(options) {
     this.app = options.app;
     logger.debug("Init router");
-    this.currentUrl = window.location.pathname;
 
     this.on("route", this.everyRoute);
   },
@@ -35,43 +34,28 @@ module.exports = Backbone.Router.extend({
     "themes/:slug": "editTheme",
     "themes/:slug/edit": "editTheme"
   },
-  //
+
   navigate: function(fragment, options) {
     var view = this.app.view.currentView;
     logger.debug('NAV', fragment, options);
     if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
       view.askToSave().then(function(okToContinue) {
         if ( okToContinue ) {
-          logger.debug('ok navigate!');
           Backbone.Router.prototype.navigate.call(this, fragment, options);
-          // this.navigate(fragment, options);
           window.onbeforeunload = null;
           window.popstate = null;
           $('body').removeClass('modal-open');
-          this.currentUrl = window.location.pathname;
         }
       });
     } else {
       Backbone.Router.prototype.navigate.call(this, fragment, options);
-      this.currentUrl = window.location.pathname;
-      // this.navigate(fragment, options);
     }
   },
 
-  // back: function() {
-  //   if(this.routesHit > 1) {
-  //     //more than one route hit -> user did not land to current page directly
-  //     window.history.back();
-  //   } else {
-  //     //otherwise go to the home page. Use replaceState if available so
-  //     //the navigation doesn't create an extra history entry
-  //     this.navigate('app/', {trigger:true, replace:true});
-  //   }
-  // }
 
   // This is called for every route
   everyRoute: function(route, params) {
-    logger.debug('everyRoute', this.currentUrl);
+    logger.debug('everyRoute', route);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.messages.start();
