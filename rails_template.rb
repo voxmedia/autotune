@@ -83,7 +83,7 @@ Autotune.configure do |conf|
       'body_font_family' => 'Georgia Regular, serif',
       'header_font_family' => 'Georgia Bold, serif',
       'button_font_family' => 'Georgia Regular, serif',
-      'header_font_weight' => 700
+      'header_font_weight' => 700,
       'button_font_weight' => 'normal'
     },
     'social' => {
