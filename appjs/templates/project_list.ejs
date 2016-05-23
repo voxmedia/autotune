@@ -17,7 +17,7 @@
     <h3>Projects</h3>
   </div>
 </div>
-<table class="table table-striped projects">
+<table class="table projects">
   <thead>
     <tr>
       <td>
@@ -88,27 +88,27 @@
       class="info-notice"
       <% } %>>
       <% if ( item.hasStatus('built') ) { %>
-        <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
+        <span class="m-status"><span class="glyphicon glyphicon-ok"></span></span>
       <% } else if ( item.hasStatus('broken') ) { %>
-        <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
+        <span class="m-status"><span class="glyphicon glyphicon-warning-sign"></span></span>
       <% } else if ( item.hasStatus('building') ) { %>
-        <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
+        <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
       <% } else { %>
-        <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
+        <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
       <% } %>
-      <a href="<%=item.url() %>"><%= item.get('title') %></a></td>
+      <a class="title" href="<%=item.url() %>"><%= item.get('title') %></a></td>
     <td><%=item.get('created_by') %></td>
     <td>
       <% if ( item.hasUnpublishedUpdates() ) { %>
-        <span class="text-success">Published</span>
+        <span class="label label-success">Published</span>
       <% } else if ( item.isPublished() ) { %>
-        <span class="text-success">Published</span>
+        <span class="label label-success">Published</span>
       <% } else if ( item.hasStatus('broken') ) { %>
-        <span class="text-danger">Broken</span>
+        <span class="label label-danger">Broken</span>
       <% } else { %>
-        <span class="text-warning">Draft</span>
+        <span class="label label-warning">Draft</span>
       <% } %>
-      <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
+      <% if ( item.get('published_at') ) { %><div class="pub-time"><%=item.publishedTime() %></div><% } %>
     </td>
     <td>
       <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
@@ -120,21 +120,29 @@
     <td><%=item.get('blueprint_title') %></td>
     <td class="text-right">
 
-      <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
+      <a data-tooltip="edit" href="<%=item.url() %>/edit">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+      </a>
     <% if ( !item.hasStatus( 'built' ) ) { %>
-      <span class="icon-preview" disabled></span>
+      <span class="glyphicon glyphicon-eye-open disabled" aria-hidden="true"></span>
     <% } else if ( item.published ) { %>
       <a data-tooltip="preview" target="_blank"
-         href="<%=item.getPublishUrl('http') %>"><span class="icon-preview"></span></a>
+         href="<%=item.getPublishUrl('http') %>">
+        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+      </a>
     <% } else { %>
       <a data-tooltip="preview"
-         href="<%=item.url() %>/edit?togglePreview=true"><span class="icon-preview"></span></a>
+         href="<%=item.url() %>/edit?togglePreview=true">
+        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+      </a>
     <% } %>
       <a data-tooltip="delete"
          data-action-message="Project deleted"
          data-action-confirm="Are you sure you wish to delete this?"
          data-action="destroy" data-model="Project" data-action-next="reload"
-         data-model-id="<%= item.get('slug') %>"><span class="icon-delete"></span></a>
+         data-model-id="<%= item.get('slug') %>">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+      </a>
     </td>
   </tr>
 <% }); %>

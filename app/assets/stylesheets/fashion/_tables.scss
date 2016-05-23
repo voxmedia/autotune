@@ -25,40 +25,17 @@ th { font-weight: normal; }
   padding-bottom: $table-condensed-cell-padding;
 }
 
-.table-striped {
+.table {
   > thead > tr > th,
   > thead > tr > td,
   > tbody > tr > th,
   > tbody > tr > td,
   > tfoot > tr > th,
-  > tfoot > tr > td { border-width:0; }
+  > tfoot > tr > td {
+    padding: 10px 10px;
+  }
 }
-//
-// table {
-//   width: 100%;
-//   border-collapse: collapse;
-// }
-//
-// tr {
-//   border-bottom: 1px solid color(border);
-//   &:hover {
-//     background-color: mix(color(primary), white, 10%);
-//   }
-// }
-//
-// th,
-// td {
-//   padding: (type(-2)) type(-2);
-//   font-size: type(-1);
-// }
-//
-// th {
-//   text-transform: uppercase;
-//   font-weight: 400;
-//   letter-spacing: .1em;
-//   font-size: type(-2);
-//   text-align: left;
-//   border-bottom: 3px solid color(border);
-//   color: color(actionable);
-//   background-color: color(background);
-// }
+
+.table-striped{
+  border-width:0;
+}

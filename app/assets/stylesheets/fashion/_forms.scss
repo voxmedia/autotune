@@ -19,6 +19,7 @@ label,
   }
 }
 
+[type='search'],
 [type='text'],
 [type='email'],
 [type='password'],
@@ -30,7 +31,7 @@ select.form-control {
   color: color(text);
   border: 2px solid color(border);
   // border-radius: $border-radius;
-  -webkit-appearance:none;
+  outline: 0;
   padding: .5em;
   display: block;
   width: 100%;
@@ -56,7 +57,10 @@ form.form-inline{
   vertical-align: middle;
   div, div.form-group{
     margin-right: 10px;
-    vertical-align: bottom;
+    vertical-align: middle;
+    &:last-child{
+      margin-right: 0px;
+    }
   }
   .btn{
     padding: 8px 15px;

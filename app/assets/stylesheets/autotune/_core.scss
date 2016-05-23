@@ -106,10 +106,16 @@ input[type="checkbox"] {
   margin: auto;
 }
 
+.pub-time{
+  color: color(secondary);
+  font-size: 75%;
+  margin-top: 7px;
+}
+
 //status notifications and alerts
-.m-status {
-  display: block;
-  font-size: 11px;
+.m-status, .m-status .glyphicon {
+  display: inline-block;
+  font-size: 10px;
   text-transform: capitalize;
   &.status-ok {
     color: $positive-color;
@@ -134,29 +140,43 @@ input[type="checkbox"] {
 
 //alerts in tables
 .table td {
-  &.ok-notice,
-  &.info-notice,
-  &.alert-notice {
-    padding-top: 20px;
+  color: color(actionable, dark);
+  &.text-right .glyphicon{
+    color: color(actionable);
+    display: inline-block;
+  }
+  .m-status{
+    display: table-cell;
+    left: -10px;
     position: relative;
-    &:before {
-      content: "";
-      position: absolute;
-      width: 5px;
-      left: 0;
-      top: -1px;
-      bottom: 0;
-    }
   }
-  &.ok-notice:before {
-    background-color: $positive-color;
+  a.title {
+    color: color(actionable);
+    display: table-cell;
   }
-  &.info-notice:before {
-    background-color: $cautionary-color;
-  }
-  &.alert-notice:before {
-    background-color: $negative-color;
-  }
+  // &.ok-notice,
+  // &.info-notice,
+  // &.alert-notice {
+  //   padding-top: 20px;
+  //   position: relative;
+  //   &:before {
+  //     content: "";
+  //     position: absolute;
+  //     width: 3px;
+  //     left: 0;
+  //     top: -1px;
+  //     bottom: 0;
+  //   }
+  // }
+  // &.ok-notice:before {
+  //   background-color: color(positive);
+  // }
+  // &.info-notice:before {
+  //   background-color: color(cautionary);
+  // }
+  // &.alert-notice:before {
+  //   background-color: color(negative);
+  // }
 }
 .table td:last-child {
   white-space:nowrap;
@@ -256,23 +276,26 @@ input[type="checkbox"] {
   //   background: $gray-lighter;
   // }
   &.projects {
-    tr.m-table-heading{
-      // background-color: color(actionable);
-      // color: #fff;
-      border-bottom-width: 1px;
+    tr.m-table-heading > td {
+      padding-top: 35px;
+      text-transform: uppercase;
+      color: color(actionable);
+      border-bottom: 3px solid color(border);
     }
-    tbody > tr > td {
-      padding: 10px 15px;
-      &:nth-child(1) {
-        width: 35%;
-      }
-      &:nth-child(2),
-      &:nth-child(3),
-      &:nth-child(4) {
-        width: 15%;
-      }
-      &:nth-child(5){
-        width: 20%;
+    tbody > tr {
+      td {
+        padding: 10px 15px;
+        &:nth-child(1) {
+          width: 35%;
+        }
+        &:nth-child(2),
+        &:nth-child(3),
+        &:nth-child(4) {
+          width: 15%;
+        }
+        &:nth-child(5){
+          width: 20%;
+        }
       }
     }
   }
