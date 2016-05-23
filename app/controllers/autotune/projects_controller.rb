@@ -50,13 +50,15 @@ module Autotune
       end
 
       if params.key? :search
-        users = User.search(params[:search]).pluck(:id)
-        sql = @projects.search_sql(params[:search])
+        unless params[:search].empty?
+          users = User.search(params[:search]).pluck(:id)
+          sql = @projects.search_sql(params[:search])
 
-        sql[0] = "(#{sql[0]}) OR (user_id IN (?))"
-        sql << users
+          sql[0] = "(#{sql[0]}) OR (user_id IN (?))"
+          sql << users
 
-        @projects = @projects.where(sql)
+          @projects = @projects.where(sql)
+        end
       end
 
       if params.key? :theme

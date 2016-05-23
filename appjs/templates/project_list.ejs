@@ -1,5 +1,5 @@
-<div>
-      <!-- <form class="form-inline" method="get" action="/projects">
+<!-- <div>
+      <form class="form-inline" method="get" action="/projects">
         <div class="form-group">
           <label class="sr-only" for="search">Search query</label>
           <div class="btn-group">
@@ -12,9 +12,9 @@
           </div>
         </div>
       </form>
-    </div> -->
-  <h3>Projects</h3>
-</div>
+    </div>
+  <h2>Projects</h2>
+</div> -->
 <table class="table projects">
   <thead>
     <tr>
@@ -24,12 +24,14 @@
       </td>
       <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
-          <label class="sr-only" for="search">Search query</label>
-          <div class="btn-group">
+          <!-- <label class="sr-only" for="search">Search query</label> -->
+          <!-- <div class="btn-group"> -->
             <input type="text" class="form-control"
                    name="search" id="search" placeholder="Search"
                    <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-          </div>
+          <!-- </div> -->
+          <br />
+          <br />
           Filters
           <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
             (<a href="/projects">clear</a>)
@@ -96,7 +98,7 @@
       <% } else if ( item.hasStatus('broken') ) { %>
         <span class="m-status"><span class="glyphicon glyphicon-warning-sign"></span></span>
       <% } else if ( item.hasStatus('building') ) { %>
-        <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
+        <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span>
       <% } else { %>
         <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
       <% } %>

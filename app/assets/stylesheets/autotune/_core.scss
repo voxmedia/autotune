@@ -99,10 +99,16 @@ input[type="checkbox"] {
   margin: -10px 10px 0;
 }
 
+.ui-pnotify-icon .glyphicon{
+  color: #ffffff;
+}
+
 .ui-pnotify.center-notification{
   right: 0;
   left: 0;
   margin: auto;
+  max-width: 750px;
+  top: 50px;
 }
 
 .pub-time{
@@ -117,24 +123,28 @@ input[type="checkbox"] {
   font-size: 10px;
   text-transform: capitalize;
   &.status-ok {
-    color: $positive-color;
+    color: color(positive);
   }
   &.status-info {
-    color: $cautionary-color;
+    color: color(cautionary);
   }
   &.status-alert {
-    color: $negative-color;
+    color: color(negative);
   }
 }
 
 .status-ok {
-  color: $positive-color;
+  color: color(positive);
 }
 .status-info {
-  color: $cautionary-color;
+  color: color(cautionary);
 }
 .status-alert {
-  color: $negative-color;
+  color: color(negative);
+}
+
+.table.projects{
+  margin-top: 40px;
 }
 
 //alerts in tables
@@ -182,7 +192,10 @@ input[type="checkbox"] {
 }
 
 //nav
-.navbar-nav > li { float: right; }
+.navbar-nav{
+  float: right;
+  li { float: left; }
+}
 
 #nav {
   .navbar-brand {

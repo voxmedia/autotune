@@ -35,6 +35,8 @@ select.form-control {
   padding: .5em;
   display: block;
   width: 100%;
+  // max-width:250px;
+  // float: right;
   font-size: type(-1);
   .p-ui-dark & {
     border-color: color(border, dark);
