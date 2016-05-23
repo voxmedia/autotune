@@ -1,6 +1,5 @@
-<div class="m-page-heading">
-    <div class="pull-right">
-      <form class="form-inline" method="get" action="/projects">
+<div>
+      <!-- <form class="form-inline" method="get" action="/projects">
         <div class="form-group">
           <label class="sr-only" for="search">Search query</label>
           <div class="btn-group">
@@ -13,9 +12,8 @@
           </div>
         </div>
       </form>
-    </div>
-    <h3>Projects</h3>
-  </div>
+    </div> -->
+  <h3>Projects</h3>
 </div>
 <table class="table projects">
   <thead>
@@ -26,8 +24,14 @@
       </td>
       <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
+          <label class="sr-only" for="search">Search query</label>
+          <div class="btn-group">
+            <input type="text" class="form-control"
+                   name="search" id="search" placeholder="Search"
+                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          </div>
           Filters
-          <% if(query.theme || query.blueprint_title || query.pub_status) { %>
+          <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
             (<a href="/projects">clear</a>)
           <% } %>
           &nbsp;

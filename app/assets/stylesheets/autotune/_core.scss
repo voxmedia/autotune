@@ -1,6 +1,7 @@
 //lets add some padding to crunched page bottoms
 #main {
   padding-bottom: 25px;
+  margin-top: 25px;
 }
 
 #spinner {
@@ -13,6 +14,7 @@
 }
 
 #nav {
+  top: 0;
   margin: 0;
 }
 
@@ -86,9 +88,6 @@ footer {
 }
 
 //broken radio button fixes
-.radio label, .checkbox label {
-  padding-left: 25px;
-}
 .radio input[type="radio"],
 .radio-inline input[type="radio"],
 .checkbox input[type="checkbox"],
@@ -183,7 +182,7 @@ input[type="checkbox"] {
 }
 
 //nav
-.navbar-nav > li { float: left; }
+.navbar-nav > li { float: right; }
 
 #nav {
   .navbar-brand {

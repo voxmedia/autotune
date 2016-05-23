@@ -42,7 +42,7 @@ td.actionbar .btn-group button {
 }
 
 .alpaca-array-actionbar-top {
-  position:absolute;
+  position:relative;
   top:0;
   right:0;
 }
@@ -78,8 +78,19 @@ td.actionbar .btn-group button {
   .btn-default {
     background-color: transparent;
     border-color: transparent;
+    color: color(actionable);
+    font-size: 16px;
+    border-color: transparent;
+    &:first-of-type{
+      padding-left: 0px;
+    }
+    &:last-of-type{
+      padding-right: 19px;
+    }
     &:hover {
-      color:$link-hover-color;
+      background-color: transparent;
+      border-color: transparent;
+      color:darken(color(actionable), 15%);
     }
   }
 }
