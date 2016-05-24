@@ -35,8 +35,25 @@ module.exports = Backbone.Router.extend({
     "themes/:slug/edit": "editTheme"
   },
 
+  navigate: function(fragment, options) {
+    var view = this.app.view.currentView;
+    if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+      view.askToSave().then(function(okToContinue) {
+        if ( okToContinue ) {
+          Backbone.Router.prototype.navigate.call(this, fragment, options);
+          window.onbeforeunload = null;
+          $('body').removeClass('modal-open');
+        }
+      });
+    } else {
+      Backbone.Router.prototype.navigate.call(this, fragment, options);
+    }
+  },
+
+
   // This is called for every route
   everyRoute: function(route, params) {
+    logger.debug('everyRoute', route);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
     this.app.messages.start();
@@ -203,7 +220,6 @@ module.exports = Backbone.Router.extend({
       return project.blueprint.fetch();
     }).then(function() {
       old_attributes = _.clone(project.attributes);
-      logger.debug('oldies', old_attributes);
       new_attributes.blueprint_config = old_attributes.blueprint_config;
       new_attributes.blueprint_id = old_attributes.blueprint_id;
       new_attributes.blueprint_title = old_attributes.blueprint_title;

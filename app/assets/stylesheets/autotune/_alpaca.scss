@@ -33,12 +33,25 @@ td.actionbar .btn-group button {
 
 .alpaca-container-item {
   position:relative;
+  .well{
+    padding-bottom: 48px;
+  }
+  .alpaca-array-actionbar {
+    &:before{
+      margin: 0 0 -4px 0;
+      font-size: 16px;
+    }
+  }
+  .btn-default{
+    margin: 5px 0;
+  }
 }
 
 .alpaca-array-actionbar-bottom {
   position:absolute;
   bottom:0;
-  right:0;
+  // right:0;
+  left: 20px;
 }
 
 .alpaca-array-actionbar-top {
@@ -51,11 +64,9 @@ td.actionbar .btn-group button {
   display:none;
 }
 
-.alpaca-container-item {
-}
-
 .alpaca-field-checkbox .alpaca-control.checkbox {
-  margin-left:8px;
+  margin: 0 0 0 8px;
+  // margin-bottom: 0px;
   display:inline-block;
 }
 
@@ -110,43 +121,74 @@ td.actionbar .btn-group button {
   content:' Click to expand';
 }
 
-
+//
 .alpaca-field-table .table-responsive {
-  border-collapse: collapse;
-  td { border:1px solid $input-border; }
-
-  .table > tbody > tr:first-child td {
-    border-width:1px;
+  border-width: 0px;
+  padding-top: 15px;
+  .table thead > tr > th {
+    background-color: darken(color(accent), 5%);
   }
-
+  .table > tbody > tr{
+    td {
+      border-width:0px;
+    }
+    &:nth-child(even){
+      background-color: darken(color(accent), 5%);
+    }
+  }
+//   border-collapse: collapse;
+//   td { border:1px solid $input-border; }
+//
+//   .table > tbody > tr:first-child td {
+//     border-width:1px;
+//   }
+//
   .alpaca-array-actionbar-top {
     padding:0 4px;
     position:static;
   }
 
-  .alpaca-field-checkbox {
-    padding:0 4px;
+  .alpaca-array-actionbar:before{
+    font-size: 13px;
+    margin: 0 0;
   }
 
-  .form-control {
-    border-width:1;
-    border-color:transparent;
-    padding:2px 0 2px 4px;
-    &:focus { border-color:$input-border-focus; }
+  .form-group{
+    margin-bottom: 0px;
   }
-
+//
+//   .alpaca-field-checkbox {
+//     padding:0 4px;
+//   }
+//
+//   .form-control {
+//     border-width:1;
+//     border-color:transparent;
+//     padding:2px 0 2px 4px;
+//     &:focus { border-color:$input-border-focus; }
+//   }
+//
   .btn {
     font-size:12px;
     float:none;
     padding:0;
     border-width:0;
-    margin:0;
+    margin:0 8px 0 0;
   }
-
-  td { padding:0; background-color:$input-bg; }
-  th { padding:2px; }
-
-  .form-group { margin-bottom: 0; }
-
+//
+//   td { padding:0; background-color:$input-bg; }
+//   th { padding:2px; }
+//
+//   .form-group { margin-bottom: 0; }
+//
   tbody .alpaca-control-label { display:none; }
+}
+
+.form-group{
+  .checkbox + .help-block{
+    padding-left: 38px;
+  }
+  .help-block, .help-block .glyphicon{
+    color: color(actionable, dark);
+  }
 }

@@ -15,10 +15,12 @@ module.exports = {
   },
 
   handleForm: function(eve) {
-    var inst, Model, view = this, app = this.app, $form;
+    var $form;
 
     eve.preventDefault();
     eve.stopPropagation();
+
+    logger.debug(eve);
 
     if ( eve.currentTarget.tagName === 'FORM' ) {
       $form = $(eve.currentTarget);
@@ -26,10 +28,17 @@ module.exports = {
       $form = $(eve.currentTarget).parents('form');
     }
 
-    this.app.trigger('loadingStart');
+    return this.doSubmit($form);
+  },
+
+  doSubmit: function(formEle) {
+    var inst, Model, view = this, app = this.app,
+        $form = this.$(formEle);
+
+    app.trigger('loadingStart');
     logger.debug('handleForm');
 
-    var values = this.formValues($form),
+    var values = view.formValues($form),
         model_class = $form.data('model'),
         model_id = $form.data('model-id'),
         action = $form.data('action'),
@@ -45,7 +54,7 @@ module.exports = {
       // if the method attr is `get` then we can navigate to that new
       // url and avoid any posting
       var basepath = $form.attr('action') || window.location.pathname;
-      Backbone.history.navigate(
+      app.router.navigate(
         basepath + '?' + $form.serialize(),
         {trigger: true});
       return;
@@ -76,11 +85,14 @@ module.exports = {
       }).then(function() {
         logger.debug('next: '+next);
         if ( next === 'show' && action === 'new' ) {
-          Backbone.history.navigate(inst.url(), {trigger: true});
+          var updatedFormData = inst.formData();
+          delete updatedFormData['slug'];
+          view.formDataOnLoad = updatedFormData;
+          app.router.navigate(inst.url(), {trigger: true});
         } else if ( next === 'show' ) {
           view.render();
         } else if ( next ) {
-          Backbone.history.navigate(next, {trigger: true});
+          app.router.navigate(next, {trigger: true});
         } else {
           view.render();
         }

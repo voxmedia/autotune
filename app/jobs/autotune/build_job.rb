@@ -41,7 +41,8 @@ module Autotune
         'group' => project.group.slug,
         'theme' => project.theme.slug,
         'available_themes' => Theme.all.pluck(:slug),
-        'theme_data' => Theme.full_theme_data)
+        'theme_data' => Theme.full_theme_data,
+        'build_type' => 'publish')
 
       current_user ||= project.user
 

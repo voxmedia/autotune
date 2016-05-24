@@ -5,6 +5,11 @@
       <div class="navbar-text" id="spinner">
         <%=render(require('./spinner.ejs'), {color:'white'})%>
       </div>
+      <div class="project-save-warning">
+        <span class="glyphicon glyphicon-warning-sign"></span>Your work is not saved.
+        <button type="submit" class="btn btn-primary btn-sm"
+                 id="savePreview" data-loading-text="Saving...">Save now</button>
+      </div>
     </div>
     <ul class="nav navbar-nav">
       <li data-tab="projects"><a href="/projects">Projects</a></li>

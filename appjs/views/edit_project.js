@@ -22,6 +22,74 @@ function isVisible(control) {
   return control.type !== 'hidden' && $(control.domEl).is(':visible');
 }
 
+var ProjectSaveModal = Backbone.View.extend({
+
+    id: 'save-modal',
+    className: 'modal show',
+    template: require('../templates/modal.ejs'),
+
+    events: {
+      'hidden': 'teardown',
+      'click #closeModal': 'closeModal',
+      'click #dismiss': 'cancel',
+      'click #save': 'submit',
+      'click': 'closeModal'
+    },
+
+    initialize: function(options) {
+      _.bindAll(this, 'show', 'teardown', 'render', 'renderView');
+      logger.debug('init options', options);
+      if (_.isObject(options)) {
+        _.extend(this, _.pick(options, 'app', 'parentView'));
+      }
+      this.render();
+    },
+
+    show: function() {
+      this.$el.modal('show');
+    },
+
+    teardown: function() {
+      this.$el.data('modal', null);
+      this.remove();
+    },
+
+    render: function() {
+      this.renderView(this.template);
+      return this;
+    },
+
+    renderView: function(template) {
+      this.$el.html(template());
+      this.$el.modal({show:false}); // dont show modal on instantiation
+      logger.debug('modal', this);
+    },
+
+    cancel: function(){
+      logger.debug('cancel', this);
+      $('.project-save-warning').hide();
+      this.trigger('cancel');
+      this.teardown();
+    },
+
+    submit: function(){
+      var self = this;
+      this.parentView
+        .doSubmit( this.parentView.$('#projectForm form') )
+        .then(function() {
+          self.trigger('submit');
+          self.teardown();
+        });
+    },
+
+    closeModal: function(eve){
+      if($(eve.target).hasClass('modal-backdrop')){
+        this.teardown();
+        this.trigger('close');
+      }
+    },
+ });
+
 var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
   template: require('../templates/project.ejs'),
   forceUpdateDataFlag: false,
@@ -36,15 +104,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterInit: function(options) {
+    var view = this;
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
     if(options.query){
       this.togglePreview = options.query.togglePreview ? true : false;
     }
 
+    window.onbeforeunload = function(event) {
+      if(view.hasUnsavedChanges()){
+        return 'You have unsaved changes!';
+      }
+    };
+
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
+
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
         this.listenTo(this.app, 'focus', this.focusPollChange, this);
@@ -58,6 +134,36 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }, this);
   },
 
+  askToSave: function() {
+    var view = this;
+    var saveModal = new ProjectSaveModal({app: this.app, parentView: this}),
+        ret = new Promise(function(resolve, reject) {
+          saveModal.once('cancel submit', function() {
+            resolve(true);
+          });
+          saveModal.on('close', function() {
+            resolve(false);
+          });
+        });
+
+    if($('#save-modal').length === 0){
+      saveModal.show();
+    }
+
+    return ret;
+  },
+
+  hasUnsavedChanges: function(){
+    var view = this,
+        data = view.alpaca.getValue();
+
+    if(_.isEqual(view.formDataOnLoad, data) ){
+      return false;
+    } else {
+      return true;
+    }
+  },
+
   focusPollChange: function(){
     this.forceUpdateDataFlag = true;
     this.pollChange();
@@ -69,14 +175,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         query = '',
         data = $form.alpaca('get').getValue();
 
-    if ( !this.model.hasPreviewType('live') ) {
-      data['slug'] = [data['theme'], data['slug']].join('-');
-      if( !_.isEqual(this.model.formData(), data) ){
-        $('#save-warning').show();
-      } else {
-        $('#save-warning').hide();
-      }
-      return;
+    if(this.hasUnsavedChanges()){
+      $('.project-save-warning').show().css('display', 'inline-block');
+    } else {
+      $('.project-save-warning').hide();
     }
 
     // Make sure the form is valid before proceeding
@@ -213,6 +315,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   beforeRender: function() {
+    $('.project-save-warning').hide();
     this.stopListeningForChanges();
   },
 
@@ -260,6 +363,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             buildData = view.model.buildData(),
             previewUrl = '', iframeLoaded,
             previewSlug = '';
+
+        view.formDataOnLoad = formData;
 
         // Callback for when iframe loads
         iframeLoaded = _.once(function() {

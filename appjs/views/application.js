@@ -17,9 +17,14 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   //className: 'container-fluid',
   template: require('../templates/application.ejs'),
   alertDefaults: {
-    addclass: "center-notification",
-    width: '95%',
+    addclass: "stack-bottomright",
+    stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
+    // addclass: "center-notification",
+    // width: '95%',
     buttons: { sticker: false }
+  },
+  events: {
+    'click #savePreview': 'savePreview'
   },
 
   afterInit: function() {
@@ -130,6 +135,11 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     } else {
       return PNotify.removeAll();
     }
+  },
+
+  savePreview: function(){
+    // this.currentView.doSubmit();
+    this.$('#projectForm form').submit();
   }
 });
 
