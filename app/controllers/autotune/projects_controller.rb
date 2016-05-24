@@ -202,6 +202,7 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(@build_data, {}, current_user)
+
       render :json => @build_data
     rescue => exc
       if @project.present? && @project.meta['error_message'].present?
