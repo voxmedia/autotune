@@ -188,7 +188,8 @@ td.actionbar .btn-group button {
   .checkbox + .help-block{
     padding-left: 38px;
   }
-  .help-block, .help-block .glyphicon{
-    color: color(actionable, dark);
-  }
+}
+
+.help-block, .help-block .glyphicon{
+  color: color(actionable, dark);
 }
