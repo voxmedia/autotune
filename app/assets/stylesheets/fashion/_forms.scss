@@ -100,6 +100,7 @@ input[type='radio'],
     border-radius: $border-radius;
     border: 2px solid color(border);
     cursor: pointer;
+    background-color: color(background);
     label:hover &,
     &:hover {
       border-color: color(primary);

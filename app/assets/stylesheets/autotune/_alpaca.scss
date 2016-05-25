@@ -35,6 +35,9 @@ td.actionbar .btn-group button {
   position:relative;
   .well{
     padding-bottom: 48px;
+    .alpaca-control.checkbox{
+      margin-left: 0px;
+    }
   }
   .alpaca-array-actionbar {
     &:before{
@@ -44,6 +47,13 @@ td.actionbar .btn-group button {
   }
   .btn-default{
     margin: 5px 0;
+  }
+  label{
+    display: inline-block;
+    width: initial;
+    + .checkbox + .help-block{
+      padding-left: 0px;
+    }
   }
 }
 
@@ -195,4 +205,8 @@ td.actionbar .btn-group button {
 
 .help-block, .help-block .glyphicon{
   color: color(actionable, dark);
+}
+
+.has-error .help-block .glyphicon{
+  color: color(negative);
 }
