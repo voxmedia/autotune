@@ -96,7 +96,7 @@
       <% if ( item.hasStatus('built') ) { %>
         <span class="m-status"><span class="glyphicon glyphicon-ok"></span></span>
       <% } else if ( item.hasStatus('broken') ) { %>
-        <span class="m-status"><span class="glyphicon glyphicon-warning-sign"></span></span>
+        <span class="m-status"><span class="glyphicon glyphicon-alert"></span></span>
       <% } else if ( item.hasStatus('building') ) { %>
         <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span>
       <% } else { %>
