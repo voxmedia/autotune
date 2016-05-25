@@ -52,7 +52,8 @@
     <div role="tabpanel" class="tab-pane active" id="edit">
       <% if (model.blueprint.hasPreviewType('live')) { %>
       <div id="projectEditor" class="row">
-          <div class="col-sm-8">
+          <div class="col-sm-8 scroll-pane" id="preview-pane">
+            <h4 class="blueprint-title"><%= model.get('blueprint_title') %></h4>
             <h3>
                 <% if ( model.isNew() && (copyProject == false) ) {
                   %>New Project<%
@@ -152,7 +153,8 @@
             </div>
           </div>
 
-          <div class="col-sm-4">
+          <div class="col-sm-4 scroll-pane" id="form-pane">
+            <h4>Preview</h4>
             <ul class="nav nav-pills">
               <button type="button" id="small-view"
                       class="btn btn-default resize"> Small </button>

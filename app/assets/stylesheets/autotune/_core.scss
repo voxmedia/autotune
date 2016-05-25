@@ -1,8 +1,12 @@
 //lets add some padding to crunched page bottoms
+html{
+  // overflow:hidden;
+}
 #main {
   padding-bottom: 25px;
   // margin-top: 25px;
 }
+
 .container{
   width: 100%;
   padding: 0px;
@@ -503,5 +507,30 @@ label {
   .modal-footer{
     border-width: 0px;
     padding-top: 0px;
+  }
+}
+
+.blueprint-title{
+  margin-top: 0px;
+  color: color(actionable, dark);
+  text-transform: uppercase;
+}
+
+.scroll-pane{
+  padding-top: 25px;
+  position: fixed;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#preview-pane{
+  margin-left: 15px;
+}
+
+#form-pane{
+  right: 0;
+  background-color: color(accent);
+  #projectForm{
+    padding-top: 25px;
   }
 }
