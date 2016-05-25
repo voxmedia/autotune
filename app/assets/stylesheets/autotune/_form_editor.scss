@@ -75,6 +75,7 @@
   border: 0px solid color(background);
   text-align: center;
   li, li.active{
+    z-index: 3;
     display:inline-block;
     float: none;
     border: 0px solid transparent;
@@ -83,13 +84,13 @@
     margin-top:-1px;
     margin-left: -4px;
     a{
-      border: 1px solid color(border);
+      border: 1px solid color(background);
       border-bottom-color: transparent;
       // border-top-color: transparent;
       border-left-color: transparent;
       border-radius: 0px;
       margin: 0;
-      height: 38px;
+      height: 40px;
       vertical-align: middle;
     }
     &:hover{
@@ -121,6 +122,8 @@
   position: fixed;
   width: 100%;
   background-color: #fff;
+  z-index: 4;
+  padding-top: 25px;
 }
 .ace_editor {
   border-width:1px;
