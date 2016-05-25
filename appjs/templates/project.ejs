@@ -54,13 +54,13 @@
       <div id="projectEditor" class="row">
           <div class="col-sm-8 scroll-pane" id="preview-pane">
             <h4 class="blueprint-title"><%= model.get('blueprint_title') %></h4>
-            <h3>
+            <h3 id="projectTitle">
                 <% if ( model.isNew() && (copyProject == false) ) {
                   %>New Project<%
                 } else if ( copyProject ) {
-                  %>New <%= model.get( 'title' ) %><%
+                  %><input value="New <%= model.get( 'title' ) %>"></input><%
                 } else {
-                  %><%= model.get( 'title' ) %><%
+                  %><textarea value="<%= model.get( 'title' ) %>"><%= model.get( 'title' ) %></textarea><%
                 } %>
             </h3>
 

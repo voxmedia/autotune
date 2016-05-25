@@ -170,6 +170,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
+    this.$('#projectForm input[name="title"]').val($('#projectTitle textarea').val());
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
@@ -180,6 +181,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     } else {
       $('.project-save-warning').hide();
     }
+
+    // logger.debug('keypress', $('#projectTitle textarea').val(), data);
+    // data['title'] = $('#projectTitle textarea').val();
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form

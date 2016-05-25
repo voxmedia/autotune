@@ -534,3 +534,13 @@ label {
     padding-top: 25px;
   }
 }
+
+h3#projectTitle textarea{
+  padding: 0px;
+  height: 100px;
+  border-width:0px;
+}
+
+[data-alpaca-container-item-name='title']{
+  display: none;
+}
