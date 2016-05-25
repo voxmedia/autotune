@@ -56,11 +56,11 @@
             <h4 class="blueprint-title"><%= model.get('blueprint_title') %></h4>
             <h3 id="projectTitle">
                 <% if ( model.isNew() && (copyProject == false) ) {
-                  %>New Project<%
+                  %><textarea>New Project</textarea><%
                 } else if ( copyProject ) {
-                  %><input value="New <%= model.get( 'title' ) %>"></input><%
+                  %><textarea>New <%= model.get( 'title' ) %></textarea><%
                 } else {
-                  %><textarea value="<%= model.get( 'title' ) %>"><%= model.get( 'title' ) %></textarea><%
+                  %><textarea><%= model.get( 'title' ) %></textarea><%
                 } %>
             </h3>
 
