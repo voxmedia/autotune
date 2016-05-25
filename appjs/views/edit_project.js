@@ -99,7 +99,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change form': 'pollChange',
     'keypress': 'pollChange',
     'click #savePreview': 'savePreview',
-    'click #preview .resize': 'resizePreview',
+    'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm'
   },
 

@@ -1,7 +1,16 @@
 //lets add some padding to crunched page bottoms
 #main {
   padding-bottom: 25px;
-  margin-top: 25px;
+  // margin-top: 25px;
+}
+.container{
+  width: 100%;
+  padding: 0px;
+}
+
+#project-tabs{
+  position:relative;
+  z-index: 3;
 }
 
 #spinner {
@@ -28,10 +37,6 @@ label.block {
 
 .margin-bottom {
   margin-bottom: 25px;
-}
-
-.tab-content {
-  margin-top:20px;
 }
 
 #screenshots img {

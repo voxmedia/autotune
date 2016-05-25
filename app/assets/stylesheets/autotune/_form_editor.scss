@@ -71,8 +71,56 @@
 .tab-pane {
   height: 100%;
 }
-.nav-tabs li {
-  margin:5px 5px -1px;
+.nav-tabs{
+  border: 0px solid color(background);
+  text-align: center;
+  li, li.active{
+    display:inline-block;
+    float: none;
+    border: 0px solid transparent;
+    // margin:5px 5px -1px;
+    // border-width: 0px;
+    margin-top:-1px;
+    margin-left: -4px;
+    a{
+      border: 1px solid color(border);
+      border-bottom-color: transparent;
+      // border-top-color: transparent;
+      border-left-color: transparent;
+      border-radius: 0px;
+      margin: 0;
+      height: 38px;
+      vertical-align: middle;
+    }
+    &:hover{
+      a{
+        border-color: transparent;
+      }
+    }
+  }
+  li {
+    a{
+      color: color(accent);
+    }
+    &:first-of-type{
+      a{
+        border-left: 1px solid color(border);
+      }
+    }
+    &:hover{
+      a{
+        background-color: lighten(color(background, dark), 70%);
+        color: color(text);
+        border-color: transparent;
+      }
+    }
+  }
+}
+.tab-content{
+  top: 36px;
+  position: fixed;
+  width: 100%;
+  background-color: #fff;
 }
 .ace_editor {
   border-width:1px;
