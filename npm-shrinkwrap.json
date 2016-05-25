@@ -1,11 +1,11 @@
 {
   "name": "autotune",
-  "version": "0.3.19",
+  "version": "0.3.24",
   "dependencies": {
     "alpaca": {
       "version": "1.5.17",
-      "from": "voxmedia/alpaca#dev",
-      "resolved": "git+https://github.com/voxmedia/alpaca#479444b0349e9a1e8b188558c5f48d14932f70c3"
+      "from": "caseymm/alpaca#dev-input-style",
+      "resolved": "git+https://github.com/caseymm/alpaca#020210135f97f55fe6adcb4f1313316f8508acb9"
     },
     "backbone": {
       "version": "1.2.3",

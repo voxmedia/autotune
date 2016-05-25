@@ -414,8 +414,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             $( "#draft-preview" ).trigger( "click" );
           }
         }
-        $("input:checkbox").after("<b></b>");
-        $("input:radio").after("<b></b>");
       }).catch(function(err) {
         console.error(err);
       }).then(function() {

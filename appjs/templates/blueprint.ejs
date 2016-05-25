@@ -1,6 +1,6 @@
 <div class="row m-page-heading">
   <div class="col-xs-12">
-    <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-default" href="<%=model.url() %>/new_project">New project</a><% } %></h3>
+    <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-primary" href="<%=model.url() %>/new_project">New project</a><% } %></h3>
 
     <% if ( !model.isNew() ) { %>
     <p class="text-muted">
@@ -85,7 +85,7 @@
                         data-loading-text="Saving...">Save changes</button>
 
                 <% if ( !model.isNew() ) { %>
-                <button type="button" class="btn btn-default"
+                <button type="button" class="btn btn-primary"
                         data-action-message="Upgrade started"
                         data-loading-text="Upgrading..."
                         data-action="update-repo" data-model="Blueprint"

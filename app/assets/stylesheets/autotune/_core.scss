@@ -152,10 +152,6 @@ input[type="checkbox"] {
   color: color(negative);
 }
 
-.table.projects{
-  margin-top: 40px;
-}
-
 //alerts in tables
 .table td {
   color: color(actionable, dark);
@@ -204,6 +200,11 @@ input[type="checkbox"] {
 .navbar{
   min-height: 30px;
   z-index: 3;
+}
+
+.navbar-text{
+  margin-top: 9px;
+  margin-bottom: 9px;
 }
 
 .navbar-nav{
@@ -301,7 +302,8 @@ input[type="checkbox"] {
   // tbody > tr:nth-of-type(even) {
   //   background: $gray-lighter;
   // }
-  &.projects {
+  &.collection {
+    margin-top:40px;
     tr.m-table-heading > td {
       padding-top: 35px;
       text-transform: uppercase;
