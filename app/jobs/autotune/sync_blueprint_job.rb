@@ -89,8 +89,8 @@ module Autotune
             themes = Theme.where(:slug => blueprint.config['themes'])
           end
 
-          # if no theme is selected at this point, use generic theme
-          themes = Theme.where(:slug => 'generic') if themes.empty?
+          # if no theme is selected at this point, use any default theme
+          themes = Theme.where(:parent => nil).first if themes.empty?
 
           themes.each do |theme|
             slug = blueprint.themable? ? blueprint.version : [blueprint.version, theme.slug].join('-')
