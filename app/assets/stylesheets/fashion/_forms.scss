@@ -192,6 +192,7 @@ a {
   }
 
   &.btn-default,
+  &.btn-default.active,
   &.btn-primary,
   &.btn-success,
   &.btn-secondary,
@@ -220,9 +221,16 @@ a {
     &.btn-#{$type} {
       background-color: $color;
       border-color: $color;
-      &:hover, &:active, &:focus {
+      &:hover, &:focus, &:active, &.active {
         background: darken($color, 10%);
         border-color: darken($color, 10%);
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        outline: 0;
+      }
+      &:active, &.active{
+        background: darken($color, 15%);
+        border-color: darken($color, 15%);
       }
     }
   }

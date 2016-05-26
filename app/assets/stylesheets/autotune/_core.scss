@@ -1,6 +1,6 @@
 //lets add some padding to crunched page bottoms
 html{
-  // overflow:hidden;
+  overflow-x:hidden;
 }
 #main {
   padding-bottom: 25px;
@@ -12,6 +12,12 @@ html{
   max-width: 1300px;
   padding: 1rem;
   margin: auto;
+}
+
+.row{
+  @media (max-width: $screen-sm){
+    margin: 0;
+  }
 }
 
 .tab-pane .container, .tab-content .container{
@@ -183,6 +189,24 @@ input[type="checkbox"] {
       position: relative;
     }
   }
+
+  &.bold-actions-cell{
+    @media (max-width: 625px){
+      display: none;
+    }
+  }
+
+  &.theme-cell{
+    @media (max-width: 500px){
+      display: none;
+    }
+  }
+
+  &.author-cell{
+    @media (max-width: 410px){
+      display: none;
+    }
+  }
   // &.ok-notice,
   // &.info-notice,
   // &.alert-notice {
@@ -231,7 +255,7 @@ input[type="checkbox"] {
   .navbar-brand {
     // font-weight: bold;
     font-size: 20px;
-    padding: 4px 0;
+    padding: 4px 0 4px 3px;
     height: auto;
     line-height: 1;
     &:before {
@@ -536,10 +560,13 @@ label {
   position: fixed;
   height: 100%;
   overflow-y: scroll;
+  @media (max-width: $screen-sm){
+    position: relative;
+  }
 }
 
 #preview-pane{
-  margin-left: 15px;
+  // margin-left: 15px;
 }
 
 #form-pane{
@@ -554,7 +581,7 @@ h3#projectTitle {
   cursor: pointer;
   div, textarea{
     line-height: 1.25;
-    display: inline-block;
+    display: inline;
   }
   .glyphicon{
     font-size: 13px;
@@ -575,4 +602,9 @@ h3#projectTitle {
       color: color(primary);
     }
   }
+}
+
+input#search{
+  margin-bottom: 15px;
+  float:right;
 }

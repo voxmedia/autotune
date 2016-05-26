@@ -66,7 +66,16 @@
 }
 
 .tab-content {
-  height: calc(100% - 47px);
+  height: 100%;
+  top: 36px;
+  position: fixed;
+  width: 100%;
+  background-color: color(background);
+  overflow-y: scroll;
+  z-index: 4;
+  .tab-content{
+    position: relative;
+  }
 }
 .tab-pane {
   height: 100%;
@@ -116,13 +125,6 @@
       }
     }
   }
-}
-.tab-content{
-  top: 36px;
-  position: fixed;
-  width: 100%;
-  background-color: #fff;
-  z-index: 4;
 }
 .ace_editor {
   border-width:1px;

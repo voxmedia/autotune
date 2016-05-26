@@ -1,36 +1,63 @@
-<!-- <div>
-      <form class="form-inline" method="get" action="/projects">
-        <div class="form-group">
-          <label class="sr-only" for="search">Search query</label>
-          <div class="btn-group">
-            <input type="text" class="form-control"
-                   name="search" id="search" placeholder="Search"
-                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-          <% if(query.search) { %>
-            <a href="/projects">clear</a>
-          <% } %>
-          </div>
-        </div>
-      </form>
-    </div>
-  <h2>Projects</h2>
-</div> -->
-<div class="container">
+<div class="container" style="padding-top: 60px;">
+  <div style="display: inline-block;">
+    <a id="new-project" class="btn btn-primary"
+       href="/projects/new">New project</a>
+  </div>
+  <div class="text-right" style="display: inline-block; float: right;">
+    <form class="form-inline" method="get" action="/projects">
+        <input type="text" class="form-control"
+               name="search" id="search" placeholder="Search"
+               <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+      <br />
+      <br />
+      Filters
+      <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
+        (<a href="/projects">clear</a>)
+      <% } %>
+      &nbsp;
+      <% if ( app.themes.length > 1 ) { %>
+      <div class="select">
+        <select name="theme" id="theme" class="form-control" data-auto-submit="true">
+          <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
+        <% app.themes.each(function(theme) { %>
+          <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
+                value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>
+        <% }) %>
+        </select>
+      </div>
+      <% } %>
+      <div class="select">
+        <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">
+          <option disabled <% if(!query.blueprint_title) { %>selected<% } %>>Blueprint</option>
+        <% _.each(app.config.blueprint_titles, function(blueprint_title) { %>
+          <option <% if(String(blueprint_title.id) === query.blueprint_title) { %>selected<% } %>
+                value="<%=blueprint_title.id %>"><%=blueprint_title.title %></option>
+        <% }) %>
+        </select>
+      </div>
+      <div class="select">
+        <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
+          <option disabled <% if(!query.pub_status) { %>selected<% } %>>Status</option>
+        <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
+          <option <% if(pub_status === query.pub_status) { %>selected<% } %>
+                value="<%=pub_status %>"><%=pub_status %></option>
+        <% }) %>
+        </select>
+      </div>
+    </form>
+  </div>
   <table class="table collection">
     <thead>
       <tr>
-        <td>
+        <!-- <td>
           <a id="new-project" class="btn btn-primary"
              href="/projects/new">New project</a>
         </td>
-        <td class="text-right" colspan="5">
+        <td class="text-right">
           <form class="form-inline" method="get" action="/projects">
-            <!-- <label class="sr-only" for="search">Search query</label> -->
-            <!-- <div class="btn-group"> -->
               <input type="text" class="form-control"
                      name="search" id="search" placeholder="Search"
                      <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-            <!-- </div> -->
             <br />
             <br />
             Filters
@@ -69,18 +96,18 @@
               </select>
             </div>
           </form>
-        </td>
+        </td> -->
       </tr>
     </thead>
     <tbody>
 
     <tr class="m-table-heading">
       <td>Project</td>
-      <td>Author</td>
-      <td>Status</td>
-      <td>Theme</td>
-      <td>Blueprint</td>
-      <td class="text-right">Bold Actions</td>
+      <td class="author-cell">Author</td>
+      <td class="status-cell">Status</td>
+      <td class="theme-cell">Theme</td>
+      <td class="blueprint-cell">Blueprint</td>
+      <td class="bold-actions-cell text-right">Bold Actions</td>
     </tr>
     <% if(!hasObjects()) { %>
     <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>
@@ -104,8 +131,8 @@
           <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
         <% } %>
         <a class="title" href="<%=item.url() %>"><%= item.get('title') %></a></td>
-      <td><%=item.get('created_by') %></td>
-      <td>
+      <td class="author-cell"><%=item.get('created_by') %></td>
+      <td class="status-cell">
         <% if ( item.hasUnpublishedUpdates() ) { %>
           <span class="m-status status-ok">Published</span>
         <% } else if ( item.isPublished() ) { %>
@@ -117,15 +144,15 @@
         <% } %>
         <% if ( item.get('published_at') ) { %><div class="pub-time"><%=item.publishedTime() %></div><% } %>
       </td>
-      <td>
+      <td class="theme-cell">
         <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
         <%=app.themes.findWhere({slug: item.get('theme')}).get('title') %>
         <% } else { %>
         <em class="text-muted"><%=item.get('theme') %></em>
         <% } %>
       </td>
-      <td><%=item.get('blueprint_title') %></td>
-      <td class="text-right">
+      <td class="blueprint-cell"><%=item.get('blueprint_title') %></td>
+      <td class="bold-actions-cell text-right">
 
         <a data-tooltip="edit" href="<%=item.url() %>/edit">
           <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
