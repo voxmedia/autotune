@@ -48,6 +48,11 @@
                 <% } %> >
             <div class="form-group">
               <label for="title">Title</label>
+              <% if(model.isDefault()) {%>
+               <p class="text-muted">Theme name will be displayed as typed below.</p>
+              <% } else {%>
+                <p class="text-muted">Theme name will be displayed as "Group name - Theme name"</p>
+              <% }%>
               <input type="text" required class="form-control"
                      <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
                      id="title" name="title" placeholder="Enter title">
