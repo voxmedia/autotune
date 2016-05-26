@@ -1,6 +1,6 @@
 <div class="container">
-  <div class="m-page-heading">
-    <div class="pull-right">
+  <div class="m-page-heading list">
+    <!-- <div class="pull-right">
       <form class="form-inline" method="get" action="/blueprints">
         <div class="form-group">
           <label class="sr-only" for="search">Search query</label>
@@ -12,7 +12,7 @@
           <% } %>
         </div>
       </form>
-    </div>
+    </div> -->
     <h3>Manage blueprints</h3>
   </div>
 
@@ -24,8 +24,14 @@
         </td>
         <td class="text-right" colspan="3">
           <form class="form-inline" method="get" action="/blueprints">
+            <label class="sr-only" for="search">Search query</label>
+            <input type="search" class="form-control"
+                   name="search" id="search" placeholder="Search"
+                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+                   <br />
+                   <br />
             Filters
-            <% if(query.type || query.tag || query.status) { %>
+            <% if(query.type || query.tag || query.status || query.search) { %>
               (<a href="/blueprints">clear</a>)
             <% } %>
             &nbsp;

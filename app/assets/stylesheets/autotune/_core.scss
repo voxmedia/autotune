@@ -14,7 +14,7 @@ html{
   margin: auto;
 }
 
-.tab-pane .container{
+.tab-pane .container, .tab-content .container{
   max-width: 900px;
 }
 
@@ -133,13 +133,13 @@ input[type="checkbox"] {
 .pub-time{
   color: color(secondary);
   font-size: 75%;
-  margin-top: 7px;
+  margin-top: 3px;
 }
 
 //status notifications and alerts
 .m-status, .m-status .glyphicon {
   display: inline-block;
-  font-size: 10px;
+  // font-size: 10px;
   text-transform: capitalize;
   &.status-ok {
     color: color(positive);
@@ -150,6 +150,9 @@ input[type="checkbox"] {
   &.status-alert {
     color: color(negative);
   }
+}
+.m-status .glyphicon{
+  font-size: 10px;
 }
 
 .status-ok {
@@ -169,14 +172,16 @@ input[type="checkbox"] {
     color: color(actionable);
     display: inline-block;
   }
-  .m-status{
-    display: table-cell;
-    left: -10px;
-    position: relative;
-  }
   a.title {
     color: color(actionable);
     display: table-cell;
+  }
+  &:first-child{
+    .m-status{
+      display: table-cell;
+      left: -10px;
+      position: relative;
+    }
   }
   // &.ok-notice,
   // &.info-notice,
@@ -271,7 +276,11 @@ input[type="checkbox"] {
 
 //page headings
 .m-page-heading {
-  padding: 40px 0 20px 0;
+  padding: 40px 0 0 0px;
+  &.list{
+    padding: 50px 0 0 10px;
+    margin-bottom: -20px;
+  }
   h3 {
     margin: 0;
     // font-size: 31px;

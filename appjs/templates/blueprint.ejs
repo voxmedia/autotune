@@ -1,130 +1,134 @@
-<div class="row m-page-heading">
-  <div class="container">
-    <div class="col-xs-12">
-      <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-primary" href="<%=model.url() %>/new_project">New project</a><% } %></h3>
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active"><a
+      href="#edit" aria-controls="edit"
+      role="tab" data-toggle="tab">Blueprint Info</a></li>
+  <% if ( model.hasForm() ) { %>
+  <li role="presentation"><a
+      href="#builder" aria-controls="builder"
+      role="tab" data-toggle="tab">Form Builder</a></li>
+  <% } else { %>
+  <li role="presentation" class="disabled"><a>Form Builder</a></li>
+  <% } %>
+</ul>
 
-      <% if ( !model.isNew() ) { %>
-      <p class="text-muted">
-        Status:
-        <% if(model.hasStatus('ready')) { %>
-        <span class="text-success"><i class="icon-ok"></i>Ready</span>
-        <% } else if(model.hasStatus('broken')) { %>
-        <span class="text-danger"><i class="icon-alert"></i>Broken</span>
-        <% } else if(model.hasStatus('updating')) { %>
-        <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
-        <% } else { %>
-        <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
-        <% } %>
-      </p>
-      <% } %>
-    </div>
-  </div>
 
   <div class="row">
     <div class="col-xs-12">
-      <!-- Nav tabs -->
-      <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a
-            href="#edit" aria-controls="edit"
-            role="tab" data-toggle="tab">Blueprint Info</a></li>
-        <% if ( model.hasForm() ) { %>
-        <li role="presentation"><a
-            href="#builder" aria-controls="builder"
-            role="tab" data-toggle="tab">Form Builder</a></li>
-        <% } else { %>
-        <li role="presentation" class="disabled"><a>Form Builder</a></li>
-        <% } %>
-      </ul>
 
       <!-- Tab panes -->
       <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="edit">
-          <div class="row">
-            <div class="col-sm-6">
-              <form id="new-blueprint" role="form"
-                    data-next="show" data-model="Blueprint"
-                    <% if(model.isNew()) { %>
-                    data-action="new"
-                    <% } else { %>
-                    data-action="edit" data-model-id="<%=model.get('id') %>"
-                    <% } %> >
-                <div class="form-group">
-                  <label for="title">Title</label>
-                  <input type="text" required class="form-control"
-                         <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
-                         id="title" name="title" placeholder="Enter title">
-                </div>
-                <div class="form-group">
-                  <label for="repo_url">Repo url</label>
-                  <input type="text" required class="form-control"
-                         <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
-                         id="repo_url" name="repo_url" placeholder="https://github.com/username/reponame.git#branchname">
-                  <p class="help-block">You can target a branch by adding <code>#branchname</code> to the url.<p>
-                  <p class="help-block">Changing the repo url will trigger an automatic upgrade of the blueprint.</p>
-                </div>
-                <% if(!model.isNew()) { %>
-                <div class="form-group">
-                  <label for="status" class="block">Status</label>
-                  <div class="select">
-                    <select id="status" name="status" class="form-control">
-                      <option>Change status</option>
-                      <option value="testing"
-                        <% if ( model.hasStatus('testing') ) { %>selected<% } %>
-                        >Testing</option>
-                      <option value="broken"
-                        <% if ( model.hasStatus('broken') ) { %>selected<% } %>
-                        >Broken</option>
-                      <option value="ready"
-                        <% if ( model.hasStatus('ready') ) { %>selected<% } %>
-                        >Ready</option>
-                    </select>
-                  </div>
-                </div>
-                <% } %>
-                <div class="form-group">
-                  <button type="submit" class="btn btn-primary"
-                          data-loading-text="Saving...">Save changes</button>
+        <div class="container">
+          <div class="m-page-heading">
+            <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-primary" href="<%=model.url() %>/new_project">New project</a><% } %></h3>
 
-                  <% if ( !model.isNew() ) { %>
-                  <button type="button" class="btn btn-primary"
-                          data-action-message="Upgrade started"
-                          data-loading-text="Upgrading..."
-                          data-action="update-repo" data-model="Blueprint"
-                          data-action-next="reload"
-                          data-model-id="<%=model.get('slug') %>">Upgrade</button>
-                  <button type="button" class="btn btn-danger"
-                          <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
-                          data-action-message="Project deleted"
-                          data-action-confirm="Are you sure you wish to delete this?"
-                          data-loading-text="Deleting..."
-                          data-action="destroy"
-                          data-action-next="/blueprints" data-model="Blueprint"
-                          data-model-id="<%=model.get('slug') %>">Delete</button>
+            <% if ( !model.isNew() ) { %>
+            <p class="text-muted">
+              Status:
+              <% if(model.hasStatus('ready')) { %>
+              <span class="text-success"><i class="icon-ok"></i>Ready</span>
+              <% } else if(model.hasStatus('broken')) { %>
+              <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+              <% } else if(model.hasStatus('updating')) { %>
+              <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+              <% } else { %>
+              <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
+              <% } %>
+            </p>
+            <% } %>
+          </div>
+        </div>
+        <div role="tabpanel" class="tab-pane active" id="edit">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-6">
+                <form id="new-blueprint" role="form"
+                      data-next="show" data-model="Blueprint"
+                      <% if(model.isNew()) { %>
+                      data-action="new"
+                      <% } else { %>
+                      data-action="edit" data-model-id="<%=model.get('id') %>"
+                      <% } %> >
+                  <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" required class="form-control"
+                           <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
+                           id="title" name="title" placeholder="Enter title">
+                  </div>
+                  <div class="form-group">
+                    <label for="repo_url">Repo url</label>
+                    <input type="text" required class="form-control"
+                           <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
+                           id="repo_url" name="repo_url" placeholder="https://github.com/username/reponame.git#branchname">
+                    <p class="help-block">You can target a branch by adding <code>#branchname</code> to the url.<p>
+                    <p class="help-block">Changing the repo url will trigger an automatic upgrade of the blueprint.</p>
+                  </div>
+                  <% if(!model.isNew()) { %>
+                  <div class="form-group">
+                    <label for="status" class="block">Status</label>
+                    <div class="select">
+                      <select id="status" name="status" class="form-control">
+                        <option>Change status</option>
+                        <option value="testing"
+                          <% if ( model.hasStatus('testing') ) { %>selected<% } %>
+                          >Testing</option>
+                        <option value="broken"
+                          <% if ( model.hasStatus('broken') ) { %>selected<% } %>
+                          >Broken</option>
+                        <option value="ready"
+                          <% if ( model.hasStatus('ready') ) { %>selected<% } %>
+                          >Ready</option>
+                      </select>
+                    </div>
+                  </div>
                   <% } %>
-                </div>
-              </form>
-            </div>
-            <div class="col-sm-6">
-              <% if ( !model.isNew() ) { %>
-              <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
-              <p><strong>Type:</strong> <%=model.get('type') %></p>
-              <% if ( model.has('config') ) { %>
-              <p class="margin-bottom"><%=model.get('config').description %></p>
-              <% } %>
-              <% } %>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary"
+                            data-loading-text="Saving...">Save changes</button>
+
+                    <% if ( !model.isNew() ) { %>
+                    <button type="button" class="btn btn-primary"
+                            data-action-message="Upgrade started"
+                            data-loading-text="Upgrading..."
+                            data-action="update-repo" data-model="Blueprint"
+                            data-action-next="reload"
+                            data-model-id="<%=model.get('slug') %>">Upgrade</button>
+                    <button type="button" class="btn btn-danger"
+                            <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
+                            data-action-message="Project deleted"
+                            data-action-confirm="Are you sure you wish to delete this?"
+                            data-loading-text="Deleting..."
+                            data-action="destroy"
+                            data-action-next="/blueprints" data-model="Blueprint"
+                            data-model-id="<%=model.get('slug') %>">Delete</button>
+                    <% } %>
+                  </div>
+                </form>
+              </div>
+              <div class="col-sm-6">
+                <% if ( !model.isNew() ) { %>
+                <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
+                <p><strong>Type:</strong> <%=model.get('type') %></p>
+                <% if ( model.has('config') ) { %>
+                <p class="margin-bottom"><%=model.get('config').description %></p>
+                <% } %>
+                <% } %>
+              </div>
             </div>
           </div>
         </div>
 
-        <div role="tabpanel" class="tab-pane" id="builder">
-          <div id="schema"></div>
-          <div id="previewWrap">
-            <div class="message"></div>
-            <div id="previewDiv"></div>
-          </div>
+        <div role="tabpanel" class="tab-pane" id="builder" style="max-width: 900px; margin: auto; padding: 1rem;">
+          <!-- <div class="container"> -->
+            <div id="schema"></div>
+            <div id="previewWrap">
+              <div class="message"></div>
+              <div id="previewDiv"></div>
+            </div>
+          <!-- </div> -->
         </div>
 
       </div>
+
     </div>
   </div>
-</div>

@@ -107,13 +107,13 @@
       <td><%=item.get('created_by') %></td>
       <td>
         <% if ( item.hasUnpublishedUpdates() ) { %>
-          <span class="label label-success">Published</span>
+          <span class="m-status status-ok">Published</span>
         <% } else if ( item.isPublished() ) { %>
-          <span class="label label-success">Published</span>
+          <span class="m-status status-ok">Published</span>
         <% } else if ( item.hasStatus('broken') ) { %>
-          <span class="label label-danger">Broken</span>
+          <span class="m-status status-alert">Broken</span>
         <% } else { %>
-          <span class="label label-warning">Draft</span>
+          <span class="m-status status-info">Draft</span>
         <% } %>
         <% if ( item.get('published_at') ) { %><div class="pub-time"><%=item.publishedTime() %></div><% } %>
       </td>
