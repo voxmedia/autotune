@@ -535,11 +535,26 @@ label {
   }
 }
 
-h3#projectTitle textarea{
-  padding: 0px;
-  height: 100px;
-  border-width:0px;
+h3#projectTitle {
+  div, textarea{
+    line-height: 1.25;
+    display: inline-block;
+  }
+  .glyphicon{
+    font-size: 13px;
+    color: color(actionable, dark);
+    vertical-align: top;
+    margin-left: 7px;
+  }
+  textarea{
+    padding: 0px;
+    height: 100px;
+    border-width:0px;
+    overflow: hidden;
+    display: none;
+  }
 }
+
 
 [data-alpaca-container-item-name='title']{
   display: none;
