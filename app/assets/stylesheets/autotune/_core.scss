@@ -9,7 +9,13 @@ html{
 
 .container{
   width: 100%;
-  padding: 0px;
+  max-width: 1300px;
+  padding: 1rem;
+  margin: auto;
+}
+
+.tab-pane .container{
+  max-width: 900px;
 }
 
 #spinner {
@@ -560,9 +566,4 @@ h3#projectTitle {
       color: color(primary);
     }
   }
-}
-
-
-[data-alpaca-container-item-name='title']{
-  display: none;
 }

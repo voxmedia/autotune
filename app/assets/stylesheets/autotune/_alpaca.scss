@@ -55,6 +55,9 @@ td.actionbar .btn-group button {
       padding-left: 0px;
     }
   }
+  legend{
+    font-size: 18px;
+  }
 }
 
 .alpaca-array-actionbar-bottom {
@@ -209,8 +212,4 @@ td.actionbar .btn-group button {
 
 .has-error .help-block .glyphicon{
   color: color(negative);
-}
-
-.col-sm-4 legend.alpaca-container-label{
-  display: none;
 }

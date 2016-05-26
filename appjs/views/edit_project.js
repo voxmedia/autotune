@@ -579,10 +579,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         options_fields['slug']['fieldClass'] = 'hidden';
       }
 
-      if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
-        var googleText = form_config.schema.properties.google_doc_url.title;
-        var newText = googleText + '<br><button type="button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
-        form_config.schema.properties.google_doc_url.title = newText;
+      if(this.model.hasPreviewType('live')){
+        options_fields['title'] = {
+          'fieldClass': 'hidden'
+        };
+        if(this.model.getConfig().spreadsheet_template){
+          var googleText = form_config.schema.properties.google_doc_url.title;
+          var newText = googleText + '<br><button type="button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
+          form_config.schema.properties.google_doc_url.title = newText;
+        }
       }
 
       _.extend(schema_properties, form_config.schema.properties || {});
@@ -591,9 +596,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         _.extend(options_fields, form_config.options.fields || {});
       }
 
+      logger.debug('^^', schema_properties);
+
       var opts = {
         "schema": {
-          "title": this.model.blueprint.get('title'),
+          "title": function(){
+            if(view.model.hasPreviewType('live')){
+              return '';
+            } else {
+              return view.model.blueprint.get('title');
+            }
+          },
           "description": this.model.getConfig().description,
           "type": "object",
           "properties": schema_properties
@@ -656,6 +669,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           opts.data.theme = pluckAttr(availableThemes, 'slug')[0];
         }
       }
+
+      logger.debug('**', opts);
 
       $form.alpaca(opts);
     }
