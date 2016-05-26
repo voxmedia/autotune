@@ -166,17 +166,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   toggleEditTitle: function(eve){
-    if(eve.delegateTarget.localName === 'div'){
+    if(eve.target.localName !== 'textarea'){
+      logger.debug('clicking here', eve);
       this.$('#projectTitle div').hide();
       this.$('#projectTitle .glyphicon').hide();
       this.$('#projectTitle textarea').show();
-      this.$('#projectTitle textarea').val('').focus().val(this.$('#projectTitle div').text());
-
+      this.$('#projectTitle textarea').val('').focus();
+      if(this.$('#projectTitle div').text() !== 'Add Project Title'){
+        this.$('#projectTitle textarea').val(this.$('#projectTitle div').text());
+      }
     }
   },
 
   resizeTitleTextarea: function(){
-    this.$('#projectForm input[name="title"]').val(this.$('#projectTitle textarea').val());
     this.$('#projectTitle div').text(this.$('#projectTitle textarea').val());
     this.$('#projectTitle textarea').height(this.$('#projectTitle div').height());
     var titleHasFocus = this.$('#projectTitle textarea').is(':focus');
@@ -193,6 +195,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
+    this.$('#projectForm input[name="title"]').val(this.$('#projectTitle textarea').val());
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
@@ -205,9 +208,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     } else {
       $('.project-save-warning').hide();
     }
-
-    // logger.debug('keypress', $('#projectTitle textarea').val(), data);
-    // data['title'] = $('#projectTitle textarea').val();
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form

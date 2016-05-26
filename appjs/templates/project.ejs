@@ -53,16 +53,16 @@
       <% if (model.blueprint.hasPreviewType('live')) { %>
       <div id="projectEditor" class="row">
           <div class="col-sm-8 scroll-pane" id="preview-pane">
-            <h4 class="blueprint-title"><%= model.get('blueprint_title') %></h4>
+            <h4 class="blueprint-title"><%= model.blueprint.get('title') %></h4>
             <h3 id="projectTitle">
                 <% if ( model.isNew() && (copyProject == false) ) {
                   %>
-                  <div>Add Project Title</div>
+                  <div>Add Project Title</div><span class="glyphicon glyphicon-pencil"></span>
                   <textarea>Add Project Title</textarea>
                   <%
                 } else if ( copyProject ) {
                   %>
-                  <div><%= model.get( 'title' ) %></div>
+                  <div><%= model.get( 'title' ) %></div><span class="glyphicon glyphicon-pencil"></span>
                   <textarea><%= model.get( 'title' ) %></textarea>
                   <%
                 } else {

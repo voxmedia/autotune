@@ -536,6 +536,7 @@ label {
 }
 
 h3#projectTitle {
+  cursor: pointer;
   div, textarea{
     line-height: 1.25;
     display: inline-block;
@@ -547,11 +548,17 @@ h3#projectTitle {
     margin-left: 7px;
   }
   textarea{
+    cursor: text;
     padding: 0px;
-    height: 100px;
+    height: 28px;
     border-width:0px;
     overflow: hidden;
     display: none;
+  }
+  &:hover{
+    .glyphicon{
+      color: color(primary);
+    }
   }
 }
 
