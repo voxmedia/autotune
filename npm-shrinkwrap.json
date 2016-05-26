@@ -1,6 +1,6 @@
 {
   "name": "autotune",
-  "version": "0.3.19",
+  "version": "0.3.24",
   "dependencies": {
     "alpaca": {
       "version": "1.5.17",
