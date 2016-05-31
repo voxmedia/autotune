@@ -1,29 +1,16 @@
 <p class="margin-top">
-  <button type="submit" class="btn btn-primary" id="saveBtn"
-          data-loading-text="Saving...">Save</button>
+
+<% if ( model.hasType( 'app' ) ) { %>
+<button type="submit" class="btn btn-primary" id="saveBtn"
+        data-loading-text="Saving...">Save</button>
+<% } %>
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
-    <% if ( model.hasType( 'graphic' ) ) { %>
-  <a class="btn btn-primary" id="previewBtn"
-     <% if ( !model.hasPreviewType('live') && !model.hasInitialBuild()) { %>disabled="true"<% } %>
-      href="#preview">Preview</a>
-    <% } else { %>
-  <a class="btn btn-primary" target="_blank" id="previewBtn"
-     href="<%=model.getPreviewUrl() %>">Preview</a>
+    <% if ( model.hasType( 'app' ) ) { %>
+    <a class="btn btn-primary" target="_blank" id="previewBtn"
+       href="<%=model.getPreviewUrl() %>">Preview</a>
     <% } %>
-  <% } else { %>
-  <a class="btn btn-primary" target="_blank" id="viewBtn"
-     href="<%=model.getPublishUrl() %>">View</a>
-  <% } %>
-
-  <% if ( model.isPublishable() ) { %>
-  <button type="button" class="btn btn-success" id="publishBtn"
-          <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
-          data-action-message="Publishing..."
-          data-action="build-and-publish" data-model="Project"
-          data-action-next="reload"
-          data-model-id="<%=model.get('slug') %>">Publish</button>
   <% } %>
 
   <a class="btn btn-info" id="duplicateBtn"

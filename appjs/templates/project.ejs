@@ -28,7 +28,13 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-
+    <div id="project-save-warning-container">
+      <div class="project-save-warning">
+        <span class="glyphicon glyphicon-alert"></span>Your work is not saved.
+        <button type="submit" class="btn btn-primary btn-sm"
+                 id="savePreview" data-loading-text="Saving...">Save now</button>
+      </div>
+    </div>
     <div role="tabpanel" class="tab-pane active" id="edit">
       <% if (model.blueprint.hasPreviewType('live')) { %>
       <div id="projectEditor" class="row">
@@ -98,27 +104,10 @@
           <div id="preview">
 
             <div class="preview-frame">
-              <% if ( ! model.hasPreviewType('live') ) { %>
-                <div id="save-warning" class="project-save-warning">
-                  <p class="text-warning">
-                   The data in the project form isn't up-to-date with the latest project build data. Save your project to see changes.
-                  </p>
-                </div>
-                <% if ( model.hasStatus('broken') ) { %>
-                <p class="text-danger">
-                   <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
-                </p>
-                  <% if ( model.has('error_message') ) { %>
-                  <p class="text-danger">
-                   <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
-                   <%=model.get('error_message') %>
-                  </p>
-                  <% } %>
-                <% } else if ( model.hasUnpublishedUpdates() ) { %>
-                <p class="text-warning">
-                  <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
-                </p>
-                <% } %>
+              <% if ( model.hasUnpublishedUpdates() ) { %>
+              <p class="text-warning">
+                <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
+              </p>
               <% } %>
               <div id="embed-preview" class="loading">
                 <div class="overlay">
@@ -213,6 +202,17 @@
 
     <div role="tabpanel" class="tab-pane" id="publish">
       <div class="container">
+        <% if ( model.isPublishable() ) { %>
+        <button type="button" class="btn btn-success" id="publishBtn"
+                <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
+                data-action-message="Publishing..."
+                data-action="build-and-publish" data-model="Project"
+                data-action-next="reload"
+                data-model-id="<%=model.get('slug') %>">Publish</button>
+        <% } else { %>
+          <a class="btn btn-primary" target="_blank" id="viewBtn"
+             href="<%=model.getPublishUrl() %>">View</a>
+        <% } %>
         <% if ( model.has('embed_html') ) { %>
         <p>
           <button type="button" class="btn btn-default"
