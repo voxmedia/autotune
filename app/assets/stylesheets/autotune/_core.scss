@@ -12,6 +12,9 @@ html{
   max-width: 1300px;
   padding: 1rem;
   margin: auto;
+  .row{
+    margin: 0 -15px;
+  }
 }
 
 .row{
@@ -300,8 +303,8 @@ input[type="checkbox"] {
 .m-page-heading {
   padding: 40px 0 0 0px;
   &.list{
-    padding: 50px 0 0 10px;
-    margin-bottom: -20px;
+    padding: 50px 0 0 0;
+    margin-bottom: 20px;
   }
   h3 {
     margin: 0;
@@ -344,7 +347,6 @@ input[type="checkbox"] {
   //   background: $gray-lighter;
   // }
   &.collection {
-    margin-top:40px;
     tr.m-table-heading > td {
       padding-top: 35px;
       text-transform: uppercase;
@@ -366,6 +368,9 @@ input[type="checkbox"] {
           width: 20%;
         }
       }
+    }
+    @media (max-width: 580px) and (min-width: 500px){
+      margin-top: 40px;
     }
   }
 }
@@ -620,16 +625,59 @@ h3#projectTitle {
       }
     }
   }
-  @media (max-width: 550px){
-    // .new-button, .text-right{
-    //   display: block;
-    //   width: 100%;
-    // }
-    // .select{
-    //   float:right;
-    //   display: block;
-    //   width: 261px;
-    //   margin-top: 10px;
-    // }
+  @media (max-width: 580px){
+    .filters{
+      position: absolute;
+      right: 0px;
+      width: 100%;
+      span, div{
+        width: 23%;
+        margin-right: 2%;
+        select{
+          width: 100%;
+        }
+        &:last-child{
+          margin-right: 10px;
+        }
+      }
+    }
   }
+  @media (max-width: 500px){
+    .filters{
+      position: relative;
+      span{
+        width: 110px;
+        margin-left: -100px;
+      }
+      div{
+        float:right;
+        width: 100%;
+        max-width: 261px;
+        display: block;
+        margin: 0 0 10px 0;
+        select, #blueprint_title{
+          width: 100%;
+        }
+        &:last-child{
+          margin-right: 0px;
+        }
+      }
+    }
+  }
+  @media (max-width: 400px){
+    .new-button, .text-right{
+      display: block;
+      width: 100%;
+      a.btn{
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+  }
+}
+
+input#search{
+  width: 100%;
+  max-width: 261px;
+  float:right;
 }
