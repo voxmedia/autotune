@@ -27,7 +27,12 @@ html{
 
 .tab-pane{
   @media (max-width: 1040px){
-    padding-top: 20px;
+    .scroll-pane{
+      padding-top: 45px;
+    }
+    .container{
+      padding-top: 50px;
+    }
   }
 }
 
@@ -86,7 +91,7 @@ label.block {
 }
 
 #navbar-save-container{
-  display:inline-block;
+  display:inline;
   .project-save-warning{
     display: none;
     padding: 4px 15px;
@@ -108,11 +113,12 @@ label.block {
   display: block;
   background-color: color(background);
   z-index: 1;
+  margin-top: -1px;
   border-bottom: 1px solid color(border);
   .project-save-warning{
     display: none;
     color: color(text);
-    padding: 5px;
+    padding: 6px 5px 5px 5px;
     .glyphicon{
       margin-right: 10px;
     }
@@ -597,6 +603,9 @@ label {
   // position: fixed;
   height: 100%;
   overflow-y: scroll;
+  h4{
+    margin-top: 0px;
+  }
   @media (max-width: $screen-sm){
     position: relative;
   }
@@ -604,7 +613,7 @@ label {
 
 #preview-pane{
   // margin-left: 15px;
-  padding: 25px 15px 0 15px;
+  // padding: 25px 15px 0 15px;
   position:fixed;
   @media (max-width: $screen-sm){
     position: relative;
