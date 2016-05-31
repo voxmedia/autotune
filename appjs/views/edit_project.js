@@ -83,7 +83,7 @@ var ProjectSaveModal = Backbone.View.extend({
     },
 
     closeModal: function(eve){
-      if($(eve.target).hasClass('modal-backdrop')){
+      if($(eve.target).hasClass('modal-backdrop') || $(eve.target).is('#closeModal')){
         this.teardown();
         this.trigger('close');
       }

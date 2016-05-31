@@ -68,6 +68,38 @@ Autotune.configure do |conf|
     'ENV' => Rails.env
   }
 
+  # Theme meta data
+  conf.theme_meta_data = {
+    'colors' => {
+      'primary_color' => {
+        'friendly_name' => 'Primary color',
+        'helper_text' => 'Dominant color for the theme'
+      },
+      'secondary_color' => {
+        'friendly_name' => 'Secondary color',
+        'helper_text' => 'Secondary color for the theme'
+      },
+      'button_bg_color' => {
+        'friendly_name' => 'Button background color',
+        'helper_text' => 'Color for buttons'
+      },
+      'button_bg_color_hover' => {
+        'friendly_name' => 'Button background hover color',
+        'helper_text' => 'Color for hover state of buttons'
+      },
+      'button_font_color' => {
+        'friendly_name' => 'Button font color',
+        'helper_text' => 'Color for text on buttons'
+      }
+    },
+    'social' => {
+      'twitter_handle' => {
+        'friendly_name' => 'Twitter account',
+        'helper_text' => 'Used for via @ text for shares'
+      }
+    }
+  }
+
   # Generic theme data
   conf.generic_theme = {
     'colors' => {
@@ -83,7 +115,7 @@ Autotune.configure do |conf|
       'body_font_family' => 'Georgia Regular, serif',
       'header_font_family' => 'Georgia Bold, serif',
       'button_font_family' => 'Georgia Regular, serif',
-      'header_font_weight' => 700
+      'header_font_weight' => 700,
       'button_font_weight' => 'normal'
     },
     'social' => {

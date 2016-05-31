@@ -18,9 +18,7 @@
   </div>
 </div>
 
-<!-- <div class="col-xs-12">
-  <input type='text' class="colorpicker"/>
-</div> -->
+
 <div role="tabpanel">
 
   <!-- Nav tabs -->
@@ -48,6 +46,11 @@
                 <% } %> >
             <div class="form-group">
               <label for="title">Title</label>
+              <% if(model.isDefault()) {%>
+               <p class="text-muted">Theme name will be displayed as typed below.</p>
+              <% } else {%>
+                <p class="text-muted">Theme name will be displayed as "Group name - Theme name"</p>
+              <% }%>
               <input type="text" required class="form-control"
                      <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
                      id="title" name="title" placeholder="Enter title">
@@ -69,9 +72,9 @@
             <% } %>
             <% if (!model.isNew()) { %>
               <h3>Theme Data</h3>
-              <% _.each(model.themeData(), function(obj, group){ %>
+              <% _.each(['colors','social'], function(group){ %>
                 <div class="form-group">
-                <% if (_.isObject(obj)) { %>
+                <% if (_.isObject(model.themeData(group))) { %>
                   <table class="table">
                     <tbody>
                       <tr class="m-table-heading">
@@ -80,14 +83,21 @@
                       </tr>
                   <% _.each(model.themeData(group), function(prop, key){ %>
                     <tr>
-                      <td>
-                        <label class="" for="<%= key %>"><%= key %></label>
+                      <td class="theme-prop-label">
+                        <% if (app.config.theme_meta_data[group] && app.config.theme_meta_data[group][key]) { %>
+                          <label class=""> <%= app.config.theme_meta_data[group][key].friendly_name %></label>
+                          <p><small class="text-muted" for="<%= key %>">$<%= key %></small></p>
+                          <p class="helper-text text-muted"> <%= app.config.theme_meta_data[group][key].helper_text %></p>
+                        <% } else {%>
+                          <label class=""> <%= key %></label>
+                          <p><small class="text-muted" for="<%= key %>">$<%= key %></small></p>
+                        <% } %>
                       </td>
                       <td>
                       <% if (isColor(prop)) { %>
-                        <input type='text' class='colorpicker' name="themedata-<%= group %>-<%= key %>" value="<%= prop %>" />
+                        <input type='text' class='right colorpicker' name="themedata-<%= group %>-<%= key %>" value="<%= prop %>" />
                       <% } else {%>
-                          <input type='text' name="themedata-<%= group %>-<%= key %>" value="<%= prop %>" />
+                          <input type='text' class="right" name="themedata-<%= group %>-<%= key %>" value="<%= prop %>" />
                       <% } %>
                       </td>
                   <% }) %>
@@ -96,7 +106,7 @@
               <% } else { %>
                <div class="form-group">
                    <label for="<%= group %>"><%= group %></label>
-                   <input type='text' name="themedata-root-<%= group %>" value="<%= obj %>" />
+                   <input type='text' name="themedata-root-<%= obj %>" value="<%= model.themeData(group) %>" />
                </div>
               <% } %>
               </div>
