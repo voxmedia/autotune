@@ -87,7 +87,7 @@
                         <% if (app.config.theme_meta_data[group] && app.config.theme_meta_data[group][key]) { %>
                           <label class=""> <%= app.config.theme_meta_data[group][key].friendly_name %></label>
                           <p><small class="text-muted" for="<%= key %>">$<%= key %></small></p>
-                          <p class="text-muted"> <%= app.config.theme_meta_data[group][key].helper_text %></p>
+                          <p class="helper-text text-muted"> <%= app.config.theme_meta_data[group][key].helper_text %></p>
                         <% } else {%>
                           <label class=""> <%= key %></label>
                           <p><small class="text-muted" for="<%= key %>">$<%= key %></small></p>
