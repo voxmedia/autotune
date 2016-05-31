@@ -1,50 +1,55 @@
 <div class="container" style="padding-top: 60px;">
-  <div style="display: inline-block;">
-    <a id="new-project" class="btn btn-primary"
-       href="/projects/new">New project</a>
-  </div>
-  <div class="text-right" style="display: inline-block; float: right;">
-    <form class="form-inline" method="get" action="/projects">
+  <div class="list-page-header">
+    <div class="new-button">
+      <button id="new-project" class="btn btn-primary"
+         href="/projects/new">New project</button>
+    </div>
+    <div class="text-right">
+      <form class="form-inline" method="get" action="/projects">
         <input type="text" class="form-control"
-               name="search" id="search" placeholder="Search"
-               <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-      <br />
-      <br />
-      Filters
-      <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
-        (<a href="/projects">clear</a>)
-      <% } %>
-      &nbsp;
-      <% if ( app.themes.length > 1 ) { %>
-      <div class="select">
-        <select name="theme" id="theme" class="form-control" data-auto-submit="true">
-          <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
-        <% app.themes.each(function(theme) { %>
-          <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
-                value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>
-        <% }) %>
-        </select>
-      </div>
-      <% } %>
-      <div class="select">
-        <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">
-          <option disabled <% if(!query.blueprint_title) { %>selected<% } %>>Blueprint</option>
-        <% _.each(app.config.blueprint_titles, function(blueprint_title) { %>
-          <option <% if(String(blueprint_title.id) === query.blueprint_title) { %>selected<% } %>
-                value="<%=blueprint_title.id %>"><%=blueprint_title.title %></option>
-        <% }) %>
-        </select>
-      </div>
-      <div class="select">
-        <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
-          <option disabled <% if(!query.pub_status) { %>selected<% } %>>Status</option>
-        <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
-          <option <% if(pub_status === query.pub_status) { %>selected<% } %>
-                value="<%=pub_status %>"><%=pub_status %></option>
-        <% }) %>
-        </select>
-      </div>
-    </form>
+                 name="search" id="search" placeholder="Search"
+                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+                 <br />
+                 <br />
+                 <br />
+        <div class="filters">
+          Filters
+          <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
+            (<a href="/projects">clear</a>)
+          <% } %>
+          &nbsp;
+          <% if ( app.themes.length > 1 ) { %>
+            <div class="select">
+              <select name="theme" id="theme" class="form-control" data-auto-submit="true">
+                <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
+              <% app.themes.each(function(theme) { %>
+                <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
+                      value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>
+              <% }) %>
+              </select>
+            </div>
+            <% } %>
+            <div class="select">
+              <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">
+                <option disabled <% if(!query.blueprint_title) { %>selected<% } %>>Blueprint</option>
+              <% _.each(app.config.blueprint_titles, function(blueprint_title) { %>
+                <option <% if(String(blueprint_title.id) === query.blueprint_title) { %>selected<% } %>
+                      value="<%=blueprint_title.id %>"><%=blueprint_title.title %></option>
+              <% }) %>
+              </select>
+            </div>
+            <div class="select">
+              <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
+                <option disabled <% if(!query.pub_status) { %>selected<% } %>>Status</option>
+              <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
+                <option <% if(pub_status === query.pub_status) { %>selected<% } %>
+                      value="<%=pub_status %>"><%=pub_status %></option>
+              <% }) %>
+              </select>
+            </div>
+        </div>
+      </form>
+    </div>
   </div>
   <table class="table collection">
     <thead>
