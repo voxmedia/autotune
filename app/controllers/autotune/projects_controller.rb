@@ -165,6 +165,7 @@ module Autotune
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.group = @project.theme.group
 
         # is this user allowed to use this theme?
         unless @project.theme.nil? ||
