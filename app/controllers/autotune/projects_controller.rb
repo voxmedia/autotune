@@ -64,6 +64,11 @@ module Autotune
         query[:theme_id] = theme.id
       end
 
+      if params.key? :group
+        group = Group.find_by_slug(params[:group])
+        query[:group_id] = group.id
+      end
+
       unless current_user.role? :superuser
         if current_user.role? [:editor, :designer]
           @projects = @projects.where(
