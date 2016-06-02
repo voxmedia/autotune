@@ -30,18 +30,18 @@ module Autotune
       # Filter and search query
       query = {}
 
-      query[:status] = params[:status] if params.key? :status
+      query[:status] = params[:status] if params[:status].present?
 
-      if params.key? :blueprint
+      if params[:blueprint].present?
         blueprint = Blueprint.find_by_slug(params[:blueprint])
         query[:blueprint_id] = blueprint.id
-      elsif params.key? :blueprint_id
+      elsif params[:blueprint_id].present?
         query[:blueprint_id] = params[:blueprint_id]
-      elsif params.key? :blueprint_title
+      elsif params[:blueprint_title].present?
         query[:blueprint_id] = params[:blueprint_title]
       end
 
-      if params.key? :pub_status
+      if params[:pub_status].present?
         if params[:pub_status] == 'published'
           @projects = @projects.where.not(:published_at => nil)
         else
@@ -49,7 +49,7 @@ module Autotune
         end
       end
 
-      if params.key? :search
+      if params[:search].present?
         users = User.search(params[:search]).pluck(:id)
         sql = @projects.search_sql(params[:search])
 
@@ -59,12 +59,12 @@ module Autotune
         @projects = @projects.where(sql)
       end
 
-      if params.key? :theme
+      if params[:theme].present?
         theme = Theme.find_by_slug(params[:theme])
         query[:theme_id] = theme.id
       end
 
-      if params.key? :group
+      if params[:group].present?
         group = Group.find_by_slug(params[:group])
         query[:group_id] = group.id
       end
@@ -81,7 +81,7 @@ module Autotune
 
       @projects = @projects.where(query)
 
-      if params.key? :type
+      if params[:type].present?
         @blueprints = Blueprint
         @blueprint_ids = @blueprints.where(:type => params[:type]).pluck(:id)
         @projects = @projects.where(:blueprint_id => @blueprint_ids)
