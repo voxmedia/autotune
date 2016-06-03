@@ -6,9 +6,14 @@
     </div>
     <div class="text-right">
       <form class="form-inline" method="get" action="/projects">
-        <input type="text" class="form-control"
-                 name="search" id="search" placeholder="Search"
-                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+        <div class="input-group">
+          <input type="text" class="form-control"
+                   name="search" id="search" placeholder="Search"
+                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </span>
+        </div>
                  <br />
                  <br />
                  <br />

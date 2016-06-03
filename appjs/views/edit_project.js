@@ -98,7 +98,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
     'keypress': 'pollChange',
-    'click #projectTitle ': 'toggleEditTitle',
+    // 'click #projectTitle ': 'toggleEditTitle',
     'click #savePreview': 'savePreview',
     'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm'
@@ -165,29 +165,29 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
   },
 
-  toggleEditTitle: function(eve){
-    if(eve.target.localName !== 'textarea'){
-      logger.debug('clicking here', eve);
-      this.$('#projectTitle div').hide();
-      this.$('#projectTitle .glyphicon').hide();
-      this.$('#projectTitle textarea').show();
-      this.$('#projectTitle textarea').val('').focus();
-      if(this.$('#projectTitle div').text() !== 'Add Project Title'){
-        this.$('#projectTitle textarea').val(this.$('#projectTitle div').text());
-      }
-    }
-  },
-
-  resizeTitleTextarea: function(){
-    this.$('#projectTitle div').text(this.$('#projectTitle textarea').val());
-    this.$('#projectTitle textarea').height(this.$('#projectTitle div').height());
-    var titleHasFocus = this.$('#projectTitle textarea').is(':focus');
-    if(!titleHasFocus){
-      this.$('#projectTitle div').show();
-      this.$('#projectTitle .glyphicon').show();
-      this.$('#projectTitle textarea').hide();
-    }
-  },
+  // toggleEditTitle: function(eve){
+  //   if(eve.target.localName !== 'textarea'){
+  //     logger.debug('clicking here', eve);
+  //     this.$('#projectTitle div').hide();
+  //     this.$('#projectTitle .glyphicon').hide();
+  //     this.$('#projectTitle textarea').show();
+  //     this.$('#projectTitle textarea').val('').focus();
+  //     if(this.$('#projectTitle div').text() !== 'Add Project Title'){
+  //       this.$('#projectTitle textarea').val(this.$('#projectTitle div').text());
+  //     }
+  //   }
+  // },
+  //
+  // resizeTitleTextarea: function(){
+  //   this.$('#projectTitle div').text(this.$('#projectTitle textarea').val());
+  //   this.$('#projectTitle textarea').height(this.$('#projectTitle div').height());
+  //   var titleHasFocus = this.$('#projectTitle textarea').is(':focus');
+  //   if(!titleHasFocus){
+  //     this.$('#projectTitle div').show();
+  //     this.$('#projectTitle .glyphicon').show();
+  //     this.$('#projectTitle textarea').hide();
+  //   }
+  // },
 
   focusPollChange: function(){
     this.forceUpdateDataFlag = true;
@@ -195,13 +195,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
-    this.$('#projectForm input[name="title"]').val(this.$('#projectTitle textarea').val());
+    // this.$('#projectForm input[name="title"]').val(this.$('#projectTitle textarea').val());
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
         data = $form.alpaca('get').getValue();
 
-    this.resizeTitleTextarea();
+    // this.resizeTitleTextarea();
 
     if(this.hasUnsavedChanges()){
       $('.project-save-warning').show().css('display', 'inline-block');
@@ -580,9 +580,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
 
       if(this.model.hasPreviewType('live')){
-        options_fields['title'] = {
-          'fieldClass': 'hidden'
-        };
+        // options_fields['title'] = {
+        //   'fieldClass': 'hidden'
+        // };
         if(this.model.getConfig().spreadsheet_template){
           var googleText = form_config.schema.properties.google_doc_url.title;
           var newText = googleText + '<br><button type="button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';

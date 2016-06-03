@@ -293,12 +293,20 @@ input[type="checkbox"] {
 }
 
 #nav {
-  .navbar-brand {
+  a.navbar-brand {
     // font-weight: bold;
     font-size: 20px;
     padding: 4px 0 4px 3px;
     height: auto;
     line-height: 1;
+    color: color(background);
+    perspective: 1000;
+    &:hover{
+      color: darken(color(background), 20%);
+      &:before{
+        transform: rotateY(180deg);
+      }
+    }
     &:before {
       content: "";
       background-image: image-url('autotune/logo.png');
@@ -307,10 +315,12 @@ input[type="checkbox"] {
       background-repeat: no-repeat;
       display: inline-block;
       height: 25px;
-      // margin-bottom: -5px;
       margin-right: 8px;
       width: 26px;
+      transform: rotateY(0deg);
       vertical-align: text-top;
+      transform-style: preserve-3d;
+      transition: all 150ms linear;
     }
   }
 }

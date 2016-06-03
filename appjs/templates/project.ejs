@@ -56,18 +56,21 @@
           <h3 id="projectTitle">
               <% if ( model.isNew() && (copyProject == false) ) {
                 %>
-                <div>Add Project Title</div><span class="glyphicon glyphicon-pencil"></span>
-                <textarea>Add Project Title</textarea>
+                <div>Add Project Title</div>
+                <!-- <span class="glyphicon glyphicon-pencil"></span> -->
+                <!-- <textarea>Add Project Title</textarea> -->
                 <%
               } else if ( copyProject ) {
                 %>
-                <div><%= model.get( 'title' ) %></div><span class="glyphicon glyphicon-pencil"></span>
-                <textarea><%= model.get( 'title' ) %></textarea>
+                <div><%= model.get( 'title' ) %></div>
+                <!-- <span class="glyphicon glyphicon-pencil"></span> -->
+                <!-- <textarea><%= model.get( 'title' ) %></textarea> -->
                 <%
               } else {
                 %>
-                <div><%= model.get( 'title' ) %></div><span class="glyphicon glyphicon-pencil"></span>
-                <textarea><%= model.get( 'title' ) %></textarea>
+                <div><%= model.get( 'title' ) %></div>
+                <!-- <span class="glyphicon glyphicon-pencil"></span> -->
+                <!-- <textarea><%= model.get( 'title' ) %></textarea> -->
                 <%
               } %>
           </h3>
