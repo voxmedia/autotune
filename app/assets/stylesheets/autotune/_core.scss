@@ -739,3 +739,45 @@ input#search{
   max-width: 261px;
   float:right;
 }
+
+.pagination{
+  display: table;
+  margin: auto;
+  li{
+    &.ellipses span{
+      cursor: default;
+      background-color: transparent;
+      border-color: transparent;
+      color: color(text);
+      margin-top: -4px .33em 0 .33em;
+      padding: .2em .5em;
+    }
+    a{
+      border-radius: 3px;
+      border-color: color(text, dark);
+      background-color: color(text, dark);
+      color: color(text);
+      padding: .2em .5em;
+      margin: 0 .33em;
+      &:hover, &:focus{
+        background-color: color(border, dark);
+        border-color: color(border, dark);
+        color: color(background);
+      }
+    }
+    &.active a, &.active a:hover, &.active a:focus{
+      background-color: color(background, dark);
+      border-color: color(background, dark);
+      color: color(background);
+    }
+  }
+
+  li.previous{
+    position:absolute;
+    left:10px;
+  }
+  li.next{
+    position:absolute;
+    right:10px;
+  }
+}

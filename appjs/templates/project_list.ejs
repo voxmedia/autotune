@@ -193,73 +193,70 @@
   <% }); %>
     </tbody>
   </table>
-  <nav>
+  <nav class="previous">
     <ul class="pagination">
       <% if(collection.state.currentPage !== collection.state.firstPage){ %>
-      <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
-      <% if(collection.state.currentPage - 1 >= collection.state.firstPage){ %>
-        <li class=""><a href="<%=getPageUrl(collection.state.firstPage)%>"><%=collection.state.firstPage %><span class="sr-only"></span></a></li>
-      <% } %>
-      <% if(collection.state.currentPage - 3 > collection.state.firstPage){ %>
-        <li><a>...<span class="sr-only"></span></a></li>
-      <% } %>
+        <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
       <% } %>
 
-      <% if(collection.state.currentPage === collection.state.firstPage){ %>
-
-        <% var i = 1; %>
-        <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
-        <% while(collection.state.firstPage + i <= collection.state.totalPages && i < 6) { %>
-          <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
-          <% i++; %>
+        <% if(collection.state.currentPage - 1 >= collection.state.firstPage){ %>
+          <li class=""><a href="<%=getPageUrl(collection.state.firstPage)%>"><%=collection.state.firstPage %><span class="sr-only"></span></a></li>
+        <% } %>
+        <% if(collection.state.currentPage - 3 > collection.state.firstPage){ %>
+          <li class="ellipses"><span>...</span></li>
         <% } %>
 
-      <% } else if(collection.state.currentPage === collection.state.lastPage){ %>
+        <% if(collection.state.currentPage === collection.state.firstPage){ %>
 
-        <% var i = -5; %>
-        <% while(i < 0) { %>
-          <% if(collection.state.lastPage + i >= collection.state.firstPage){ %>
-            <li class=""><a href="<%=getPageUrl(collection.state.lastPage + i)%>"><%=collection.state.lastPage + i %><span class="sr-only"></span></a></li>
+          <% var i = 1; %>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+          <% while(collection.state.firstPage + i <= collection.state.totalPages && i < 6) { %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% i++; %>
           <% } %>
-          <% i++; %>
-        <% } %>
-        <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
 
-      <% } else { %>
+        <% } else if(collection.state.currentPage === collection.state.lastPage){ %>
 
-        <% var i = -2; %>
-        <% while(i < 0) { %>
-          <% if(collection.state.currentPage + i > collection.state.firstPage){ %>
-          <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+          <% var i = -5; %>
+          <% while(i < 0) { %>
+            <% if(collection.state.lastPage + i >= collection.state.firstPage){ %>
+              <li class=""><a href="<%=getPageUrl(collection.state.lastPage + i)%>"><%=collection.state.lastPage + i %><span class="sr-only"></span></a></li>
+            <% } %>
+            <% i++; %>
           <% } %>
-          <% i++; %>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+
+        <% } else { %>
+
+          <% var i = -2; %>
+          <% while(i < 0) { %>
+            <% if(collection.state.currentPage + i > collection.state.firstPage){ %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% } %>
+            <% i++; %>
+          <% } %>
+
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+
+          <% var i = 1; %>
+          <% while(collection.state.currentPage + i <= collection.state.lastPage && i < 3) { %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% i++; %>
+          <% } %>
+
         <% } %>
 
-        <!-- <li class=""><a href="<%=getPageUrl(collection.state.currentPage - 1)%>"><%=collection.state.currentPage - 1 %><span class="sr-only"></span></a></li> -->
-        <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
 
-        <% var i = 1; %>
-        <% while(collection.state.currentPage + i <= collection.state.lastPage && i < 3) { %>
-          <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
-          <% i++; %>
-        <% } %>
-        <!-- <li class=""><a href="<%=getPageUrl(collection.state.currentPage + 1)%>"><%=collection.state.currentPage + 1 %><span class="sr-only"></span></a></li> -->
-
-      <% } %>
-
-      <% if(collection.state.currentPage !== collection.state.lastPage){ %>
         <% if(collection.state.lastPage - collection.state.currentPage > 2){ %>
           <% if(collection.state.lastPage - collection.state.currentPage > 3){ %>
-          <li><a>...<span class="sr-only"></span></a></li>
+          <li class="ellipses"><span>...</span></li>
           <% } %>
           <li class=""><a href="<%=getPageUrl(collection.state.lastPage)%>"><%=collection.state.lastPage %><span class="sr-only"></span></a></li>
         <% } %>
-      <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
-      <% } %>
 
+      <% if(collection.state.currentPage !== collection.state.lastPage){ %>
+        <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
+      <% } %>
     </ul>
   </nav>
-  <!-- <% _.each(collection.state, function(item, value) { %>
-    <p><%= item %>, <%= value %></p>
-  <% }) %> -->
 </div>
