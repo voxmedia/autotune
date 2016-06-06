@@ -12,7 +12,7 @@ var ProjectCollection = PageableCollection.extend({
     totalPages: null,
     firstPage: 1,
     currentPage: 1,
-    pageSize: 15
+    pageSize: 15,
   },
 
   parseState: function (response, queryParams, state, options) {
