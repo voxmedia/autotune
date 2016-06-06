@@ -25,9 +25,14 @@
     <div class="text-right">
       <form class="form-inline" method="get" action="/blueprints">
         <label class="sr-only" for="search">Search query</label>
-        <input type="search" class="form-control"
-               name="search" id="search" placeholder="Search"
-               <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+        <div class="input-group">
+          <input type="search" class="form-control"
+                 name="search" id="search" placeholder="Search"
+                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </span>
+        </div>
                <br />
                <br />
                <br />
