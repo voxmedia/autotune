@@ -12,6 +12,7 @@ var $ = require('jquery'),
 PNotify.prototype.options.styling = "bootstrap3";
 // Load PNotify buttons component
 require('pnotify/src/pnotify.buttons');
+require('pnotify/src/pnotify.callbacks');
 
 var Application = BaseView.extend(require('./mixins/links.js'), {
   //className: 'container-fluid',
@@ -104,13 +105,19 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   },
 
   alert: function(message, level, wait) {
-    // this.$('#alert-area').prepend('<p>ug.</p>');
+    var page = this;
     this.alertDefaults.stack.context = this.$('#alert-area');
     var noti,
         opts = _.defaults({
           text: message,
           type: level || 'info',
-          delay: 8000
+          delay: 8000,
+          before_open: function(thing){
+            page.$('#alert-area').parent().addClass('has-alert');
+          },
+          after_close: function(thing){
+            page.$('#alert-area').parent().removeClass('has-alert');
+          }
         }, this.alertDefaults);
 
     if ( _.isNumber(wait) && wait > 0 ) {
@@ -124,18 +131,10 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
 
     noti = this.findNotification( message );
 
-    // var elem = this.$('#alert-area').parent();
-    // this.$('#alert-area span.glyphicon').click(function(){
-    //   $(elem).removeClass('has-alert');
-    // });
-    setTimeout(function(){
-      this.$('#alert-area').parent().removeClass('has-alert');
-    }, 8000);
     return noti || new PNotify(opts);
   },
 
   findNotification: function(message) {
-    this.$('#alert-area').parent().addClass('has-alert');
     return _.find(PNotify.notices, function(notify) {
       return notify.options.text === message;
     } );
