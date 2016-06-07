@@ -165,16 +165,36 @@ input[type="checkbox"] {
   margin: -10px 10px 0;
 }
 
+#alert-area{
+  .ui-pnotify .ui-pnotify-shadow{
+    box-shadow: none;
+  }
+  .ui-pnotify-icon, .ui-pnotify-icon span{
+    float: none;
+    display: inline;
+    margin-right: 10px;
+  }
+  .ui-pnotify-text{
+    display: inline;
+  }
+  .alert{
+    padding: 4px;
+    text-align: center;
+    border-radius: 0px;
+  }
+}
+
 .ui-pnotify-icon .glyphicon{
   color: #ffffff;
 }
 
-.ui-pnotify.center-notification{
+.ui-pnotify.center-top-notification{
   right: 0;
   left: 0;
   margin: auto;
-  max-width: 750px;
-  top: 50px;
+  top: 0px;
+  height: 28px;
+  font-size: 12px;
 }
 
 .pub-time{

@@ -62,11 +62,9 @@ var ProjectSaveModal = Backbone.View.extend({
     renderView: function(template) {
       this.$el.html(template());
       this.$el.modal({show:false}); // dont show modal on instantiation
-      logger.debug('modal', this);
     },
 
     cancel: function(){
-      logger.debug('cancel', this);
       $('.project-save-warning').hide();
       this.trigger('cancel');
       this.teardown();
@@ -596,8 +594,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         _.extend(options_fields, form_config.options.fields || {});
       }
 
-      logger.debug('^^', schema_properties);
-
       var opts = {
         "schema": {
           "title": function(){
@@ -669,8 +665,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           opts.data.theme = pluckAttr(availableThemes, 'slug')[0];
         }
       }
-
-      logger.debug('**', opts);
 
       $form.alpaca(opts);
     }

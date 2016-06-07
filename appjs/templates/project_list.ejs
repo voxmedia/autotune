@@ -210,7 +210,7 @@
 
           <% var i = 1; %>
           <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
-          <% while(collection.state.firstPage + i < collection.state.totalPages && i < 6) { %>
+          <% while(collection.state.firstPage + i <= collection.state.totalPages && i < 6) { %>
             <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
             <% i++; %>
           <% } %>

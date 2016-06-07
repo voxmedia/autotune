@@ -17,11 +17,12 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   //className: 'container-fluid',
   template: require('../templates/application.ejs'),
   alertDefaults: {
-    addclass: "stack-bottomright",
-    stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
-    // addclass: "center-notification",
-    // width: '95%',
-    buttons: { sticker: false }
+    // addclass: "stack-bottomright",
+    stack: {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0},
+    addclass: "center-top-notification",
+    width: '100%',
+    buttons: { sticker: false },
+    animate_speed: 0
   },
   events: {
     'click #savePreview': 'savePreview'
@@ -103,6 +104,8 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   },
 
   alert: function(message, level, wait) {
+    // this.$('#alert-area').prepend('<p>ug.</p>');
+    this.alertDefaults.stack.context = this.$('#alert-area');
     var noti,
         opts = _.defaults({
           text: message,
@@ -120,10 +123,19 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     }
 
     noti = this.findNotification( message );
+
+    // var elem = this.$('#alert-area').parent();
+    // this.$('#alert-area span.glyphicon').click(function(){
+    //   $(elem).removeClass('has-alert');
+    // });
+    setTimeout(function(){
+      this.$('#alert-area').parent().removeClass('has-alert');
+    }, 8000);
     return noti || new PNotify(opts);
   },
 
   findNotification: function(message) {
+    this.$('#alert-area').parent().addClass('has-alert');
     return _.find(PNotify.notices, function(notify) {
       return notify.options.text === message;
     } );

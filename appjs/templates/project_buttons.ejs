@@ -1,9 +1,11 @@
 <p class="margin-top">
 
-<% if ( model.hasType( 'app' ) ) { %>
+<!-- <% if ( model.hasType( 'app' ) ) { %>
 <button type="submit" class="btn btn-primary" id="saveBtn"
         data-loading-text="Saving...">Save</button>
-<% } %>
+<% } %> -->
+<button type="submit" class="btn btn-primary" id="saveBtn"
+        data-loading-text="Saving...">Save</button>
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
