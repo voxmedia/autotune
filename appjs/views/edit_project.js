@@ -258,6 +258,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         $('#embed-preview').empty();
         view.pym = new pym.Parent('embed-preview', previewUrl);
         view.pym.iframe.onload = iframeLoaded;
+        view.pym.onMessage('postPreviewData', function(data){
+          logger.debug('theme change ----------- received message from preview', data);
+          view.$('#projectForm').alpaca('set').setValue(JSON.parse(data));
+          view.pollChange();
+        });
 
         // In case some dumb script hangs the loading process
         setTimeout(iframeLoaded, 20000);
@@ -432,6 +437,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           if ( view.pym ) { view.pym.remove(); }
           view.pym = new pym.Parent('embed-preview', previewUrl);
           view.pym.iframe.onload = iframeLoaded;
+          view.pym.onMessage('postPreviewData', function(data){
+            logger.debug('A ----------- received message from preview', data);
+            var parsedData = JSON.parse(data);
+            view.$('#projectForm').alpaca('set').setValue(parsedData);
+            view.renderForm();
+            view.pollChange();
+          });
 
           // In case some dumb script hangs the loading process
           setTimeout(iframeLoaded, 20000);
@@ -666,6 +678,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         }
       }
 
+      logger.debug('form alpaca opts', opts);
       $form.alpaca(opts);
     }
   },
