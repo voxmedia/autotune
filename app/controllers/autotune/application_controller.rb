@@ -6,6 +6,9 @@ module Autotune
     # protect_from_forgery with: :exception
 
     before_action :require_login, :except => [:cors_preflight_check]
+    before_action :require_google_login,
+                  :except => [:cors_preflight_check],
+                  :if => :google_auth_required?
 
     before_action :cors_set_access_control_headers
 
@@ -83,12 +86,20 @@ module Autotune
       gauth.present? && gauth.valid_credentials?
     end
 
+    def google_auth_required?
+      Autotune.configuration.google_auth_enabled
+    end
+
     def any_roles?
       current_user.meta['roles'].present? && current_user.meta['roles'].any?
     end
 
     def role?(*args)
       args.reduce { |a, e| a || current_user.meta['roles'].include?(e.to_s) }
+    end
+
+    def accepts_json?
+      Mime[:json].in?(request.accepts)
     end
 
     private
@@ -102,15 +113,8 @@ module Autotune
     end
 
     def require_login
-      if signed_in? && any_roles?
-        if Autotune.configuration.google_auth_enabled
-          return require_google_login
-        end
-        return true
-      end
-
       if signed_in?
-        render_error 'Not allowed', :forbidden
+        render_error('Not allowed', :forbidden) unless any_roles?
       else
         respond_to do |format|
           format.html { redirect_to login_path(request.fullpath) }
@@ -120,11 +124,11 @@ module Autotune
     end
 
     def require_google_login
-      return true if has_google_auth?
-
-      respond_to do |format|
-        format.html { render 'google_auth' }
-        format.json { render_error 'Unauthorized', :unauthorized }
+      if signed_in? && any_roles? && !has_google_auth? && !accepts_json?
+        respond_to do |format|
+          format.html { render 'google_auth' }
+          format.json { render_error 'Unauthorized', :unauthorized }
+        end
       end
     end
 
@@ -144,7 +148,7 @@ module Autotune
       # It appears Rails automatically assumes you want HTML if html or */*
       # is anywhere in the Accept header. This is not how the Accept header is
       # supposed to work.
-      if Mime[:json].in?(request.accepts)
+      if accepts_json?
         # We'll be lazy and assume the client wants JSON if application/json
         # appears in the Accept header. Then we have to force the format.
         request.format = :json

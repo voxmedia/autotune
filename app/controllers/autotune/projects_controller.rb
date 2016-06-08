@@ -12,7 +12,7 @@ module Autotune
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update,:update_snapshot, :destroy, :build, :build_and_publish] do
+    before_action :only => [:show, :update, :update_snapshot, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
              current_user.role?(:editor => instance.group.slug) ||

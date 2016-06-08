@@ -369,6 +369,25 @@ module Autotune
       assert_equal LIVE_HEAD1, new_p.blueprint_version
     end
 
+    test 'json request not blocked by google auth requirement' do
+      tmp = Autotune.config.google_auth_enabled
+      Autotune.config.google_auth_enabled = true
+      valid_auth_header!
+      get :index
+      assert_response :ok
+      assert_match 'Please authenticate with Google', response.body,
+                   'Should display message about logging in with Google'
+
+      accept_json!
+
+      get :index
+      assert_response :success
+      assert_instance_of Array, decoded_response
+      assert_equal Project.all.count, decoded_response.length
+
+      Autotune.config.google_auth_enabled = tmp
+    end
+
     private
 
     def assert_project_data!
