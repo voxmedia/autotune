@@ -235,9 +235,28 @@ input[type="checkbox"] {
 //alerts in tables
 .table td {
   color: color(actionable, dark);
-  &.text-right .glyphicon{
-    color: color(actionable);
-    display: inline-block;
+  &.text-right{
+    .glyphicon{
+      color: color(actionable);
+      display: inline-block;
+    }
+    a{
+      &:first-of-type{
+        span{
+          margin-left: 0px;
+        }
+      }
+      &:last-of-type{
+        span{
+          margin-right: 0px;
+        }
+      }
+      &:only-of-type{
+        span{
+          margin: 0 6px;
+        }
+      }
+    }
   }
   a.title {
     color: color(actionable);
@@ -658,33 +677,33 @@ label {
     padding: 25px 0 50px 0;
   }
 }
-
-h3#projectTitle {
-  cursor: pointer;
-  div, textarea{
-    line-height: 1.25;
-    display: inline;
-  }
-  .glyphicon{
-    font-size: 13px;
-    color: color(actionable, dark);
-    vertical-align: top;
-    margin-left: 7px;
-  }
-  textarea{
-    cursor: text;
-    padding: 0px;
-    height: 28px;
-    border-width:0px;
-    overflow: hidden;
-    display: none;
-  }
-  &:hover{
-    .glyphicon{
-      color: color(primary);
-    }
-  }
-}
+//
+// h3#projectTitle {
+//   cursor: pointer;
+//   div, textarea{
+//     line-height: 1.25;
+//     display: inline;
+//   }
+//   .glyphicon{
+//     font-size: 13px;
+//     color: color(actionable, dark);
+//     vertical-align: top;
+//     margin-left: 7px;
+//   }
+//   textarea{
+//     cursor: text;
+//     padding: 0px;
+//     height: 28px;
+//     border-width:0px;
+//     overflow: hidden;
+//     display: none;
+//   }
+//   &:hover{
+//     .glyphicon{
+//       color: color(primary);
+//     }
+//   }
+// }
 
 .list-page-header{
   width: 100%;

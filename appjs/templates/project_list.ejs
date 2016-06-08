@@ -11,7 +11,7 @@
                    name="search" id="search" placeholder="Search"
                    <% if(query.search) { %>value="<%=query.search %>"<% } %>>
           <span class="input-group-btn">
-            <button class="btn btn-primary" type="submit">Search</button>
+            <button class="btn btn-secondary" type="submit">Search</button>
           </span>
         </div>
                  <br />
@@ -113,12 +113,12 @@
     <tbody>
 
     <tr class="m-table-heading">
-      <td>Project</td>
+      <td style="padding-left: 25px;">Project</td>
       <td class="author-cell">Author</td>
       <td class="status-cell">Status</td>
       <td class="theme-cell">Theme</td>
       <td class="blueprint-cell">Blueprint</td>
-      <td class="bold-actions-cell text-right">Bold Actions</td>
+      <td class="bold-actions-cell">Actions</td>
     </tr>
     <% if(!hasObjects()) { %>
     <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>

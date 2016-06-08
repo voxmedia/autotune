@@ -70,14 +70,8 @@ form.form-inline{
 }
 
 .input-group .input-group-btn button, .input-group .input-group-btn button:hover{
-  border: 2px solid color(border);
+  border-width: 2px;
   padding: 7px 15px;
-}
-
-.input-group input:focus{
-  + .input-group-btn button{
-    border: 2px solid color(primary);
-  }
 }
 
 .input-group-btn [type="button"], .input-group-btn [type="submit"]{

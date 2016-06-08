@@ -30,7 +30,7 @@
                  name="search" id="search" placeholder="Search"
                  <% if(query.search) { %>value="<%=query.search %>"<% } %>>
           <span class="input-group-btn">
-            <button class="btn btn-primary" type="submit">Search</button>
+            <button class="btn btn-secondary" type="submit">Search</button>
           </span>
         </div>
                <br />
@@ -132,7 +132,7 @@
       <tr class="m-table-heading">
         <td>Blueprint</td>
         <td>Status</td>
-        <td class="text-right" colspan="2">Bold Actions</td>
+        <td colspan="2">Actions</td>
       </tr>
     <% if(getObjects().length == 0) { %>
         <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>
