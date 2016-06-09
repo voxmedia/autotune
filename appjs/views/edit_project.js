@@ -203,8 +203,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     if(this.hasUnsavedChanges()){
       $('.project-save-warning').show().css('display', 'inline-block');
+      $('.project-saved').hide();
     } else {
       $('.project-save-warning').hide();
+      $('.project-saved').show().css('display', 'inline-block');
     }
 
     // Make sure the form is valid before proceeding

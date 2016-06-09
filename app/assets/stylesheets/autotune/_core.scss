@@ -21,6 +21,10 @@ html{
   margin: 0;
 }
 
+#project-tabs{
+
+}
+
 .tab-pane .container, .tab-content .container{
   max-width: 900px;
 }
@@ -92,41 +96,55 @@ label.block {
 
 #navbar-save-container{
   display:inline;
-  .project-save-warning{
+  .project-save-warning, .project-saved{
     display: none;
-    padding: 4px 15px;
+    padding: 8px 15px;
     color: #ffffff;
+    font-size: 11px;
+    button{
+      font-size: 11px;
+      padding: 2px 5px;
+      margin-left: 5px;
+    }
     .glyphicon{
       margin-right: 7px;
+      font-size: 11px;
+      vertical-align: top;
+      &.glyphicon-alert{
+        vertical-align: baseline;
+      }
     }
   }
-  @media (max-width: 1040px){
-    display: none;
+  .project-saved{
+    padding: 10px 15px;
   }
+  // @media (max-width: 710px){
+  //   display: none;
+  // }
 }
 
-#project-save-warning-container{
-  display: block;
-  position: fixed;
-  width: 100%;
-  text-align: center;
-  display: block;
-  background-color: color(background);
-  z-index: 1;
-  margin-top: -1px;
-  border-bottom: 1px solid color(border);
-  .project-save-warning{
-    display: none;
-    color: color(text);
-    padding: 6px 5px 5px 5px;
-    .glyphicon{
-      margin-right: 10px;
-    }
-  }
-  @media (min-width: 1040px){
-    display: none;
-  }
-}
+// #project-save-warning-container{
+//   display: block;
+//   position: fixed;
+//   width: 100%;
+//   text-align: center;
+//   display: block;
+//   background-color: color(background);
+//   z-index: 1;
+//   margin-top: -1px;
+//   border-bottom: 1px solid color(border);
+//   .project-save-warning{
+//     display: none;
+//     color: color(text);
+//     padding: 6px 5px 5px 5px;
+//     .glyphicon{
+//       margin-right: 10px;
+//     }
+//   }
+//   @media (min-width: 710px){
+//     display: none;
+//   }
+// }
 
 #embed-preview {
   position:relative;
@@ -340,6 +358,7 @@ input[type="checkbox"] {
     line-height: 1;
     color: color(background);
     perspective: 1000;
+    display: table-cell;
     &:hover{
       color: darken(color(background), 20%);
       &:before{

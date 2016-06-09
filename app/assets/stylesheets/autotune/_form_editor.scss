@@ -67,12 +67,12 @@
 
 .tab-content {
   height: 100%;
-  top: 36px;
+  top: 68px;
   position: fixed;
   width: 100%;
   background-color: color(background);
   overflow-y: scroll;
-  z-index: 4;
+  // z-index: ;
   .tab-content{
     position: relative;
   }
@@ -81,50 +81,34 @@
   height: 100%;
 }
 .nav-tabs{
-  border: 0px solid color(background);
   text-align: center;
-  li, li.active{
+  border-bottom: none;
+  position: fixed;
+  top: 36px;
+  width: 100%;
+  li{
     z-index: 3;
     display:inline-block;
     float: none;
-    border: 0px solid transparent;
-    // margin:5px 5px -1px;
-    // border-width: 0px;
-    margin-top:-1px;
     margin-left: -4px;
-    background-color: $navbar-inverse-bg;
+    background-color: transparent;
     a{
-      border: 1px solid color(background);
-      border-bottom-color: transparent;
-      // border-top-color: transparent;
-      border-left-color: transparent;
-      border-radius: 0px;
+      color: color(actionable);
       margin: 0;
-      height: 40px;
       vertical-align: middle;
-    }
-    &:hover{
-      a{
-        border-color: transparent;
+      padding: 7px 15px;
+      &:hover{
+        border: 1px solid transparent;
+        background-color: transparent;
       }
+    }
+    &.active a, &.active a:hover{
+      font-weight: bold;
+      border: 0px solid transparent;
     }
   }
-  li {
-    a{
-      color: color(accent);
-    }
-    &:first-of-type{
-      a{
-        border-left: 1px solid color(border);
-      }
-    }
-    &:hover{
-      a{
-        background-color: lighten(color(background, dark), 70%);
-        color: color(text);
-        border-color: transparent;
-      }
-    }
+  + .tab-content{
+    border-top: 1px solid color(border);
   }
 }
 .ace_editor {
@@ -136,11 +120,11 @@
   #nav{
     top: 28px;
   }
-  #main{
-    margin-top: 28px;
+  .nav-tabs{
+    top: 64px;
   }
   .tab-content{
-    top: 64px;
+    top: 96px;
   }
 
 }
