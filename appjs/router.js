@@ -148,7 +148,7 @@ module.exports = Backbone.Router.extend({
       jqxhr = projects.getFirstPage({data: query, reset: true});
     }
 
-    Promise.resolve( jqxhr ).then(function(value) {
+    Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
         query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
