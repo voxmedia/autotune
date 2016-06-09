@@ -41,8 +41,8 @@ html{
 }
 
 #spinner {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   position:relative;
 }
 #spinner img {
@@ -98,7 +98,7 @@ label.block {
   display:inline;
   .project-save-warning, .project-saved{
     display: none;
-    padding: 8px 15px;
+    padding: 5px 15px;
     color: #ffffff;
     font-size: 11px;
     button{
@@ -116,7 +116,7 @@ label.block {
     }
   }
   .project-saved{
-    padding: 10px 15px;
+    padding: 8px 15px;
   }
   // @media (max-width: 710px){
   //   display: none;
@@ -337,23 +337,83 @@ input[type="checkbox"] {
 .navbar{
   min-height: 30px;
   z-index: 3;
+  .navbar-header{
+    @media (max-width: 767px){
+      float: none;
+    }
+  }
 }
 
 .navbar-text{
-  margin-top: 9px;
-  margin-bottom: 9px;
+  margin-top: 8px;
+  margin-bottom: 5px;
+  margin-left: 9px;
+}
+
+.navbar-collapse{
+  padding: 0;
 }
 
 .navbar-nav{
   float: right;
-  li { float: left; }
+  li {
+    float: left;
+    a{
+      padding: 7px 0;
+    }
+  }
+  @media (max-width: 767px){
+    display: block;
+    float: left;
+    width: 100%;
+    li{
+      float: none;
+      display: block;
+      border-bottom: 1px solid color(background, dark);
+      &:last-of-type{
+        border-bottom: none;
+      }
+      &.active a:after, .active a:hover:after{
+        display: none;
+      }
+    }
+  }
+}
+
+.navbar-toggle{
+  float: left;
+  margin: 0 2px 0 0;
+  padding: 0px 0;
+  border: none;
+  border-radius: 0px;
+  border-right: 1px solid color(backgroud, dark);
+  height: 32px;
+  .icon-bar{
+    top: 0px;
+    border-radius: 0px;
+  }
+}
+
+.small-nav{
+  display: none;
+  @media (max-width: 767px){
+    display: block;
+  }
+}
+
+.big-nav{
+  display: inline-block;
+  @media (max-width: 767px){
+    display: none;
+  }
 }
 
 #nav {
   a.navbar-brand {
     // font-weight: bold;
     font-size: 20px;
-    padding: 4px 0 4px 3px;
+    padding: 0 0 0 3px;
+    margin: 3px 0;
     height: auto;
     line-height: 1;
     color: color(background);
@@ -372,13 +432,25 @@ input[type="checkbox"] {
       background-size: 100%;
       background-repeat: no-repeat;
       display: inline-block;
-      height: 25px;
+      height: 26px;
       margin-right: 8px;
       width: 26px;
       transform: rotateY(0deg);
       vertical-align: text-top;
       transform-style: preserve-3d;
       transition: all 150ms linear;
+    }
+    &.small-nav{
+      display: none;
+      @media (max-width: 767px){
+        display: inline-block;
+      }
+    }
+    &.big-nav{
+      display: inline-block;
+      @media (max-width: 767px){
+        display: none;
+      }
     }
   }
 }
