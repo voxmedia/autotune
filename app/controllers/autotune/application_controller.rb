@@ -81,10 +81,6 @@ module Autotune
       current_user.present?
     end
 
-    def google_auth_request?
-      request.env['PATH_INFO'] === '/auth/google_oauth2/callback'
-    end
-
     def has_google_auth?
       gauth = current_user.authorizations.find_by(:provider => 'google_oauth2')
       gauth.present? && gauth.valid_credentials?
@@ -128,7 +124,7 @@ module Autotune
     end
 
     def require_google_login
-      if signed_in? && any_roles? && !has_google_auth? && !google_auth_request?
+      if signed_in? && any_roles? && !has_google_auth?
         respond_to do |format|
           format.html { render 'google_auth' }
           format.json { render_error 'Unauthorized', :unauthorized }

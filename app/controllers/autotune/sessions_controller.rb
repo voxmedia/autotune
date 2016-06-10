@@ -4,6 +4,7 @@ module Autotune
   # Handle authentication and user sessions
   class SessionsController < ApplicationController
     skip_before_action :require_login, :only => [:new, :create, :failure]
+    skip_before_action :require_google_login, :only => [:new, :create, :failure]
 
     def create
       auth = Authorization.find_or_initialize_by_auth_hash(omniauth)
