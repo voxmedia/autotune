@@ -5,14 +5,21 @@ require 'redis'
 module Autotune
   # API for projects
   class ProjectsController < ApplicationController
-    before_action :respond_to_html
     model Project
+    skip_before_action :require_google_login,
+                       :only => [:index, :show]
+
+    before_action :only => [:index, :show] do
+      require_google_login if google_auth_required? && !accepts_json?
+    end
+
+    before_action :respond_to_html
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update,:update_snapshot, :destroy, :build, :build_and_publish] do
+    before_action :only => [:show, :update, :update_snapshot, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
              current_user.role?(:editor => instance.group.slug) ||
