@@ -3,19 +3,7 @@
     <h3>Projects</h3>
   </div>
   <div class="col-xs-12 col-sm-6 text-right">
-    <form class="form-inline" method="get" action="/projects">
-      <div class="form-group">
-        <label class="sr-only" for="search">Search query</label>
-        <div class="btn-group">
-          <input type="text" class="form-control"
-                 name="search" id="search" placeholder="Search"
-                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-        <% if(query.search) { %>
-          <a href="/projects">clear</a>
-        <% } %>
-        </div>
-      </div>
-    </form>
+    
   </div>
 </div>
 <table class="table projects">
@@ -27,10 +15,8 @@
       </td>
       <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
+          <div class="form-group">
           Filters
-          <% if(query.theme || query.blueprint_title || query.pub_status) { %>
-            (<a href="/projects">clear</a>)
-          <% } %>
           &nbsp;
           <% if ( app.themes.length > 1 ) { %>
           <div class="select">
@@ -61,6 +47,16 @@
                     value="<%=pub_status %>"><%=pub_status %></option>
             <% }) %>
             </select>
+          </div>
+            <label class="sr-only" for="search">Search query</label>
+            <div class="btn-group">
+              <input type="text" class="form-control"
+                     name="search" id="search" placeholder="Search"
+                     <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+            <% if(query.search || query.theme || query.blueprint_title || query.pub_status) { %>
+              <a href="/projects">clear</a>
+            <% } %>
+            </div>
           </div>
         </form>
       </td>

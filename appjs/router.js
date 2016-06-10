@@ -145,7 +145,7 @@ module.exports = Backbone.Router.extend({
     if (query.page) {
       jqxhr = projects.getPage(parseInt(query.page), {data: query});
     } else {
-      jqxhr = projects.getFirstPage({data: query});
+      jqxhr = projects.getFirstPage({data: query, reset: true});
     }
 
     Promise.resolve( jqxhr ).then(function() {
