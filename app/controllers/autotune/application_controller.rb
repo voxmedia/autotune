@@ -124,7 +124,7 @@ module Autotune
     end
 
     def require_google_login
-      if signed_in? && any_roles? && !has_google_auth? && !accepts_json?
+      if signed_in? && any_roles? && !has_google_auth?
         respond_to do |format|
           format.html { render 'google_auth' }
           format.json { render_error 'Unauthorized', :unauthorized }
