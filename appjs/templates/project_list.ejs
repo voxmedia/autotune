@@ -53,7 +53,7 @@
               <input type="text" class="form-control"
                      name="search" id="search" placeholder="Search"
                      <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-            <% if(query.search) { %>
+            <% if(query.search || query.theme || query.blueprint_title || query.pub_status) { %>
               <a href="/projects">clear</a>
             <% } %>
             </div>
