@@ -252,12 +252,6 @@ input[type="checkbox"] {
   color: color(negative);
 }
 
-.m-table-heading{
-  @media (max-width: $table-bp){
-    display: none;
-  }
-}
-
 .small-list-view{
   display: none;
   @media (max-width: $table-bp){
@@ -295,31 +289,42 @@ table.table.collection tbody tr td {
     color: color(actionable);
     display: table-cell;
   }
-  // needs to be replaced with small bp scss variable
-  @media (max-width: $table-bp){
-    display: block;
-    width: 100% !important;
-    border: none;
-    padding: 2px 0px;
-    font-size: 90%;
-    &.project-cell{
-      border-top: 2px solid color(border);
-      margin-top: 25px;
-      padding: 15px 0px 10px 0px;
-    }
-    &.status-cell{
-      display: none;
-    }
-    &.bold-actions-cell{
-      padding: 15px 0px 0px 0px;
-    }
-    &.text-right{
-      text-align: left;
-    }
-    .glyphicons{
+}
+
+table.table.collection.project-list{
+  tbody tr td{
+    // needs to be replaced with small bp scss variable
+    @media (max-width: $table-bp){
+      display: block;
+      width: 100% !important;
+      border: none;
+      padding: 2px 0px;
       font-size: 90%;
+      &.project-cell{
+        border-top: 2px solid color(border);
+        margin-top: 25px;
+        padding: 15px 0px 10px 0px;
+      }
+      &.status-cell{
+        display: none;
+      }
+      &.bold-actions-cell{
+        padding: 15px 0px 0px 0px;
+      }
+      &.text-right{
+        text-align: left;
+      }
+      .glyphicons{
+        font-size: 90%;
+      }
     }
   }
+  .m-table-heading{
+    @media (max-width: $table-bp){
+      display: none;
+    }
+  }
+}
   // &.ok-notice,
   // &.info-notice,
   // &.alert-notice {
@@ -343,7 +348,7 @@ table.table.collection tbody tr td {
   // &.alert-notice:before {
   //   background-color: color(negative);
   // }
-}
+
 .table td:last-child {
   white-space:nowrap;
 }
@@ -817,7 +822,7 @@ label {
     display: table-cell;
     width: 110px;
     @media (max-width: $table-bp){
-      width: 100%;
+      margin-bottom: 20px;
       display: block;
     }
   }
@@ -826,16 +831,29 @@ label {
     width: 100%;
     vertical-align: top;
     .filter-label{
-      float:left;
-      display: block;
-      margin: -15px 0 5px 0;
+      display:inline;
+      @media (max-width: $table-bp){
+        float: left;
+        display: block;
+        margin: -15px 0 5px 0;
+      }
+    }
+    .input-group{
+      padding-right: 10px;
+      @media (max-width: $table-bp){
+        width: 100%;
+        margin-left: 0px;
+      }
     }
     input, .filters{
-      float: left;
-      display: block;
-      text-align: left;
-      width: 100%;
-      margin-left: 0px;
+      display: inline;
+      @media (max-width: $table-bp){
+        float: left;
+        text-align: left;
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0px;
+      }
       .select:first-of-type{
         margin-left: 0px;
       }
@@ -848,21 +866,11 @@ label {
       display: block;
     }
   }
-  @media (max-width: 400px){
-    .new-button, .text-right{
-      display: block;
-      width: 100%;
-      a.btn{
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    }
-  }
 }
 
 input#search{
   width: 100%;
-  max-width: 261px;
+  max-width: 315px;
   float:right;
 }
 

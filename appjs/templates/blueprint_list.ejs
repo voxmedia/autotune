@@ -35,14 +35,13 @@
         </div>
                <br />
                <br />
-               <br />
-        <div class="filters">
-          <span>Filters
+        <div class="filter-label">Filters
           <% if(query.type || query.tag || query.status || query.search) { %>
             (<a href="/blueprints">clear</a>)
           <% } %>
           &nbsp;
-          </span>
+        </div>
+        <div class="filters">
           <div class="select">
             <select name="type" id="type" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
