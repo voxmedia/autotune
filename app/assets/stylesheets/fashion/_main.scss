@@ -22,7 +22,8 @@ main {
 }
 
 .label{
-  padding: .2em .6em;
+  padding: .1em .5em;
+  font-size: 100%;
   @each $type, $color in (
       default    color(default),
       primary    color(primary),
@@ -34,9 +35,9 @@ main {
       disabled color(disabled),
       link color(link)) {
     &.label-#{$type} {
-      background-color: color(background);
-      border: 1px solid $color;
-      color: $color;
+      background-color: $color;
+      // border: 1px solid $color;
+      color: color(background);
     }
   }
 }

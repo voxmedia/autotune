@@ -1,4 +1,6 @@
 //lets add some padding to crunched page bottoms
+$table-bp: 675px;
+
 html{
   overflow-x:hidden;
 }
@@ -250,8 +252,21 @@ input[type="checkbox"] {
   color: color(negative);
 }
 
+.m-table-heading{
+  @media (max-width: $table-bp){
+    display: none;
+  }
+}
+
+.small-list-view{
+  display: none;
+  @media (max-width: $table-bp){
+    display: inline;
+  }
+}
+
 //alerts in tables
-.table td {
+table.table.collection tbody tr td {
   color: color(actionable, dark);
   &.text-right{
     .glyphicon{
@@ -280,29 +295,29 @@ input[type="checkbox"] {
     color: color(actionable);
     display: table-cell;
   }
-  &:first-child{
-    .m-status{
-      display: table-cell;
-      left: -10px;
-      position: relative;
+  // needs to be replaced with small bp scss variable
+  @media (max-width: $table-bp){
+    display: block;
+    width: 100% !important;
+    border: none;
+    padding: 2px 0px;
+    font-size: 90%;
+    &.project-cell{
+      border-top: 2px solid color(border);
+      margin-top: 25px;
+      padding: 15px 0px 10px 0px;
     }
-  }
-
-  &.bold-actions-cell{
-    @media (max-width: 625px){
+    &.status-cell{
       display: none;
     }
-  }
-
-  &.theme-cell{
-    @media (max-width: 500px){
-      display: none;
+    &.bold-actions-cell{
+      padding: 15px 0px 0px 0px;
     }
-  }
-
-  &.author-cell{
-    @media (max-width: 410px){
-      display: none;
+    &.text-right{
+      text-align: left;
+    }
+    .glyphicons{
+      font-size: 90%;
     }
   }
   // &.ok-notice,
@@ -539,14 +554,14 @@ input[type="checkbox"] {
         &:nth-child(1) {
           width: 35%;
         }
-        &:nth-child(2),
-        &:nth-child(3),
-        &:nth-child(4) {
-          width: 15%;
-        }
-        &:nth-child(5){
-          width: 20%;
-        }
+        // &:nth-child(2),
+        // &:nth-child(3),
+        // &:nth-child(4) {
+        //   width: 15%;
+        // }
+        // &:nth-child(5){
+        //   width: 20%;
+        // }
       }
     }
     @media (max-width: 580px) and (min-width: 500px){
@@ -801,55 +816,36 @@ label {
   .new-button{
     display: table-cell;
     width: 110px;
+    @media (max-width: $table-bp){
+      width: 100%;
+      display: block;
+    }
   }
   .text-right{
     display: table-cell;
     width: 100%;
     vertical-align: top;
-    input, .filters{
+    .filter-label{
+      float:left;
       display: block;
+      margin: -15px 0 5px 0;
+    }
+    input, .filters{
+      float: left;
+      display: block;
+      text-align: left;
+      width: 100%;
+      margin-left: 0px;
+      .select:first-of-type{
+        margin-left: 0px;
+      }
       a{
         display: inline;
       }
     }
-  }
-  @media (max-width: 580px){
-    .filters{
-      position: absolute;
-      right: 0px;
+    @media (max-width: $table-bp){
       width: 100%;
-      span, div{
-        width: 23%;
-        margin-right: 2%;
-        select{
-          width: 100%;
-        }
-        &:last-child{
-          margin-right: 10px;
-        }
-      }
-    }
-  }
-  @media (max-width: 500px){
-    .filters{
-      position: relative;
-      span{
-        width: 110px;
-        margin-left: -100px;
-      }
-      div{
-        float:right;
-        width: 100%;
-        max-width: 261px;
-        display: block;
-        margin: 0 0 10px 0;
-        select, #blueprint_title{
-          width: 100%;
-        }
-        &:last-child{
-          margin-right: 0px;
-        }
-      }
+      display: block;
     }
   }
   @media (max-width: 400px){

@@ -16,14 +16,13 @@
         </div>
                  <br />
                  <br />
-                 <br />
-        <div class="filters">
-          <span>Filters
+        <div class="filter-label">Filters
           <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
             (<a href="/projects">clear</a>)
           <% } %>
           &nbsp;
-          </span>
+        </div>
+        <div class="filters">
           <% if ( app.themes.length > 1 ) { %>
             <div class="select">
               <select name="theme" id="theme" class="form-control" data-auto-submit="true">
@@ -113,9 +112,10 @@
     <tbody>
 
     <tr class="m-table-heading">
-      <td style="padding-left: 25px;">Project</td>
+      <td class="project-cell">Project</td>
       <td class="author-cell">Author</td>
       <td class="status-cell">Status</td>
+      <td class="publish-cell">Published</td>
       <td class="theme-cell">Theme</td>
       <td class="blueprint-cell">Blueprint</td>
       <td class="bold-actions-cell">Actions</td>
@@ -125,35 +125,45 @@
     <% }
      _.each(getObjects(), function(item) { %>
      <tr>
-      <td <% if ( item.hasStatus('built') ) { %>
-        class="ok-notice"
-        <% } else if ( item.hasStatus('broken') ) { %>
-        class="alert-notice"
-        <% } else { %>
-        class="info-notice"
-        <% } %>>
+      <td class="project-cell">
+        <a class="title" href="<%=item.url() %>"><%= item.get('title') %></a></td>
+      <td class="author-cell">
+        <span class="small-list-view">Created by </span>
+        <%=item.get('created_by') %>
+      </td>
+      <td class="status-cell">
         <% if ( item.hasStatus('built') ) { %>
-          <span class="m-status"><span class="glyphicon glyphicon-ok"></span></span>
+          <!-- <span class="m-status"><span class="glyphicon glyphicon-ok"></span></span> -->
+          <span class="label label-success">Built</span>
         <% } else if ( item.hasStatus('broken') ) { %>
-          <span class="m-status"><span class="glyphicon glyphicon-alert"></span></span>
+          <span class="label label-danger">Broken</span>
         <% } else if ( item.hasStatus('building') ) { %>
-          <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span>
+          <!-- <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span> -->
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
         <% } else { %>
           <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
         <% } %>
-        <a class="title" href="<%=item.url() %>"><%= item.get('title') %></a></td>
-      <td class="author-cell"><%=item.get('created_by') %></td>
-      <td class="status-cell">
-        <% if ( item.hasUnpublishedUpdates() ) { %>
-          <span class="m-status status-ok">Published</span>
-        <% } else if ( item.isPublished() ) { %>
-          <span class="m-status status-ok">Published</span>
-        <% } else if ( item.hasStatus('broken') ) { %>
-          <span class="m-status status-alert">Broken</span>
+      </td>
+      <td class="publish-cell">
+        <% if ( item.hasUnpublishedUpdates() || item.isPublished() ) { %>
+          Published
         <% } else { %>
-          <span class="m-status status-info">Draft</span>
+          Draft
         <% } %>
         <% if ( item.get('published_at') ) { %><div class="pub-time"><%=item.publishedTime() %></div><% } %>
+        <span style="margin-left: 5px;" class="small-list-view">
+          <% if ( item.hasStatus('built') ) { %>
+            <!-- <span class="m-status"><span class="glyphicon glyphicon-ok"></span></span> -->
+            <span class="label label-success">Built</span>
+          <% } else if ( item.hasStatus('broken') ) { %>
+            <span class="label label-danger">Broken</span>
+          <% } else if ( item.hasStatus('building') ) { %>
+            <!-- <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span> -->
+            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
+          <% } else { %>
+            <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
+          <% } %>
+        </span>
       </td>
       <td class="theme-cell">
         <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
