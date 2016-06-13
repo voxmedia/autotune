@@ -213,19 +213,25 @@
 
 
     <div role="tabpanel" class="tab-pane" id="publish">
-      <div class="container">
+      <div class="container" style="padding-top: 20px;">
+        <h3><%= model.get( 'title' ) %></h3>
+        <hr />
+        <h4>Publish</h4>
         <% if ( model.isPublishable() ) { %>
-        <button type="button" class="btn btn-success" id="publishBtn"
+        <button type="button" class="btn btn-primary" id="publishBtn"
                 <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
                 data-action-message="Publishing..."
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
-                data-model-id="<%=model.get('slug') %>">Publish</button>
-        <% } else { %>
-          <a class="btn btn-primary" target="_blank" id="viewBtn"
-             href="<%=model.getPublishUrl() %>">View</a>
+                data-model-id="<%=model.get('slug') %>">Publish now</button>
         <% } %>
+        <a class="btn btn-secondary" target="_blank" id="viewBtn"
+           href="<%=model.getPublishUrl() %>">View</a>
         <% if ( model.has('embed_html') ) { %>
+          <br />
+          <br />
+          <br />
+        <h4>Embed in your story</h4>
         <p>
           <button type="button" class="btn btn-default"
                   data-hook="copyEmbedToClipboard">Copy embed code</button>
@@ -234,6 +240,9 @@
         <textarea class="form-control" rows="6" readonly><%=model.get('embed_html') %></textarea>
         <% } %>
         <% if ( model.has('screenshot_sm_url') ) { %>
+          <br />
+          <br />
+        <h4>Screenshots</h4>
         <ul class="nav nav-pills">
           <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>
           <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>
