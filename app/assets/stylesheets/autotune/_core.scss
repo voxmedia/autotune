@@ -1,5 +1,5 @@
 //lets add some padding to crunched page bottoms
-$table-bp: 675px;
+// $screen-sm: 675px;
 
 html{
   overflow-x:hidden;
@@ -120,9 +120,14 @@ label.block {
   .project-saved{
     padding: 8px 15px;
   }
-  // @media (max-width: 710px){
-  //   display: none;
-  // }
+  @media (min-width: $screen-sm){
+    display: block;
+    position: absolute;
+    top: 35px;
+    .project-save-warning, .project-saved{
+      color: color(background, dark);
+    }
+  }
 }
 
 // #project-save-warning-container{
@@ -254,7 +259,7 @@ input[type="checkbox"] {
 
 .small-list-view{
   display: none;
-  @media (max-width: $table-bp){
+  @media (max-width: $screen-sm){
     display: inline;
   }
 }
@@ -294,7 +299,7 @@ table.table.collection tbody tr td {
 table.table.collection.project-list{
   tbody tr td{
     // needs to be replaced with small bp scss variable
-    @media (max-width: $table-bp){
+    @media (max-width: $screen-sm){
       display: block;
       width: 100% !important;
       border: none;
@@ -320,7 +325,7 @@ table.table.collection.project-list{
     }
   }
   .m-table-heading{
-    @media (max-width: $table-bp){
+    @media (max-width: $screen-sm){
       display: none;
     }
   }
@@ -772,11 +777,19 @@ label {
 }
 
 #preview-pane{
-  // margin-left: 15px;
-  // padding: 25px 15px 0 15px;
   position:fixed;
+  padding: 15px 15px;
+  margin-left: -3px;
+  ul.nav{
+    display: none;
+  }
   @media (max-width: $screen-sm){
+    margin-left: 0px;
     position: relative;
+    overflow-y: auto;
+    ul.nav{
+      display: block;
+    }
   }
 }
 
@@ -784,8 +797,18 @@ label {
   background-color: color(accent);
   float: right;
   margin-left: 0px;
+  @media (max-width: $screen-sm){
+    position: relative;
+    float: none;
+    ul.nav{
+      display: none;
+    }
+  }
   #projectForm{
     padding: 25px 0 50px 0;
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
   }
 }
 //
@@ -819,35 +842,39 @@ label {
 .list-page-header{
   width: 100%;
   .new-button{
-    display: table-cell;
+    display: inline;
     width: 110px;
-    @media (max-width: $table-bp){
+    @media (max-width: $screen-sm){
       margin-bottom: 20px;
       display: block;
     }
   }
   .text-right{
-    display: table-cell;
+    display: inline-block;
     width: 100%;
+    max-width: 450px;
+    float: right;
     vertical-align: top;
     .filter-label{
       display:inline;
-      @media (max-width: $table-bp){
+      float: left;
+      margin-left: 0px;
+      @media (max-width: $screen-sm){
         float: left;
         display: block;
         margin: -15px 0 5px 0;
       }
     }
     .input-group{
-      padding-right: 10px;
-      @media (max-width: $table-bp){
+      @media (max-width: $screen-sm){
         width: 100%;
         margin-left: 0px;
       }
     }
     input, .filters{
       display: inline;
-      @media (max-width: $table-bp){
+      white-space:nowrap;
+      @media (max-width: $screen-sm){
         float: left;
         text-align: left;
         width: 100%;
@@ -861,8 +888,9 @@ label {
         display: inline;
       }
     }
-    @media (max-width: $table-bp){
+    @media (max-width: $screen-sm){
       width: 100%;
+      max-width: 100%;
       display: block;
     }
   }

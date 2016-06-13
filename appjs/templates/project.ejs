@@ -39,8 +39,7 @@
       <% if (model.blueprint.hasPreviewType('live')) { %>
       <div id="projectEditor" class="row">
 
-        <div class="col-sm-4 col-sm-offset-8 scroll-pane" id="form-pane">
-          <h4>Preview</h4>
+        <div class="col-sm-8 scroll-pane" id="preview-pane">
           <ul class="nav nav-pills">
             <button type="button" id="small-view"
                     class="btn btn-default resize"> Small </button>
@@ -49,9 +48,7 @@
             <button type="button" id="fluid-view"
                     class="btn btn-default resize active"> Full </button>
           </ul>
-          <div id="projectForm"></div>
-        </div>
-        <div class="col-sm-8 scroll-pane" id="preview-pane">
+          <br />
           <h4 class="blueprint-title"><%= model.blueprint.get('title') %></h4>
           <h3 id="projectTitle">
               <% if ( model.isNew() && (copyProject == false) ) {
@@ -145,6 +142,18 @@
             <% } %>
 
           </div>
+        </div>
+        <div class="col-sm-4 scroll-pane" id="form-pane">
+          <h4>Preview</h4>
+          <ul class="nav nav-pills">
+            <button type="button" id="small-view"
+                    class="btn btn-default resize"> Small </button>
+            <button type="button" id="medium-view"
+                    class="btn btn-default resize"> Medium </button>
+            <button type="button" id="fluid-view"
+                    class="btn btn-default resize active"> Full </button>
+          </ul>
+          <div id="projectForm"></div>
         </div>
 
       </div>
