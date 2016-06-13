@@ -41,7 +41,7 @@
         </div>
         <div class="filters">
           <div id='inline-filter'>Filters
-            <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
+            <% if(query.type || query.blueprint_title || query.status || query.search) { %>
               (<a href="/projects">clear</a>)
             <% } %>
             &nbsp;
@@ -52,15 +52,6 @@
             <% _.each(app.config.blueprint_types, function(type) { %>
               <option <% if(type === query.type) { %>selected<% } %>
                     value="<%=type %>"><%=type %></option>
-            <% }) %>
-            </select>
-          </div>
-          <div class="select">
-            <select name="tag" id="tag" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
-            <% _.each(app.config.blueprint_tags, function(tag) { %>
-              <option <% if(tag.slug === query.tag) { %>selected<% } %>
-                    value="<%=tag.slug %>"><%=tag.title %></option>
             <% }) %>
             </select>
           </div>
@@ -135,7 +126,7 @@
       <tr class="m-table-heading">
         <td>Blueprint</td>
         <td>Status</td>
-        <td colspan="2">Actions</td>
+        <td class="bold-actions-cell">Actions</td>
       </tr>
     <% if(getObjects().length == 0) { %>
         <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>

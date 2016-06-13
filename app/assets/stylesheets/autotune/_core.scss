@@ -80,7 +80,10 @@ label.block {
   max-width: 100%;
 }
 
-#blueprint-data { height:300px; }
+#blueprint-data {
+  height:300px;
+  border:1px solid color(border);
+}
 
 .preview-frame {
   margin: 25px auto;
@@ -579,6 +582,10 @@ table.table.collection.project-list{
       text-transform: uppercase;
       color: color(actionable);
       border-bottom: 3px solid color(border);
+      &.bold-actions-cell{
+        text-align: right;
+        padding-right: 37px;
+      }
     }
     tbody > tr {
       td {
@@ -586,14 +593,6 @@ table.table.collection.project-list{
         &:nth-child(1) {
           width: 35%;
         }
-        // &:nth-child(2),
-        // &:nth-child(3),
-        // &:nth-child(4) {
-        //   width: 15%;
-        // }
-        // &:nth-child(5){
-        //   width: 20%;
-        // }
       }
     }
     @media (max-width: 580px) and (min-width: 500px){
@@ -862,6 +861,7 @@ label {
 // }
 $nav-break: 550px;
 .list-page-header{
+  margin-top: 25px;
   width: 100%;
   .new-button{
     display: inline;
