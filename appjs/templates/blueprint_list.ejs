@@ -33,15 +33,19 @@
             <button class="btn btn-secondary" type="submit">Search</button>
           </span>
         </div>
-               <br />
-               <br />
-        <div class="filter-label">Filters
+        <div id="break-filter">Filters
           <% if(query.type || query.tag || query.status || query.search) { %>
             (<a href="/blueprints">clear</a>)
           <% } %>
           &nbsp;
         </div>
         <div class="filters">
+          <div id='inline-filter'>Filters
+            <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
+              (<a href="/projects">clear</a>)
+            <% } %>
+            &nbsp;
+          </div>
           <div class="select">
             <select name="type" id="type" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>

@@ -309,6 +309,7 @@ table.table.collection.project-list{
         border-top: 2px solid color(border);
         margin-top: 25px;
         padding: 15px 0px 10px 0px;
+        font-size: 100%;
       }
       &.status-cell{
         display: none;
@@ -321,6 +322,13 @@ table.table.collection.project-list{
       }
       .glyphicons{
         font-size: 90%;
+      }
+      .pub-time{
+        display: inline-block;
+        font-size: 100%;
+        &:before{
+          content: "- ";
+        }
       }
     }
   }
@@ -533,13 +541,13 @@ table.table.collection.project-list{
   display: inline-block;
   position: relative;
 }
-
-@media (max-width: $screen-md-max) {
-  #blueprint_title { width:160px; }
-}
-@media (max-width: $grid-float-breakpoint-max) {
-  #blueprint_title { width:120px; }
-}
+//
+// @media (max-width: $screen-md-max) {
+//   #blueprint_title { width:160px; }
+// }
+// @media (max-width: $grid-float-breakpoint-max) {
+//   #blueprint_title { width:120px; }
+// }
 
 // .m-table-heading {
 //   background-color: $gray-darker;
@@ -844,57 +852,74 @@ label {
 //     }
 //   }
 // }
-
+$nav-break: 550px;
 .list-page-header{
   width: 100%;
   .new-button{
     display: inline;
     width: 110px;
-    @media (max-width: $screen-sm){
-      margin-bottom: 20px;
+    @media (max-width: $nav-break){
+      margin-bottom: 30px;
       display: block;
     }
   }
   .text-right{
     display: inline-block;
-    width: 100%;
-    max-width: 450px;
+    // width: 100%;
+    // max-width: 450px;
     float: right;
     vertical-align: top;
+    form{
+      width: inherit;
+    }
     .filter-label{
       display:inline;
       float: left;
       margin-left: 0px;
-      @media (max-width: $screen-sm){
+      @media (max-width: $nav-break){
         float: left;
         display: block;
         margin: -15px 0 5px 0;
       }
     }
     .input-group{
-      @media (max-width: $screen-sm){
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
+      #search{
+        max-width: 276px;
+      }
+      @media (max-width: $nav-break){
         width: 100%;
         margin-left: 0px;
+        #search{
+          max-width: 100%;
+        }
       }
     }
-    input, .filters{
-      display: inline;
-      white-space:nowrap;
-      @media (max-width: $screen-sm){
-        float: left;
-        text-align: left;
-        width: 100%;
-        max-width: 100%;
-        margin-left: 0px;
-      }
-      .select:first-of-type{
-        margin-left: 0px;
-      }
-      a{
-        display: inline;
+    .input-group-btn{
+      width: auto;
+    }
+    .filters{
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+      margin-left: 0px;
+      div{
+        flex-grow: 1;
+        // flex-basis: auto;
+        &:nth-of-type(2){
+          margin-left: 0px;
+        }
+        &#inline-filter{
+          @media (max-width: $nav-break){
+            display: none;
+          }
+        }
       }
     }
-    @media (max-width: $screen-sm){
+    @media (max-width: $nav-break){
       width: 100%;
       max-width: 100%;
       display: block;
@@ -902,11 +927,20 @@ label {
   }
 }
 
-input#search{
-  width: 100%;
-  max-width: 315px;
-  float:right;
+#break-filter{
+  display: none;
+  text-align: left;
+  margin: 0px 0 10px 0px;
+  @media (max-width: $nav-break){
+    display: block;
+  }
 }
+
+// input#search{
+//   width: 100%;
+//   max-width: 315px;
+//   float:right;
+// }
 
 .pagination{
   display: table;

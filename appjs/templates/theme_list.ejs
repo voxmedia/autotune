@@ -1,43 +1,64 @@
-<div class="row m-page-heading">
-  <div class="col-xs-12 col-sm-6">
-    <h3>Manage themes</h3>
-  </div>
-  <div class="col-xs-12 col-sm-6 text-right">
-    <form class="form-inline" method="get" action="/themes">
-      <div class="form-group">
-        <label class="sr-only" for="search">Search query</label>
-        <div class="btn-group">
-          <div class="input-group">
-            <input type="text" class="form-control"
-                   name="search" id="search" placeholder="Search"
-                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-            <span class="input-group-btn">
-              <button class="btn btn-secondary" type="submit">Search</button>
-            </span>
+<div class="container">
+  <div class="row m-page-heading">
+    <div class="col-xs-12 col-sm-6">
+      <h3>Manage themes</h3>
+    </div>
+    <!-- <div class="col-xs-12 col-sm-6 text-right">
+      <form class="form-inline" method="get" action="/themes">
+        <div class="form-group">
+          <label class="sr-only" for="search">Search query</label>
+          <div class="btn-group">
+            <div class="input-group">
+              <input type="text" class="form-control"
+                     name="search" id="search" placeholder="Search"
+                     <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+              <span class="input-group-btn">
+                <button class="btn btn-secondary" type="submit">Search</button>
+              </span>
+            </div>
+          <% if(query.search) { %>
+            <a href="/themes">clear</a>
+          <% } %>
           </div>
+        </div>
+      </form>
+    </div> -->
+    <div class="col-xs-12 col-sm-6 text-right">
+    </div>
+  </div>
+  <div class="list-page-header">
+
+    <div class="new-button">
+      <a class="btn btn-primary" href="/themes/new">New theme</a>
+    </div>
+    <div class="text-right">
+      <form class="form-inline" method="get" action="/themes">
+        <div class="input-group">
+          <input type="text" class="form-control"
+                 name="search" id="search" placeholder="Search"
+                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          <span class="input-group-btn">
+            <button class="btn btn-secondary" type="submit">Search</button>
+          </span>
+        </div>
         <% if(query.search) { %>
           <a href="/themes">clear</a>
         <% } %>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="col-xs-12 col-sm-6 text-right">
-  </div>
-</div>
-<table class="table themes">
-  <thead>
-    <tr>
-      <td>
-        <a class="btn btn-primary btn-xs" href="/themes/new">New theme</a>
-      </td>
-      <td class="text-right" colspan="3">
-        <form class="form-inline" method="get" action="/themes">
+        <div id='break-filter'>
           Filters
           <% if(query.status || query.group) { %>
             (<a href="/themes">clear</a>)
           <% } %>
           &nbsp;
+        </div>
+        <div class="filters">
+          <div id='inline-filter'>
+            Filters
+            <% if(query.status || query.group) { %>
+              (<a href="/themes">clear</a>)
+            <% } %>
+            &nbsp;
+          </div>
           <% if ( app.designerGroups.length > 1 ) { %>
           <div class="select">
             <select name="group" id="group" class="form-control" data-auto-submit="true">
@@ -58,59 +79,69 @@
             <% }) %>
             </select>
           </div>
-        </form>
+        </div>
+      </form>
+    </div>
+  </div>
+  <table class="table themes">
+    <thead>
+      <tr>
+        <!-- <td>
+          <a class="btn btn-primary" href="/themes/new">New theme</a>
+        </td> -->
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="m-table-heading">
+        <td>Theme</td>
+        <td>Group</td>
+        <td>Status</td>
+        <td colspan="2">Actions</td>
+      </tr>
+    <% if(getObjects().length == 0) { %>
+        <td class="text-center" colspan="4"><h4>No themes found</h4></td>
+    <% }
+    _.each(getObjects(), function(item) { %>
+    <tr>
+      <td <% if(item.get('status') == 'ready') { %>
+        class="ok-notice"
+        <% } else if(item.get('status') == 'broken') { %>
+        class="alert-notice"
+        <% } else { %>
+        class="info-notice"
+        <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
+      <td>
+        <%= item.attributes.group_name %>
+      </td>
+      <td>
+        <% if(item.get('status') == 'ready') { %>
+        <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
+        <% } else if(item.get('status') == 'broken') { %>
+          <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
+        <% } else if(item.hasStatus('updating')) { %>
+          <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+        <% } else { %>
+          <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
+        <% } %>
+      </td>
+      <td class="text-right" colspan="2">
+        <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
+        <a data-tooltip="delete" href="#"
+           data-action-message="Theme deleted"
+           data-action-confirm="Are you sure you wish to delete this?"
+           data-action="destroy" data-model="Theme" data-action-next="reload"
+           data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
       </td>
     </tr>
-  </thead>
-  <tbody>
-    <tr class="m-table-heading">
-      <td>Theme</td>
-      <td>Group</td>
-      <td>Status</td>
-      <td colspan="2">Actions</td>
-    </tr>
-  <% if(getObjects().length == 0) { %>
-      <td class="text-center" colspan="4"><h4>No themes found</h4></td>
-  <% }
-  _.each(getObjects(), function(item) { %>
-  <tr>
-    <td <% if(item.get('status') == 'ready') { %>
-      class="ok-notice"
-      <% } else if(item.get('status') == 'broken') { %>
-      class="alert-notice"
-      <% } else { %>
-      class="info-notice"
-      <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
-    <td>
-      <%= item.attributes.group_name %>
-    </td>
-    <td>
-      <% if(item.get('status') == 'ready') { %>
-      <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
-      <% } else if(item.get('status') == 'broken') { %>
-        <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
-      <% } else if(item.hasStatus('updating')) { %>
-        <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
-      <% } else { %>
-        <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
-      <% } %>
-    </td>
-    <td class="text-right" colspan="2">
-      <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
-      <a data-tooltip="delete" href="#"
-         data-action-message="Theme deleted"
-         data-action-confirm="Are you sure you wish to delete this?"
-         data-action="destroy" data-model="Theme" data-action-next="reload"
-         data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
-    </td>
-  </tr>
-<% }); %>
-  </tbody>
-</table>
-<nav>
-  <ul class="pager">
-    <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
-    <li>Page <%=collection.state.currentPage %></li>
-    <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
-  </ul>
-</nav>
+  <% }); %>
+    </tbody>
+  </table>
+  <nav>
+    <ul class="pager">
+      <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
+      <li>Page <%=collection.state.currentPage %></li>
+      <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
+    </ul>
+  </nav>
+</div>
