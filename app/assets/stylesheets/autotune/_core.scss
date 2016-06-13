@@ -379,21 +379,30 @@ table.table.collection.project-list{
   padding: 0;
 }
 
-.navbar-nav{
+#nav .navbar-nav{
   float: right;
   li {
     float: left;
     a{
       padding: 7px 0;
     }
+    &.small-nav{
+      display: none;
+      a.navbar-brand{
+        margin-left: -26px;
+        padding: 0 0;
+      }
+    }
   }
-  @media (max-width: 767px){
+  @media (max-width: $screen-sm){
     display: block;
     float: left;
     width: 100%;
-    li{
+    li, li.small-nav{
       float: none;
       display: block;
+      font-size: 18px;
+      padding: 10px 0 10px 33px;
       border-bottom: 1px solid color(background, dark);
       &:last-of-type{
         border-bottom: none;
@@ -434,47 +443,44 @@ table.table.collection.project-list{
 }
 
 #nav {
-  a.navbar-brand {
-    // font-weight: bold;
-    font-size: 20px;
-    padding: 0 0 0 3px;
-    margin: 3px 0;
-    height: auto;
-    line-height: 1;
+  a{
     color: color(background);
-    perspective: 1000;
-    display: table-cell;
     &:hover{
       color: darken(color(background), 20%);
-      &:before{
-        transform: rotateY(180deg);
+    }
+    &.navbar-brand {
+      font-size: 20px;
+      padding: 0 0 0 3px;
+      margin: 3px 0;
+      height: auto;
+      line-height: 1;
+      perspective: 1000;
+      display: table-cell;
+      &:hover{
+        &:before{
+          transform: rotateY(180deg);
+        }
       }
-    }
-    &:before {
-      content: "";
-      background-image: image-url('autotune/logo.png');
-      background-image: image-url('autotune/logo.svg');
-      background-size: 100%;
-      background-repeat: no-repeat;
-      display: inline-block;
-      height: 26px;
-      margin-right: 8px;
-      width: 26px;
-      transform: rotateY(0deg);
-      vertical-align: text-top;
-      transform-style: preserve-3d;
-      transition: all 150ms linear;
-    }
-    &.small-nav{
-      display: none;
-      @media (max-width: 767px){
+      &:before {
+        content: "";
+        background-image: image-url('autotune/logo.png');
+        background-image: image-url('autotune/logo.svg');
+        background-size: 100%;
+        background-repeat: no-repeat;
         display: inline-block;
+        height: 26px;
+        margin-right: 8px;
+        width: 26px;
+        transform: rotateY(0deg);
+        vertical-align: text-top;
+        transform-style: preserve-3d;
+        transition: all 150ms linear;
       }
-    }
-    &.big-nav{
-      display: inline-block;
-      @media (max-width: 767px){
-        display: none;
+      &.big-nav{
+        display: inline-block;
+        @media (max-width: 767px){
+          display: none;
+        }
       }
     }
   }

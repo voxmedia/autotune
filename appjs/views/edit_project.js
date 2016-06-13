@@ -129,6 +129,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('unload', function() {
       this.stopListening(this.app);
       this.stopListeningForChanges();
+      $('#navbar-save-container').hide();
       if ( this.pym ) { this.pym.remove(); }
     }, this);
   },

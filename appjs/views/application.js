@@ -26,6 +26,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     animate_speed: 0
   },
   events: {
+    'click ul.navbar-nav li a': 'toggleNav',
     'click #savePreview': 'savePreview'
   },
 
@@ -145,6 +146,14 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
       return this.findNotification( message );
     } else {
       return PNotify.removeAll();
+    }
+  },
+
+  toggleNav: function(event){
+    logger.debug('toggleNav', event);
+    if($('#navbar-collapse').hasClass('in')){
+      // $('#navbar-collapse').removeClass('in');
+      $('#navbar-collapse').collapse('toggle');
     }
   },
 
