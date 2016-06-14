@@ -85,7 +85,7 @@ module.exports = {
       }).then(function() {
         logger.debug('next: '+next);
         if ( next === 'show' && action === 'new' ) {
-          var updatedFormData = inst.formData();
+          var updatedFormData = view.alpaca.getValue();
           delete updatedFormData['slug'];
           view.formDataOnLoad = updatedFormData;
           app.router.navigate(inst.url(), {trigger: true});
