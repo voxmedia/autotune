@@ -119,7 +119,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-
+      $('#navbar-save-container').show();
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
         this.listenTo(this.app, 'focus', this.focusPollChange, this);

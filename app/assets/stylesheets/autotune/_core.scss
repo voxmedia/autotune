@@ -879,6 +879,10 @@ $nav-break: 550px;
     vertical-align: top;
     form{
       width: inherit;
+      min-width: 408px;
+      @media (max-width: $nav-break){
+        min-width: 100%;
+      }
     }
     .filter-label{
       display:inline;
@@ -914,9 +918,17 @@ $nav-break: 550px;
       justify-content: flex-end;
       align-items: center;
       margin-left: 0px;
+      // .form-inline .form-control{
+      //   @media (min-width: 768px){
+      //     width:100%;
+      //   }
+      // }
       div{
         flex-grow: 1;
         // flex-basis: auto;
+        select{
+          width:100%;
+        }
         &:nth-of-type(2){
           margin-left: 0px;
         }

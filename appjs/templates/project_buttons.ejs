@@ -1,11 +1,9 @@
 <p class="margin-top">
 
-<!-- <% if ( model.hasType( 'app' ) ) { %>
+<% if ( model.hasType( 'app' ) ) { %>
 <button type="submit" class="btn btn-primary" id="saveBtn"
         data-loading-text="Saving...">Save</button>
-<% } %> -->
-<button type="submit" class="btn btn-primary" id="saveBtn"
-        data-loading-text="Saving...">Save</button>
+<% } %>
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
@@ -15,7 +13,7 @@
     <% } %>
   <% } %>
 
-  <a class="btn btn-info" id="duplicateBtn"
+  <a class="btn btn-secondary" id="duplicateBtn"
           href="/projects/<%=model.get('slug') %>/duplicate">Duplicate</a>
 
   <button type="button" class="btn btn-danger" id="deleteBtn"
