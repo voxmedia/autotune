@@ -75,11 +75,15 @@ module.exports = {
       }).then(function() {
         logger.debug('form finished saving');
 
-        if ( action === 'new' ) {
-          app.view.success('New '+model_class+' saved');
-        } else {
-          app.view.success(model_class+' updates saved');
+        if(view.model.hasUnpublishedUpdates()){
+          app.view.info(model_class+' has unpublished updates');
         }
+        //
+        // if ( action === 'new' ) {
+        //   app.view.success('New '+model_class+' saved');
+        // } else {
+        //   app.view.success(model_class+' updates saved');
+        // }
 
         return view.hook('afterSubmit');
       }).then(function() {

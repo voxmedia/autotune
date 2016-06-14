@@ -75,11 +75,6 @@
           <div id="preview">
 
             <div class="preview-frame">
-              <% if ( model.hasUnpublishedUpdates() ) { %>
-              <p class="text-warning">
-                <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
-              </p>
-              <% } %>
               <div id="embed-preview" class="loading">
                 <div class="overlay">
                   <%=render(require('./spinner.ejs'), {size:30, color:'white'})%>
