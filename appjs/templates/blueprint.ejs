@@ -13,7 +13,7 @@
 </ul>
 
 <!-- Tab panes -->
-<div class="tab-content">
+<div class="tab-content" style="overflow-y:scroll;">
   <div class="container">
     <div class="m-page-heading">
       <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-primary" href="<%=model.url() %>/new_project">New project</a><% } %></h3>

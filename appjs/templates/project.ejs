@@ -27,7 +27,7 @@
   </ul>
 
   <!-- Tab panes -->
-  <div class="tab-content">
+  <div class="tab-content" <% if (!model.blueprint.hasPreviewType('live')) { %> style="overflow-y:scroll;" <% } %>>
     <div role="tabpanel" class="tab-pane active" id="edit">
       <% if (model.blueprint.hasPreviewType('live')) { %>
       <div id="projectEditor" class="row">
