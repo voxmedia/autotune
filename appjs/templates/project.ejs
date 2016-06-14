@@ -28,13 +28,6 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-    <!-- <div id="project-save-warning-container">
-      <div class="project-save-warning">
-        <span class="glyphicon glyphicon-alert"></span>Your work is not saved.
-        <button type="submit" class="btn btn-primary btn-sm"
-                 id="savePreview" data-loading-text="Saving...">Save now</button>
-      </div>
-    </div> -->
     <div role="tabpanel" class="tab-pane active" id="edit">
       <% if (model.blueprint.hasPreviewType('live')) { %>
       <div id="projectEditor" class="row">
@@ -49,32 +42,10 @@
                     class="btn btn-default resize active"> Full </button>
           </ul>
           <br />
-          <h4 class="blueprint-title"><%= model.blueprint.get('title') %></h4>
-          <h3 id="projectTitle">
-              <% if ( model.isNew() && (copyProject == false) ) {
-                %>
-                <div>Add Project Title</div>
-                <!-- <span class="glyphicon glyphicon-pencil"></span> -->
-                <!-- <textarea>Add Project Title</textarea> -->
-                <%
-              } else if ( copyProject ) {
-                %>
-                <div><%= model.get( 'title' ) %></div>
-                <!-- <span class="glyphicon glyphicon-pencil"></span> -->
-                <!-- <textarea><%= model.get( 'title' ) %></textarea> -->
-                <%
-              } else {
-                %>
-                <div><%= model.get( 'title' ) %></div>
-                <!-- <span class="glyphicon glyphicon-pencil"></span> -->
-                <!-- <textarea><%= model.get( 'title' ) %></textarea> -->
-                <%
-              } %>
-          </h3>
+          <p class="blueprint-title"><%= model.blueprint.get('title') %></p>
 
           <% if ( !model.isNew() ) { %>
-          <p class="text-muted">
-            Status:
+          <p>
             <% if ( model.hasStatus('broken') ) { %>
             <span class="text-danger"><i class="icon-alert"></i>Broken</span>
             <% } else if ( !model.hasStatus('built') ) { %>
@@ -91,7 +62,7 @@
               <a data-tooltip="View Draft Preview"
                  target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
             <% } %>
-            <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
+            <% if ( model.get('published_at') ) { %> - <%=model.publishedTime() %><% } %>
           </p>
           <% } %>
 
@@ -130,11 +101,6 @@
             </p>
             <% } %>
 
-            <% if ( model.hasPreviewType('live') ) { %>
-            <button type="submit" class="btn btn-default"
-                    id="savePreview" data-loading-text="Saving...">Save</button>
-            <% } %>
-
             <% if ( model.hasThemeType('dynamic') && model.hasPreviewType('live') && !model.isCurrentVersion() ) { %>
             <button type="button" class="btn btn-warning"
                     data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
@@ -171,8 +137,7 @@
             </h3>
 
             <% if ( !model.isNew() ) { %>
-            <p class="text-muted">
-              Status:
+            <p>
               <% if ( model.hasStatus('broken') ) { %>
               <span class="text-danger"><i class="icon-alert"></i>Broken</span>
               <% } else if ( !model.hasStatus('built') ) { %>
@@ -189,7 +154,7 @@
                 <a data-tooltip="View Draft Preview"
                    target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
               <% } %>
-              <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
+              <% if ( model.get('published_at') ) { %> - <%=model.publishedTime() %><% } %>
             </p>
             <% } %>
 

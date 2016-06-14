@@ -71,8 +71,9 @@
   position: fixed;
   width: 100%;
   background-color: color(background);
-  overflow-y: scroll;
-  // z-index: ;
+  @media(max-width: $screen-sm){
+      overflow-y: scroll;
+  }
   .tab-content{
     position: relative;
   }

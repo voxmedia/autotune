@@ -1,4 +1,4 @@
-<p class="margin-top">
+<p>
 
 <% if ( model.hasType( 'app' ) ) { %>
 <button type="submit" class="btn btn-primary" id="saveBtn"
@@ -32,32 +32,3 @@
 <p id="success-message" class="text-success hidden">
   <span class="m-status status-ok"><i class="icon-ok"></i>You project has successfully saved.</span>
 </p>
-
-<% if ( ! model.isNew() ) { %>
-  <% if ( model.hasStatus('broken') ) { %>
-  <p class="text-danger">
-     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> There were errors during the build.</span>
-    </p>
-    <% if ( model.has('error_message') ) { %>
-    <p class="text-danger">
-     <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
-     <%=model.getErrorMsg() %></p>
-    <% } %>
-  </div>
-  <% } else if ( model.hasStatus('building') ) { %>
-  <p class="text-warning">
-    <span class="m-status status-info"><i class="icon-info"></i>Building the project, see? <%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span>
-  </p>
-  <% } else if ( model.isDraft() ) { %>
-  <p class="text-warning">
-    <span class="m-status status-info"><i class="icon-info"></i>You are currently editing a draft.</span>
-  </p>
-  <p class="text-warning">
-    <span class="m-status status-info"><i class="icon-info"></i>You must publish to see your updates live.</span>
-  </p>
-  <% } else if ( model.hasUnpublishedUpdates() ) { %>
-  <p class="text-warning">
-    <span class="m-status status-info"><i class="icon-info"></i>This project has unpublished changes. To preview your changes, click ‘Preview’. If you are satisfied with your changes, you must republish.</span>
-  </p>
-  <% } %>
-<% } %>

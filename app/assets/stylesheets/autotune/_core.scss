@@ -42,7 +42,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
 .tab-pane{
   @media (max-width: 1040px){
     .scroll-pane{
-      padding-top: 45px;
+      padding-top: 35px;
     }
     .container{
       padding-top: 50px;
@@ -166,7 +166,6 @@ label.block {
 
 #embed-preview {
   position:relative;
-  border: 2px dashed #ccc;
   .overlay { display: none; }
 
   &.loading .overlay {
@@ -780,7 +779,7 @@ label {
 
 .blueprint-title{
   margin-top: 0px;
-  color: color(actionable, dark);
+  color: color(actionable);
   text-transform: uppercase;
 }
 
@@ -800,7 +799,6 @@ label {
 #preview-pane{
   position:fixed;
   padding: 15px 15px;
-  margin-left: -3px;
   ul.nav{
     display: none;
   }
@@ -814,10 +812,17 @@ label {
   }
 }
 
+#form-pane, #preview-pane{
+  padding-bottom: 70px;
+  @media (max-width: $screen-sm){
+    padding-bottom: 20px;
+  }
+}
+
 #form-pane{
   background-color: color(accent);
-  float: right;
-  margin-left: 0px;
+  position:fixed;
+  right:0px;
   @media (max-width: $screen-sm){
     position: relative;
     float: none;
@@ -826,7 +831,7 @@ label {
     }
   }
   #projectForm{
-    padding: 25px 0 50px 0;
+    padding: 25px 0 0 0;
     width: 100%;
     max-width: 500px;
     margin: auto;
