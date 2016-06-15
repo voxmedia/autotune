@@ -165,7 +165,7 @@ module Autotune
         end
       end
       # delete all memberships that weren't updated
-      group_memberships.where('id in ?', stale_ids).delete_all unless stale_ids.empty?
+      group_memberships.where(id: stale_ids).delete_all unless stale_ids.empty?
       save
     end
 
