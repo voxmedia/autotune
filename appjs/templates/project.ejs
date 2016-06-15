@@ -177,16 +177,21 @@
         <h3><%= model.get( 'title' ) %></h3>
         <hr />
         <h4>Publish</h4>
-        <% if ( model.isPublishable() ) { %>
         <button type="button" class="btn btn-primary" id="publishBtn"
                 <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
                 data-action-message="Publishing..."
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>">Publish now</button>
-        <% } %>
         <a class="btn btn-secondary" target="_blank" id="viewBtn"
            href="<%=model.getPublishUrl() %>">View</a>
+
+          <br />
+          <br />
+          <br />
+        <h4>Share Text</h4>
+
+        <textarea id="shareText" class="form-control" rows="6"></textarea>
         <% if ( model.has('embed_html') ) { %>
           <br />
           <br />

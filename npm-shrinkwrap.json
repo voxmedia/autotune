@@ -5,7 +5,7 @@
     "alpaca": {
       "version": "1.5.17",
       "from": "caseymm/alpaca#dev-input-style",
-      "resolved": "git+https://github.com/caseymm/alpaca#020210135f97f55fe6adcb4f1313316f8508acb9"
+      "resolved": "git+https://github.com/caseymm/alpaca#3f5f5a113434bf7e73d5081269a07158b33e080f"
     },
     "backbone": {
       "version": "1.2.3",

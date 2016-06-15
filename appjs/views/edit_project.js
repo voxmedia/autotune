@@ -195,6 +195,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   pollChange: _.debounce(function(){
     // this.$('#projectForm input[name="title"]').val(this.$('#projectTitle textarea').val());
+    this.alpaca.childrenByPropertyId["tweet_text"].setValue($('textarea#shareText').val());
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
@@ -403,6 +404,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             previewUrl = '', iframeLoaded,
             previewSlug = '';
 
+        view.$('#shareText').val(formData['tweet_text']);
         view.formDataOnLoad = formData;
 
         // Callback for when iframe loads
@@ -581,7 +583,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           "label": "Social share text",
           "constrainMaxLength": true,
           "constrainMinLength": true,
-          "showMaxLengthIndicator": true
+          "showMaxLengthIndicator": true,
+          "fieldClass": "hidden"
         }
       };
 
