@@ -33,10 +33,10 @@ module Autotune
       # Filter and search query
       query = {}
 
-      query[:status] = params[:status] if params.key? :status
-      query[:group_id] = params[:group] if params.key? :group
+      query[:status] = params[:status] if params[:status].present?
+      query[:group_id] = params[:group] if params[:group].present?
 
-      @themes = @themes.search(params[:search], :title) if params.key? :search
+      @themes = @themes.search(params[:search]) if params[:search].present?
 
       @themes = @themes.where(query)
 

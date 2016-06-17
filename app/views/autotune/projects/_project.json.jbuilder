@@ -20,4 +20,12 @@ if project.built? && (!project.live? || project.published?)
   json.screenshot_sm_url deployer.url_for('screenshots/screenshot_s.png')
   json.screenshot_md_url deployer.url_for('screenshots/screenshot_m.png')
   json.screenshot_lg_url deployer.url_for('screenshots/screenshot_l.png')
+  json.screenshot_smx2_url deployer.url_for('screenshots/screenshot_s@2.png')
+  json.screenshot_mdx2_url deployer.url_for('screenshots/screenshot_m@2.png')
+  json.screenshot_lgx2_url deployer.url_for('screenshots/screenshot_l@2.png')
+
+  # render the embed html template and strip all linebreaks
+  json.embed_html render(
+    :template => 'autotune/projects/_embed.html.erb',
+    :locals => { :project => project }).gsub(/\s*\n+\s*/, ' ')
 end

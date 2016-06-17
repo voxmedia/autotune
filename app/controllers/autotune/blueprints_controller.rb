@@ -3,9 +3,16 @@ require_dependency 'autotune/application_controller'
 module Autotune
   # API for blueprints
   class BlueprintsController < ApplicationController
+    model Blueprint
+    skip_before_action :require_google_login,
+                       :only => [:index, :show]
+
+    before_action :only => [:index, :show] do
+      require_google_login if google_auth_required? && !accepts_json?
+    end
+
     before_action :respond_to_html
     before_action :require_superuser, :only => [:create, :update, :update_repo, :destroy]
-    model Blueprint
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
@@ -14,10 +21,10 @@ module Autotune
     def index
       @blueprints = Blueprint
       query = {}
-      query[:status] = params[:status] if params.key? :status
-      query[:tag] = params[:tag] if params.key? :theme
-      query[:type] = params[:type] if params.key? :type
-      @blueprints = @blueprints.search(params[:search]) if params.key? :search
+      query[:status] = params[:status] if params[:status].present?
+      query[:tag] = params[:tag] if params[:theme].present?
+      query[:type] = params[:type] if params[:type].present?
+      @blueprints = @blueprints.search(params[:search]) if params[:search].present?
 
       if query.empty?
         @blueprints = @blueprints.all

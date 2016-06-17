@@ -91,9 +91,13 @@ class ActiveSupport::TestCase
       "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/")
     # puts 'Working dir: ' + Rails.configuration.autotune.working_dir
     FileUtils.mkdir_p(Rails.configuration.autotune.working_dir)
+
+    @tmp_gauth_flag = Rails.configuration.autotune.google_auth_enabled
   end
 
   def teardown
+    Rails.configuration.autotune.google_auth_enabled = @tmp_gauth_flag
+
     FileUtils.rm_rf(Rails.configuration.autotune.working_dir) \
       if File.exist?(Rails.configuration.autotune.working_dir)
     %w(preview publish media).each do |dir|
@@ -107,10 +111,6 @@ class ActiveSupport::TestCase
   def mock_auth
     OmniAuth.config.mock_auth
   end
-
-  #def repo_url
-    #File.expand_path('../repos/autotune-example-blueprint.git', __FILE__).to_s
-  #end
 end
 
 # Helpers for controller tests

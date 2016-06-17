@@ -5,14 +5,21 @@ require 'redis'
 module Autotune
   # API for projects
   class ProjectsController < ApplicationController
-    before_action :respond_to_html
     model Project
+    skip_before_action :require_google_login,
+                       :only => [:index, :show]
+
+    before_action :only => [:index, :show] do
+      require_google_login if google_auth_required? && !accepts_json?
+    end
+
+    before_action :respond_to_html
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update,:update_snapshot, :destroy, :build, :build_and_publish] do
+    before_action :only => [:show, :update, :update_snapshot, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
              current_user.role?(:editor => instance.group.slug) ||
@@ -30,18 +37,18 @@ module Autotune
       # Filter and search query
       query = {}
 
-      query[:status] = params[:status] if params.key? :status
+      query[:status] = params[:status] if params[:status].present?
 
-      if params.key? :blueprint
+      if params[:blueprint].present?
         blueprint = Blueprint.find_by_slug(params[:blueprint])
         query[:blueprint_id] = blueprint.id
-      elsif params.key? :blueprint_id
+      elsif params[:blueprint_id].present?
         query[:blueprint_id] = params[:blueprint_id]
-      elsif params.key? :blueprint_title
+      elsif params[:blueprint_title].present?
         query[:blueprint_id] = params[:blueprint_title]
       end
 
-      if params.key? :pub_status
+      if params[:pub_status].present?
         if params[:pub_status] == 'published'
           @projects = @projects.where.not(:published_at => nil)
         else
@@ -49,21 +56,24 @@ module Autotune
         end
       end
 
-      if params.key? :search
-        unless params[:search].empty?
-          users = User.search(params[:search]).pluck(:id)
-          sql = @projects.search_sql(params[:search])
+      if params[:search].present?
+        users = User.search(params[:search]).pluck(:id)
+        sql = @projects.search_sql(params[:search])
 
-          sql[0] = "(#{sql[0]}) OR (user_id IN (?))"
-          sql << users
+        sql[0] = "(#{sql[0]}) OR (user_id IN (?))"
+        sql << users
 
-          @projects = @projects.where(sql)
-        end
+        @projects = @projects.where(sql)
       end
 
-      if params.key? :theme
+      if params[:theme].present?
         theme = Theme.find_by_slug(params[:theme])
         query[:theme_id] = theme.id
+      end
+
+      if params[:group].present?
+        group = Group.find_by_slug(params[:group])
+        query[:group_id] = group.id
       end
 
       unless current_user.role? :superuser
@@ -78,7 +88,7 @@ module Autotune
 
       @projects = @projects.where(query)
 
-      if params.key? :type
+      if params[:type].present?
         @blueprints = Blueprint
         @blueprint_ids = @blueprints.where(:type => params[:type]).pluck(:id)
         @projects = @projects.where(:blueprint_id => @blueprint_ids)
@@ -162,6 +172,7 @@ module Autotune
 
       if request.POST.key? 'theme'
         @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.group = @project.theme.group
 
         # is this user allowed to use this theme?
         unless @project.theme.nil? ||
@@ -202,7 +213,6 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(@build_data, {}, current_user)
-
       render :json => @build_data
     rescue => exc
       if @project.present? && @project.meta['error_message'].present?
