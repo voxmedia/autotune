@@ -1,4 +1,11 @@
 // star for required fields? this is the easeist way to adjust that
+legend {
+  font-size:$font-size-h4;
+  font-weight: bold;
+  border-width: 0px;
+  margin-bottom: 0px;
+}
+
 .glyphicon-star:before {
   font-family: $font-family-sans-serif;
   content: "*";
@@ -17,8 +24,8 @@ td.actionbar .btn-group button {
 
 .alpaca-field-object .alpaca-field-object,
 .alpaca-field-array {
-  margin-top:40px;
-  margin-bottom:15px;
+  margin-top:20px;
+  margin-bottom:20px;
 }
 .alpaca-field-array .alpaca-field-object {
   margin-top:0;
@@ -26,25 +33,58 @@ td.actionbar .btn-group button {
 
 .alpaca-field-array {
   padding-bottom:15px;
-  > legend {
-    font-size:$font-size-h3;
-  }
+  // > legend {
+  //   font-size:$font-size-h4;
+  //   font-weight: bold;
+  // }
 }
 
 .alpaca-container-item {
   position:relative;
+  padding:0px;
+  .alpaca-array-actionbar{
+    position: absolute;
+    vertical-align: middle;
+    right: 0px;
+    .btn-default{
+      color: color(border);
+    }
+  }
   .well{
-    padding-bottom: 48px;
+    padding: 0px;
+    // padding-bottom: 20px;
+    border-width: 0px;
+    legend{
+      padding: 10px;
+      margin-bottom: 0px;
+      border: 1px solid color(background, dark);
+      font-size: $font-size-base;
+      font-weight: normal;
+      text-transform: uppercase;
+      color: color(border);
+      background-color: color(background, dark);
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      span{
+        width:50%;
+      }
+    }
+    .alpaca-container{
+      padding:10px;
+      border:1px solid color(border);
+      border-top-width: 0px;
+      border-radius: 0 0 3px 3px;
+    }
     .alpaca-control.checkbox{
       margin-left: 0px;
     }
   }
-  .alpaca-array-actionbar {
-    &:before{
-      margin: 0 0 -4px 0;
-      font-size: 16px;
-    }
-  }
+  // .alpaca-array-actionbar {
+  //   &:before{
+  //     margin: 0 0 -4px 0;
+  //     font-size: 16px;
+  //   }
+  // }
   .btn-default{
     margin: 5px 0;
   }
@@ -60,18 +100,18 @@ td.actionbar .btn-group button {
   }
 }
 
-.alpaca-array-actionbar-bottom {
-  position:absolute;
-  bottom:0;
-  // right:0;
-  left: 20px;
-}
-
-.alpaca-array-actionbar-top {
-  position:relative;
-  top:0;
-  right:0;
-}
+// .alpaca-array-actionbar-bottom {
+//   position:absolute;
+//   bottom:0;
+//   // right:0;
+//   left: 20px;
+// }
+//
+// .alpaca-array-actionbar-top {
+//   position:relative;
+//   top:0;
+//   right:0;
+// }
 
 .alpaca-field-hidden {
   display:none;
@@ -81,6 +121,11 @@ td.actionbar .btn-group button {
   margin: 0 0 0 8px;
   // margin-bottom: 0px;
   display:inline-block;
+}
+.alpaca-container-item{
+  .pull-left{
+    float: none;
+  }
 }
 
 .alpaca-array-actionbar {
@@ -99,12 +144,17 @@ td.actionbar .btn-group button {
     border-color: transparent;
   }
 
+  .alpaca-array-actionbar-action{
+    padding: 5px;
+  }
+
   .btn-default {
     background-color: transparent;
     border-color: transparent;
     color: color(actionable);
     font-size: 16px;
     border-color: transparent;
+
     &:first-of-type{
       padding-left: 0px;
     }
@@ -124,14 +174,14 @@ td.actionbar .btn-group button {
   position:relative;
 }
 .alpaca-container span[data-toggle=collapse]:after {
-  content:' Click to collapse';
+  // content:' Click to collapse';
   display:inline-block;
   margin-left:8px;
   font-size:60%;
   color:$headings-small-color;
 }
 .alpaca-container span[data-toggle=collapse].collapsed:after {
-  content:' Click to expand';
+  // content:' Click to expand';
 }
 
 //
@@ -156,15 +206,15 @@ td.actionbar .btn-group button {
 //     border-width:1px;
 //   }
 //
-  .alpaca-array-actionbar-top {
-    padding:0 4px;
-    position:static;
-  }
-
-  .alpaca-array-actionbar:before{
-    font-size: 13px;
-    margin: 0 0;
-  }
+  // .alpaca-array-actionbar-top {
+  //   padding:0 4px;
+  //   position:static;
+  // }
+  //
+  // .alpaca-array-actionbar:before{
+  //   font-size: 13px;
+  //   margin: 0 0;
+  // }
 
   .form-group{
     margin-bottom: 0px;
