@@ -12,6 +12,8 @@ module Autotune
     belongs_to :parent, :class_name => 'Theme'
     has_many :children, :class_name => 'Theme', :foreign_key => 'parent_id'
 
+    search_fields :title
+
     before_validation :update_parent, :on => :create
     validates :slug, :title, :group, :presence => true
     validates :title,
