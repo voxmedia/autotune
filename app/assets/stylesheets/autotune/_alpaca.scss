@@ -17,9 +17,15 @@ legend {
   padding:0;
 }
 
-td.actionbar .btn-group button {
-  margin-right: 0;
-  font-size: 1.1em;
+td.actionbar{
+  .btn-group button {
+    margin-right: 0;
+    font-size: 1.1em;
+  }
+  .alpaca-array-actionbar{
+    position: relative;
+    vertical-align: sub;
+  }
 }
 
 .alpaca-field-object .alpaca-field-object,
@@ -44,8 +50,9 @@ td.actionbar .btn-group button {
   padding:0px;
   .alpaca-array-actionbar{
     position: absolute;
-    vertical-align: middle;
+    // vertical-align: middle;
     right: 0px;
+    top: 0px;
     .btn-default{
       color: color(border);
     }
@@ -199,16 +206,24 @@ td.actionbar .btn-group button {
 }
 
 //
-.alpaca-field-table .table-responsive {
+.alpaca-field-table, .alpaca-field-table .table-responsive {
   border-width: 0px;
   padding-top: 15px;
-  .table thead{
-    display: none;
+  &.quiz-hide-header .table thead{
+    // display: none;
+    &:before{
+      text-transform: uppercase;
+      content: 'Content';
+    }
     tr > th {
-      // border-bottom: 2px solid color(border);
-      // &:first-of-type{
-      //   text-transform: uppercase;
-      // }
+      display: none;
+      &:last-child{
+        &:after{
+          display: block;
+          float: right;
+          content: '✓ Correct Answer';
+        }
+      }
     }
   }
   .table > tbody > tr{
@@ -220,6 +235,13 @@ td.actionbar .btn-group button {
       .alpaca-field-checkbox{
         width: 1px;
         margin: 0px;
+      }
+      &.actionbar{
+        width: 130px;
+        vertical-align: middle;
+        div{
+          margin-top: -10px;
+        }
       }
     }
   }

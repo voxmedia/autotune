@@ -15,7 +15,7 @@
     "alpaca": {
       "version": "1.5.17",
       "from": "caseymm/alpaca#dev-input-style",
-      "resolved": "git://github.com/caseymm/alpaca.git#452079b358ee76329facb3947c9c9fce257298eb"
+      "resolved": "git://github.com/caseymm/alpaca.git#b17c6a8b2add7859c8c38261defbe9823bffe07f"
     },
     "amdefine": {
       "version": "1.0.0",
