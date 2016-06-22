@@ -222,7 +222,6 @@ td.actionbar{
     }
   }
   &.quiz-hide-header .table thead{
-    // display: none;
     &:before{
       text-transform: uppercase;
       content: 'Options';
@@ -254,46 +253,15 @@ td.actionbar{
         margin: 0px;
       }
       &.actionbar{
-        // width: 130px;
         vertical-align: middle;
-        // div{
-        //   margin-top: -10px;
-        // }
       }
     }
   }
-//   border-collapse: collapse;
-//   td { border:1px solid $input-border; }
-//
-//   .table > tbody > tr:first-child td {
-//     border-width:1px;
-//   }
-//
-  // .alpaca-array-actionbar-top {
-  //   padding:0 4px;
-  //   position:static;
-  // }
-  //
-  // .alpaca-array-actionbar:before{
-  //   font-size: 13px;
-  //   margin: 0 0;
-  // }
 
   .form-group{
     margin-bottom: 0px;
   }
-//
-//   .alpaca-field-checkbox {
-//     padding:0 4px;
-//   }
-//
-//   .form-control {
-//     border-width:1;
-//     border-color:transparent;
-//     padding:2px 0 2px 4px;
-//     &:focus { border-color:$input-border-focus; }
-//   }
-//
+
   .btn {
     font-size:12px;
     float:none;
@@ -305,12 +273,7 @@ td.actionbar{
       padding: 3px 5px;
     }
   }
-//
-//   td { padding:0; background-color:$input-bg; }
-//   th { padding:2px; }
-//
-//   .form-group { margin-bottom: 0; }
-//
+
   tbody .alpaca-control-label { display:none; }
 }
 
