@@ -218,7 +218,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
-    if ( !this.formValidate(this.model, $form) ) {
+    if ( this.formValidate(this.model, $form) ) {
+      if(!view.pym && !view.model.hasInitialBuild()){
+        var iframeLoaded = _.once(function() {
+          view.pym.sendMessage('updateData', JSON.stringify(data));
+          $('#embed-preview').removeClass('loading');
+        });
+        var version = view.model.getVersion(),
+          previewSlug = view.model.isThemeable() ?
+              version :[version, view.theme].join('-'),
+          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
+        $('#embed-preview').empty();
+        view.pym = new pym.Parent('embed-preview', previewUrl);
+        view.pym.iframe.onload = iframeLoaded;
+      }
+    } else {
       // If the form isn't valid, bail
       return;
     }
@@ -445,15 +459,17 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
           // Setup our iframe with pym
           if ( view.pym ) { view.pym.remove(); }
-          view.pym = new pym.Parent('embed-preview', previewUrl);
-          view.pym.iframe.onload = iframeLoaded;
-          view.pym.onMessage('postPreviewData', function(data){
-            logger.debug('A ----------- received message from preview');
-            // var parsedData = JSON.parse(data);
-            // view.$('#projectForm').alpaca().setValue(parsedData);
-            view.postedPreviewData = JSON.parse(data);
-            view.pollChange();
-          });
+          if ( view.formValidate(view.model, view.$('#projectForm')) ){
+            view.pym = new pym.Parent('embed-preview', previewUrl);
+            view.pym.iframe.onload = iframeLoaded;
+            view.pym.onMessage('postPreviewData', function(data){
+              logger.debug('A ----------- received message from preview');
+              // var parsedData = JSON.parse(data);
+              // view.$('#projectForm').alpaca().setValue(parsedData);
+              view.postedPreviewData = JSON.parse(data);
+              view.pollChange();
+            });
+          }
 
           // In case some dumb script hangs the loading process
           setTimeout(iframeLoaded, 20000);
@@ -734,6 +750,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       valid = control.form.isFormValid();
 
       if ( !valid ) {
+        logger.debug('not valid');
         $form.find('#validation-error').removeClass('hidden');
       } else {
         $form.find('#resolve-message').removeClass('hidden');

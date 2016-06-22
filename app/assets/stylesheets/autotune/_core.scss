@@ -823,6 +823,7 @@ label {
   background-color: color(accent);
   position:fixed;
   right:0px;
+  padding-bottom: 50px;
   @media (max-width: $screen-sm){
     position: relative;
     float: none;

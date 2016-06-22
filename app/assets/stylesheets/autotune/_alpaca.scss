@@ -3,7 +3,7 @@ legend {
   font-size:$font-size-h4;
   font-weight: bold;
   border-width: 0px;
-  margin-bottom: 0px;
+  margin-bottom: 10px;
 }
 
 .glyphicon-star:before {
@@ -81,6 +81,9 @@ td.actionbar{
     }
     .alpaca-container{
       padding:10px;
+      div{
+        padding: 0px;
+      }
       // border:0px solid color(border);
       // border-top-width: 2px;
       // border-radius: 0 0 3px 3px;
@@ -209,11 +212,21 @@ td.actionbar{
 .alpaca-field-table, .alpaca-field-table .table-responsive {
   border-width: 0px;
   padding-top: 15px;
+  .table thead > tr > th {
+    padding: 10px 10px 10px 0px;
+    text-transform: uppercase;
+    color: color(actionable);
+    &:last-child{
+      padding-right: 0px;
+      display: none;
+    }
+  }
   &.quiz-hide-header .table thead{
     // display: none;
     &:before{
       text-transform: uppercase;
-      content: 'Content';
+      content: 'Options';
+      color: color(actionable);
     }
     tr > th {
       display: none;
@@ -232,16 +245,20 @@ td.actionbar{
     }
     td {
       border-width:0px;
+      padding: 10px 10px 10px 0px;
+      &:last-child{
+        padding-right: 0px;
+      }
       .alpaca-field-checkbox{
         width: 1px;
         margin: 0px;
       }
       &.actionbar{
-        width: 130px;
+        // width: 130px;
         vertical-align: middle;
-        div{
-          margin-top: -10px;
-        }
+        // div{
+        //   margin-top: -10px;
+        // }
       }
     }
   }
@@ -282,7 +299,8 @@ td.actionbar{
     float:none;
     padding:0;
     border-width:0;
-    margin:0 8px 0 0;
+    // margin:0 8px 0 0;
+    margin: 0px;
     &.btn-sm{
       padding: 3px 5px;
     }
