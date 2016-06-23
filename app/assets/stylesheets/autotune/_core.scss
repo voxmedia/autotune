@@ -168,6 +168,16 @@ label.block {
   position:relative;
   .overlay { display: none; }
 
+  &.validation-error:after{
+    display:block;
+    position:absolute;
+    top:0; right:0; bottom:0; left:0;
+    font-size:16px;
+    padding-top:16px;
+    content: 'Please enter valid data into the form.';
+    .overlay { display: none; }
+  }
+
   &.loading .overlay {
     display:block;
     position:absolute;

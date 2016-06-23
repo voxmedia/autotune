@@ -218,90 +218,79 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
-    if ( this.formValidate(this.model, $form) ) {
-      if(!view.pym && !view.model.hasInitialBuild()){
+    if ( !this.formValidate(this.model, $form) ) {
+      if ( !view.pym ) {
+        logger.debug('enter valid data, please');
+        $('#embed-preview').addClass('validation-error');
+      }
+      // If the form isn't valid, bail
+      return;
+    } else {
+      // Now that data is connected and valid, show some sort of loading indicator:
+      $('#embed-preview').removeClass('validation-error').addClass('loading');
+      if( this.forceUpdateDataFlag ){
+        // Check the flag in case we want to force an update
+        query = '?force_update=true';
+        this.forceUpdateDataFlag = false;
+      } else if ( _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
+        // If data hasn't changed, bail
+        return;
+      }
+
+      logger.debug('pollchange');
+
+      // stash data so we can see if it changed
+      this.previousData = data;
+
+      return $.ajax({
+        type: "POST",
+        url: this.model.url() + "/preview_build_data" + query,
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        dataType: 'json'
+      }).then(function( data ) {
+        logger.debug('Updating live preview...');
         var iframeLoaded = _.once(function() {
           view.pym.sendMessage('updateData', JSON.stringify(data));
           $('#embed-preview').removeClass('loading');
         });
-        var version = view.model.getVersion(),
-          previewSlug = view.model.isThemeable() ?
-              version :[version, view.theme].join('-'),
-          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
-        $('#embed-preview').empty();
-        view.pym = new pym.Parent('embed-preview', previewUrl);
-        view.pym.iframe.onload = iframeLoaded;
-      }
-    } else {
-      // If the form isn't valid, bail
-      return;
-    }
 
-    if( this.forceUpdateDataFlag ){
-      // Check the flag in case we want to force an update
-      query = '?force_update=true';
-      this.forceUpdateDataFlag = false;
-    } else if ( _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
-      // If data hasn't changed, bail
-      return;
-    }
+        if(data.theme !== view.theme || !view.pym){
+          if(typeof data.theme !== 'undefined'){
+            view.theme = data.theme;
+          }
+          var version = view.model.getVersion(),
+            previewSlug = view.model.isThemeable() ?
+                version :[version, view.theme].join('-'),
+            previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
-    logger.debug('pollchange');
+          if ( view.pym ) { view.pym.remove(); }
 
-    // stash data so we can see if it changed
-    this.previousData = data;
+          // $('#embed-preview').empty();
+          view.pym = new pym.Parent('embed-preview', previewUrl);
+          view.pym.iframe.onload = iframeLoaded;
+          view.pym.onMessage('postPreviewData', function(data){
+            logger.debug('theme change ----------- received message from preview', data);
+            view.$('#projectForm').alpaca('set').setValue(JSON.parse(data));
+            view.pollChange();
+          });
 
-    // Show some sort of loading indicator:
-    $('#embed-preview').addClass('loading');
-
-    return $.ajax({
-      type: "POST",
-      url: this.model.url() + "/preview_build_data" + query,
-      data: JSON.stringify(data),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).then(function( data ) {
-      logger.debug('Updating live preview...');
-      var iframeLoaded = _.once(function() {
-        view.pym.sendMessage('updateData', JSON.stringify(data));
-        $('#embed-preview').removeClass('loading');
-      });
-
-      if(data.theme !== view.theme){
-        if(typeof data.theme !== 'undefined'){
-          view.theme = data.theme;
+          // In case some dumb script hangs the loading process
+          setTimeout(iframeLoaded, 20000);
+        } else {
+          iframeLoaded();
         }
-        var version = view.model.getVersion(),
-          previewSlug = view.model.isThemeable() ?
-              version :[version, view.theme].join('-'),
-          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
-
-        if ( view.pym ) { view.pym.remove(); }
-
-        $('#embed-preview').empty();
-        view.pym = new pym.Parent('embed-preview', previewUrl);
-        view.pym.iframe.onload = iframeLoaded;
-        view.pym.onMessage('postPreviewData', function(data){
-          logger.debug('theme change ----------- received message from preview', data);
-          view.$('#projectForm').alpaca('set').setValue(JSON.parse(data));
-          view.pollChange();
-        });
-
-        // In case some dumb script hangs the loading process
-        setTimeout(iframeLoaded, 20000);
-      } else {
-        iframeLoaded();
-      }
-    }, function(err) {
-      if ( err.status < 500 ) {
-        view.app.view.error(
-          "Can't update live preview (" +err.responseJSON.error+").", 'permanent');
-      } else {
-        view.app.view.error(
-          "Could not update live preview, please contact support.", 'permanent' );
-        logger.error(err);
-      }
-    });
+      }, function(err) {
+        if ( err.status < 500 ) {
+          view.app.view.error(
+            "Can't update live preview (" +err.responseJSON.error+").", 'permanent');
+        } else {
+          view.app.view.error(
+            "Could not update live preview, please contact support.", 'permanent' );
+          logger.error(err);
+        }
+      });
+    }
   }, 500),
 
   savePreview: function(){
@@ -422,16 +411,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         view.formDataOnLoad = formData;
 
         // Callback for when iframe loads
-        iframeLoaded = _.once(function() {
-          logger.debug('iframeLoaded');
-          if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
-            view.pollChange();
-          } else {
-            if(!view.model.hasStatus('building')){
-              $('#embed-preview').removeClass('loading');
-            }
-          }
-        });
+        // iframeLoaded = _.once(function() {
+        //   logger.debug('iframeLoaded');
+        //   if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
+        //     view.pollChange();
+        //   } else {
+        //     if(!view.model.hasStatus('building')){
+        //       $('#embed-preview').removeClass('loading');
+        //     }
+        //   }
+        // });
+        if ( view.model.hasPreviewType('live') ) {
+          view.pollChange();
+        }
 
         // Figure out preview url
         if ( view.model.hasPreviewType('live') ) {
@@ -442,9 +434,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             [view.model.getVersion(), view.theme].join('-');
           previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
-          if ( !view.copyProject && !view.model.hasInitialBuild() ){
-            previewUrl = previewUrl + '#new';
-          }
+          // if ( !view.copyProject && !view.model.hasInitialBuild() ){
+          //   previewUrl = previewUrl + '#new';
+          // }
+
+          // Revisit this
         } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
           // if the project is a graphic and has been built (but doesn't have live enabled)
           var previousPreviewUrl = view.model['_previousAttributes']['preview_url'];
@@ -456,28 +450,24 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
         }
 
-        if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
-          // Setup our iframe with pym
-          if ( view.pym ) { view.pym.remove(); }
-          if ( view.formValidate(view.model, view.$('#projectForm')) ){
-            view.pym = new pym.Parent('embed-preview', previewUrl);
-            view.pym.iframe.onload = iframeLoaded;
-            view.pym.onMessage('postPreviewData', function(data){
-              logger.debug('A ----------- received message from preview');
-              // var parsedData = JSON.parse(data);
-              // view.$('#projectForm').alpaca().setValue(parsedData);
-              view.postedPreviewData = JSON.parse(data);
-              view.pollChange();
-            });
-          }
-
-          // In case some dumb script hangs the loading process
-          setTimeout(iframeLoaded, 20000);
-
-          if ( view.togglePreview ){
-            $( "#draft-preview" ).trigger( "click" );
-          }
-        }
+        // if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
+        //   // Setup our iframe with pym
+        //   if ( view.pym ) { view.pym.remove(); }
+        //   if ( view.formValidate(view.model, view.$('#projectForm')) ){
+        //     view.pym = new pym.Parent('embed-preview', previewUrl);
+        //     view.pym.iframe.onload = iframeLoaded;
+        //     view.pym.onMessage('postPreviewData', function(data){
+        //       logger.debug('A ----------- received message from preview');
+        //       // var parsedData = JSON.parse(data);
+        //       // view.$('#projectForm').alpaca().setValue(parsedData);
+        //       view.postedPreviewData = JSON.parse(data);
+        //       view.pollChange();
+        //     });
+        //   }
+        //
+        //   // In case some dumb script hangs the loading process
+        //   setTimeout(iframeLoaded, 20000);
+        // }
       }).catch(function(err) {
         console.error(err);
       }).then(function() {
@@ -498,7 +488,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   renderForm: function(resolve, reject) {
     var $form = this.$('#projectForm'),
-        button_tmpl = require('../templates/project_buttons.ejs'),
         view = this,
         form_config, availableThemes, twitterHandles, newProject, populateForm = false;
 
@@ -677,9 +666,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
           view.alpaca.childrenByPropertyId["slug"].setValue(
             view.model.get('slug_sans_theme') );
-
-          control.form.form.append(
-            helpers.render(button_tmpl, view.templateData()) );
 
           resolve();
         }
