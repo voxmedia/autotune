@@ -37,6 +37,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
 
 .tab-pane .container, .tab-content .container{
   max-width: 900px;
+  margin-bottom: 150px;
+}
+
+.tab-pane{
+  overflow-y: scroll;
+  .tab-pane{
+    overflow: hidden;
+  }
 }
 
 .tab-pane{
@@ -45,7 +53,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
       padding-top: 35px;
     }
     .container{
-      padding-top: 50px;
+      padding-top: 20px;
     }
   }
 }
@@ -105,6 +113,10 @@ label.block {
 
 #save-warning{
   display: none;
+}
+
+.btn{
+  margin-right: 8px;
 }
 
 #navbar-save-container{
@@ -549,6 +561,12 @@ table.table.collection.project-list{
     margin: 0;
     // font-size: 31px;
     font-weight: bold;
+  }
+  &.contain{
+    max-width: 900px;
+    margin: auto;
+    padding: 1rem;
+    margin-top: 30px;
   }
 
   @media (max-width: $grid-float-breakpoint-max) {

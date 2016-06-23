@@ -44,7 +44,9 @@
           <br />
           <p class="blueprint-title"><%= model.blueprint.get('title') %></p>
 
-          <% if ( !model.isNew() ) { %>
+          <% if ( model.isNew() ) { %>
+            <p>Draft</p>
+          <% } else { %>
           <p>
             <% if ( model.hasStatus('broken') ) { %>
             <span class="text-danger"><i class="icon-alert"></i>Broken</span>
@@ -57,7 +59,7 @@
               <a data-tooltip="View Published Preview"
                  target="_blank" href="<%=model.getPublishUrl() %>">Published</a>
             <% } else if ( model.hasType( 'graphic' ) ) { %>
-              <a data-tooltip="View Draft Preview" data-toggle="tab" href="#preview">Draft</a>
+              Draft
             <% } else { %>
               <a data-tooltip="View Draft Preview"
                  target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
@@ -75,6 +77,7 @@
           <div id="preview">
 
             <div class="preview-frame">
+              <!-- add classes depending on what is new or not -->
               <div id="embed-preview">
                 <div class="overlay">
                   <%=render(require('./spinner.ejs'), {size:30, color:'white'})%>

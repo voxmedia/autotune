@@ -13,9 +13,9 @@
 </ul>
 
 <!-- Tab panes -->
-<div class="tab-content" style="overflow-y:scroll;">
-  <div class="container">
-    <div class="m-page-heading">
+<div class="tab-content" style="overflow: scroll;">
+  <!-- <div class="container"> -->
+    <div class="m-page-heading contain">
       <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-primary" href="<%=model.url() %>/new_project">New project</a><% } %></h3>
 
       <% if ( !model.isNew() ) { %>
@@ -33,7 +33,7 @@
       </p>
       <% } %>
     </div>
-  </div>
+  <!-- </div> -->
   <div role="tabpanel" class="tab-pane active" id="edit">
     <div class="container">
       <div class="row">
@@ -114,9 +114,9 @@
     </div>
   </div>
 
-  <div role="tabpanel" class="tab-pane" id="builder" style="max-width: 900px; margin: auto; padding: 1rem;">
+  <div role="tabpanel" class="tab-pane" id="builder" style="max-width: 900px; margin: auto; padding: 1rem; overflow: hidden;">
     <!-- <div class="container"> -->
-      <div id="schema"></div>
+      <div id="schema" style="max-height: 550px;"></div>
       <div id="previewWrap">
         <div class="message"></div>
         <div id="previewDiv"></div>
