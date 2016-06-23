@@ -267,6 +267,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           if ( view.pym ) { view.pym.remove(); }
 
           // $('#embed-preview').empty();
+          logger.debug('preview url!', previewUrl);
           view.pym = new pym.Parent('embed-preview', previewUrl);
           view.pym.iframe.onload = iframeLoaded;
           view.pym.onMessage('postPreviewData', function(data){
@@ -278,6 +279,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           // In case some dumb script hangs the loading process
           setTimeout(iframeLoaded, 20000);
         } else {
+          logger.debug('hi!', view.pym);
           iframeLoaded();
         }
       }, function(err) {
@@ -411,16 +413,16 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         view.formDataOnLoad = formData;
 
         // Callback for when iframe loads
-        // iframeLoaded = _.once(function() {
-        //   logger.debug('iframeLoaded');
-        //   if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
-        //     view.pollChange();
-        //   } else {
-        //     if(!view.model.hasStatus('building')){
-        //       $('#embed-preview').removeClass('loading');
-        //     }
-        //   }
-        // });
+        iframeLoaded = _.once(function() {
+          logger.debug('iframeLoaded');
+          if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
+            view.pollChange();
+          } else {
+            if(!view.model.hasStatus('building')){
+              $('#embed-preview').removeClass('loading');
+            }
+          }
+        });
         if ( view.model.hasPreviewType('live') ) {
           view.pollChange();
         }
@@ -450,24 +452,26 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
         }
 
-        // if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
-        //   // Setup our iframe with pym
-        //   if ( view.pym ) { view.pym.remove(); }
-        //   if ( view.formValidate(view.model, view.$('#projectForm')) ){
-        //     view.pym = new pym.Parent('embed-preview', previewUrl);
-        //     view.pym.iframe.onload = iframeLoaded;
-        //     view.pym.onMessage('postPreviewData', function(data){
-        //       logger.debug('A ----------- received message from preview');
-        //       // var parsedData = JSON.parse(data);
-        //       // view.$('#projectForm').alpaca().setValue(parsedData);
-        //       view.postedPreviewData = JSON.parse(data);
-        //       view.pollChange();
-        //     });
-        //   }
-        //
-        //   // In case some dumb script hangs the loading process
-        //   setTimeout(iframeLoaded, 20000);
-        // }
+        if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
+          if(!view.model.isNew()){
+            // Setup our iframe with pym
+            if ( view.pym ) { view.pym.remove(); }
+            if ( view.formValidate(view.model, view.$('#projectForm')) ){
+              view.pym = new pym.Parent('embed-preview', previewUrl);
+              view.pym.iframe.onload = iframeLoaded;
+              view.pym.onMessage('postPreviewData', function(data){
+                logger.debug('A ----------- received message from preview');
+                // var parsedData = JSON.parse(data);
+                // view.$('#projectForm').alpaca().setValue(parsedData);
+                view.postedPreviewData = JSON.parse(data);
+                view.pollChange();
+              });
+            }
+            // In case some dumb script hangs the loading process
+            setTimeout(iframeLoaded, 20000);
+          }
+
+        }
       }).catch(function(err) {
         console.error(err);
       }).then(function() {
