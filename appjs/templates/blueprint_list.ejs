@@ -75,58 +75,13 @@
   <table class="table collection">
     <thead>
       <tr>
-        <!-- <td>
-          <a class="btn btn-primary" href="/blueprints/new">New blueprint</a>
-        </td>
-        <td class="text-right" colspan="3">
-          <form class="form-inline" method="get" action="/blueprints">
-            <label class="sr-only" for="search">Search query</label>
-            <input type="search" class="form-control"
-                   name="search" id="search" placeholder="Search"
-                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-                   <br />
-                   <br />
-            Filters
-            <% if(query.type || query.tag || query.status || query.search) { %>
-              (<a href="/blueprints">clear</a>)
-            <% } %>
-            &nbsp;
-            <div class="select">
-              <select name="type" id="type" class="form-control" data-auto-submit="true">
-                <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
-              <% _.each(app.config.blueprint_types, function(type) { %>
-                <option <% if(type === query.type) { %>selected<% } %>
-                      value="<%=type %>"><%=type %></option>
-              <% }) %>
-              </select>
-            </div>
-            <div class="select">
-              <select name="tag" id="tag" class="form-control" data-auto-submit="true">
-                <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
-              <% _.each(app.config.blueprint_tags, function(tag) { %>
-                <option <% if(tag.slug === query.tag) { %>selected<% } %>
-                      value="<%=tag.slug %>"><%=tag.title %></option>
-              <% }) %>
-              </select>
-            </div>
-            <div class="select">
-              <select name="status" id="status" class="form-control" data-auto-submit="true">
-                <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
-              <% _.each(app.config.blueprint_statuses, function(status) { %>
-                <option <% if(status === query.status) { %>selected<% } %>
-                      value="<%=status %>"><%=status %></option>
-              <% }) %>
-              </select>
-            </div>
-          </form>
-        </td> -->
       </tr>
     </thead>
     <tbody>
       <tr class="m-table-heading">
         <td>Blueprint</td>
         <td>Status</td>
-        <td class="bold-actions-cell">Actions</td>
+        <td class="bold-actions-cell" style="padding-right:37px;">Actions</td>
       </tr>
     <% if(getObjects().length == 0) { %>
         <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>

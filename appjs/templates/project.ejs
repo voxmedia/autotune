@@ -180,9 +180,17 @@
                 data-action-message="Publishing..."
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
-                data-model-id="<%=model.get('slug') %>">Publish now</button>
+                data-model-id="<%=model.get('slug') %>">
+                <% if ( model.hasInitialBuild() ) { %>
+                  Publish changes now
+                <% } else { %>
+                  Publish now
+                <% } %>
+                </button>
+        <% if ( model.hasInitialBuild() ) { %>
         <a class="btn btn-secondary" target="_blank" id="viewBtn"
            href="<%=model.getPublishUrl() %>">View</a>
+        <% } %>
 
           <br />
           <br />

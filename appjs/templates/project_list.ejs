@@ -144,9 +144,11 @@
           <span class="label label-danger">Broken</span>
         <% } else if ( item.hasStatus('building') ) { %>
           <!-- <span class="m-status"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%></span> -->
-          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#ffffff'})%>Building</span>
+        <% } else if ( item.hasStatus('updated') )  { %>
+          <span class="label label-info">Updated</span>
         <% } else { %>
-          <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
+          <span class="label label-info"><%=item.get('status') %></span>
         <% } %>
       </td>
       <td class="publish-cell">
