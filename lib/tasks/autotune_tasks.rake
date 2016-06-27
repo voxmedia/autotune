@@ -133,17 +133,20 @@ namespace :autotune do
   end
 
   desc 'Send a message to users'
-  task :alert_users, [:level, :text] => [:environment] do |_, args|
-    Autotune.send_message('alert', :level => args[:level], :text => args[:text])
+  task :alert_users, [:level, :text, :timeout] => [:environment] do |_, args|
+    timeout = args[:timeout].to_i.to_s == args[:timeout] ? args[:timeout].to_i : args[:timeout]
+    Autotune.send_message('alert', :level => args[:level],
+                                   :text => args[:text],
+                                   :timeout => timeout)
     puts "Sent #{args[:level]} alert to everyone: #{args[:text]}"
   end
 
   desc 'Reset all themes'
   task :reset_themes => :environment do
     puts 'Resetting all themes'
-    Autotune::Theme.all.each_with_index { |t, i|
+    Autotune::Theme.all.each_with_index do |t, i|
       build_bp = i == (Autotune::Theme.count - 1)
       t.update_data(:build_blueprints => build_bp)
-    }
+    end
   end
 end
