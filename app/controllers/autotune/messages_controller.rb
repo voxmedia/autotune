@@ -12,7 +12,7 @@ module Autotune
         dt = Time.at(params[:since].to_i)
       elsif params[:since].blank?
         # missing required parameter
-        render_error "Parameter 'since' is required", :bad_request
+        return render_error "Parameter 'since' is required", :bad_request
       else
         # Some other datetime value
         dt = DateTime.parse(params[:since])
