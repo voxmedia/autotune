@@ -176,7 +176,7 @@ _.extend(App.prototype, Backbone.Events, {
    * Display an alert message to the user
    **/
   handleAlertMessage: function(data) {
-    this.view.alert(data.text, data.level);
+    this.view.alert(data.text, data.level, data.timeout);
   },
 
   /**
