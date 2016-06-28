@@ -90,10 +90,11 @@ module Autotune
     def send_message(type, data)
       ensure_redis
       dt = DateTime.current
-      payload = { 'type' => type, 'time' => dt.utc.to_f + MESSAGE_BUFFER, 'data' => data }
-      redis.zadd('messages', dt.utc.to_f + MESSAGE_BUFFER, payload.to_json)
+      payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
+      redis.zadd('messages', dt.utc.to_f, payload.to_json)
       redis.publish type, data.to_json
       purge_messages :older_than => dt - 24.hours
+      dt
     end
 
     def purge_messages(older_than: nil)
@@ -111,7 +112,7 @@ module Autotune
       if since.nil?
         results = redis.zrange('messages', 0, 1000)
       else
-        results = redis.zrangebyscore('messages', since.utc.to_f, '+inf')
+        results = redis.zrangebyscore('messages', since.utc.to_f - MESSAGE_BUFFER, '+inf')
       end
 
       results.map! { |d| ActiveSupport::JSON.decode(d) }
