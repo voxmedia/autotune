@@ -115,6 +115,7 @@ td.actionbar{
   label{
     display: inline-block;
     width: initial;
+    color: color(text);
     + .checkbox + .help-block{
       padding-left: 0px;
     }
@@ -285,6 +286,9 @@ td.actionbar{
 
 .help-block, .help-block .glyphicon{
   color: color(actionable, dark);
+  i{
+    display: none;
+  }
 }
 
 .has-error .help-block .glyphicon{

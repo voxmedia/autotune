@@ -198,17 +198,20 @@
         <h4>Share Text</h4>
 
         <textarea id="shareText" class="form-control" rows="6"></textarea>
-        <% if ( model.has('embed_html') ) { %>
+        <p class="help-block">This text will appear when the graphic is shared via twitter or facebook.</p>
           <br />
           <br />
           <br />
         <h4>Embed in your story</h4>
+
+        <% if ( model.has('embed_html') ) { %>
+        <textarea class="form-control" id="embedText" rows="6" readonly><%=model.get('embed_html') %></textarea>
         <p>
           <button type="button" class="btn btn-default"
                   data-hook="copyEmbedToClipboard">Copy embed code</button>
         </p>
-
-        <textarea class="form-control" rows="6" readonly><%=model.get('embed_html') %></textarea>
+        <% } else { %>
+          <textarea class="form-control" id="embedText" rows="6" placeholder="Please publish your project to receive the embed code." readonly></textarea>
         <% } %>
         <% if ( model.has('screenshot_sm_url') ) { %>
           <br />
@@ -245,10 +248,10 @@
         </p>
 
         <p>
-          <button type="button" class="btn btn-default"
+          <button type="button" class="btn btn-primary"
                   data-action-message="Build started" data-loading-text="Starting build..."
                   data-action="build" data-action-next="reload">Rebuild</button>
-          <button type="button" class="btn btn-warning"
+          <button type="button" class="btn btn-secondary"
                   data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
                   data-action="update-snapshot" data-action-next="reload">Upgrade</button>
         </p>

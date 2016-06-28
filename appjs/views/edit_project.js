@@ -466,6 +466,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           }
 
         }
+        if(view.model.hasPreviewType('live')){
+          if(view.model.getConfig().spreadsheet_template){
+            $( "input[name='google_doc_url']" ).after('<button type="button" id="spreadsheet-button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>');
+          }
+        }
       }).catch(function(err) {
         console.error(err);
       }).then(function() {
@@ -601,17 +606,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       // hide slug for blueprint types that are not apps
       if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {
         options_fields['slug']['fieldClass'] = 'hidden';
-      }
-
-      if(this.model.hasPreviewType('live')){
-        // options_fields['title'] = {
-        //   'fieldClass': 'hidden'
-        // };
-        if(this.model.getConfig().spreadsheet_template){
-          var googleText = form_config.schema.properties.google_doc_url.title;
-          var newText = googleText + '<br><button type="button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
-          form_config.schema.properties.google_doc_url.title = newText;
-        }
       }
 
       _.extend(schema_properties, form_config.schema.properties || {});

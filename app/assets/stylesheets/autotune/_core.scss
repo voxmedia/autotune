@@ -125,9 +125,9 @@ label.block {
     display: none;
     padding: 5px 15px;
     color: #ffffff;
-    font-size: 11px;
+    font-size: 12px;
     button{
-      font-size: 11px;
+      font-size: 12px;
       padding: 2px 5px;
       margin-left: 5px;
     }
@@ -754,6 +754,7 @@ table.table.collection.project-list{
 
 .blueprint-title{
   margin-top: 0px;
+  margin-bottom: 3px;
   color: color(actionable);
   text-transform: uppercase;
 }
@@ -768,6 +769,9 @@ table.table.collection.project-list{
   }
   @media (max-width: $screen-sm){
     position: relative;
+    h4{
+      display: none;
+    }
   }
 }
 
@@ -783,6 +787,11 @@ table.table.collection.project-list{
     overflow-y: auto;
     ul.nav{
       display: block;
+    }
+  }
+  @media (max-width: 500px){
+    ul.nav{
+      display: none;
     }
   }
 }
@@ -960,4 +969,16 @@ $nav-break: 550px;
   li.next{
     justify-content: flex-end;
   }
+}
+
+#shareText{
+  width: 50%;
+}
+
+#embedText, #shareText{
+  margin: 15px 0;
+}
+
+#spreadsheet-button{
+  margin-top: 8px;
 }
