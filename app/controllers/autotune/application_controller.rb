@@ -36,6 +36,11 @@ module Autotune
       end
     end
 
+    def add_date_header
+      # Tue, 15 Nov 1994 08:12:31 GMT
+      headers['Date'] = Time.zone.now.strftime('%a, %e %b %Y %H:%M:%S %Z')
+    end
+
     # For all responses, return the CORS access control headers.
     def cors_set_access_control_headers
       headers['Access-Control-Allow-Origin'] = '*'

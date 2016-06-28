@@ -19,6 +19,8 @@ module Autotune
   ROLES = %w(none author editor designer superuser)
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
+  # add a time buffer to account for processing
+  MESSAGE_BUFFER = 0.5
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :verify_omniauth, :verify_authorization_header,
@@ -91,6 +93,8 @@ module Autotune
       payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
       redis.zadd('messages', dt.utc.to_f, payload.to_json)
       redis.publish type, data.to_json
+      purge_messages :older_than => dt - 24.hours
+      dt
     end
 
     def purge_messages(older_than: nil)
@@ -108,7 +112,7 @@ module Autotune
       if since.nil?
         results = redis.zrange('messages', 0, 1000)
       else
-        results = redis.zrangebyscore('messages', since.utc.to_f, '+inf')
+        results = redis.zrangebyscore('messages', since.utc.to_f - MESSAGE_BUFFER, '+inf')
       end
 
       results.map! { |d| ActiveSupport::JSON.decode(d) }
@@ -131,3 +135,4 @@ end
 # Load deployers
 require 'autotune/deployers/file'
 require 'autotune/deployers/s3'
+

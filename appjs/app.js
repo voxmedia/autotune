@@ -65,6 +65,10 @@ function App(config) {
   this.designerGroups.reset(config.designer_groups);
   delete config.designer_groups;
 
+  this.config = config;
+
+  if ( this.isDev() ) { logger.level = 'debug'; }
+
   this.blueprints = new models.BlueprintCollection();
   this.projects = new models.ProjectCollection();
   this.editableThemes = new models.ThemeCollection();
@@ -73,16 +77,12 @@ function App(config) {
   this.view = new views.Application({ app: this });
 
   // Initialize server event listener
-  this.messages = new Messages();
+  this.messages = new Messages({startDate: new Date(Date.parse(config.date)).getTime()/1000});
   this.listenTo(this.messages, 'stop', this.handleListenerStop);
   this.listenTo(this.messages, 'error', this.handleListenerError);
   this.listenTo(this.messages, 'open', this.handleListenerStart);
   this.listenTo(this.messages, 'alert', this.handleAlertMessage);
   this.messages.start();
-
-  this.config = config;
-
-  if ( this.isDev() ) { logger.level = 'debug'; }
 
   // Initialize routing
   this.router = new Router({ app: this });
@@ -155,14 +155,16 @@ _.extend(App.prototype, Backbone.Events, {
    * Do something when the listener errors out
    **/
   handleListenerError: function(error) {
+    var msg;
     this.view.clearNotification( 'Reload to see changes' );
     if ( error === 'auth' ) {
-      this.view.error(
-        'Your session has expired. Please reload your browser.', true);
+      msg = 'Your session has expired.';
+    } else if (error) {
+      msg = 'There was a problem connecting to the server ('+error+').';
     } else {
-      this.view.error(
-        'There was a problem connecting to the server ('+error+').', true);
+      msg = 'There was a problem connecting to the server.';
     }
+    this.view.error(msg, true);
   },
 
   /**

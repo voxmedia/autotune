@@ -12,12 +12,13 @@ module Autotune
         dt = Time.at(params[:since].to_i)
       elsif params[:since].blank?
         # missing required parameter
-        render_error "Parameter 'since' is required", :bad_request
+        return render_error "Parameter 'since' is required", :bad_request
       else
         # Some other datetime value
         dt = DateTime.parse(params[:since])
       end
 
+      add_date_header
       if params[:type]
         render :json => Autotune.messages(:since => dt, :type => params[:type])
       else

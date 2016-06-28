@@ -135,10 +135,10 @@ namespace :autotune do
   desc 'Send a message to users'
   task :alert_users, [:level, :text, :timeout] => [:environment] do |_, args|
     timeout = args[:timeout].to_i.to_s == args[:timeout] ? args[:timeout].to_i : args[:timeout]
-    Autotune.send_message('alert', :level => args[:level],
-                                   :text => args[:text],
-                                   :timeout => timeout)
-    puts "Sent #{args[:level]} alert to everyone: #{args[:text]}"
+    dt = Autotune.send_message('alert', :level => args[:level],
+                                        :text => args[:text],
+                                        :timeout => timeout)
+    puts "Sent #{args[:level]} alert to everyone at #{dt.to_f}: #{args[:text]}"
   end
 
   desc 'Reset all themes'
