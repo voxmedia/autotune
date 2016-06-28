@@ -87,9 +87,10 @@ module Autotune
 
     def send_message(type, data)
       ensure_redis
+      buffer = 0.5 # add a time buffer to account for processing
       dt = DateTime.current
-      payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
-      redis.zadd('messages', dt.utc.to_f, payload.to_json)
+      payload = { 'type' => type, 'time' => dt.utc.to_f + buffer, 'data' => data }
+      redis.zadd('messages', dt.utc.to_f + buffer, payload.to_json)
       redis.publish type, data.to_json
       purge_messages :older_than => dt - 24.hours
     end
@@ -132,3 +133,4 @@ end
 # Load deployers
 require 'autotune/deployers/file'
 require 'autotune/deployers/s3'
+
