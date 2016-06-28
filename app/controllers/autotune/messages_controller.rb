@@ -18,6 +18,7 @@ module Autotune
         dt = DateTime.parse(params[:since])
       end
 
+      add_date_header
       if params[:type]
         render :json => Autotune.messages(:since => dt, :type => params[:type])
       else
