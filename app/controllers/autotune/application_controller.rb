@@ -11,6 +11,7 @@ module Autotune
                   :if => :google_auth_required?
 
     before_action :cors_set_access_control_headers
+    after_action :date_header
 
     helper_method :current_user, :signed_in?, :omniauth_path, :login_path, :role?
 
@@ -34,6 +35,11 @@ module Autotune
           model.new
         end
       end
+    end
+
+    def date_header
+      # Tue, 15 Nov 1994 08:12:31 GMT
+      headers['Date'] = Time.zone.now.strftime('%a, %e %b %Y %H:%M:%S %Z')
     end
 
     # For all responses, return the CORS access control headers.

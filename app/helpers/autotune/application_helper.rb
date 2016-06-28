@@ -18,7 +18,8 @@ module Autotune
         :editable_slug_types => Autotune::EDITABLE_SLUG_BLUEPRINT_TYPES,
         :spinner => ActionController::Base.helpers.asset_path('autotune/spinner.gif'),
         :faq_url => Rails.configuration.autotune.faq_url,
-        :theme_meta_data => Rails.configuration.autotune.theme_meta_data
+        :theme_meta_data => Rails.configuration.autotune.theme_meta_data,
+        :date => Time.zone.now.strftime('%a, %e %b %Y %H:%M:%S %Z')
       }
     end
   end

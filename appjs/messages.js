@@ -14,7 +14,8 @@ function Messages(opts) {
   });
 
   this.errorStop = false;
-  this.lastCheck = Date.now()/1000;
+  this.lastCheck = opts.startDate || (Date.now()/1000);
+  logger.debug('Start messages at ' + this.lastCheck);
 }
 
 _.extend(Messages.prototype, Backbone.Events, {
@@ -36,6 +37,9 @@ _.extend(Messages.prototype, Backbone.Events, {
     this.errorCount = 0;
 
     return this;
+  },
+
+  setTime: function(time) {
   },
 
   /**
@@ -83,13 +87,14 @@ _.extend(Messages.prototype, Backbone.Events, {
     if ( this.paused ) { return; }
 
     var ts = this.lastCheck, self = this;
-    this.lastCheck = Date.now()/1000;
 
     logger.debug('Checking messages... (app.messages.stop() to stop)');
     $.get(
-      '/messages', { since: ts }, null, 'json'
-    ).then(function( data ) {
+      '/messages', { since: Math.floor(ts) }, null, 'json'
+    ).then(function( data, status, jqxhr ) {
       self.errorCount = 0;
+
+      self.lastCheck = new Date(Date.parse(jqxhr.getResponseHeader('Date'))).getTime()/1000;
 
       data.forEach(function(item) {
         logger.debug('message', item);
@@ -110,13 +115,14 @@ _.extend(Messages.prototype, Backbone.Events, {
 
       });
     }, function( jqxhr, textStatus, error ) {
+      logger.debug('Error getting messages, errorCount ' + self.errorCount + ' of ' + self.config.errorRetry);
       if ( jqxhr.status === 401 || jqxhr.status === 403 ) {
         self.stop();
         self.trigger('error', 'auth');
         self.errorStop = true;
       } else {
         self.errorCount++;
-        if ( self.errorCount >= self.errorRetry ) {
+        if ( self.errorCount >= self.config.errorRetry ) {
           self.stop();
           self.trigger('error', error);
           self.errorStop = true;
