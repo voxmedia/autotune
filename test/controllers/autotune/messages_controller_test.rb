@@ -30,7 +30,7 @@ module Autotune
 
       # To test the since function, make sure we only recieve half of the
       # messages we created
-      get :index, :since => current_dt.to_f
+      get :index, :since => current_dt.to_f + Autotune::MESSAGE_BUFFER
       assert_response :success
       assert_instance_of Array, decoded_response,
                          'Should have an array of messages'
@@ -48,17 +48,18 @@ module Autotune
       num_messages.times { Autotune.send_message('ping', 'pong') }
       sleep 1
       dt = DateTime.current
+      sleep 1
       num_messages.times { Autotune.send_message('ping', 'pong') }
 
       # To test the since function, make sure we only recieve half of the
       # messages we created. Test with a bunch of date formats
-      [dt.to_f, dt.to_i, dt.iso8601, dt.rfc3339, dt.jisx0301].each do |d|
-        get :index, :since => d
+      [:to_f, :to_i, :iso8601, :rfc3339, :jisx0301].each do |meth|
+        get :index, :since => dt.send(meth)
         assert_response :success
         assert_instance_of Array, decoded_response,
-                           'Should have an array of messages'
+                           "Should have an array of messages from request with #{meth} format"
         assert_equal num_messages, decoded_response.length,
-                     "Should have #{num_messages} messages"
+                     "Should have #{num_messages} messages from request with #{meth} format"
       end
     end
 
@@ -75,7 +76,7 @@ module Autotune
 
       # To test the since function, make sure we only recieve half of the
       # messages we created
-      get :index, :since => current_dt.to_f, :type => 'foo'
+      get :index, :since => current_dt.to_f + Autotune::MESSAGE_BUFFER, :type => 'foo'
       assert_response :success
       assert_instance_of Array, decoded_response,
                          'Should have an array of messages'
@@ -99,7 +100,7 @@ module Autotune
       p = autotune_projects(:example_one)
       p.update!(:status => 'building')
 
-      get :index, :since => current_dt.to_f
+      get :index, :since => current_dt.to_f + Autotune::MESSAGE_BUFFER
       assert_response :success
       assert_instance_of Array, decoded_response,
                          'Should have an array of messages'
@@ -115,7 +116,7 @@ module Autotune
       b = autotune_blueprints(:example)
       b.update!(:status => 'ready')
 
-      get :index, :since => current_dt.to_f
+      get :index, :since => current_dt.to_f + Autotune::MESSAGE_BUFFER
       assert_response :success
       assert_instance_of Array, decoded_response,
                          'Should have an array of messages'

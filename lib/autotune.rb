@@ -19,6 +19,8 @@ module Autotune
   ROLES = %w(none author editor designer superuser)
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
+  # add a time buffer to account for processing
+  MESSAGE_BUFFER = 0.5
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :verify_omniauth, :verify_authorization_header,
@@ -87,10 +89,9 @@ module Autotune
 
     def send_message(type, data)
       ensure_redis
-      buffer = 0.5 # add a time buffer to account for processing
       dt = DateTime.current
-      payload = { 'type' => type, 'time' => dt.utc.to_f + buffer, 'data' => data }
-      redis.zadd('messages', dt.utc.to_f + buffer, payload.to_json)
+      payload = { 'type' => type, 'time' => dt.utc.to_f + MESSAGE_BUFFER, 'data' => data }
+      redis.zadd('messages', dt.utc.to_f + MESSAGE_BUFFER, payload.to_json)
       redis.publish type, data.to_json
       purge_messages :older_than => dt - 24.hours
     end
