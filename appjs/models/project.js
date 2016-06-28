@@ -210,7 +210,6 @@ var Project = Backbone.Model.extend({
    * @returns {boolean}
    **/
   hasStatus: function() {
-    console.log('find status', this);
     var iteratee = function(m, i) {
       return m || this.get( 'status' ) === i;
     };

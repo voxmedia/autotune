@@ -116,13 +116,13 @@
       </td>
       <td>
         <% if(item.get('status') == 'ready') { %>
-        <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
+          <span class="label label-success"><%=item.get('status') %></span>
         <% } else if(item.get('status') == 'broken') { %>
-          <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
+          <span class="label label-danger"><%=item.get('status') %></span>
         <% } else if(item.hasStatus('updating')) { %>
-          <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFFFFF'})%>Upgrading</span>
         <% } else { %>
-          <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
+          <span class="label label-info"><%=item.get('status') %></span>
         <% } %>
       </td>
       <td class="text-right" colspan="2">
@@ -142,6 +142,8 @@
       <% if(collection.state.currentPage !== collection.state.firstPage){ %>
         <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
       <% } %>
+
+      <ul class="pagination">
 
         <% if(collection.state.currentPage - 1 >= collection.state.firstPage){ %>
           <li class=""><a href="<%=getPageUrl(collection.state.firstPage)%>"><%=collection.state.firstPage %><span class="sr-only"></span></a></li>
@@ -197,6 +199,8 @@
           <% } %>
           <li class=""><a href="<%=getPageUrl(collection.state.lastPage)%>"><%=collection.state.lastPage %><span class="sr-only"></span></a></li>
         <% } %>
+
+      </ul>
 
       <% if(collection.state.currentPage !== collection.state.lastPage){ %>
         <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>

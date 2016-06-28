@@ -24,6 +24,7 @@ main {
 .label{
   padding: .1em .5em;
   font-size: 100%;
+  text-transform: capitalize;
   @each $type, $color in (
       default    color(default),
       primary    color(primary),

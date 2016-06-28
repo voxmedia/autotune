@@ -298,10 +298,10 @@ input[type="checkbox"] {
 
 //alerts in tables
 table.table.collection tbody tr td {
-  color: color(actionable, dark);
+  color: color(actionable);
   &.text-right{
     .glyphicon{
-      color: color(actionable);
+      color: color(text);
       display: inline-block;
     }
     a{
@@ -323,7 +323,7 @@ table.table.collection tbody tr td {
     }
   }
   a.title {
-    color: color(actionable);
+    color: color(text);
     display: table-cell;
   }
 }
@@ -567,6 +567,10 @@ table.table.collection.project-list{
     margin: auto;
     padding: 1rem;
     margin-top: 30px;
+    .btn{
+      margin-left: 10px;
+      vertical-align: bottom;
+    }
   }
 
   @media (max-width: $grid-float-breakpoint-max) {
@@ -611,7 +615,7 @@ table.table.collection.project-list{
       border-bottom: 3px solid color(border);
       &.bold-actions-cell{
         text-align: right;
-        padding-right: 68px;
+        padding-right: 37px;
       }
     }
     tbody > tr {
@@ -853,6 +857,9 @@ $nav-break: 550px;
       #search{
         max-width: 276px;
       }
+      .btn{
+        margin-right: 0px;
+      }
       @media (max-width: $nav-break){
         width: 100%;
         margin-left: 0px;
@@ -909,8 +916,15 @@ $nav-break: 550px;
 }
 
 .pagination{
-  display: table;
-  margin: auto;
+  // display: table;
+  // margin: auto;
+  width:100%;
+  display: flex;
+  .pagination{
+    width: initial;
+    margin: 0 auto;
+    justify-content: center;
+  }
   li{
     &.ellipses span{
       cursor: default;
@@ -941,11 +955,9 @@ $nav-break: 550px;
   }
 
   li.previous{
-    position:absolute;
-    left:10px;
+    justify-content: flex-start;
   }
   li.next{
-    position:absolute;
-    right:10px;
+    justify-content: flex-end;
   }
 }

@@ -204,7 +204,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if(view.postedPreviewData){
       data = view.postedPreviewData;
     }
-    logger.debug('PC DATA', data);
 
     // this.resizeTitleTextarea();
 
@@ -220,7 +219,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     // Alpaca takes a loooong time to validate a complex form
     if ( !this.formValidate(this.model, $form) ) {
       if ( !view.pym ) {
-        logger.debug('enter valid data, please');
         $('#embed-preview').addClass('validation-error');
       }
       // If the form isn't valid, bail
@@ -435,10 +433,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           previewSlug = view.model.isThemeable() ? view.model.getVersion() :
             [view.model.getVersion(), view.theme].join('-');
           previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
-
-          // if ( !view.copyProject && !view.model.hasInitialBuild() ){
-          //   previewUrl = previewUrl + '#new';
-          // }
 
           // Revisit this
         } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){

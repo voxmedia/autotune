@@ -114,7 +114,7 @@
                       data-loading-text="Saving...">Save changes</button>
 
               <% if ( hasRole('superuser') && !model.isNew() && model.isDefault()) { %>
-              <button type="button" class="btn btn-info"
+              <button type="button" class="btn btn-secondary"
                       data-action-message="Reset started"
                       data-action-confirm="Resetting will delete all changes made to the theme. Are you sure you wish to continue?"
                       data-loading-text="Resetting..."
@@ -162,7 +162,7 @@
                             data-loading-text="Saving...">Save changes</button>
 
                     <% if ( hasRole('superuser') && !model.isNew() && model.isDefault()) { %>
-                    <button type="button" class="btn btn-info"
+                    <button type="button" class="btn btn-secondary"
                             data-action-message="Reset started"
                             data-action-confirm="Resetting will delete all changes made to the theme. Are you sure you wish to continue?"
                             data-loading-text="Resetting..."
