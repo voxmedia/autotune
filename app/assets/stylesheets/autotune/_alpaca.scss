@@ -177,19 +177,19 @@ td.actionbar{
     background-color: transparent;
     border-color: transparent;
     color: color(actionable);
-    font-size: 16px;
+    font-size: 18px;
     border-color: transparent;
-
+    margin-top: 3px;
     &:first-of-type{
       padding-left: 0px;
     }
     &:last-of-type{
-      padding-right: 19px;
+      padding-right: 10px;
     }
     &:hover {
       background-color: transparent;
       border-color: transparent;
-      color:darken(color(actionable), 15%);
+      color: #ffffff;
     }
   }
 }
@@ -246,6 +246,7 @@ td.actionbar{
     td {
       border-width:0px;
       padding: 10px 10px 10px 0px;
+      vertical-align: top;
       &:last-child{
         padding-right: 0px;
       }
@@ -254,7 +255,10 @@ td.actionbar{
         margin: 0px;
       }
       &.actionbar{
-        vertical-align: middle;
+        padding-top: 14px;
+      }
+      .alpaca-field-checkbox{
+        padding-top: 8px;
       }
     }
   }
@@ -264,14 +268,17 @@ td.actionbar{
   }
 
   .btn {
-    font-size:12px;
+    font-size:18px;
     float:none;
     padding:0;
     border-width:0;
-    // margin:0 8px 0 0;
     margin: 0px;
+    color: color(actionable);
     &.btn-sm{
-      padding: 3px 5px;
+      padding: 3px 3px;
+    }
+    &:hover{
+      color:darken(color(actionable), 15%);
     }
   }
 
@@ -293,4 +300,14 @@ td.actionbar{
 
 .has-error .help-block .glyphicon{
   color: color(negative);
+}
+
+table.table + .alpaca-array-toolbar{
+  .alpaca-array-toolbar-action.btn.btn-default.btn-sm{
+    color: #ffffff;
+    background-color: color(actionable, dark);
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-bottom: 8px;
+  }
 }
