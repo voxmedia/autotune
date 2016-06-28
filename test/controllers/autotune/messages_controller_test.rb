@@ -46,9 +46,9 @@ module Autotune
 
       # Send twice as many messages as we want to test for
       num_messages.times { Autotune.send_message('ping', 'pong') }
-      sleep 1
+      sleep 2
       dt = DateTime.current
-      sleep 1
+      sleep 2
       num_messages.times { Autotune.send_message('ping', 'pong') }
 
       # To test the since function, make sure we only recieve half of the
