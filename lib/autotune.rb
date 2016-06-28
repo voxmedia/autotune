@@ -91,6 +91,7 @@ module Autotune
       payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
       redis.zadd('messages', dt.utc.to_f, payload.to_json)
       redis.publish type, data.to_json
+      purge_messages :older_than => dt - 24.hours
     end
 
     def purge_messages(older_than: nil)
