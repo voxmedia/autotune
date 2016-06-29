@@ -218,14 +218,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
     if ( !this.formValidate(this.model, $form) ) {
-      if ( !view.pym ) {
-        $('#embed-preview').addClass('validation-error');
-      }
+      // if ( !view.pym ) {
+      //   $('#embed-preview').addClass('validation-error');
+      // }
       // If the form isn't valid, bail
       return;
     } else {
-      // Now that data is connected and valid, show some sort of loading indicator:
-      $('#embed-preview').removeClass('validation-error').addClass('loading');
       if( this.forceUpdateDataFlag ){
         // Check the flag in case we want to force an update
         query = '?force_update=true';
@@ -239,6 +237,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       // stash data so we can see if it changed
       this.previousData = data;
+
+      // Now that data is connected and valid, show some sort of loading indicator:
+      if($('#embed-preview.validation-error')){
+        $('#embed-preview').removeClass('validation-error').addClass('loading');
+      }
 
       return $.ajax({
         type: "POST",
@@ -421,9 +424,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             }
           }
         });
-        if ( view.model.hasPreviewType('live') ) {
-          view.pollChange();
-        }
 
         // Figure out preview url
         if ( view.model.hasPreviewType('live') ) {
@@ -447,24 +447,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         }
 
         if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
-          if(!view.model.isNew()){
-            // Setup our iframe with pym
-            if ( view.pym ) { view.pym.remove(); }
-            if ( view.formValidate(view.model, view.$('#projectForm')) ){
-              view.pym = new pym.Parent('embed-preview', previewUrl);
-              view.pym.iframe.onload = iframeLoaded;
-              view.pym.onMessage('postPreviewData', function(data){
-                logger.debug('A ----------- received message from preview');
-                // var parsedData = JSON.parse(data);
-                // view.$('#projectForm').alpaca().setValue(parsedData);
-                view.postedPreviewData = JSON.parse(data);
-                view.pollChange();
-              });
-            }
-            // In case some dumb script hangs the loading process
-            setTimeout(iframeLoaded, 20000);
+          // Setup our iframe with pym
+          if ( view.pym ) { view.pym.remove(); }
+          if ( view.formValidate(view.model, view.$('#projectForm')) ){
+            view.pym = new pym.Parent('embed-preview', previewUrl);
+            view.pym.iframe.onload = iframeLoaded;
+            view.pym.onMessage('postPreviewData', function(data){
+              logger.debug('A ----------- received message from preview');
+              // var parsedData = JSON.parse(data);
+              // view.$('#projectForm').alpaca().setValue(parsedData);
+              view.postedPreviewData = JSON.parse(data);
+              view.pollChange();
+            });
           }
-
+          // In case some dumb script hangs the loading process
+          setTimeout(iframeLoaded, 20000);
         }
         if(view.model.hasPreviewType('live')){
           if(view.model.getConfig().spreadsheet_template){

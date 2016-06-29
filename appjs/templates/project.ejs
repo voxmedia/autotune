@@ -78,14 +78,17 @@
 
             <div class="preview-frame">
               <!-- add classes depending on what is new or not -->
-              <div id="embed-preview">
+              <div id="embed-preview" class=
+              <% if (model.isNew()) { %>
+                "validation-error"
+              <% } else if (!model.hasPreviewType('live') && model.hasStatus('building')) { %>
+                "building"
+              <% } else { %>
+                "loading"
+              <% } %>>
                 <div class="overlay">
-                  <%=render(require('./spinner.ejs'), {size:30, color:'white'})%>
-                  <% if (!model.hasPreviewType('live') && model.hasStatus('building')) { %>
-                  Building project
-                  <% } else { %>
-                  Loading preview
-                  <% } %>
+                  <%=render(require('./spinner.ejs'), {size:30, color:'#FFFFFF'})%>
+                  <!-- <div></div> -->
                 </div>
               </div>
             </div>

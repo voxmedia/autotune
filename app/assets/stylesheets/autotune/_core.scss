@@ -153,54 +153,54 @@ label.block {
   }
 }
 
-// #project-save-warning-container{
-//   display: block;
-//   position: fixed;
-//   width: 100%;
-//   text-align: center;
-//   display: block;
-//   background-color: color(background);
-//   z-index: 1;
-//   margin-top: -1px;
-//   border-bottom: 1px solid color(border);
-//   .project-save-warning{
-//     display: none;
-//     color: color(text);
-//     padding: 6px 5px 5px 5px;
-//     .glyphicon{
-//       margin-right: 10px;
-//     }
-//   }
-//   @media (min-width: 710px){
-//     display: none;
-//   }
-// }
-
 #embed-preview {
   position:relative;
-  .overlay { display: none; }
-
-  &.validation-error:after{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #F5F5F5;
-    height: 250px;
-    font-size: 16px;
-    text-align: center;
-    content: 'Fill out the project information to see a preview.';
-    .overlay { display: none; }
+  &.validation-error{
+    .overlay{ display: none; }
+    &:after{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #F5F5F5;
+      height: 250px;
+      font-size: 16px;
+      text-align: center;
+      content: 'Fill out the project information to see a preview.';
+    }
   }
-
-  &.loading .overlay {
-    display:block;
-    position:absolute;
-    top:0; right:0; bottom:0; left:0;
-    background-color:rgba($black, 0.6);
-    color:white;
-    font-size:40px;
-    padding-top:40px;
-    text-align:center;
+  &.loading{
+    .overlay {
+      display:block;
+      position:absolute;
+      top:0; right:0; bottom:0; left:0;
+      background-color:rgba($black, 0.6);
+      color:white;
+      font-size:35px;
+      padding-top:60px;
+      text-align:center;
+      min-height: 175px;
+      &:after{
+        display: inline;
+        content: 'Loading';
+      }
+    }
+  }
+  &.building{
+    .overlay {
+      display:block;
+      position:absolute;
+      top:0; right:0; bottom:0; left:0;
+      background-color:rgba($black, 0.6);
+      color:white;
+      font-size:35px;
+      padding-top:60px;
+      text-align:center;
+      min-height: 175px;
+      &:after{
+        display: inline;
+        content: 'Building';
+      }
+    }
   }
 }
 
