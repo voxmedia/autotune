@@ -10,7 +10,7 @@ module Autotune
     end
 
     # do the deed
-    def perform(blueprint, status: nil, update: false, build_themes: false, current_user: nil)
+    def perform(blueprint, update: false, build_themes: false, current_user: nil)
       # Create a new repo object based on the blueprints working dir
       repo = WorkDir.repo(blueprint.working_dir,
                           Rails.configuration.autotune.setup_environment)
@@ -25,7 +25,7 @@ module Autotune
               blueprint.version == repo.version &&
               !build_themes
           # The correct blueprint files are on disk, and the blueprint is not
-          # broken. And we are not rebuilding themes.Nothing to do.
+          # broken. And we are not rebuilding themes. Nothing to do.
           return
         elsif !update
           # we're not updating, but the blueprint is broken, so set it up
@@ -124,12 +124,8 @@ module Autotune
         end
       end
 
-      # Blueprint is now ready for testing
-      if status
-        blueprint.status = status
-      elsif blueprint.status != 'ready'
-        blueprint.status = 'testing'
-      end
+      # Blueprint is now built
+      blueprint.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)

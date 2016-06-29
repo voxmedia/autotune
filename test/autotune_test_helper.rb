@@ -105,7 +105,8 @@ class ActiveSupport::TestCase
         if File.exist?(Rails.root.join 'public', dir)
     end
 
-    assert_no_enqueued_jobs
+    assert_equal 0, enqueued_jobs.size,
+                 'There are enqueued jobs left in test teardown'
   end
 
   def mock_auth

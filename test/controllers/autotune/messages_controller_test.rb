@@ -114,7 +114,7 @@ module Autotune
 
       current_dt = DateTime.current
       b = autotune_blueprints(:example)
-      b.update!(:status => 'ready')
+      b.update!(:status => 'built')
 
       get :index, :since => current_dt.to_f + Autotune::MESSAGE_BUFFER
       assert_response :success
