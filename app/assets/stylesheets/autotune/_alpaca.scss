@@ -45,9 +45,23 @@ td.actionbar{
   // }
 }
 
+
+.form-group{
+  margin-bottom: 0px;
+}
+
 .alpaca-container-item {
   position:relative;
   padding:0px;
+  margin-bottom: 8px;
+  .alpaca-container-has-items{
+    .alpaca-container-item{
+      margin-bottom: 0px;
+      label.alpaca-control-label{
+        margin-top: 10px;
+      }
+    }
+  }
   .alpaca-array-actionbar{
     position: absolute;
     // vertical-align: middle;
@@ -103,12 +117,6 @@ td.actionbar{
       }
     }
   }
-  // .alpaca-array-actionbar {
-  //   &:before{
-  //     margin: 0 0 -4px 0;
-  //     font-size: 16px;
-  //   }
-  // }
   .btn-default{
     margin: 5px 0;
   }
@@ -116,12 +124,22 @@ td.actionbar{
     display: inline-block;
     width: initial;
     color: color(text);
+    &.alpaca-control-label{
+      margin-top: 20px;
+    }
     + .checkbox + .help-block{
       padding-left: 0px;
     }
   }
   legend{
     font-size: 18px;
+  }
+  .bold-title{
+    legend.alpaca-container-label, label.control-label{
+      font-size: $font-size-h4;
+      font-weight: bold;
+      margin-top: 15px;
+    }
   }
 }
 
@@ -142,8 +160,8 @@ td.actionbar{
   display:none;
 }
 
-.alpaca-field-checkbox .alpaca-control.checkbox {
-  margin: 0 0 0 8px;
+.alpaca-field-checkbox .alpaca-control.checkbox, .alpaca-field-radio .alpaca-control.radio {
+  margin: 0 0 5px 8px;
   // margin-bottom: 0px;
   display:inline-block;
 }
@@ -222,20 +240,16 @@ td.actionbar{
       display: none;
     }
   }
-  &.quiz-hide-header .table thead{
-    &:before{
+  &.quiz-hide-header{
+    .table-responsive:before{
       text-transform: uppercase;
       content: 'Options';
       color: color(actionable);
     }
-    tr > th {
-      display: none;
-      &:last-child{
-        &:after{
-          display: block;
-          float: right;
-          content: '✓ Correct Answer';
-        }
+    .table{
+      margin-top: 8px;
+      thead > tr > th {
+        display: none;
       }
     }
   }
@@ -251,14 +265,14 @@ td.actionbar{
         padding-right: 0px;
       }
       .alpaca-field-checkbox{
-        width: 1px;
+        width: 10px;
         margin: 0px;
       }
       &.actionbar{
         padding-top: 14px;
       }
       .alpaca-field-checkbox{
-        padding-top: 8px;
+        padding-top: 9px;
       }
     }
   }
@@ -295,6 +309,9 @@ td.actionbar{
   color: color(actionable, dark);
   i{
     display: none;
+  }
+  &.alpaca-message{
+    margin-bottom: 0px;
   }
 }
 

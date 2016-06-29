@@ -757,6 +757,10 @@ table.table.collection.project-list{
   margin-bottom: 3px;
   color: color(actionable);
   text-transform: uppercase;
+  + p {
+    text-transform: none;
+    color: color(actionable);
+  }
 }
 
 .scroll-pane{
