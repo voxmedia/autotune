@@ -181,12 +181,14 @@ label.block {
   .overlay { display: none; }
 
   &.validation-error:after{
-    display:block;
-    position:absolute;
-    top:0; right:0; bottom:0; left:0;
-    font-size:16px;
-    padding-top:16px;
-    content: 'Please enter valid data into the form.';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F5F5F5;
+    height: 250px;
+    font-size: 16px;
+    text-align: center;
+    content: 'Fill out the project information to see a preview.';
     .overlay { display: none; }
   }
 
@@ -985,4 +987,30 @@ $nav-break: 550px;
 
 #spreadsheet-button{
   margin-top: 8px;
+}
+
+@keyframes ellipsis {
+  to {
+    width: 1.25em;
+  }
+}
+
+@-webkit-keyframes ellipsis {
+  to {
+    width: 1.25em;
+  }
+}
+
+#publishBtn div{
+  display: inline;
+  &:before {
+    color: #ffffff;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    -webkit-animation: ellipsis steps(4,end) 1800ms infinite;
+    animation: ellipsis steps(4,end) 1800ms infinite;
+    content: "\2026"; /* ascii code for the ellipsis character */
+    width: 0px;
+  }
 }

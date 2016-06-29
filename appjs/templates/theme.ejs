@@ -55,6 +55,7 @@
               </div>
               <% if (model.isNew()) { %>
               <div class="form-group">
+                <br />
                 <label for="group_id" class="block">Group</label>
                 <div class="select">
                   <select id="group_id" name="group_id" class="form-control">
@@ -110,6 +111,7 @@
                 </div>
                 <% }) %>
               <% } %>
+              <br />
               <button type="submit" class="btn btn-primary"
                       data-loading-text="Saving...">Save changes</button>
 
@@ -150,14 +152,17 @@
                         <% } %> >
                     <% if(!model.isDefault()) { %>
                     <div class="form-group">
-                      <h4>Inheritted data <span class="label label-warning">Read only</span> :</h4>
+                      <span class="label label-warning">Read only</span>
+                      <h4>Inherited data:</h4>
                       <div id="readonly-data" style="height:300px;"></div>
                     </div>
                     <% } %>
+                    <br />
                     <div class="form-group">
                       <h4>Theme data :</h4>
                       <div id="data" style="height:300px;">test test test</div>
                     </div>
+                    <br />
                     <button type="submit" class="btn btn-primary"
                             data-loading-text="Saving...">Save changes</button>
 

@@ -40,7 +40,7 @@ select.form-control {
   .p-ui-dark & {
     border-color: color(border, dark);
   }
-  &:focus {
+  &:focus, &:hover {
     border-color: color(primary);
   }
 }

@@ -90,20 +90,17 @@
               </div>
             </div>
 
-            <% if ( model.hasThemeType('dynamic') && model.hasPreviewType('live') && !model.isCurrentVersion() ) { %>
+            <!-- <% if ( model.hasThemeType('dynamic') && model.hasPreviewType('live') && !model.isCurrentVersion() ) { %>
             <p class="text-warning">
               <span class="m-status status-info">
                 <i class="icon-info"></i>
                 This preview may be outdated. Please upgrade the project to see the latest version.
               </span>
             </p>
-            <% } %>
-
-            <% if ( model.hasThemeType('dynamic') && model.hasPreviewType('live') && !model.isCurrentVersion() ) { %>
             <button type="button" class="btn btn-warning"
                     data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
                     data-action="update-snapshot" data-action-next="reload">Upgrade</button>
-            <% } %>
+            <% } %> -->
 
           </div>
         </div>
@@ -180,11 +177,15 @@
                 data-action-message="Publishing..."
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
-                data-model-id="<%=model.get('slug') %>">
-                <% if ( model.hasInitialBuild() ) { %>
-                  Publish changes now
+                data-model-id="<%=model.get('slug') %>"
+                <% if ( model.hasStatus('building') ) { %>
+                  style="width: 109px;">Publishing<div></div>
                 <% } else { %>
-                  Publish now
+                  ><% if ( model.hasInitialBuild() ) { %>
+                    Publish changes now
+                  <% } else { %>
+                    Publish now
+                  <% } %>
                 <% } %>
                 </button>
         <% if ( model.hasInitialBuild() ) { %>
