@@ -300,7 +300,7 @@ input[type="checkbox"] {
 
 //alerts in tables
 table.table.collection tbody tr td {
-  color: color(actionable);
+  color: color(text);
   &.text-right{
     .glyphicon{
       color: color(text);
@@ -331,7 +331,16 @@ table.table.collection tbody tr td {
 }
 
 table.table.collection.project-list{
-  tbody tr td{
+  tbody tr{
+    &.m-table-heading td.project-cell, &.m-table-heading td.bold-actions-cell{
+      color: color(actionable);
+    }
+    td{
+      color: color(actionable);
+      &.project-cell, &.bold-actions-cell{
+        color: color(text);
+      }
+  }
     // needs to be replaced with small bp scss variable
     @media (max-width: $screen-sm){
       display: block;
@@ -505,7 +514,6 @@ table.table.collection.project-list{
       }
       &:before {
         content: "";
-        background-image: image-url('autotune/logo.png');
         background-image: image-url('autotune/logo.svg');
         background-size: 100%;
         background-repeat: no-repeat;
@@ -793,6 +801,7 @@ table.table.collection.project-list{
     overflow-y: auto;
     ul.nav{
       display: block;
+      text-align: center;
     }
   }
   @media (max-width: 500px){
@@ -824,7 +833,7 @@ table.table.collection.project-list{
   #projectForm{
     padding: 25px 0 0 0;
     width: 100%;
-    max-width: 500px;
+    // max-width: 500px;
     margin: auto;
     margin-bottom: 30px;
   }
@@ -1013,4 +1022,40 @@ $nav-break: 550px;
     content: "\2026"; /* ascii code for the ellipsis character */
     width: 0px;
   }
+}
+
+#small-view:before{
+  background-image: image-url('autotune/size-mobile.svg');
+  content: "";
+  background-size: 100%;
+  background-repeat:no-repeat;
+	background-position:center center;
+  display: inline-block;
+  height: 26px;
+  width: 26px;
+  margin-bottom: -4px;
+}
+
+#medium-view:before{
+  background-image: image-url('autotune/size-tablet.svg');
+  content: "";
+  background-size: 100%;
+  background-repeat:no-repeat;
+	background-position:center center;
+  display: inline-block;
+  height: 26px;
+  width: 26px;
+  margin-bottom: -4px;
+}
+
+#fluid-view:before{
+  background-image: image-url('autotune/size-desktop.svg');
+  content: "";
+  background-size: 100%;
+  background-repeat:no-repeat;
+	background-position:center center;
+  display: inline-block;
+  height: 26px;
+  width: 26px;
+  margin-bottom: -4px;
 }
