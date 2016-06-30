@@ -169,7 +169,7 @@ button,
 a {
   cursor: pointer;
   // border: none;
-  color: color(actionable);
+  // color: color(actionable);
   display: inline-block;
   text-align: left;
 
@@ -210,7 +210,7 @@ a {
   &.btn-warning,
   &.btn-disabled {
     box-sizing: border-box;
-    color: white;
+    // color: white;
 
     // &:focus {
     //   border-color: color(actionable);

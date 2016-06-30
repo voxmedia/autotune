@@ -258,9 +258,9 @@ input[type="checkbox"] {
   }
 }
 
-.ui-pnotify-icon .glyphicon{
-  color: #ffffff;
-}
+// .ui-pnotify-icon .glyphicon{
+//   color: #ffffff;
+// }
 
 .ui-pnotify.center-top-notification{
   right: 0;
@@ -783,11 +783,23 @@ table.table.collection.project-list{
   }
 }
 
-ul.nav.nav-pills button.btn{
-  padding: 8px 9px;
-  &.active, &:hover{
-    background-color: color(primary);
-    border-color: color(primary);
+ul.nav.nav-pills{
+  button.btn{
+    padding: 8px 9px;
+    &.active, &:hover{
+      background-color: color(primary);
+      border-color: color(primary);
+    }
+  }
+  li.active, li:hover{
+    button.btn, button.btn.active{
+      background-color: color(primary);
+      border-color: color(primary);
+    }
+  }
+  li button.btn, li button.btn.active{
+    background-color: color(secondary);
+    border-color: color(secondary);
   }
 }
 
@@ -1018,7 +1030,7 @@ $nav-break: 550px;
 #publishBtn div{
   display: inline;
   &:before {
-    color: #ffffff;
+    color: $btn-color;
     overflow: hidden;
     display: inline-block;
     vertical-align: bottom;

@@ -92,18 +92,6 @@
               </div>
             </div>
 
-            <!-- <% if ( model.hasThemeType('dynamic') && model.hasPreviewType('live') && !model.isCurrentVersion() ) { %>
-            <p class="text-warning">
-              <span class="m-status status-info">
-                <i class="icon-info"></i>
-                This preview may be outdated. Please upgrade the project to see the latest version.
-              </span>
-            </p>
-            <button type="button" class="btn btn-warning"
-                    data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
-                    data-action="update-snapshot" data-action-next="reload">Upgrade</button>
-            <% } %> -->
-
           </div>
         </div>
         <div class="col-md-4 col-sm-5 scroll-pane" id="form-pane">
@@ -222,9 +210,21 @@
           <br />
         <h4>Screenshots</h4>
         <ul class="nav nav-pills">
-          <li role="presentation" class="active"><a href="#large-ss" data-toggle="tab">Large</a></li>
-          <li role="presentation"><a href="#medium-ss" data-toggle="tab">Medium</a></li>
-          <li role="presentation"><a href="#small-ss" data-toggle="tab">Small</a></li>
+          <li href="#large-ss" data-toggle="tab" class="active">
+            <button type="button" id="fluid-view"
+                  class="btn btn-default resize"></button>
+          </li>
+
+
+          <li href="#medium-ss" data-toggle="tab">
+            <button type="button" id="medium-view" href="#medium-ss" data-toggle="tab"
+                  class="btn btn-default resize"></button>
+          </li>
+
+          <li href="#small-ss" data-toggle="tab">
+            <button type="button" id="small-view"
+                  class="btn btn-default resize"></button>
+          </li>
         </ul>
 
         <div class="tab-content">

@@ -20,7 +20,7 @@ $black: #000000;
 // Base Colors
 $light-bg:          #FFFFFF;
 $light-color:       #373B42;
-$light-actionable:  #767676;
+$light-actionable:  #656565;
 $light-border:      #DDDDDD;
 $light-accent-bg:   #F5F5F5;
 
@@ -35,9 +35,11 @@ $primary-color:     #27AAE1;
 $secondary-color:   #999999;
 $default-color:     $secondary-color;
 $positive-color:    #88B716;
-$negative-color:    #DF4B27;
+$negative-color:    #FD432E;
 $cautionary-color:  #EEC600;
 $disabled-color:    #C2C2C2;
+
+$btn-color:         #222222;
 
 // Semantic Colors
 $secondary-actionable-color: #666666;
@@ -217,27 +219,27 @@ $btn-border-radius-base: $border-radius;
 
 $btn-font-weight:                normal !default;
 
-$btn-default-color:              #fff !default;
+$btn-default-color:              $btn-color !default;
 $btn-default-bg:                 $secondary-color !default;
 $btn-default-border:             darken($btn-default-bg, 20%) !default;
 
-$btn-primary-color:              #fff !default;
+$btn-primary-color:              $btn-color !default;
 $btn-primary-bg:                 $brand-primary !default;
 $btn-primary-border:             darken($btn-primary-bg, 20%) !default;
 
-$btn-success-color:              #fff !default;
+$btn-success-color:              $btn-color !default;
 $btn-success-bg:                 $brand-success !default;
 $btn-success-border:             darken($btn-success-bg, 20%) !default;
 
-$btn-info-color:                 #fff !default;
+$btn-info-color:                 $btn-color !default;
 $btn-info-bg:                    $brand-info !default;
 $btn-info-border:                darken($btn-info-bg, 20%) !default;
 
-$btn-warning-color:              #fff !default;
+$btn-warning-color:              $btn-color !default;
 $btn-warning-bg:                 $brand-warning !default;
 $btn-warning-border:             darken($btn-warning-bg, 20%) !default;
 
-$btn-danger-color:               #fff !default;
+$btn-danger-color:               $btn-color !default;
 $btn-danger-bg:                  $brand-danger !default;
 $btn-danger-border:              darken($btn-danger-bg, 20%) !default;
 
@@ -644,9 +646,9 @@ $label-warning-bg:            $brand-warning !default;
 $label-danger-bg:             $brand-danger !default;
 
 //** Default label text color
-$label-color:                 #fff !default;
+$label-color:                 $btn-color !default;
 //** Default text color of a linked label
-$label-link-hover-color:      #fff !default;
+$label-link-hover-color:      $btn-color !default;
 
 
 //== Modals
@@ -691,19 +693,19 @@ $alert-border-radius:         $border-radius-base !default;
 $alert-link-font-weight:      bold !default;
 
 $alert-success-bg:            $state-success-bg !default;
-$alert-success-text:          #ffffff !default;
+$alert-success-text:          $btn-color !default;
 $alert-success-border:        $state-success-border !default;
 
 $alert-info-bg:               $state-info-bg !default;
-$alert-info-text:             #ffffff !default;
+$alert-info-text:             $btn-color !default;
 $alert-info-border:           $state-info-border !default;
 
 $alert-warning-bg:            $state-warning-bg !default;
-$alert-warning-text:          #ffffff !default;
+$alert-warning-text:          $btn-color !default;
 $alert-warning-border:        $state-warning-border !default;
 
 $alert-danger-bg:             $state-danger-bg !default;
-$alert-danger-text:           #ffffff !default;
+$alert-danger-text:           $btn-color !default;
 $alert-danger-border:         $state-danger-border !default;
 
 

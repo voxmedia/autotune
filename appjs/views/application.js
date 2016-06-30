@@ -112,7 +112,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
         opts = _.defaults({
           text: message,
           type: level || 'info',
-          delay: 8000,
+          delay: 20000,
           before_open: function(thing){
             page.$('#alert-area').parent().addClass('has-alert');
           },
