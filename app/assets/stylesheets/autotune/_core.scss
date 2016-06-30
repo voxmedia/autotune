@@ -1056,7 +1056,7 @@ $nav-break: 550px;
   height: 100%;
   width: 6px;
   cursor: col-resize;
-  position: absolute;
+  position: fixed;
   top: 0px;
-  left: 0px;
+  margin-left: -14px;
 }
