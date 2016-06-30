@@ -99,7 +99,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     // 'click #projectTitle ': 'toggleEditTitle',
     'click #savePreview': 'savePreview',
     'click .resize': 'resizePreview',
-    'click #saveBtn': 'handleForm'
+    'click #saveBtn': 'handleForm',
+    'mousedown #split-bar': 'resizeForm'
   },
 
   afterInit: function(options) {
@@ -151,6 +152,48 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
 
     return ret;
+  },
+
+  resizeForm: function(event){
+    var view = this;
+    if($(window).width() > 768){
+      logger.debug(event.target);
+      $(document).mousemove(function (event){
+        $('#embed-preview').addClass('screen');
+        $('#embed-preview iframe').mouseover(function(event){
+          // $(document).unbind('mousemove');
+          event.stopPropagation();
+        });
+        if(event.pageX > 320 && $(window).width() - event.pageX > 300){
+          view.formWidth = $(window).width() - event.pageX;
+          $('#form-pane').css("width", view.formWidth);
+          $('#preview-pane').css("width", event.pageX);
+        }
+      });
+    }
+
+          //
+          // $('#split-bar').mousedown(function (e) {
+          //     e.preventDefault();
+          //     // $('#preview-pane').addClass('screen');
+          //     $(document).mousemove(function (e) {
+          //       e.preventDefault();
+          //       if($(window).width() > 768){
+          //         logger.debug(e.target);
+          //         if(e.pageX > 320 && $(window).width() - e.pageX > 300){
+          //           view.formWidth = $(window).width() - e.pageX;
+          //           $('#form-pane').css("width", view.formWidth);
+          //           $('#preview-pane').css("width", e.pageX);
+          //         }
+          //       }
+          //     });
+          // });
+          //
+          $(document).mouseup(function (e) {
+            $('#embed-preview').removeClass('screen');
+            $(document).unbind('mousemove');
+          });
+
   },
 
   hasUnsavedChanges: function(){
@@ -372,29 +415,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
-    $('#split-bar').mousedown(function (e) {
-        e.preventDefault();
-        // $('#preview-pane').addClass('screen');
-        $(document).mousemove(function (e) {
-          e.preventDefault();
-          if($(window).width() > 768){
-            logger.debug(e.target);
-            if(e.pageX > 320 && $(window).width() - e.pageX > 300){
-              view.formWidth = $(window).width() - e.pageX;
-              $('#form-pane').css("width", view.formWidth);
-              $('#preview-pane').css("width", e.pageX);
-            }
-          }
-        });
-    });
-
-    $(document).mouseup(function (e) {
-      // $('#preview-pane').removeClass('screen');
-      $(document).unbind('mousemove');
-    });
-
     $(window).resize(function(){
-      if($(window).width() > 768){
+      if(view.formWidth && $(window).width() > 768){
         $('#form-pane').css("width", view.formWidth);
         $('#preview-pane').css("width", $(window).width() - view.formWidth);
       } else {

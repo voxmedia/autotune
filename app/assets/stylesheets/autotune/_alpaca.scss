@@ -231,13 +231,15 @@ td.actionbar{
 .alpaca-field-table, .alpaca-field-table .table-responsive {
   border-width: 0px;
   padding-top: 15px;
-  .table thead > tr > th {
-    padding: 10px 10px 10px 0px;
-    text-transform: uppercase;
-    color: color(actionable);
-    &:last-child{
-      padding-right: 0px;
-      display: none;
+  .table{
+    thead > tr > th {
+      padding: 10px 10px 10px 0px;
+      text-transform: uppercase;
+      color: color(actionable);
+      &:last-child{
+        padding-right: 0px;
+        display: none;
+      }
     }
   }
   &.quiz-hide-header{

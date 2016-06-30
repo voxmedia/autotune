@@ -67,7 +67,7 @@
 
 .tab-content {
   height: 100%;
-  top: 68px;
+  top: 66px;
   position: fixed;
   width: 100%;
   background-color: color(background);
@@ -87,6 +87,7 @@
   position: fixed;
   top: 32px;
   width: 100%;
+  background-color: color(background);
   li{
     z-index: 3;
     display:inline-block;

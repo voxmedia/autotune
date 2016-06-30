@@ -3,6 +3,7 @@
 
 html{
   overflow-x:hidden;
+  height: auto;
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
@@ -123,7 +124,7 @@ label.block {
   display:inline;
   .project-save-warning, .project-saved{
     display: none;
-    padding: 5px 15px;
+    padding: 3px 15px;
     color: #ffffff;
     font-size: 12px;
     button{
@@ -141,7 +142,7 @@ label.block {
     }
   }
   .project-saved{
-    padding: 8px 15px;
+    padding: 6px 15px;
   }
   @media (min-width: $screen-sm){
     display: block;
@@ -166,6 +167,17 @@ label.block {
       font-size: 16px;
       text-align: center;
       content: 'Fill out the project information to see a preview.';
+    }
+  }
+  &.screen{
+    .overlay {
+      span{
+        display: none;
+      }
+      display:block;
+      position:absolute;
+      top:0; right:0; bottom:0; left:0;
+      background-color: transparent;
     }
   }
   &.loading{
@@ -381,30 +393,6 @@ table.table.collection.project-list{
     }
   }
 }
-  // &.ok-notice,
-  // &.info-notice,
-  // &.alert-notice {
-  //   padding-top: 20px;
-  //   position: relative;
-  //   &:before {
-  //     content: "";
-  //     position: absolute;
-  //     width: 3px;
-  //     left: 0;
-  //     top: -1px;
-  //     bottom: 0;
-  //   }
-  // }
-  // &.ok-notice:before {
-  //   background-color: color(positive);
-  // }
-  // &.info-notice:before {
-  //   background-color: color(cautionary);
-  // }
-  // &.alert-notice:before {
-  //   background-color: color(negative);
-  // }
-
 .table td:last-child {
   white-space:nowrap;
 }
@@ -795,6 +783,9 @@ table.table.collection.project-list{
   ul.nav{
     display: none;
   }
+  &::-webkit-scrollbar {
+    background-color: color(background);
+  }
   @media (max-width: $screen-sm){
     margin-left: 0px;
     position: relative;
@@ -1061,21 +1052,11 @@ $nav-break: 550px;
 }
 
 #split-bar {
-  background-color:color(border);
+  background-color: transparent;
   height: 100%;
-  width: 4px;
+  width: 6px;
   cursor: col-resize;
   position: absolute;
-  left: 0px;
   top: 0px;
-}
-
-.screen{
-  position:absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  opacity: 0.5;
-  background-color: red;
+  left: 0px;
 }
