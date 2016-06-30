@@ -96,11 +96,11 @@ label.block {
 .preview-frame {
   margin: 25px auto;
 
-  &.large-view {
-    width:720px;
+  &.fluid-view {
+    width:100%;
   }
   &.medium-view {
-    width:500px;
+    width:720px;
   }
   &.small-view {
     width:320px;
@@ -1058,4 +1058,24 @@ $nav-break: 550px;
   height: 26px;
   width: 26px;
   margin-bottom: -4px;
+}
+
+#split-bar {
+  background-color:color(border);
+  height: 100%;
+  width: 4px;
+  cursor: col-resize;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+.screen{
+  position:absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0.5;
+  background-color: red;
 }

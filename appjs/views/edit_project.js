@@ -372,6 +372,36 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
+    $('#split-bar').mousedown(function (e) {
+        e.preventDefault();
+        // $('#preview-pane').addClass('screen');
+        $(document).mousemove(function (e) {
+          e.preventDefault();
+          if($(window).width() > 768){
+            logger.debug(e.target);
+            if(e.pageX > 320 && $(window).width() - e.pageX > 300){
+              view.formWidth = $(window).width() - e.pageX;
+              $('#form-pane').css("width", view.formWidth);
+              $('#preview-pane').css("width", e.pageX);
+            }
+          }
+        });
+    });
+
+    $(document).mouseup(function (e) {
+      // $('#preview-pane').removeClass('screen');
+      $(document).unbind('mousemove');
+    });
+
+    $(window).resize(function(){
+      if($(window).width() > 768){
+        $('#form-pane').css("width", view.formWidth);
+        $('#preview-pane').css("width", $(window).width() - view.formWidth);
+      } else {
+        $('#form-pane').css("width", '100%');
+        $('#preview-pane').css("width", '100%');
+      }
+    });
     // autoselect embed code on focus
     this.$("#embed textarea").focus( function() { $(this).select(); } );
 
