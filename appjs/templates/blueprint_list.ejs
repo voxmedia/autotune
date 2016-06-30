@@ -107,16 +107,16 @@
         <% } %>
       </td>
       <td class="text-right" colspan="2">
-        <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
+        <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="at-icon edit-icon"></span></a>
         <a data-tooltip="Upgrade" href="#"
            data-action-message="Upgrading the blueprint..."
            data-action="updateRepo" data-model="Blueprint" data-action-next="reload"
-           data-model-id="<%= item.attributes.slug %>"><span class="icon-refresh"></span></a>
+           data-model-id="<%= item.attributes.slug %>"><span class="at-icon refresh-icon"></span></a>
         <a data-tooltip="delete" href="#"
            data-action-message="Blueprint deleted"
            data-action-confirm="Are you sure you wish to delete this?"
            data-action="destroy" data-model="Blueprint" data-action-next="reload"
-           data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
+           data-model-id="<%= item.attributes.slug %>"><span class="at-icon delete-icon"></span></a>
       </td>
     </tr>
   <% }); %>

@@ -23,6 +23,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
   max-width: 1300px;
   padding: 1rem;
   margin: auto;
+  nav &{
+    padding: 0px;
+  }
+  .navbar-header{
+    margin:0px;
+  }
   .row{
     margin: 0 -15px;
   }
@@ -135,13 +141,10 @@ label.block {
       padding: 2px 5px;
       margin-left: 5px;
     }
-    .glyphicon{
+    .at-icon{
       margin-right: 7px;
-      font-size: 11px;
-      vertical-align: top;
-      &.glyphicon-alert{
-        vertical-align: baseline;
-      }
+      width: 14px;
+      vertical-align: text-top;
     }
   }
   .project-saved{
@@ -358,37 +361,37 @@ table.table.collection.project-list{
       &.project-cell, &.bold-actions-cell{
         color: color(text);
       }
-  }
-    // needs to be replaced with small bp scss variable
-    @media (max-width: $screen-sm){
-      display: block;
-      width: 100% !important;
-      border: none;
-      padding: 2px 0px;
-      font-size: 90%;
-      &.project-cell{
-        border-top: 2px solid color(border);
-        margin-top: 25px;
-        padding: 15px 0px 10px 0px;
-        font-size: 100%;
-      }
-      &.status-cell{
-        display: none;
-      }
-      &.bold-actions-cell{
-        padding: 15px 0px 0px 0px;
-      }
-      &.text-right{
-        text-align: left;
-      }
-      .glyphicons{
+      // needs to be replaced with small bp scss variable
+      @media (max-width: $screen-sm){
+        display: block;
+        width: 100% !important;
+        border: none;
+        padding: 2px 0px;
         font-size: 90%;
-      }
-      .pub-time{
-        display: inline-block;
-        font-size: 100%;
-        &:before{
-          content: "- ";
+        &.project-cell{
+          border-top: 2px solid color(border);
+          margin-top: 25px;
+          padding: 15px 0px 10px 0px;
+          font-size: 100%;
+        }
+        &.status-cell{
+          display: none;
+        }
+        &.bold-actions-cell{
+          padding: 15px 0px 0px 0px;
+        }
+        &.text-right{
+          text-align: left;
+        }
+        .glyphicons{
+          font-size: 90%;
+        }
+        .pub-time{
+          display: inline-block;
+          font-size: 100%;
+          &:before{
+            content: "- ";
+          }
         }
       }
     }
@@ -447,7 +450,7 @@ table.table.collection.project-list{
       float: none;
       display: block;
       font-size: 18px;
-      padding: 10px 0 10px 33px;
+      padding: 10px 0 10px 48px;
       border-bottom: 1px solid color(background, dark);
       &:last-of-type{
         border-bottom: none;
@@ -619,7 +622,7 @@ table.table.collection.project-list{
       border-bottom: 3px solid color(border);
       &.bold-actions-cell{
         text-align: right;
-        padding-right: 37px;
+        padding-right: 40px;
       }
     }
     tbody > tr {
@@ -738,17 +741,20 @@ table.table.collection.project-list{
   max-width: 400px;
   margin: 200px auto 0 auto;
   z-index: 1051;
-  .glyphicon, p{
+  div{
+
+  }
+  .at-icon, p{
     display: table-cell;
   }
   p{
-    padding-top: 7px;
+    padding: 7px 0 0 10px;
   }
-  .glyphicon{
+  .at-icon{
     font-size: 27px;
     vertical-align: middle;
-    width: 41px;
-    top: 4px;
+    width: 32px;
+    height: 32px;
   }
   .modal-footer{
     border-width: 0px;
@@ -1085,4 +1091,51 @@ $nav-break: 550px;
   position: fixed;
   top: 0px;
   margin-left: -14px;
+}
+
+.at-icon{
+  background-size: 100%;
+  background-repeat:no-repeat;
+	background-position:center center;
+  display: inline-block;
+  height: 15px;
+  width: 15px;
+  margin: 0 6px;
+  &.alert-icon{
+    background-image: image-url('autotune/icons/alert.svg');
+    #navbar-save-container &, #save-modal &{
+      background-image: image-url('autotune/icons/alert_red.svg');
+    }
+  }
+  &.delete-icon{
+    background-image: image-url('autotune/icons/delete.svg');
+  }
+  &.dropdown-icon{
+    background-image: image-url('autotune/icons/dropdown.svg');
+  }
+  &.duplicate-icon{
+    background-image: image-url('autotune/icons/duplicate.svg');
+  }
+  &.edit-icon{
+    background-image: image-url('autotune/icons/edit.svg');
+  }
+  &.help-icon{
+    background-image: image-url('autotune/icons/help.svg');
+  }
+  &.info-icon{
+    background-image: image-url('autotune/icons/info.svg');
+  }
+  &.ok-icon{
+    background-image: image-url('autotune/icons/ok.svg');
+    #navbar-save-container &{
+      background-image: image-url('autotune/icons/ok_green.svg');
+    }
+  }
+  &.preview-icon{
+    background-image: image-url('autotune/icons/preview.svg');
+  }
+  &.refresh-icon{
+    background-image: image-url('autotune/icons/refresh.svg');
+  }
+
 }
