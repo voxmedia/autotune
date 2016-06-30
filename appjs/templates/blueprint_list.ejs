@@ -64,6 +64,7 @@
     <tr class="m-table-heading">
       <td>Blueprint</td>
       <td>Status</td>
+      <td>Mode</td>
       <td class="text-right" colspan="2">Bold Actions</td>
     </tr>
   <% if(getObjects().length == 0) { %>
@@ -71,7 +72,7 @@
   <% }
   _.each(getObjects(), function(item) { %>
   <tr>
-    <td <% if(item.get('status') == 'ready') { %>
+    <td <% if(item.get('mode') == 'ready') { %>
       class="ok-notice"
       <% } else if(item.get('status') == 'broken') { %>
       class="alert-notice"
@@ -79,14 +80,21 @@
       class="info-notice"
       <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
     <td>
-      <% if(item.get('status') == 'ready') { %>
-      <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
+      <% if(item.get('status') == 'built') { %>
+        <span class="m-status"><%=capitalize( item.get('status') ) %></span>
       <% } else if(item.get('status') == 'broken') { %>
-        <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
+        <span class="m-status status-alert"><i class="icon-alert"></i><%=capitalize( item.get('status') ) %></span>
       <% } else if(item.hasStatus('updating')) { %>
         <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
       <% } else { %>
-        <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
+        <span class="m-status status-info"><i class="icon-info"></i><%=capitalize( item.get('status') ) %></span>
+      <% } %>
+    </td>
+    <td>
+      <% if(item.get('mode') == 'ready') { %>
+      <span class="m-status status-ok"><i class="icon-ok"></i><%=capitalize( item.get('mode') )%></span>
+      <% } else { %>
+      <span class="m-status status-info"><i class="icon-info"></i><%=capitalize( item.get('mode') )%></span>
       <% } %>
     </td>
     <td class="text-right" colspan="2">
