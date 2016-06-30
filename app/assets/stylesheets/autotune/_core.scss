@@ -43,6 +43,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
 
 .tab-pane{
   overflow-y: scroll;
+  &#visual{
+    overflow-y: hidden;
+  }
   .tab-pane{
     overflow: hidden;
   }
@@ -339,6 +342,9 @@ table.table.collection tbody tr td {
   a.title {
     color: color(text);
     display: table-cell;
+  }
+  &.group-cell{
+    color: color(actionable);
   }
 }
 
@@ -777,6 +783,14 @@ table.table.collection.project-list{
   }
 }
 
+ul.nav.nav-pills button.btn{
+  padding: 8px 9px;
+  &.active, &:hover{
+    background-color: color(primary);
+    border-color: color(primary);
+  }
+}
+
 #preview-pane{
   position:fixed;
   padding: 15px 15px;
@@ -1022,8 +1036,8 @@ $nav-break: 550px;
   background-repeat:no-repeat;
 	background-position:center center;
   display: inline-block;
-  height: 26px;
-  width: 26px;
+  height: 20px;
+  width: 20px;
   margin-bottom: -4px;
 }
 
@@ -1034,8 +1048,8 @@ $nav-break: 550px;
   background-repeat:no-repeat;
 	background-position:center center;
   display: inline-block;
-  height: 26px;
-  width: 26px;
+  height: 20px;
+  width: 20px;
   margin-bottom: -4px;
 }
 
@@ -1046,8 +1060,8 @@ $nav-break: 550px;
   background-repeat:no-repeat;
 	background-position:center center;
   display: inline-block;
-  height: 26px;
-  width: 26px;
+  height: 20px;
+  width: 20px;
   margin-bottom: -4px;
 }
 

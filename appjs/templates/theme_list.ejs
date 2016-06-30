@@ -111,7 +111,7 @@
         <% } else { %>
         class="info-notice"
         <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
-      <td>
+      <td class="group-cell">
         <%= item.attributes.group_name %>
       </td>
       <td>
@@ -137,6 +137,7 @@
   <% }); %>
     </tbody>
   </table>
+  <% if(collection.state.totalPages > 1){ %>
   <nav class="previous">
     <ul class="pagination">
       <% if(collection.state.currentPage !== collection.state.firstPage){ %>
@@ -207,5 +208,6 @@
       <% } %>
     </ul>
   </nav>
+  <% } %>
 </div>
 </div>
