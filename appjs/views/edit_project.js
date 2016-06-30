@@ -160,40 +160,37 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       logger.debug(event.target);
       $(document).mousemove(function (event){
         $('#embed-preview').addClass('screen');
-        $('#embed-preview iframe').mouseover(function(event){
-          // $(document).unbind('mousemove');
-          event.stopPropagation();
-        });
         if(event.pageX > 320 && $(window).width() - event.pageX > 300){
           view.formWidth = $(window).width() - event.pageX;
           $('#form-pane').css("width", view.formWidth);
           $('#preview-pane').css("width", event.pageX);
+          view.showPreviewButtons();
         }
       });
     }
 
-          //
-          // $('#split-bar').mousedown(function (e) {
-          //     e.preventDefault();
-          //     // $('#preview-pane').addClass('screen');
-          //     $(document).mousemove(function (e) {
-          //       e.preventDefault();
-          //       if($(window).width() > 768){
-          //         logger.debug(e.target);
-          //         if(e.pageX > 320 && $(window).width() - e.pageX > 300){
-          //           view.formWidth = $(window).width() - e.pageX;
-          //           $('#form-pane').css("width", view.formWidth);
-          //           $('#preview-pane').css("width", e.pageX);
-          //         }
-          //       }
-          //     });
-          // });
-          //
-          $(document).mouseup(function (e) {
-            $('#embed-preview').removeClass('screen');
-            $(document).unbind('mousemove');
-          });
+    $(document).mouseup(function (e) {
+      $('#embed-preview').removeClass('screen');
+      $(document).unbind('mousemove');
+    });
 
+  },
+
+  showPreviewButtons: function(){
+    $('.nav-pills button').show();
+    // if($('#preview-pane').width() > 1000){
+    //   $('.nav-pills button').show();
+    // } else
+    if($('#preview-pane').width() < 1000 && $('#preview-pane').width() > 700){
+      $('.nav-pills #fluid-view').hide();
+      $('.nav-pills #medium-view').trigger('click');
+    } else if($('#preview-pane').width() < 701){
+      $('.nav-pills #small-view').trigger('click');
+      $('.nav-pills button').hide();
+      if($(window).width() > 768){
+        $('.nav-pills #small-view').show();
+      }
+    }
   },
 
   hasUnsavedChanges: function(){
@@ -414,16 +411,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
+    view.showPreviewButtons();
 
     $(window).resize(function(){
-      if(view.formWidth && $(window).width() > 768){
-        $('#form-pane').css("width", view.formWidth);
-        $('#preview-pane').css("width", $(window).width() - view.formWidth);
-      } else {
-        $('#form-pane').css("width", '100%');
-        $('#preview-pane').css("width", '100%');
+      view.showPreviewButtons();
+      if(view.formWidth){
+        if($(window).width() > 768){
+          $('#form-pane').css("width", view.formWidth);
+          $('#preview-pane').css("width", $(window).width() - view.formWidth);
+        } else {
+          $('#form-pane').css("width", '100%');
+          $('#preview-pane').css("width", '100%');
+        }
       }
     });
+
     // autoselect embed code on focus
     this.$("#embed textarea").focus( function() { $(this).select(); } );
 
