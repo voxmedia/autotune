@@ -22,15 +22,17 @@ module ActiveJob
     end
 
     def enqueue(options = {})
-      return self if jobs.nil?
+      return self if jobs.blank?
 
       first_job, fail_job = jobs.first
       first_job.catch(fail_job) if fail_job
 
-      prev_job = first_job
-      jobs[1..-1].each do |success, failure|
-        next if success.nil?
-        prev_job = prev_job.then(success, failure)
+      if jobs.size > 1
+        prev_job = first_job
+        jobs[1..-1].each do |success, failure|
+          next if success.nil?
+          prev_job = prev_job.then(success, failure)
+        end
       end
 
       first_job.enqueue(options)
