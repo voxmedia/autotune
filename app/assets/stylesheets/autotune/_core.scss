@@ -133,7 +133,7 @@ label.block {
   display:inline;
   .project-save-warning, .project-saved{
     display: none;
-    padding: 3px 15px 3px 0px;
+    padding: 3px 15px;
     color: #ffffff;
     font-size: 12px;
     button{
@@ -146,9 +146,20 @@ label.block {
       width: 14px;
       vertical-align: text-top;
     }
+    @media (max-width: $screen-sm){
+      padding: 8px 3px 0 3px;
+    }
+  }
+  .project-save-warning{
+    @media (max-width: $screen-sm){
+      padding: 5px 3px 0 3px;
+    }
   }
   .project-saved{
-    padding: 6px 15px 6px 0px;
+    padding: 6px 15px;
+    @media (max-width: $screen-sm){
+      padding: 8px 3px 0 3px;
+    }
   }
   @media (min-width: $screen-sm){
     display: block;
@@ -272,6 +283,7 @@ input[type="checkbox"] {
   top: 0px;
   height: 28px;
   font-size: 12px;
+  position:fixed;
 }
 
 .pub-time{
@@ -456,7 +468,7 @@ table.table.collection.project-list{
       float: none;
       display: block;
       font-size: 18px;
-      padding: 10px 0 10px 48px;
+      padding: 10px 0 10px 33px;
       border-bottom: 1px solid color(background, dark);
       &:last-of-type{
         border-bottom: none;
