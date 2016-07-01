@@ -320,21 +320,17 @@ input[type="checkbox"] {
 table.table.collection tbody tr td {
   color: color(text);
   &.text-right{
-    .glyphicon{
-      color: color(text);
-      display: inline-block;
-    }
     a{
-      &:first-of-type{
-        span{
-          margin-left: 0px;
-        }
-      }
-      &:last-of-type{
-        span{
-          margin-right: 0px;
-        }
-      }
+      // &:first-of-type{
+      //   span{
+      //     margin-left: 0px;
+      //   }
+      // }
+      // &:last-of-type{
+      //   span{
+      //     margin-right: 0px;
+      //   }
+      // }
       &:only-of-type{
         span{
           margin: 0 6px;
@@ -370,7 +366,7 @@ table.table.collection.project-list{
         font-size: 90%;
         &.project-cell{
           border-top: 2px solid color(border);
-          margin-top: 25px;
+          margin-top: 20px;
           padding: 15px 0px 10px 0px;
           font-size: 100%;
         }
@@ -382,6 +378,16 @@ table.table.collection.project-list{
         }
         &.text-right{
           text-align: left;
+          .at-icon{
+            width: 18px;
+            height: 18px;
+          }
+          a span{
+            margin: 0 10px;
+            &:first-of-type{
+              margin-left: 0px;
+            }
+          }
         }
         .glyphicons{
           font-size: 90%;
@@ -561,7 +567,6 @@ table.table.collection.project-list{
 .m-page-heading {
   padding: 40px 0 0 0px;
   &.list{
-    padding: 50px 0 0 0;
     margin-bottom: 20px;
   }
   h3 {
@@ -580,9 +585,6 @@ table.table.collection.project-list{
     }
   }
 
-  @media (max-width: $grid-float-breakpoint-max) {
-    padding:20px 0;
-  }
 }
 
 //tables
@@ -707,7 +709,7 @@ table.table.collection.project-list{
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  background-color: $black;
+  background-color: color(text);
   color: #fff;
   content: attr(data-tooltip);
   text-align: center;
@@ -722,8 +724,8 @@ table.table.collection.project-list{
   left: 50%;
   margin-left: -5px;
   width: 0;
-  border-top: 5px solid #000;
-  border-top: 5px solid $black;
+  border-top: 5px solid color(text);
+  border-top: 5px solid color(text);
   border-right: 5px solid transparent;
   border-left: 5px solid transparent;
   content: " ";
@@ -1036,7 +1038,7 @@ $nav-break: 550px;
 #publishBtn div{
   display: inline;
   &:before {
-    color: $btn-color;
+    color: $secondary-text-color;
     overflow: hidden;
     display: inline-block;
     vertical-align: bottom;

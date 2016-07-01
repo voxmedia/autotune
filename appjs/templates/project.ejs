@@ -51,7 +51,7 @@
             <% if ( model.hasStatus('broken') ) { %>
             <span class="text-danger"><i class="icon-alert"></i>Broken</span>
             <% } else if ( !model.hasStatus('built') ) { %>
-            <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
+            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Building</span>
             <% } else if ( model.hasUnpublishedUpdates() ) { %>
               <a data-tooltip="Your Published Version Has Updates"
                  target="_blank" href="<%=model.getPublishUrl() %>">Published</a> (has updates)
@@ -246,9 +246,12 @@
     <div role="tabpanel" class="tab-pane" id="developer">
       <div class="container">
         <p>Status:
-          <% if ( model.hasStatus('broken') ) { %><span class="text-danger">Broken</span>
-          <% } else if ( model.hasStatus('built') ) { %><span class="text-success">Built</span>
-          <% } else { %><span class="text-warning"><%=capitalize(model.get('status')) %></span><% } %>
+          <% if ( model.hasStatus('broken') ) { %><span class="label label-danger">Broken</span>
+          <% } else if ( model.hasStatus('built') ) { %><span class="label label-success">Built</span>
+          <% } else if ( model.hasStatus('building') ) { %>
+            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>
+              <%=capitalize(model.get('status')) %></span>
+          <% } else { %><span class="label label-info"><%=capitalize(model.get('status')) %></span><% } %>
         </p>
 
         <p>

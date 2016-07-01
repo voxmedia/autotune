@@ -1,1 +1,9 @@
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.96 15.96"><defs><style>.cls-1{fill:#373b42;}</style></defs><title>autotune_icons-KS-1</title><path class="cls-1" d="M16,8A8,8,0,1,1,8,0a8,8,0,0,1,8,8M11.64,5.65A3.41,3.41,0,0,0,8,2.33,4.71,4.71,0,0,0,4.66,4L6,5.32a3.49,3.49,0,0,1,2-1A1.52,1.52,0,0,1,9.65,5.65C9.65,7,7,7,7,9V9.64H9V9.31c0-1,2.66-1,2.66-3.66m-2.33,7A1.33,1.33,0,1,0,8,14a1.32,1.32,0,0,0,1.33-1.33"/></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 20 20" enable-background="new 0 0 20 20" xml:space="preserve">
+<path fill="#373B42" d="M20,10c0,5.5-4.5,10-10,10C4.5,20,0,15.5,0,10C0,4.5,4.5,0,10,0C15.5,0,20,4.5,20,10 M14.6,7.1
+	c0-2.5-2.1-4.2-4.6-4.2C7.5,2.9,5.8,5,5.8,5l1.7,1.7c0,0,1.2-1.2,2.5-1.2s2.1,0.8,2.1,1.7c0,1.7-3.3,1.7-3.3,4.2v0.8h2.5v-0.4
+	C11.2,10.4,14.6,10.4,14.6,7.1 M11.7,15.8c0-0.9-0.7-1.7-1.7-1.7c-0.9,0-1.7,0.7-1.7,1.7c0,0.9,0.7,1.7,1.7,1.7
+	C10.9,17.5,11.7,16.8,11.7,15.8"/>
+</svg>

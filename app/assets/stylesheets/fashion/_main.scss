@@ -37,8 +37,20 @@ main {
       link color(link)) {
     &.label-#{$type} {
       background-color: $color;
-      // border: 1px solid $color;
       // color: color(background);
+    }
+  }
+  @each $type, $color in (
+      default    $secondary-text-color,
+      primary    $primary-text-color,
+      success    $positive-text-color,
+      secondary  $secondary-text-color,
+      danger     $negative-text-color,
+      info       $cautionary-text-color,
+      warning    $cautionary-text-color,
+      disabled   $secondary-text-color) {
+    &.label-#{$type} {
+      color: $color;
     }
   }
 }

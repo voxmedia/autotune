@@ -88,7 +88,7 @@
         <% } else if ( item.hasStatus('broken') ) { %>
           <span class="label label-danger"><%=item.get('status') %></span>
         <% } else if ( item.hasStatus('building') ) { %>
-          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#ffffff'})%><%=item.get('status') %></span>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%><%=item.get('status') %></span>
         <% } else if ( item.hasStatus('updated') )  { %>
           <span class="label label-info">Updated</span>
         <% } else { %>
@@ -108,7 +108,7 @@
           <% } else if ( item.hasStatus('broken') ) { %>
             <span class="label label-danger">Broken</span>
           <% } else if ( item.hasStatus('building') ) { %>
-            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
+            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Building</span>
           <% } else { %>
             <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
           <% } %>

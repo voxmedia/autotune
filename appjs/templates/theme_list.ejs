@@ -100,7 +100,7 @@
         <% } else if(item.get('status') == 'broken') { %>
           <span class="label label-danger"><%=item.get('status') %></span>
         <% } else if(item.hasStatus('updating')) { %>
-          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFFFFF'})%>Upgrading</span>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Upgrading</span>
         <% } else { %>
           <span class="label label-info"><%=item.get('status') %></span>
         <% } %>
