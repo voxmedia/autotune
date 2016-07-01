@@ -178,19 +178,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   showPreviewButtons: function(){
     $('.nav-pills button').show();
-    // if($('#preview-pane').width() > 1000){
-    //   $('.nav-pills button').show();
-    // } else
-    if($('#preview-pane').width() < 1000 && $('#preview-pane').width() > 700){
-      $('.nav-pills #fluid-view').hide();
-      $('.nav-pills #medium-view').trigger('click');
-    } else if($('#preview-pane').width() < 701){
-      $('.nav-pills #small-view').trigger('click');
+    if($('#preview-pane').width() > 700){
+      $('.nav-pills #fluid-view').trigger('click');
+    } else if($('#preview-pane').width() > 400 && $('#preview-pane').width() < 701){
+      $('.nav-pills #fluid-view').trigger('click');
+      $('.nav-pills #medium-view').hide();
+    } else {
+      $('.nav-pills .resize#small-view').trigger('click');
       $('.nav-pills button').hide();
       if($(window).width() > 768){
-        $('.nav-pills #small-view').show();
+        $('.nav-pills .resize#small-view').show();
       }
     }
+    $('.nav-pills li button').show();
   },
 
   hasUnsavedChanges: function(){
@@ -203,30 +203,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       return true;
     }
   },
-
-  // toggleEditTitle: function(eve){
-  //   if(eve.target.localName !== 'textarea'){
-  //     logger.debug('clicking here', eve);
-  //     this.$('#projectTitle div').hide();
-  //     this.$('#projectTitle .glyphicon').hide();
-  //     this.$('#projectTitle textarea').show();
-  //     this.$('#projectTitle textarea').val('').focus();
-  //     if(this.$('#projectTitle div').text() !== 'Add Project Title'){
-  //       this.$('#projectTitle textarea').val(this.$('#projectTitle div').text());
-  //     }
-  //   }
-  // },
-  //
-  // resizeTitleTextarea: function(){
-  //   this.$('#projectTitle div').text(this.$('#projectTitle textarea').val());
-  //   this.$('#projectTitle textarea').height(this.$('#projectTitle div').height());
-  //   var titleHasFocus = this.$('#projectTitle textarea').is(':focus');
-  //   if(!titleHasFocus){
-  //     this.$('#projectTitle div').show();
-  //     this.$('#projectTitle .glyphicon').show();
-  //     this.$('#projectTitle textarea').hide();
-  //   }
-  // },
 
   focusPollChange: function(){
     this.forceUpdateDataFlag = true;

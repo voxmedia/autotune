@@ -133,7 +133,7 @@ label.block {
   display:inline;
   .project-save-warning, .project-saved{
     display: none;
-    padding: 3px 15px;
+    padding: 3px 15px 3px 0px;
     color: #ffffff;
     font-size: 12px;
     button{
@@ -148,7 +148,7 @@ label.block {
     }
   }
   .project-saved{
-    padding: 6px 15px;
+    padding: 6px 15px 6px 0px;
   }
   @media (min-width: $screen-sm){
     display: block;
@@ -624,7 +624,7 @@ table.table.collection.project-list{
       border-bottom: 3px solid color(border);
       &.bold-actions-cell{
         text-align: right;
-        padding-right: 40px;
+        padding-right: 44px;
       }
     }
     tbody > tr {
@@ -1088,11 +1088,11 @@ $nav-break: 550px;
 #split-bar {
   background-color: transparent;
   height: 100%;
-  width: 6px;
+  width: 8px;
   cursor: col-resize;
   position: fixed;
   top: 0px;
-  margin-left: -14px;
+  margin-left: -20px;
 }
 
 .at-icon{
