@@ -7,13 +7,6 @@ module.exports = function(grunt) {
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
     // Task configuration.
-    browserify: {
-      dist: {
-        files: {
-          'app/assets/javascripts/autotune/application.js': ['appjs/app.js'],
-        }
-      }
-    },
     jshint: {
       options: {
         jshintrc: '.jshintrc',
@@ -43,7 +36,7 @@ module.exports = function(grunt) {
       },
       lib: {
         files: ['appjs/*.js', 'appjs/**/*.js', 'appjs/**/*.ejs'],
-        tasks: ['jshint:lib', 'browserify']
+        tasks: ['jshint:lib']
       },
       test: {
         files: ['testjs/test.js', 'testjs/**/*.js'],
@@ -60,12 +53,11 @@ module.exports = function(grunt) {
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-notify');
 
   grunt.task.run('notify_hooks');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'browserify']);
+  grunt.registerTask('default', ['jshint']);
 
 };

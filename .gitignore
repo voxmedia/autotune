@@ -12,6 +12,9 @@
 /db/*.sqlite3-journal
 /test/dummy/db/*.sqlite3
 /test/dummy/db/*.sqlite3-journal
+/test/dummy/public/preview
+/test/dummy/public/media
+/test/dummy/public/publish
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -27,6 +30,7 @@
 /working
 /test/dummy/working
 /node_modules/
+vendor/bundle
 
 dump.rdb
 
@@ -39,4 +43,4 @@ Gemfile.lock
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
-*.log
+*.log*

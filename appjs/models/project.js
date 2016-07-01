@@ -1,8 +1,10 @@
 "use strict";
 
 var Backbone = require('backbone'),
+    $ = require('jquery'),
     _ = require('underscore'),
     moment = require('moment'),
+    utils = require('../utils'),
     markdown = require('markdown').markdown;
 
 var Project = Backbone.Model.extend({
@@ -47,7 +49,7 @@ var Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   build: function() {
-    this.set({'status': 'building'});
+    this.set('status', 'building');
     return Backbone.ajax({
       dataType: 'json',
       type: 'GET',
@@ -60,7 +62,7 @@ var Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   buildAndPublish: function() {
-    this.set({'status': 'building'});
+    this.set('status', 'building');
     return Backbone.ajax({
       dataType: 'json',
       type: 'GET',
@@ -73,7 +75,7 @@ var Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   updateSnapshot: function() {
-    this.set({'status': 'updating'});
+    this.set('status', 'updating');
     return Backbone.ajax({
       dataType: 'json',
       type: 'GET',
@@ -86,13 +88,7 @@ var Project = Backbone.Model.extend({
    * @returns {boolean}
    **/
   hasInstructions: function() {
-    if ( this.get('blueprint_config') && this.get('blueprint_config').instructions ) {
-      return true;
-    } else if ( this.blueprint && this.blueprint.get('config') &&
-                this.blueprint.get('config').instructions ) {
-      return true;
-    }
-    return false;
+    return !!this.getConfig().instructions;
   },
 
   /**
@@ -101,14 +97,19 @@ var Project = Backbone.Model.extend({
    **/
   instructions: function() {
     if(this.hasInstructions()) {
-      var instructions;
-      if ( this.get('blueprint_config') ) {
-        instructions = this.get('blueprint_config').instructions;
-      } else {
-        instructions = this.blueprint.get('config')['instructions'];
-      }
+      var instructions = this.getConfig().instructions;
       return markdown.toHTML(instructions);
     }
+  },
+
+  /**
+   * Get the data that was passed to the blueprint build.
+   * @returns {object} Blueprint build data
+   **/
+  hasBuildData: function() {
+    var uniqBuildVals = _.uniq(_.values(this.formData()));
+    return !( uniqBuildVals.length === 1 &&
+              typeof uniqBuildVals[0] === 'undefined' );
   },
 
   /**
@@ -141,6 +142,31 @@ var Project = Backbone.Model.extend({
       'slug': this.get('slug'),
       'theme': this.get('theme')
     }, this.get('data'));
+  },
+
+  /**
+   * Get the data to populate the alpaca form.
+   * @returns {object} Data for Alpaca
+   **/
+  getErrorMsg: function() {
+    if ( this.has('error_message') ) {
+      var msg = this.get('error_message');
+      var fmt = function(o) {
+        if ( _.isArray(o) ) {
+          return o.map(fmt).join(', ');
+        } else if ( _.isObject(o) ) {
+          return Object.keys(o).reduce(function(m, k) {
+            var str = fmt(k) + ': ' + fmt(o[k]);
+            if ( m.length > 0 ) { return m + ', ' + str; }
+            else { return str; }
+          }, '');
+        } else {
+          return o;
+        }
+      };
+
+      return fmt(msg);
+    }
   },
 
   /**
@@ -179,18 +205,6 @@ var Project = Backbone.Model.extend({
   },
 
   /**
-   * Get the themes.
-   * @returns {array} Theme models
-   **/
-  getThemes: function() {
-    if ( this.hasConfig() ) {
-      return this.getConfig().themes || ['generic'];
-    } else {
-      return ['generic'];
-    }
-  },
-
-  /**
    * Does this project have any of these statuses?
    * @param {string} status Check for this status
    * @returns {boolean}
@@ -212,6 +226,15 @@ var Project = Backbone.Model.extend({
       return m || this.get( 'type' ) === i;
     };
     return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  /**
+   * Has this project ever been built?
+   * Used for displaying active preview tab on static projects
+   * @returns {boolean}
+   **/
+  hasInitialBuild: function() {
+    return !!this.get('output');
   },
 
   /**
@@ -258,40 +281,73 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Return the version of the blueprint
+   * @returns {string} commit hash
+   **/
+  getVersion: function() {
+    return this.get('blueprint_version') || this.blueprint.get('version');
+  },
+
+  /**
+   * Checks if project is using the current version of blueprint
+   * @returns {boolean}
+   **/
+  isCurrentVersion: function() {
+    if ( !this.get('blueprint_version') ){
+      return true;
+    }
+    return this.get('blueprint_version') === this.blueprint.get('version');
+  },
+
+  /**
+   * Does this project belong to a preview type?
+   * @param {string} type Check for this type
+   * @returns {boolean}
+   **/
+  hasPreviewType: function() {
+    var iteratee = function(m, i) {
+      return m || this.getConfig()['preview_type'] === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  hasThemeType: function() {
+    if ( !this.getConfig()['theme_type'] ) {
+      return false;
+    }
+    var iteratee = function(m, i) {
+      return m || this.getConfig()['theme_type'] === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
+  isThemeable: function() {
+    return this.hasThemeType('dynamic');
+  },
+
+  /**
    * Get the url of the preview.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @param {string} path - include this path in the URL
    * @returns {string} url
    **/
-  getPreviewUrl: function(preferredProto) {
-    return this.getBuildUrl('preview', preferredProto);
+  getPreviewUrl: function(preferredProto, path) {
+    return utils.buildUrl(this.get('preview_url'), path, preferredProto);
+  },
+
+  getPreviewSize: function() {
+    console.log(this.model);
+    console.log('getting preview size', this);
   },
 
   /**
    * Get the url to the published project.
    * @param {string} preferredProto - Return the url with this protocol (http, https) if possible
+   * @param {string} path - include this path in the URL
    * @returns {string} url
    **/
-  getPublishUrl: function(preferredProto) {
-    return this.getBuildUrl('publish', preferredProto);
-  },
-
-  /**
-   * Get the url for one of the built projects (preview or publish).
-   * @param {string} type - Type of the url (preview, publish)
-   * @param {string} preferredProto - Protocol to use if possible (http, https)
-   * @returns {string} url
-   **/
-  getBuildUrl: function(type, preferredProto) {
-    var key = ( type === 'publish' ) ? 'publish_url' : 'preview_url';
-    if ( !this.has(key) ) { return ''; }
-    var base = this.get(key);
-    if ( base.match(/^http/) ) {
-      return base;
-    } else if ( base.match(/^\/\//) ) {
-      return preferredProto + ':' + base;
-    } else {
-      return base;
-    }
+  getPublishUrl: function(preferredProto, path) {
+    return utils.buildUrl(this.get('publish_url'), path, preferredProto);
   }
 });
 

@@ -4,15 +4,22 @@
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
+    <% if ( model.hasType( 'graphic' ) ) { %>
+  <a class="btn btn-default" id="previewBtn"
+     <% if ( !model.hasPreviewType('live') && !model.hasInitialBuild()) { %>disabled="true"<% } %>
+      href="#preview">Preview</a>
+    <% } else { %>
   <a class="btn btn-default" target="_blank" id="previewBtn"
-     href="<%=model.getPreviewUrl('http') %>">Preview</a>
+     href="<%=model.getPreviewUrl() %>">Preview</a>
+    <% } %>
   <% } else { %>
   <a class="btn btn-default" target="_blank" id="viewBtn"
-     href="<%=model.getPublishUrl('http') %>">View</a>
+     href="<%=model.getPublishUrl() %>">View</a>
   <% } %>
 
   <% if ( model.isPublishable() ) { %>
   <button type="button" class="btn btn-success" id="publishBtn"
+          <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
           data-action-message="Publishing..."
           data-action="build-and-publish" data-model="Project"
           data-action-next="reload"
@@ -47,7 +54,7 @@
     <% if ( model.has('error_message') ) { %>
     <p class="text-danger">
      <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
-     <%=model.get('error_message') %></p>
+     <%=model.getErrorMsg() %></p>
     <% } %>
   </div>
   <% } else if ( model.hasStatus('building') ) { %>

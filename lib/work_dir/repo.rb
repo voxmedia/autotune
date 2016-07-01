@@ -8,29 +8,44 @@ module WorkDir
     end
     attr_writer :branch
 
+    def commit_hash_for_checkout
+      @commit_hash_for_checkout ||= 'HEAD'
+    end
+    attr_writer :commit_hash_for_checkout
+
     # Update the repo on disk
     def update
       working_dir do
-        git 'checkout', working_dir
-        git 'clean', '-fd'
-        git 'checkout', 'master'
+        git 'checkout', '.'
+        git 'clean', '-ffd'
+        git 'checkout', branch
         git 'pull', '--recurse-submodules=yes'
         git 'fetch', 'origin'
-        git 'checkout', branch
+        git 'checkout', commit_hash_for_checkout
         git 'submodule', 'update', '--init'
+        git 'clean', '-ffd'
       end
     end
 
-    # Checkout a different branch
     def switch(new_branch)
       self.branch = new_branch
       update
     end
 
+    def branch_from_repo_url(repo_url)
+      if repo_url =~ /#\S+[^\/]/
+        @branch = repo_url.split('#')[1]
+      else
+        @branch = 'master'
+      end
+    end
+
     # Clone a repo to disk from the url
     def clone(repo_url)
       FileUtils.mkdir_p(File.dirname(working_dir))
-      git 'clone', '--recursive', repo_url, working_dir
+      git 'clone', '--recursive', repo_url.split('#')[0], working_dir
+      self.branch_from_repo_url(repo_url)
+      update
     end
 
     # Get the current commit hash
@@ -42,6 +57,13 @@ module WorkDir
       version.strip
     end
     alias_method :version, :commit_hash
+
+    def checkout_version(version_hash)
+      version = 'HEAD'
+      working_dir do
+        version = git 'checkout', version_hash || 'HEAD'
+      end
+    end
 
     # Get a tar archive of the repo as a string
     def archive(branch_or_tag = nil)
@@ -55,6 +77,12 @@ module WorkDir
       FileUtils.mkdir_p(dest.working_dir)
       dest.working_dir do
         cmd 'tar', '-x', :stdin_data => archive(branch_or_tag), :binmode => true
+      end
+    end
+
+    def status
+      working_dir do
+        git 'status'
       end
     end
 

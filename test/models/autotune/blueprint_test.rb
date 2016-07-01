@@ -6,6 +6,7 @@ module Autotune
     fixtures 'autotune/blueprints'
 
     test 'creating blueprints' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       assert_raises ActiveRecord::RecordInvalid do
@@ -19,12 +20,13 @@ module Autotune
     end
 
     test 'search blueprints' do
-      assert_equal 2, Blueprint.search('Example', :title).count
-      assert_equal 1, Blueprint.search('two', :title).count
-      assert_equal 0, Blueprint.search('foo', :title).count
+      assert_equal 2, Blueprint.search('Example').count
+      assert_equal 1, Blueprint.search('two').count
+      assert_equal 0, Blueprint.search('foo').count
     end
 
     test "that slugs don't change" do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
@@ -38,6 +40,7 @@ module Autotune
     end
 
     test 'custom slugs' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
@@ -58,6 +61,7 @@ module Autotune
     end
 
     test 'automatic slugs are unique' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
@@ -72,6 +76,7 @@ module Autotune
     end
 
     test 'ensure unique slug fails gracefully' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 
@@ -81,6 +86,7 @@ module Autotune
     end
 
     test 'delete a blueprint' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
@@ -93,7 +99,7 @@ module Autotune
 
     test 'thumb url' do
       assert_equal(
-        '/assets/autotune/at_placeholder.png',
+        ActionController::Base.helpers.asset_path('autotune/at_placeholder.png'),
         autotune_blueprints(:example).thumb_url)
     end
   end

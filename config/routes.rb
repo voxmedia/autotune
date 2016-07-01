@@ -1,6 +1,13 @@
 require 'resque/server'
 
 Autotune::Engine.routes.draw do
+
+  resources :themes,
+            :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  get 'themes/:id/reset',
+      :to => 'themes#reset',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+
   resources :blueprints,
             :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
 
@@ -25,7 +32,19 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/duplicate',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  get '/changemessages' => 'changemessages#index'
+
+  post 'projects/:id/preview_build_data',
+       :to => 'projects#preview_build_data',
+       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  post 'projects/preview_build_data',
+       :to => 'projects#preview_build_data'
+  post 'projects/create_spreadsheet',
+       :to => 'projects#create_spreadsheet'
+
+  get 'changemessages' => 'changemessages#index'
+
+  get 'messages' => 'messages#index'
+  post 'messages/send' => 'messages#send_message'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

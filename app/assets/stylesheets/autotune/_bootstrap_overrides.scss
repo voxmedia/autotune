@@ -8,6 +8,9 @@
 .text-success {
   color: $green;
 }
+.text-muted{
+  color: #777;
+}
 
 //buttons
 .btn {
@@ -96,6 +99,20 @@ button.alpaca-array-actionbar-action {
   &:hover {
     color: $primary;
     background: transparent;
+  }
+}
+
+.alpaca-field-checkbox {
+  label {
+    display: inline-block;
+  }
+  .checkbox {
+    display: inline-block;
+    label {
+      top: 5px;
+      left: 5px;
+      position: relative;
+    }
   }
 }
 

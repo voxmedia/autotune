@@ -11,12 +11,17 @@ module Autotune
                 :format => { :with => /\A[0-9a-z\-_]+\z/ }
     end
 
+    # Get text from model that can be used to generate a slug.
+    # Checks for `title` or `name`
+    # @return [String]  text that can be used to generate slug
     def text_for_slug
       return title if respond_to? :title
       return name if respond_to? :name
       raise 'The Slugged concern requires a method called title, name or text_for_slug'
     end
 
+    # Creates or return unique slug for the model
+    # @return [String]  slug for the model
     def ensure_unique_slug
       self.slug ||=
         self.class.unique_slug(text_for_slug.try(:parameterize), id)

@@ -10,6 +10,7 @@
 @import "pnotify";
 @import "pnotify.buttons";
 @import "bootstrap-datetimepicker";
+@import "spectrum";
 
 // TODO: merge bootstrap_overrides, custom and the rest of this file
 @import "autotune/bootstrap_overrides";
@@ -59,12 +60,92 @@ label.block {
   max-width: 100%;
 }
 
-#preview {
-  border-top:35px solid #dfdfdf;
-  border-left:1px solid #dfdfdf;
-  border-bottom:1px solid #dfdfdf;
-  border-right:1px solid #dfdfdf;
-  border-radius:8px 8px 2px 2px;
+#blueprint-data { height:300px; }
+
+.preview-frame {
+  margin: 25px auto;
+
+  &.large-view {
+    width:720px;
+  }
+  &.medium-view {
+    width:500px;
+  }
+  &.small-view {
+    width:320px;
+  }
+
+  iframe {
+    display:block;
+  }
+}
+
+#save-warning{
+  display: none;
+}
+
+.project-save-warning{
+  display: none;
+  padding: 17px 10px 13px 10px;
+  color: #ffffff;
+  margin: -5px 10px;
+  .icon-alert{
+    width: 26px;
+    height: 22px;
+    vertical-align: bottom;
+  }
+}
+
+.bbm-wrapper{
+  position: absolute;
+  z-index: 1;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+}
+
+.modal-dialog{
+  width: 100%;
+  max-width: 400px;
+  margin: 200px auto 0 auto;
+  z-index: 1051;
+  i, p{
+    display: table-cell;
+  }
+  p{
+    padding-top: 7px;
+  }
+  .icon-alert{
+    width: 50px;
+    height: 28px;
+    vertical-align: top;
+    margin-right: 10px;
+  }
+  .modal-footer{
+    border-width: 0px;
+    padding-top: 0px;
+    #dismiss.btn{
+      border-bottom-color: #5E5E5E;
+    }
+  }
+}
+
+#embed-preview {
+  position:relative;
+  border: 2px dashed #ccc;
+  .overlay { display: none; }
+
+  &.loading .overlay {
+    display:block;
+    position:absolute;
+    top:0; right:0; bottom:0; left:0;
+    background-color:rgba($black, 0.6);
+    color:white;
+    font-size:40px;
+    padding-top:40px;
+    text-align:center;
+  }
 }
 
 footer {

@@ -6,9 +6,9 @@ require 'autotune/version'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = 'autotune'
-  s.version     = Autotune::VERSION
-  s.authors     = ['Ryan Mark']
-  s.email       = ['ryan@mrk.cc']
+  s.version     = Autotune::VERSION # update via package.json
+  s.authors     = ['Ryan Mark', 'Casey Miller', 'Kavya Sukumar']
+  s.email       = ['ryan.mark@voxmedia.com', 'casey.miller@voxmedia.com', 'kavya.sukumar@voxmedia.com']
   s.homepage    = 'https://github.com/voxmedia/autotune'
   s.summary     = 'Fancy way to turn templates into web pages'
   # s.description = 'TODO: Description of Autotune.'
@@ -27,6 +27,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'bootstrap3-datetimepicker-rails', '~> 4.15.35'
   s.add_dependency 'sass-rails', '>= 3.2'
   s.add_dependency 'will_paginate', '~> 3.0.7'
+  s.add_dependency 'google-api-client', '~> 0.8.6'
+  s.add_dependency 'omniauth-google-oauth2', '~> 0.3.0'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'pry-rails'

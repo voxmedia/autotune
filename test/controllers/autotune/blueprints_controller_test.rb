@@ -1,9 +1,14 @@
 require 'test_helper'
 
+# All the tests involving a repo use a git repo in the test/repos directory. If
+# you need to make adjustments to this repo, clone it locally by doing
+# something like:
+#   git clone ../autotune/test/repos/autotune-example-blueprint.git
+
 module Autotune
   # Test blueprint api
   class BlueprintsControllerTest < ActionController::TestCase
-    fixtures 'autotune/blueprints', 'autotune/projects'
+    fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/users', 'autotune/groups', 'autotune/group_memberships'
     test 'that listing blueprints requires authentication' do
       accept_json!
 
@@ -53,6 +58,7 @@ module Autotune
 
     test 'create blueprint' do
       # make sure we remove the example blueprint
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 
@@ -61,7 +67,10 @@ module Autotune
 
       title = 'New blueprint'
 
-      post :create, :title => title, :repo_url => repo_url
+      assert_performed_jobs 1 do
+        post :create, :title => title, :repo_url => repo_url
+      end
+
       assert_response :created
       assert_blueprint_data!
 
@@ -75,9 +84,11 @@ module Autotune
 
       title = 'Updated blueprint'
 
-      put(:update,
-          :id => autotune_blueprints(:example).id,
-          :title => title)
+      assert_no_performed_jobs do
+        put(:update,
+            :id => autotune_blueprints(:example).id,
+            :title => title)
+      end
       assert_response :success
       assert_blueprint_data!
 
@@ -87,6 +98,7 @@ module Autotune
 
     test 'delete blueprint' do
       # make sure we remove the example blueprint
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 
@@ -95,11 +107,17 @@ module Autotune
 
       title = 'New blueprint'
 
-      post :create, :title => title, :repo_url => repo_url
+      assert_performed_jobs 1 do
+        post :create, :title => title, :repo_url => repo_url
+      end
+
       assert_response :created
       assert_blueprint_data!
 
-      delete :destroy, :id => decoded_response['id']
+      assert_performed_jobs 2 do
+        delete :destroy, :id => decoded_response['id']
+      end
+
       assert_response :no_content
     end
 
@@ -123,6 +141,27 @@ module Autotune
       assert_response :success
       assert_instance_of Array, decoded_response
       assert_equal 0, decoded_response.length
+    end
+
+    test 'update blueprint repo url' do
+      accept_json!
+      valid_auth_header!
+
+      bp = autotune_blueprints(:example)
+
+      title = 'Updated blueprint'
+
+      assert_performed_jobs 1 do
+        put(:update,
+            :id => bp.id,
+            :title => title,
+            :repo_url => "#{bp.repo_url}#live")
+      end
+      assert_response :success
+      assert_blueprint_data!
+
+      new_bp = Blueprint.find decoded_response['id']
+      assert_equal title, new_bp.title
     end
 
     private

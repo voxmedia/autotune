@@ -22,6 +22,8 @@ module ActiveJob
     end
 
     def enqueue(options = {})
+      return self if jobs.nil?
+
       first_job, fail_job = jobs.first
       first_job.catch(fail_job) if fail_job
 

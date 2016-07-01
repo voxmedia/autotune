@@ -4,8 +4,12 @@ module Autotune
     extend ActiveSupport::Concern
 
     included do
-      after_save :move_working_dir
-      after_destroy :delete_working_dir
+      after_save :move_working_dir, :if => :installed?
+      after_destroy :delete_working_dir, :if => :installed?
+    end
+
+    def installed?
+      true
     end
 
     def working_dir
@@ -26,7 +30,7 @@ module Autotune
     private
 
     def move_working_dir
-      return if !slug_changed? || slug_was.nil?
+      return if !slug_changed? || slug_was.nil? || slug == slug_was
       MoveWorkDirJob.perform_later(working_dir_was, working_dir)
     end
 

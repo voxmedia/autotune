@@ -1,0 +1,192 @@
+<div class="row m-page-heading">
+  <div class="col-xs-12">
+    <h3><% if ( model.isNew() ) { %>New Theme<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+    <% if ( !model.isNew() ) { %>
+    <p class="text-muted">
+      Status:
+      <% if(model.hasStatus('ready')) { %>
+      <span class="text-success"><i class="icon-ok"></i>Ready</span>
+      <% } else if(model.hasStatus('broken')) { %>
+      <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+      <% } else if(model.hasStatus('updating')) { %>
+      <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+      <% } else { %>
+      <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
+      <% } %>
+    </p>
+    <% } %>
+  </div>
+</div>
+
+
+<div role="tabpanel">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a
+        href="#visual" aria-controls="visual"
+        role="tab" data-toggle="tab">Properties</a>
+    </li>
+    <% if ( hasRole('superuser') && !model.isNew() ) { %>
+    <li role="presentation"><a
+        href="#code" aria-controls="code"
+        role="tab" data-toggle="tab">Developer</a></li>
+  <% } %>
+  </ul>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="visual">
+      <div class="row">
+        <div class="col-sm-12">
+          <form id="edit-theme" role="form"
+                data-next="show" data-model="Theme"
+                <% if(model.isNew()) { %>
+                data-action="new"
+                <% } else { %>
+                data-action="edit" data-model-id="<%=model.get('id') %>"
+                <% } %> >
+            <div class="form-group">
+              <label for="title">Title</label>
+              <% if(model.isDefault()) {%>
+               <p class="text-muted">Theme name will be displayed as typed below.</p>
+              <% } else {%>
+                <p class="text-muted">Theme name will be displayed as "Group name - Theme name"</p>
+              <% }%>
+              <input type="text" required class="form-control"
+                     <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
+                     id="title" name="title" placeholder="Enter title">
+            </div>
+            <% if (model.isNew()) { %>
+            <div class="form-group">
+              <label for="group_id" class="block">Group</label>
+              <div class="select">
+                <select id="group_id" name="group_id" class="form-control">
+                  <option>Select group</option>
+                  <% this.app.designerGroups.each(function(group) { %>
+                      <option value="<%= group.get('id') %>" <% if ( model.get('group_id') === group.get('id') ) { %>selected<% } %>>
+                        <%= group.get('name') %>
+                      </option>
+                  <% }); %>
+                </select>
+              </div>
+            </div>
+            <% } %>
+            <% if (!model.isNew()) { %>
+              <h3>Theme Data</h3>
+              <% _.each(['colors','social'], function(group){ %>
+                <div class="form-group">
+                <% if (_.isObject(model.themeData(group))) { %>
+                  <table class="table">
+                    <tbody>
+                      <tr class="m-table-heading">
+                        <td class="col-xs-3 text-capitalize"><%= group %></td>
+                        <td></td>
+                      </tr>
+                  <% _.each(model.themeData(group), function(prop, key){ %>
+                    <tr>
+                      <td class="theme-prop-label">
+                        <% if (app.config.theme_meta_data[group] && app.config.theme_meta_data[group][key]) { %>
+                          <label class=""> <%= app.config.theme_meta_data[group][key].friendly_name %></label>
+                          <p><small class="text-muted" for="<%= key %>">$<%= key %></small></p>
+                          <p class="helper-text text-muted"> <%= app.config.theme_meta_data[group][key].helper_text %></p>
+                        <% } else {%>
+                          <label class=""> <%= key %></label>
+                          <p><small class="text-muted" for="<%= key %>">$<%= key %></small></p>
+                        <% } %>
+                      </td>
+                      <td>
+                      <% if (isColor(prop)) { %>
+                        <input type='text' class='right colorpicker' name="themedata-<%= group %>-<%= key %>" value="<%= prop %>" />
+                      <% } else {%>
+                          <input type='text' class="right" name="themedata-<%= group %>-<%= key %>" value="<%= prop %>" />
+                      <% } %>
+                      </td>
+                  <% }) %>
+                </tbody>
+              </table>
+              <% } else { %>
+               <div class="form-group">
+                   <label for="<%= group %>"><%= group %></label>
+                   <input type='text' name="themedata-root-<%= obj %>" value="<%= model.themeData(group) %>" />
+               </div>
+              <% } %>
+              </div>
+              <% }) %>
+            <% } %>
+            <button type="submit" class="btn btn-primary"
+                    data-loading-text="Saving...">Save changes</button>
+
+            <% if ( hasRole('superuser') && !model.isNew() && model.isDefault()) { %>
+            <button type="button" class="btn btn-info"
+                    data-action-message="Reset started"
+                    data-action-confirm="Resetting will delete all changes made to the theme. Are you sure you wish to continue?"
+                    data-loading-text="Resetting..."
+                    data-action="reset" data-model="Theme"
+                    data-action-next="reload"
+                    data-model-id="<%=model.get('slug') %>">Reset</button>
+            <% } %>
+            <% if ( !model.isNew() && !model.isDefault()) { %>
+            <button type="button" class="btn btn-danger"
+                    data-action-message="Theme deleted"
+                    data-action-confirm="Are you sure you wish to delete this?"
+                    data-loading-text="Deleting..."
+                    data-action="destroy"
+                    data-action-next="/themes" data-model="Theme"
+                    data-model-id="<%=model.get('slug') %>">Delete</button>
+            <% } %>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="code">
+      <div class="row">
+        <div class="col-xs-12">
+          <div id="edit">
+            <div class="row">
+              <div class="col-sm-12">
+                <form id="theme-data" role="form"
+                      data-next="show" data-model="Theme"
+                      <% if(model.isNew()) { %>
+                      data-action="new"
+                      <% } else { %>
+                      data-action="edit" data-model-id="<%=model.get('id') %>"
+                      <% } %> >
+                  <% if(!model.isDefault()) { %>
+                  <div class="form-group">
+                    <h4>Inheritted data <span class="label label-warning">Read only</span> :</h4>
+                    <div id="readonly-data" style="height:300px;"></div>
+                  </div>
+                  <% } %>
+                  <div class="form-group">
+                    <h4>Theme data :</h4>
+                    <div id="data" style="height:300px;">test test test</div>
+                  </div>
+                  <button type="submit" class="btn btn-primary"
+                          data-loading-text="Saving...">Save changes</button>
+
+                  <% if ( hasRole('superuser') && !model.isNew() && model.isDefault()) { %>
+                  <button type="button" class="btn btn-info"
+                          data-action-message="Reset started"
+                          data-action-confirm="Resetting will delete all changes made to the theme. Are you sure you wish to continue?"
+                          data-loading-text="Resetting..."
+                          data-action="reset" data-model="Theme"
+                          data-action-next="reload"
+                          data-model-id="<%=model.get('slug') %>">Reset</button>
+                  <% } %>
+                  <% if ( !model.isNew() && !model.isDefault()) { %>
+                  <button type="button" class="btn btn-danger"
+                          data-action-message="Theme deleted"
+                          data-action-confirm="Are you sure you wish to delete this?"
+                          data-loading-text="Deleting..."
+                          data-action="destroy"
+                          data-action-next="/themes" data-model="Theme"
+                          data-model-id="<%=model.get('slug') %>">Delete</button>
+                  <% } %>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

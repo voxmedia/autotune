@@ -16,11 +16,13 @@ require('pnotify/src/pnotify.buttons');
 var Application = BaseView.extend(require('./mixins/links.js'), {
   className: 'container-fluid',
   template: require('../templates/application.ejs'),
-  notifications: [],
   alertDefaults: {
     addclass: "stack-bottomright",
     stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
     buttons: { sticker: false }
+  },
+  events: {
+    'click #savePreview': 'savePreview'
   },
 
   afterInit: function() {
@@ -34,6 +36,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     this.currentView = view;
     this.currentView.load(this);
     logger.debug('displaying view', view, this.$('#main'));
+    if ( window ) { $(window).scrollTop(0); }
     this.$('#main').empty().append(view.$el);
     return this;
   },
@@ -42,14 +45,17 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     this.$('#main').empty().append(
       helpers.render( require('../templates/not_found.ejs') ));
   },
+
   display403: function() {
     this.$('#main').empty().append(
       helpers.render( require('../templates/not_allowed.ejs') ));
   },
+
   display500: function(status, message) {
     this.$('#main').empty().append(
       helpers.render( require('../templates/error.ejs'), {status: status, message: message} ));
   },
+
   displayError: function(code, status, message) {
     if (code === 404) {
       this.display404();
@@ -78,43 +84,60 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     return this;
   },
 
-  error: function(message) {
-    return this.alert(message, 'error');
+  error: function(message, wait) {
+    return this.alert(message, 'error', wait);
   },
 
-  warning: function(message) {
-    return this.alert(message, 'notice');
+  warning: function(message, wait) {
+    return this.alert(message, 'notice', wait);
   },
 
-  success: function(message) {
-    return this.alert(message, 'success');
+  success: function(message, wait) {
+    return this.alert(message, 'success', wait);
   },
 
-  alert: function(message, level, permanent, wait) {
-    var opts = _.defaults({
-      text: message,
-      type: level || 'info',
-      delay: wait || 8000
-    }, this.alertDefaults);
+  info: function(message, wait) {
+    return this.alert(message, 'info', wait);
+  },
 
-    if ( permanent ) {
+  alert: function(message, level, wait) {
+    var noti,
+        opts = _.defaults({
+          text: message,
+          type: level || 'info',
+          delay: 8000
+        }, this.alertDefaults);
+
+    if ( _.isNumber(wait) && wait > 0 ) {
+      opts['delay'] = wait;
+    } else if ( wait === true || wait === 'permanent' || wait === 0 ) {
       _.extend(opts, {
-        buttons: { close: false, sticker: false },
+        buttons: { closer: false, sticker: false },
         hide: false
       });
-      this.notifications.push( new PNotify(opts) );
-    } else {
-      new PNotify(opts);
     }
-    return this;
+
+    noti = this.findNotification( message );
+    return noti || new PNotify(opts);
   },
 
-  clearError: function() {
-    _.each(this.notifications, function(n) {
-      if ( n.remove ) { n.remove(); }
-    });
-    this.notifications = [];
-    return this;
+  findNotification: function(message) {
+    return _.find(PNotify.notices, function(notify) {
+      return notify.options.text === message;
+    } );
+  },
+
+  clearNotification: function(message) {
+    if ( message ) {
+      return this.findNotification( message );
+    } else {
+      return PNotify.removeAll();
+    }
+  },
+
+  savePreview: function(){
+    // this.currentView.doSubmit();
+    this.$('#projectForm form').submit();
   }
 });
 

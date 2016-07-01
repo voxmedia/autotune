@@ -5,10 +5,12 @@
     <% if ( !model.isNew() ) { %>
     <p class="text-muted">
       Status:
-      <% if(model.get('status') == 'ready') { %>
-      <span class="text-success"><i class="icon-ok"></i><%=capitalize(model.get('status')) %></span>
-      <% } else if(model.get('status') == 'broken') { %>
-      <span class="text-danger"><i class="icon-alert"></i><%=capitalize(model.get('status')) %></span>
+      <% if(model.hasStatus('ready')) { %>
+      <span class="text-success"><i class="icon-ok"></i>Ready</span>
+      <% } else if(model.hasStatus('broken')) { %>
+      <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+      <% } else if(model.hasStatus('updating')) { %>
+      <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
       <% } else { %>
       <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
       <% } %>
@@ -24,12 +26,12 @@
       <li role="presentation" class="active"><a
           href="#edit" aria-controls="edit"
           role="tab" data-toggle="tab">Blueprint Info</a></li>
-      <% if ( model.isNew() ) { %>
-      <li role="presentation" class="disabled"><a>Form Builder</a></li>
-      <% } else { %>
+      <% if ( model.hasForm() ) { %>
       <li role="presentation"><a
           href="#builder" aria-controls="builder"
           role="tab" data-toggle="tab">Form Builder</a></li>
+      <% } else { %>
+      <li role="presentation" class="disabled"><a>Form Builder</a></li>
       <% } %>
     </ul>
 
@@ -55,14 +57,16 @@
                 <label for="repo_url">Repo url</label>
                 <input type="text" required class="form-control"
                        <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
-                       id="repo_url" name="repo_url" placeholder="Enter repo url">
+                       id="repo_url" name="repo_url" placeholder="https://github.com/username/reponame.git#branchname">
+                <p class="help-block">You can target a branch by adding <code>#branchname</code> to the url.<p>
+                <p class="help-block">Changing the repo url will trigger an automatic upgrade of the blueprint.</p>
               </div>
               <% if(!model.isNew()) { %>
               <div class="form-group">
                 <label for="status" class="block">Status</label>
                 <div class="select">
-                  <select id="status" name="status" class="form-control"
-                    <% if ( model.hasStatus('new', 'updating') ) { %>disabled<% } %>>
+                  <select id="status" name="status" class="form-control">
+                    <option>Change status</option>
                     <option value="testing"
                       <% if ( model.hasStatus('testing') ) { %>selected<% } %>
                       >Testing</option>
@@ -81,7 +85,6 @@
 
               <% if ( !model.isNew() ) { %>
               <button type="button" class="btn btn-default"
-                      <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
                       data-action-message="Upgrade started"
                       data-loading-text="Upgrading..."
                       data-action="update-repo" data-model="Blueprint"

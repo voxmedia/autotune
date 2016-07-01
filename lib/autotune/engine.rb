@@ -10,14 +10,23 @@ module Autotune
     require 'bootstrap-sass'
     require 'bootstrap3-datetimepicker-rails'
 
+    # Omniauth for logins
+    require 'omniauth'
+    require 'omniauth-google-oauth2'
+
+    # Will paginate for paginated active records
     require 'will_paginate'
 
+    # Some active job magic
     require 'active_job/chaining'
     require 'active_job/locking'
     require 'active_job/unique'
     require 'active_job/chain'
 
     initializer 'autotune.init', :before => :load_config_initializers do |app|
+      app.config.assets.precompile += %w(
+        autotune/favicon.ico autotune/at_placeholder.png autotune/spinner.gif)
+
       app.config.autotune = Config.new
 
       # Figure out where we project our blueprints
@@ -29,8 +38,12 @@ module Autotune
       app.config.autotune.git_ssh = File.expand_path('../../../bin/git_ssh.sh', __FILE__)
       app.config.autotune.git_askpass = File.expand_path('../../../bin/git_ask_pass.sh', __FILE__)
       app.config.autotune.faq_url = 'http://voxmedia.helpscoutdocs.com/category/19-autotune'
-      app.config.autotune.themes = { :generic => 'Generic' }
-      app.config.autotune.redis = Redis.new(:host => ENV['REDIS_SERVER'])
+      app.config.autotune.google_auth_enabled = false
+      app.config.autotune.google_auth_domain = nil
+
+      if ENV['REDIS_URL']
+        app.config.autotune.redis = Redis.new(:url => ENV['REDIS_URL'])
+      end
 
       Autotune.deployment(
         :preview,
@@ -47,11 +60,6 @@ module Autotune
         :connect => "file://#{Rails.root.join('public', 'publish')}",
         :base_url => '/publish'
       )
-    end
-
-    initializer 'autotune.init', :after => :load_config_initializers do |app|
-      # make sure the generic theme is always enabled
-      app.config.autotune.themes[:generic] = 'Generic'
     end
   end
 end

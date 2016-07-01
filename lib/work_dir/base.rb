@@ -12,6 +12,14 @@ module WorkDir
     def initialize(path, env = {})
       @working_dir = path.to_s
       @env = ENV.select { |k, _| WorkDir::ALLOWED_ENV.include? k }
+      # Since this is a Rails app and should be running within a `bundle exec` context,
+      # we expect any original GEM_PATH has been unset, and the ENV is configured such that
+      # we only use what is within this bundle, which probably doesn't  include bundler itself,
+      # although we'll actually need to 'bundle install' in working directories.
+      # To keep things sane, just carry over the _ORIGINAL_GEM_PATH so that bundler is available
+      if ENV['_ORIGINAL_GEM_PATH'].present? && @env['GEM_PATH'].blank?
+        @env['GEM_PATH'] = ENV['_ORIGINAL_GEM_PATH']
+      end
       @env.update env
     end
 

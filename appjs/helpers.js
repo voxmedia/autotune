@@ -2,6 +2,7 @@
 
 var $ = require('jquery'),
     _ = require('underscore'),
+    tinycolor = require('tinycolor2'),
     querystring = require('querystring'),
     escape = require('escape-html'),
     _string = require('underscore.string');
@@ -26,7 +27,7 @@ module.exports = {
   },
 
   hasRole: function(role) {
-    return _.contains(this.app.user.get('meta').roles, role);
+    return this.app.hasRole(role);
   },
 
   /***********
@@ -54,6 +55,13 @@ module.exports = {
   getPreviousPageUrl: function() {
     return this.getPageUrl( this.collection.state.currentPage - 1 );
   },
+
+  /**********
+   * Theme editor helpers
+   */
+   isColor: function(color){
+     return tinycolor(color).isValid();
+   },
 
   /**********
    * Expose other stuff as helpers

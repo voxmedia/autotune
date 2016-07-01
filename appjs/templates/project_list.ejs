@@ -3,19 +3,7 @@
     <h3>Projects</h3>
   </div>
   <div class="col-xs-12 col-sm-6 text-right">
-    <form class="form-inline" method="get" action="/projects">
-      <div class="form-group">
-        <label class="sr-only" for="search">Search query</label>
-        <div class="btn-group">
-          <input type="text" class="form-control"
-                 name="search" id="search" placeholder="Search"
-                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-        <% if(query.search) { %>
-          <a href="/projects">clear</a>
-        <% } %>
-        </div>
-      </div>
-    </form>
+    
   </div>
 </div>
 <table class="table projects">
@@ -27,18 +15,16 @@
       </td>
       <td class="text-right" colspan="5">
         <form class="form-inline" method="get" action="/projects">
+          <div class="form-group">
           Filters
-          <% if(query.theme || query.blueprint_title || query.pub_status) { %>
-            (<a href="/projects">clear</a>)
-          <% } %>
           &nbsp;
           <% if ( app.themes.length > 1 ) { %>
           <div class="select">
             <select name="theme" id="theme" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
             <% app.themes.each(function(theme) { %>
-              <option <% if(theme.get('value') == query.theme) { %>selected<% } %>
-                    value="<%=theme.get('value') %>"><%=theme.get('label') %></option>
+              <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
+                    value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>
             <% }) %>
             </select>
           </div>
@@ -61,6 +47,16 @@
                     value="<%=pub_status %>"><%=pub_status %></option>
             <% }) %>
             </select>
+          </div>
+            <label class="sr-only" for="search">Search query</label>
+            <div class="btn-group">
+              <input type="text" class="form-control"
+                     name="search" id="search" placeholder="Search"
+                     <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+            <% if(query.search || query.theme || query.blueprint_title || query.pub_status) { %>
+              <a href="/projects">clear</a>
+            <% } %>
+            </div>
           </div>
         </form>
       </td>
@@ -92,6 +88,8 @@
         <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
       <% } else if ( item.hasStatus('broken') ) { %>
         <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
+      <% } else if ( item.hasStatus('building') ) { %>
+        <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
       <% } else { %>
         <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
       <% } %>
@@ -110,8 +108,8 @@
       <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
     </td>
     <td>
-      <% if ( app.themes.findWhere({value: item.get('theme')}) ) { %>
-      <%=app.themes.findWhere({value: item.get('theme')}).get('label') %>
+      <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
+      <%=app.themes.findWhere({slug: item.get('theme')}).get('title') %>
       <% } else { %>
       <em class="text-muted"><%=item.get('theme') %></em>
       <% } %>
@@ -126,8 +124,8 @@
       <a data-tooltip="preview" target="_blank"
          href="<%=item.getPublishUrl('http') %>"><span class="icon-preview"></span></a>
     <% } else { %>
-      <a data-tooltip="preview" target="_blank"
-         href="<%=item.getPreviewUrl('http') %>"><span class="icon-preview"></span></a>
+      <a data-tooltip="preview"
+         href="<%=item.url() %>/edit?togglePreview=true"><span class="icon-preview"></span></a>
     <% } %>
       <a data-tooltip="delete"
          data-action-message="Project deleted"

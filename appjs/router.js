@@ -28,15 +28,35 @@ module.exports = Backbone.Router.extend({
     "projects/new": "chooseBlueprint",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject",
-    "projects/:slug/duplicate": "duplicateProject"
+    "projects/:slug/duplicate": "duplicateProject",
+    "themes": "listThemes",
+    "themes/new": "newTheme",
+    "themes/:slug": "editTheme",
+    "themes/:slug/edit": "editTheme"
   },
+
+  navigate: function(fragment, options) {
+    var view = this.app.view.currentView;
+    if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+      view.askToSave().then(function(okToContinue) {
+        if ( okToContinue ) {
+          Backbone.Router.prototype.navigate.call(this, fragment, options);
+          window.onbeforeunload = null;
+          $('body').removeClass('modal-open');
+        }
+      });
+    } else {
+      Backbone.Router.prototype.navigate.call(this, fragment, options);
+    }
+  },
+
 
   // This is called for every route
   everyRoute: function(route, params) {
-    $(window).scrollTop(0);
+    logger.debug('everyRoute', route);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
-    this.app.listener.start();
+    this.app.messages.start();
     if ( params ) {
       logger.debug(route, params);
     } else {
@@ -56,9 +76,11 @@ module.exports = Backbone.Router.extend({
         app: app
       });
       view.render();
+
       app.view
         .display( view )
         .setTab('blueprints');
+
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
@@ -67,30 +89,27 @@ module.exports = Backbone.Router.extend({
   newBlueprint: function() {
     var blueprint = new models.Blueprint(),
         view = new views.EditBlueprint({ model: blueprint, app: this.app });
+
+    view.render();
+
     this.app.view
       .display( view )
       .setTab('blueprints');
 
-    view.render();
   },
 
   editBlueprint: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }),
-        maybeFetch = Promise.resolve(),
-        app = this.app, view;
+    var app = this.app, view,
+        blueprint = new models.Blueprint({ id: slug });
 
-    if ( !blueprint ) {
-      blueprint = new models.Blueprint({ id: slug });
-      this.app.blueprints.add(blueprint);
-      maybeFetch = Promise.resolve( blueprint.fetch() );
-    }
-
-    maybeFetch.then(function() {
+    Promise.resolve( blueprint.fetch() ).then(function() {
       var view = new views.EditBlueprint({ model: blueprint, app: app });
       view.render();
+
       app.view
         .display( view )
         .setTab('blueprints');
+
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
@@ -104,11 +123,14 @@ module.exports = Backbone.Router.extend({
     query['status'] = 'ready';
 
     Promise.resolve( blueprints.fetch({data: query}) ).then(function() {
-      view = new views.ChooseBlueprint({ collection: blueprints, query: query, app: app });
+      view = new views.ChooseBlueprint({
+        collection: blueprints, query: query, app: app });
       view.render();
+
       app.view
         .display( view )
         .setTab('projects');
+
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
@@ -116,44 +138,38 @@ module.exports = Backbone.Router.extend({
 
   listProjects: function(params) {
     var projects = this.app.projects,
-        // bp_list = this.app.blueprints.pluck('id', 'title'),
         app = this.app, query = {}, view, jqxhr;
 
     if(params) { query = querystring.parse(params); }
 
     if (query.page) {
-      jqxhr = projects.getPage(parseInt(query.page));
+      jqxhr = projects.getPage(parseInt(query.page), {data: query});
     } else {
-      jqxhr = projects.getFirstPage();
+      jqxhr = projects.getFirstPage({data: query, reset: true});
     }
 
-    Promise.resolve( projects.fetch({data: query}) ).then(function() {
+    Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
         query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
         app: app
       });
+
       view.render();
       app.view
         .display( view )
         .setTab('projects');
+
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
   },
 
   newProject: function(slug) {
-    var blueprint = this.app.blueprints.findWhere({ slug: slug }),
-        maybeFetch = Promise.resolve(),
-        app = this.app, view, project;
+    var app = this.app, view, project,
+        blueprint = new models.Blueprint({ id: slug });
 
-    if ( !blueprint ) {
-      blueprint = new models.Blueprint({ id: slug });
-      this.app.blueprints.add(blueprint);
-      maybeFetch = Promise.resolve( blueprint.fetch() );
-    }
-
-    maybeFetch.then(function() {
+    Promise.resolve( blueprint.fetch() ).then(function() {
       project = new models.Project({ blueprint: blueprint });
       view = new views.EditProject({ model: project, app: app });
       view.render();
@@ -165,60 +181,45 @@ module.exports = Backbone.Router.extend({
     });
   },
 
-  editProject: function(slug) {
-    var project = this.app.projects.findWhere({ slug: slug }),
-        maybeFetch = Promise.resolve('some value'),
-        app = this.app, view, blueprint;
+  editProject: function(slug, params) {
+    var project = new models.Project({ id: slug }),
+        app = this.app, view, query = {};
 
-    if ( !project ) {
-      project = new models.Project({ id: slug });
-      this.app.projects.add(project);
-      maybeFetch = Promise.resolve( project.fetch() );
-    }
+    if(params) { query = querystring.parse(params); }
 
-    maybeFetch.then(function() {
-      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
+    Promise.resolve( project.fetch() ).then(function() {
+      project.blueprint = new models.Blueprint({
+        id: project.get('blueprint_id') });
 
-      if ( !blueprint ) {
-        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
-        app.blueprints.add(blueprint);
-        return blueprint.fetch();
-      }
+      return project.blueprint.fetch();
     }).then(function() {
-      project.blueprint = blueprint;
-      view = new views.EditProject({ model: project, app: app });
+      view = new views.EditProject({
+        model: project, app: app, query: query,
+        disableForm: query.hasOwnProperty('disableform') });
       view.render();
+
       app.view
         .display( view )
         .setTab('projects');
+
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
   },
 
+  // editProjectPreview: function
+
   duplicateProject: function(slug) {
-    var project = this.app.projects.findWhere({ slug: slug }),
-        maybeFetch = Promise.resolve('some value'),
-        app = this.app, view, blueprint,
+    var project = new models.Project({ id: slug }),
+        app = this.app, view,
         new_project, old_attributes, new_attributes = {};
 
-    if ( !project ) {
-      project = new models.Project({ id: slug });
-      this.app.projects.add(project);
-      maybeFetch = Promise.resolve( project.fetch() );
-    }
-
-    maybeFetch.then(function() {
-      blueprint = app.blueprints.findWhere({ id: project.get('blueprint_id') });
-
-      if ( !blueprint ) {
-        blueprint = new models.Blueprint({ id: project.get('blueprint_id') });
-        app.blueprints.add(blueprint);
-        return blueprint.fetch();
-      }
+    Promise.resolve( project.fetch() ).then(function() {
+      project.blueprint = new models.Blueprint({
+        id: project.get('blueprint_id') });
+      return project.blueprint.fetch();
     }).then(function() {
       old_attributes = _.clone(project.attributes);
-      
       new_attributes.blueprint_config = old_attributes.blueprint_config;
       new_attributes.blueprint_id = old_attributes.blueprint_id;
       new_attributes.blueprint_title = old_attributes.blueprint_title;
@@ -230,9 +231,10 @@ module.exports = Backbone.Router.extend({
       new_attributes.status = 'new';
 
       new_project = new models.Project(new_attributes);
-      new_project.blueprint = blueprint;
+      new_project.blueprint = project.blueprint;
 
-      view = new views.EditProject({ model: new_project, app: app, copyProject: true });
+      view = new views.EditProject({
+        model: new_project, app: app, copyProject: true });
       view.render();
 
       app.view
@@ -241,5 +243,63 @@ module.exports = Backbone.Router.extend({
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
-  }
+  },
+
+  listThemes: function(params) {
+    var themes = this.app.editableThemes,
+        app = this.app, query = {}, view, jqxhr;
+
+    if(params) { query = querystring.parse(params); }
+
+    if (query.page) {
+      jqxhr = themes.getPage(parseInt(query.page), {data: query});
+    } else {
+      jqxhr = themes.getFirstPage({data: query});
+    }
+
+    Promise.resolve( jqxhr  ).then(function() {
+      view = new views.ListThemes({
+        collection: themes,
+        query: _.pick(query, 'status', 'group', 'search'),
+        app: app
+      });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+
+  editTheme: function(slug) {
+    var app = this.app, view,
+        theme = new models.Theme({ id: slug });
+
+    Promise.resolve( theme.fetch() ).then(function() {
+      var view = new views.EditTheme({ model: theme, app: app });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+
+  newTheme: function() {
+    var theme = new models.Theme(),
+        view = new views.EditTheme({ model: theme, app: this.app });
+
+    view.render();
+
+    this.app.view
+      .display( view )
+      .setTab('themes');
+
+  },
 });
