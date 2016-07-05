@@ -210,7 +210,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
-    // this.$('#projectForm input[name="title"]').val(this.$('#projectTitle textarea').val());
     this.alpaca.childrenByPropertyId["tweet_text"].setValue($('textarea#shareText').val());
 
     var view = this,
@@ -221,8 +220,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if(view.postedPreviewData){
       data = view.postedPreviewData;
     }
-
-    // this.resizeTitleTextarea();
 
     if(this.hasUnsavedChanges()){
       $('.project-save-warning').show().css('display', 'inline-block');
@@ -281,14 +278,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
           if ( view.pym ) { view.pym.remove(); }
-
           view.pym = new pym.Parent('embed-preview', previewUrl);
           view.pym.iframe.onload = iframeLoaded;
 
           // In case some dumb script hangs the loading process
           setTimeout(iframeLoaded, 20000);
         } else {
-          logger.debug('hi!', view.pym);
           iframeLoaded();
         }
       }, function(err) {
