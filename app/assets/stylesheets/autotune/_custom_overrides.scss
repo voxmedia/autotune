@@ -3,3 +3,46 @@ input#search{
   max-width: 200px;
   float:right;
 }
+
+.selectize-input {
+	background-color: color(background);
+  color: color(text);
+  border: 2px solid color(border);
+  -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+.selectize-control.single .selectize-input {
+	margin-left: 0;
+	text-align: left;
+	.item {
+		margin: 0;
+	}
+	&:after {
+		display: none;
+	}
+}
+
+.selectize-dropdown {
+	width: initial !important;
+	.option {
+		text-align: left;
+		min-width: 100%;
+		white-space: nowrap;
+		&.selected {
+			background: none;
+		}
+		&.active {
+			color: white;
+			background: #27AAE1;
+		}
+	}
+	.selectize-dropdown-content {
+		margin-left: 0;
+	}
+}
+
+form.form-inline div.option {
+	margin-left: 0;
+}

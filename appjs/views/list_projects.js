@@ -13,6 +13,12 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     this.listenForChanges();
   },
 
+  afterRender: function() {
+    $('.selectize-target').selectize({
+      highlight: false
+    });
+  },
+
   listenForChanges: function() {
     this.listenTo(this.app.listener, 'change:project',
                   this.updateStatus, this);
