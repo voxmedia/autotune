@@ -1,32 +1,47 @@
-//icons
-.text-right .glyphicon,
-[class^="icon-"] {
-  position: relative;
-  top: 2px;
+// //icons
+.at-icon{
+  background-size: 100%;
+  background-repeat:no-repeat;
+	background-position:center center;
   display: inline-block;
-  font-family: 'Glyphicons Halflings';
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: color(text);
-  font-size: 15px;
+  height: 15px;
+  width: 15px;
   margin: 0 6px;
-  &:not([disabled]):hover {
-    cursor: pointer;
-    color: color(primary);
-    text-decoration: none;
+}
+
+.alert-icon{
+  background-image: image-url('autotune/icons/alert.svg');
+  #navbar-save-container &, #save-modal &{
+    background-image: image-url('autotune/icons/alert_red.svg');
   }
-  &[disabled] {
-    opacity: 0.5;
-    cursor: default;
-    &:hover {
-      color: color(disabled);
-    }
-    &:hover:before,
-    &:hover:after {
-      content: "";
-    }
+}
+.delete-icon{
+  background-image: image-url('autotune/icons/delete.svg');
+}
+.dropdown-icon{
+  background-image: image-url('autotune/icons/dropdown.svg');
+}
+.duplicate-icon{
+  background-image: image-url('autotune/icons/duplicate.svg');
+}
+.edit-icon{
+  background-image: image-url('autotune/icons/edit.svg');
+}
+.help-icon{
+  background-image: image-url('autotune/icons/help.svg');
+}
+.info-icon{
+  background-image: image-url('autotune/icons/info.svg');
+}
+.ok-icon{
+  background-image: image-url('autotune/icons/ok.svg');
+  #navbar-save-container &{
+    background-image: image-url('autotune/icons/ok_green.svg');
   }
+}
+.preview-icon{
+  background-image: image-url('autotune/icons/preview.svg');
+}
+.refresh-icon{
+  background-image: image-url('autotune/icons/refresh.svg');
 }

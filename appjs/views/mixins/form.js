@@ -76,7 +76,6 @@ module.exports = {
         if ( action === 'new' ) {
           app.view.success('New '+model_class+' saved');
         } else {
-          logger.debug(this.findNotification('pub'));
           if(!app.view.findNotification('Publishing...')){
             if(model_class === 'Project'){
               if(view.model.hasUnpublishedUpdates()){
