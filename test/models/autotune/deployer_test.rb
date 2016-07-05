@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'work_dir'
+require 'autoshell'
 
 module Autotune
   # test taggy stuff
@@ -88,7 +88,7 @@ module Autotune
           :connect => "file://#{path}",
           :project => p)
 
-        wd = WorkDir.repo(p.working_dir)
+        wd = Autoshell.new(p.working_dir)
         FileUtils.mkdir_p(wd.expand 'build')
         open(wd.expand('build/index.html'), 'w') do |fp|
           fp.write('<h1>Hello World!</h1>')
@@ -168,7 +168,7 @@ module Autotune
         :connect => "s3://#{ENV['TEST_BUCKET']}/at-temp",
         :project => p)
 
-      wd = WorkDir.repo(p.working_dir)
+      wd = Autoshell.new(p.working_dir)
       FileUtils.mkdir_p(wd.expand 'build')
       open(wd.expand('build/index.html'), 'w') do |fp|
         fp.write('<h1>Hello World!</h1>')

@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'will_paginate', '~> 3.0.7'
   s.add_dependency 'google-api-client', '~> 0.8.6'
   s.add_dependency 'omniauth-google-oauth2', '~> 0.3.0'
+  s.add_dependency 'autoshell', '~> 1.0.0'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'pry-rails'

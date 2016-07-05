@@ -1,5 +1,4 @@
 require 'uri'
-require 'work_dir'
 require 'redis'
 
 # Main autotune module
