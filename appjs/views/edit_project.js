@@ -469,7 +469,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             [view.model.getVersion(), view.theme].join('-');
           previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
-          // Revisit this
         } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
           // if the project is a graphic and has been built (but doesn't have live enabled)
           var previousPreviewUrl = view.model['_previousAttributes']['preview_url'];
@@ -733,7 +732,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       valid = control.form.isFormValid();
 
       if ( !valid ) {
-        logger.debug('not valid');
         $form.find('#validation-error').removeClass('hidden');
       } else {
         $form.find('#resolve-message').removeClass('hidden');
