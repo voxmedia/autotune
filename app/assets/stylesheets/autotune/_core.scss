@@ -55,9 +55,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
   .tab-pane{
     overflow: hidden;
   }
-}
-
-.tab-pane{
   @media (max-width: 1040px){
     .scroll-pane{
       padding-top: 35px;
@@ -65,6 +62,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
     .container{
       padding-top: 20px;
     }
+  }
+  @media (max-width: $screen-sm){
+    overflow-y: initial;
   }
 }
 
@@ -144,6 +144,7 @@ label.block {
     .at-icon{
       margin-right: 7px;
       width: 14px;
+      height: 14px;
       vertical-align: text-top;
     }
     @media (max-width: $screen-sm){
@@ -165,6 +166,7 @@ label.block {
     display: block;
     position: absolute;
     top: 35px;
+    left: 0px;
     .project-save-warning, .project-saved{
       color: color(background, dark);
     }
@@ -259,7 +261,35 @@ input[type="checkbox"] {
   }
   .ui-pnotify-icon, .ui-pnotify-icon span{
     float: none;
-    display: inline;
+    background-size: contain;
+    background-repeat:no-repeat;
+  	background-position:left center;
+    display: inline-block;
+    height: 14px;
+    width: 20px;
+    vertical-align: baseline;
+    .glyphicon{
+      &.glyphicon-ok-sign{
+       background-image: image-url('autotune/icons/ok_text.svg');
+       &:before{
+         content: '';
+       }
+      }
+      &.glyphicon-info-sign, &.glyphicon-sign{
+       background-image: image-url('autotune/icons/info_text.svg');
+       vertical-align: top;
+       &:before{
+         content: '';
+       }
+      }
+      &.glyphicon-warning-sign{
+       background-image: image-url('autotune/icons/alert_text.svg');
+       &:before{
+         content: '';
+       }
+      }
+    }
+
     // margin-right: 10px;
   }
   .ui-pnotify-text{

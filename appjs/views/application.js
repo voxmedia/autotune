@@ -112,7 +112,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
         opts = _.defaults({
           text: message,
           type: level || 'info',
-          delay: 8000,
+          delay: 80000,
           before_open: function(thing){
             page.$('#alert-area').parent().addClass('has-alert');
           },
@@ -129,7 +129,6 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
         hide: false
       });
     }
-
     noti = this.findNotification( message );
 
     return noti || new PNotify(opts);
@@ -152,14 +151,12 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   toggleNav: function(event){
     logger.debug('toggleNav', event);
     if($('#navbar-collapse').hasClass('in')){
-      // $('#navbar-collapse').removeClass('in');
       $('#navbar-collapse').collapse('toggle');
     }
   },
 
   savePreview: function(){
-    // this.currentView.doSubmit();
-    this.$('#projectForm form').submit();
+    this.currentView.doSubmit(this.$('#projectForm form'));
   }
 });
 
