@@ -153,6 +153,19 @@ input[type='radio'],
   display: inline;
 }
 
+//broken radio button fixes
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  margin-left: -25px;
+}
+input[type="radio"],
+input[type="checkbox"] {
+  margin: -10px 10px 0;
+}
+
+
 option {
   font-weight: 400;
   color: black;
@@ -210,11 +223,6 @@ a {
   &.btn-warning,
   &.btn-disabled {
     box-sizing: border-box;
-    // color: white;
-
-    // &:focus {
-    //   border-color: color(actionable);
-    // }
   }
 
   @each $type, $color in (
