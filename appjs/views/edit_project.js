@@ -388,10 +388,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
     view.showPreviewButtons();
-    // if(view.model.hasUnpublishedUpdates()){
-    //   app.view.info('Project has unpublished updates');
-    // }
-
     $(window).resize(function(){
       view.showPreviewButtons();
       if(view.formWidth){

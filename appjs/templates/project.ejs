@@ -79,7 +79,7 @@
             <div class="preview-frame">
               <!-- add classes depending on what is new or not -->
               <div id="embed-preview" class=
-              <% if (model.isNew()) { %>
+              <% if (model.isNew() && !model.hasBuildData()) { %>
                 "validation-error"
               <% } else if (!model.hasPreviewType('live') && model.hasStatus('building')) { %>
                 "building"
