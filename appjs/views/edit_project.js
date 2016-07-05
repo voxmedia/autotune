@@ -96,7 +96,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
     'keypress': 'pollChange',
-    // 'click #projectTitle ': 'toggleEditTitle',
     'click #savePreview': 'savePreview',
     'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm',
@@ -283,7 +282,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
           if ( view.pym ) { view.pym.remove(); }
 
-          // $('#embed-preview').empty();
           logger.debug('preview url!', previewUrl);
           view.pym = new pym.Parent('embed-preview', previewUrl);
           view.pym.iframe.onload = iframeLoaded;
