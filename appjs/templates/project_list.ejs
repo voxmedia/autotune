@@ -8,7 +8,7 @@
       <form class="form-inline" method="get" action="/projects">
         <div class="input-group">
           <input type="text" class="form-control"
-                   name="search" id="search" placeholder="Search"
+                   name="search" id="search" placeholder="Search keywords"
                    <% if(query.search) { %>value="<%=query.search %>"<% } %>>
           <span class="input-group-btn">
             <button class="btn btn-secondary" type="submit">Search</button>
@@ -29,7 +29,7 @@
           </div>
           <% if ( app.themes.length > 1 ) { %>
             <div class="select">
-              <select name="theme" id="theme" class="form-control selectize-target" data-auto-submit="true" placeholder = "Select Theme">
+              <select name="theme" id="theme" class="form-control selectize-target" data-auto-submit="true" placeholder = "Search themes">
                 <option disabled <% if(!query.theme) { %>selected<% } %>></option>
               <% app.themes.each(function(theme) { %>
                 <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>

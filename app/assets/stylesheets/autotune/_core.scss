@@ -953,6 +953,9 @@ $nav-break: 550px;
           margin-left: 0px;
         }
         &#inline-filter{
+          a {
+            text-decoration: underline;
+          }
           @media (max-width: $nav-break){
             display: none;
           }
