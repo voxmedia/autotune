@@ -149,9 +149,7 @@ $nav-break: 550px;
       @media (max-width: $nav-break){
         width: 100%;
         margin-left: 0px;
-        #search{
-          max-width: 100%;
-        }
+        justify-content: flex-start;
       }
     }
     .input-group-btn{
@@ -162,6 +160,7 @@ $nav-break: 550px;
       flex-direction: row;
       justify-content: flex-end;
       align-items: center;
+      margin-left: 0px;
       div{
         flex-grow: 1;
         select{
@@ -181,6 +180,7 @@ $nav-break: 550px;
       width: 100%;
       max-width: 100%;
       display: block;
+      justify-content: flex-start;
     }
   }
 }
