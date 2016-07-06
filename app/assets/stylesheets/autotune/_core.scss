@@ -7,13 +7,6 @@ html{
   height: auto;
 }
 
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
-  font-weight: bold;
-  +hr{
-    margin-top: 0px;
-  }
-}
-
 #main {
   padding-bottom: 25px;
 }

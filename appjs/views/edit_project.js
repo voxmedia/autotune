@@ -157,8 +157,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   resizeForm: function(event){
     var view = this;
     if($(window).width() > 768){
-      logger.debug(event.target);
-      $(document).mousemove(function (event){
+      $('#edit').mousemove(function (event){
         $('#embed-preview').addClass('screen');
         if(event.pageX > 320 && $(window).width() - event.pageX > 300){
           view.formWidth = $(window).width() - event.pageX;
@@ -169,11 +168,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       });
     }
 
-    $(document).mouseup(function (e) {
+    $('#edit').mouseup(function (e) {
       $('#embed-preview').removeClass('screen');
-      $(document).unbind('mousemove');
+      $('#edit').unbind('mousemove');
     });
-
   },
 
   showPreviewButtons: function(){
