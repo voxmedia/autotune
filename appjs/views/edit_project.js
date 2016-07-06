@@ -100,7 +100,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'click #savePreview': 'savePreview',
     'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm',
-    'mousedown #split-bar': 'resizeForm'
+    'mousedown #split-bar': 'enableFormResize',
+    'mouseup': 'disableFormResize',
+    'mousemove': 'resizeForm'
   },
 
   afterInit: function(options) {
@@ -154,10 +156,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return ret;
   },
 
+  enableFormResize: function(event){
+    this.enableFormSlide = true;
+  },
+
+  disableFormResize: function(event){
+    if(this.enableFormSlide){
+      $('#embed-preview').removeClass('screen');
+      this.enableFormSlide = false;
+    }
+  },
+
   resizeForm: function(event){
     var view = this;
-    if($(window).width() > 768){
-      $('#edit').mousemove(function (event){
+    if(view.enableFormSlide){
+      if($(window).width() > 768){
         $('#embed-preview').addClass('screen');
         if(event.pageX > 320 && $(window).width() - event.pageX > 300){
           view.formWidth = $(window).width() - event.pageX;
@@ -165,13 +178,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           $('#preview-pane').css("width", event.pageX);
           view.showPreviewButtons();
         }
-      });
+      }
     }
-
-    $('#edit').mouseup(function (e) {
-      $('#embed-preview').removeClass('screen');
-      $('#edit').unbind('mousemove');
-    });
   },
 
   showPreviewButtons: function(){
@@ -391,6 +399,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
+
+    view.enableFormSlide = false;
     view.showPreviewButtons();
     $(window).resize(function(){
       view.showPreviewButtons();

@@ -147,7 +147,6 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   },
 
   toggleNav: function(event){
-    logger.debug('toggleNav', event);
     if($('#navbar-collapse').hasClass('in')){
       $('#navbar-collapse').collapse('toggle');
     }
