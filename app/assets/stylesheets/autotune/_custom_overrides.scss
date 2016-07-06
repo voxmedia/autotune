@@ -18,6 +18,7 @@ input#search{
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	max-height: 32px !important;
   input {
+  	cursor: text;
   	width: initial !important;
   }
   &.full input {
@@ -40,7 +41,7 @@ input#search{
 }
 
 .selectize-dropdown {
-	width: initial !important;
+	width: 100%;
 	.option {
 		text-align: left;
 		min-width: 100%;
