@@ -581,7 +581,7 @@ label.block {
 .tab-pane{
   overflow-y: scroll;
   &#visual{
-    overflow-y: hidden;
+    overflow-y: visible;
   }
   .tab-pane{
     overflow: hidden;
