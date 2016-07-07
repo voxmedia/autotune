@@ -1,6 +1,4 @@
 {
-  "name": "autotune",
-  "version": "0.3.41",
   "dependencies": {
     "abbrev": {
       "version": "1.0.9",
@@ -295,7 +293,19 @@
     "browserify": {
       "version": "5.12.1",
       "from": "browserify@5.12.1",
-      "resolved": "https://registry.npmjs.org/browserify/-/browserify-5.12.1.tgz"
+      "resolved": "https://registry.npmjs.org/browserify/-/browserify-5.12.1.tgz",
+      "dependencies": {
+        "glob": {
+          "version": "4.5.3",
+          "from": "glob@>=4.0.5 <5.0.0",
+          "resolved": "https://registry.npmjs.org/glob/-/glob-4.5.3.tgz"
+        },
+        "minimatch": {
+          "version": "2.0.10",
+          "from": "minimatch@>=2.0.1 <3.0.0",
+          "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-2.0.10.tgz"
+        }
+      }
     },
     "browserify-aes": {
       "version": "1.0.6",
