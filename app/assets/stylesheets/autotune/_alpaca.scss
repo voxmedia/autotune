@@ -35,6 +35,7 @@ td.actionbar{
 }
 .alpaca-field-array .alpaca-field-object {
   margin-top:0;
+  z-index: 1;
 }
 
 .alpaca-field-array {
@@ -63,6 +64,7 @@ td.actionbar{
     }
   }
   .alpaca-array-actionbar{
+    z-index:20;
     position: absolute;
     // vertical-align: middle;
     right: 0px;
