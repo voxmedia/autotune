@@ -85,9 +85,10 @@
   text-align: center;
   border-bottom: none;
   position: fixed;
-  top: 32px;
+  top: 33px;
   width: 100%;
   background-color: color(background);
+  z-index: 3;
   li{
     z-index: 3;
     display:inline-block;
@@ -126,7 +127,9 @@
     top: 60px;
   }
   .tab-content{
-    top: 92px;
+    top: 93px;
   }
-
+  .m-page-heading, .container.projects{
+    padding-top: 68px;
+  }
 }

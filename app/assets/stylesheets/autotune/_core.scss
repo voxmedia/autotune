@@ -29,6 +29,9 @@ html{
   .row{
     margin: 0 -15px;
   }
+  &.projects{
+    padding-top: 40px;
+  }
 }
 
 .margin-top {
@@ -125,13 +128,29 @@ label.block {
 }
 
 #split-bar {
-  background-color: transparent;
+  background-color: lighten(color(border, light), 5.5%);
   height: 100%;
-  width: 8px;
+  width: 16px;
   cursor: col-resize;
   position: fixed;
-  top: 0px;
-  margin-left: -20px;
+  top: 67px;
+  margin-left: -35px;
+  @media (max-width: $screen-sm){
+    display: none;
+  }
+  &:before {
+    content: '.';
+    position: absolute;
+    font-size: 14px;
+    color: color(actionable, light);
+    text-shadow: 0 7px color(actionable, light), 0 14px color(actionable, light), 0 21px color(actionable, light), 6px 0 color(actionable, light), 6px 7px color(actionable, light), 6px 14px color(actionable, light), 6px 21px color(actionable, light);
+    top: 50%;
+    margin-top: -67px;
+    left: 3px;
+    @media (max-width: $screen-sm){
+      display: none;
+    }
+  }
 }
 
 #shareText{
@@ -240,7 +259,7 @@ label.block {
 
 .navbar{
   min-height: 30px;
-  z-index: 3;
+  z-index: 4;
   .navbar-header{
     @media (max-width: 767px){
       float: none;
@@ -691,6 +710,7 @@ label.block {
   padding-bottom: 70px;
   @media (max-width: $screen-sm){
     padding-bottom: 20px;
+    padding-left: 15px;
   }
 }
 
@@ -699,9 +719,11 @@ label.block {
   position:fixed;
   right:0px;
   padding-bottom: 50px;
+  padding-left: 35px;
   @media (max-width: $screen-sm){
     position: relative;
     float: none;
+    padding-left: 15px;
     ul.nav{
       display: none;
     }
@@ -878,4 +900,8 @@ ul.nav.nav-pills{
     border-width: 0px;
     padding-top: 0px;
   }
+}
+
+.top-space{
+  margin-top: 15px;
 }
