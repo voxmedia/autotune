@@ -341,7 +341,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   listenForChanges: function() {
-    if ( !this.model.isNew() && !this.listening ) {
+    if ( !this.model.isNew() ) {
       this.listenTo(this.app.messages,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
