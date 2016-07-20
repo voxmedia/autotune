@@ -356,6 +356,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   updateStatus: function(object) {
     // don't care about the updated step
+    logger.debug('Update project status: ' + object.status, object);
     if ( object.status === 'updated' ) { return; }
 
     logger.debug('Update project status: ' + object.status);
