@@ -155,7 +155,7 @@ module Autotune
       end
 
       if @project.valid?
-        @project.status = 'built' if @project.live?
+        @project.status = 'updated' if @project.live?
         @project.save
         @project.build unless @project.live?
 
@@ -190,7 +190,7 @@ module Autotune
       end
 
       if @project.valid?
-        @project.status = 'built' if @project.live?
+        # @project.status = 'updated' if @project.live?
         @project.save
         @project.build unless @project.live?
 

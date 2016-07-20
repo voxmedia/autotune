@@ -354,16 +354,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.listening = false;
   },
 
-  updateStatus: function(status) {
+  updateStatus: function(object) {
     // don't care about the updated step
-    if ( status === 'updated' ) { return; }
+    if ( object.status === 'updated' ) { return; }
 
-    logger.debug('Update project status: ' + status);
-    if (status === 'built'){
+    logger.debug('Update project status: ' + object.status);
+    logger.debug('  ~~~  ');
+    logger.debug(object.status, this.model);
+    logger.debug('  ~~~  ');
+    if (object.status === 'built'){
       if(!this.model.hasPreviewType('live')){
         $('#embed-preview').removeClass('loading');
       }
-      this.app.view.success('Building complete');
+      // this.app.view.success('Building complete');
     }
 
     // fetch the model, re-render the view and catch errors

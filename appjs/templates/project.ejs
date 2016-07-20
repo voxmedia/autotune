@@ -48,11 +48,7 @@
             <p>Draft</p>
           <% } else { %>
           <p>
-            <% if ( model.hasStatus('broken') ) { %>
-            <span class="text-danger"><i class="icon-alert"></i>Broken</span>
-            <% } else if ( !model.hasStatus('built') ) { %>
-            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Building</span>
-            <% } else if ( model.hasUnpublishedUpdates() ) { %>
+            <% if ( model.hasUnpublishedUpdates() ) { %>
               <a data-tooltip="Your Published Version Has Updates"
                  target="_blank" href="<%=model.getPublishUrl() %>">Published</a> (has updates)
             <% } else if ( model.isPublished() ) { %>
@@ -65,6 +61,15 @@
                  target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
             <% } %>
             <% if ( model.get('published_at') ) { %> - <%=model.publishedTime() %><% } %>
+            <% if ( model.hasStatus('built') || model.hasStatus('updated') ) { %>
+              <span class="label label-success">Built</span>
+            <% } else if ( model.hasStatus('broken') ) { %>
+              <span class="label label-danger"><%=model.get('status') %></span>
+            <% } else if ( model.hasStatus('building') ) { %>
+              <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%><%=model.get('status') %></span>
+            <% } else { %>
+              <span class="label label-info"><%=model.get('status') %></span>
+            <% } %>
           </p>
           <% } %>
 
@@ -171,15 +176,13 @@
                 data-model-id="<%=model.get('slug') %>"
                 <% if ( model.hasStatus('building') ) { %>
                   style="width: 109px;">Publishing<div></div>
+                <% } else if ( model.isPublished() ) { %>
+                  >Publish changes now
                 <% } else { %>
-                  ><% if ( model.hasInitialBuild() ) { %>
-                    Publish changes now
-                  <% } else { %>
-                    Publish now
-                  <% } %>
+                  >Publish now
                 <% } %>
                 </button>
-        <% if ( model.hasInitialBuild() ) { %>
+        <% if ( model.isPublished() ) { %>
         <a class="btn btn-secondary" target="_blank" id="viewBtn"
            href="<%=model.getPublishUrl() %>">View</a>
         <% } %>

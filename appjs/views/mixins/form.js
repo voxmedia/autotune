@@ -78,7 +78,7 @@ module.exports = {
         } else {
           if(!app.view.findNotification('Publishing...')){
             if(model_class === 'Project'){
-              if(view.model.hasUnpublishedUpdates()){
+              if(view.model.hasUnpublishedUpdates() && view.model.hasStatus('built')){
                 app.view.info(model_class+' updates saved but not published');
               } else {
                 app.view.success(model_class+' updates saved');

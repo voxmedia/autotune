@@ -53,4 +53,7 @@ main {
       color: $color;
     }
   }
+  p & {
+    margin-left: 5px;
+  }
 }

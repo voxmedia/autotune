@@ -83,14 +83,12 @@
         <%=item.get('created_by') %>
       </td>
       <td class="status-cell">
-        <% if ( item.hasStatus('built') ) { %>
-          <span class="label label-success"><%=item.get('status') %></span>
+        <% if ( item.hasStatus('built') || item.hasStatus('updated') ) { %>
+          <span class="label label-success">Built</span>
         <% } else if ( item.hasStatus('broken') ) { %>
           <span class="label label-danger"><%=item.get('status') %></span>
         <% } else if ( item.hasStatus('building') ) { %>
           <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%><%=item.get('status') %></span>
-        <% } else if ( item.hasStatus('updated') )  { %>
-          <span class="label label-info">Updated</span>
         <% } else { %>
           <span class="label label-info"><%=item.get('status') %></span>
         <% } %>
