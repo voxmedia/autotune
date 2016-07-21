@@ -511,19 +511,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }).catch(function(err) {
         console.error(err);
       }).then(function() {
-        view.listenForChanges();
+        // view.listenForChanges();
       });
   },
 
   afterSubmit: function() {
-    this.listenForChanges();
-    if (this.model.hasStatus('building')){
-      if(!this.model.hasPreviewType('live')){
-        $('#embed-preview').addClass('loading');
-      }
-      this.app.view.alert(
-        'Building... This might take a moment.', 'notice', 16000);
-    }
+    // this.listenForChanges();
+    // if (this.model.hasStatus('building')){
+    //   if(!this.model.hasPreviewType('live')){
+    //     $('#embed-preview').addClass('loading');
+    //   }
+    //   this.app.view.alert(
+    //     'Building... This might take a moment.', 'notice', 16000);
+    // }
   },
 
   renderForm: function(resolve, reject) {

@@ -36,7 +36,7 @@ module.exports = {
       $btn.button('loading');
     }
 
-    if(action === 'build-and-publish'){
+    if(action === 'build-and-publish' && view.hasUnsavedChanges()){
       view.$('#projectForm form').submit();
     }
 
