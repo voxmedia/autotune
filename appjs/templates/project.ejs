@@ -170,7 +170,6 @@
         <h4>Publish</h4>
         <button type="button" class="btn btn-primary" id="publishBtn"
                 <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
-                data-action-message="Publishing..."
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>"

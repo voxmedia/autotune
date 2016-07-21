@@ -36,9 +36,9 @@ module.exports = {
       $btn.button('loading');
     }
 
-    if(action === 'build-and-publish' && view.hasUnsavedChanges()){
-      view.$('#projectForm form').submit();
-    }
+    // if(action === 'build-and-publish' && view.hasUnsavedChanges()){
+    //   view.$('#projectForm form').submit();
+    // }
 
     if ( model_class && model_id ) {
       if ( this.collection ) {
@@ -59,13 +59,24 @@ module.exports = {
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
         if(action_message){
-          app.view.success(action_message, 4000);
+          app.view.success(action_message, 8000);
         }
 
         switch (action) {
+          case 'build-and-publish':
+            app.view.warning(
+              'Publishing... This might take a moment.', 8000);
+            break;
           case 'build':
             app.view.warning(
-              'Building... This might take a moment.', 16000);
+              'Building... This might take a moment.', 8000);
+            break;
+          case 'save':
+            if(view.hasUnpublishedUpdates() && view.hasStatus('built')){
+              app.view.info(model_class+' updates saved but not published');
+            } else {
+              app.view.success(model_class+' updates saved');
+            }
             break;
           case 'destroy':
             if ( view.collection ) {

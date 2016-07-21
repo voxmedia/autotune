@@ -76,16 +76,19 @@ module.exports = {
         if ( action === 'new' ) {
           app.view.success('New '+model_class+' saved');
         } else {
-          if(!app.view.findNotification('Publishing...')){
-            if(model_class === 'Project'){
-              if(view.model.hasUnpublishedUpdates() && view.model.hasStatus('built')){
-                app.view.info(model_class+' updates saved but not published');
-              } else {
-                app.view.success(model_class+' updates saved');
-              }
-            } else {
-              app.view.success(model_class+' updates saved');
-            }
+          // if(!app.view.findNotification('Publishing...')){
+          //   if(model_class === 'Project'){
+          //     if(view.model.hasUnpublishedUpdates() && view.model.hasStatus('built')){
+          //       app.view.info(model_class+' updates saved but not published');
+          //     } else {
+          //       app.view.success(model_class+' updates saved');
+          //     }
+          //   } else {
+          //     app.view.success(model_class+' updates saved');
+          //   }
+          // }
+          if(model_class !== 'Project'){
+            app.view.success(model_class+' updates saved');
           }
         }
 
@@ -100,6 +103,7 @@ module.exports = {
           }
           app.router.navigate(inst.url(), {trigger: true});
         } else if ( next === 'show' ) {
+          logger.debug('form 103', action);
           view.render();
         } else if ( next ) {
           app.router.navigate(next, {trigger: true});

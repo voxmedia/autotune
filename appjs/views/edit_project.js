@@ -217,11 +217,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   pollChange: _.debounce(function(){
     this.alpaca.childrenByPropertyId["tweet_text"].setValue($('textarea#shareText').val());
-
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
         data = $form.alpaca('get').getValue();
+
 
     if(view.postedPreviewData){
       data = view.postedPreviewData;
