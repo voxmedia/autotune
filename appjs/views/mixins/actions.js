@@ -64,6 +64,7 @@ module.exports = {
 
         switch (action) {
           case 'build-and-publish':
+          logger.debug('b&p', new Date());
             app.view.warning(
               'Publishing... This might take a moment.', 8000);
             break;

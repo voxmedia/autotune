@@ -145,6 +145,10 @@ module Autotune
     # @raise The original exception when the update fails
     def build_and_publish(current_user = nil)
       update(:status => 'building')
+      puts
+      puts 'date&time building'
+      puts DateTime.current
+      puts
       ActiveJob::Chain.new(
         SyncBlueprintJob.new(blueprint, :current_user => current_user),
         SyncProjectJob.new(self),
