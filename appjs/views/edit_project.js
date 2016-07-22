@@ -358,8 +358,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     // don't care about the updated step
     logger.debug('Update project status: ' + object.status, object);
     if ( object.status === 'updated' ) { return; }
-
-    logger.debug('Update project status: ' + object.status);
     logger.debug('  ~~~  ');
     logger.debug(object.status, this.model);
     logger.debug('  ~~~  ');
@@ -511,12 +509,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }).catch(function(err) {
         console.error(err);
       }).then(function() {
-        // view.listenForChanges();
+        view.listenForChanges();
       });
   },
 
   afterSubmit: function() {
-    // this.listenForChanges();
+    this.listenForChanges();
     // if (this.model.hasStatus('building')){
     //   if(!this.model.hasPreviewType('live')){
     //     $('#embed-preview').addClass('loading');
