@@ -502,7 +502,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         }
         if(view.model.hasPreviewType('live')){
           if(view.model.getConfig().spreadsheet_template){
-            $( "input[name='google_doc_url']" ).after('<button type="button" id="spreadsheet-button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>');
+            $( "input[name='google_doc_url']" ).after('<b><a type="button" id="spreadsheet-button" data-hook="create-spreadsheet">Create new empty spreadsheet</a></b>');
           }
         }
         view.getTwitterCount();
