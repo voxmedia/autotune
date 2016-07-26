@@ -81,10 +81,6 @@ module Autotune
 
       # Set status and save project
       project.published_at = DateTime.current if target.to_sym == :publish
-      puts
-      puts 'date&time'
-      puts DateTime.current
-      puts
       project.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag
