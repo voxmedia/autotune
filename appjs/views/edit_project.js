@@ -333,7 +333,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   savePreview: function(){
-    logger.debug('SAVE PREVIEW');
     this.$('#projectForm form').submit();
   },
 
@@ -381,9 +380,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     Promise
       .resolve(this.model.fetch())
       .then(function() {
-        // if(object.status === this.model.get('status')){
-        //   return view.render();
-        // }
+        // Model is currently registering changes multiple times (havne't figured out why yet).
+        // For now, this prevents the page from rendering multiple unnecessary times.
+        if(view.previousStatus !== object.status){
+          view.previousStatus = object.status;
+          return view.render();
+        }
       }).catch(function(jqXHR) {
         view.app.view.displayError(
           jqXHR.status, jqXHR.statusText, jqXHR.responseText);
@@ -413,7 +415,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
     view.count += 1;
-    logger.debug('count: ', view.count, view.model.get('status'));
+    view.previousStatus = view.model.get('status');
+    logger.debug('count: ', view.count, view.model.get('status'), view.model);
 
     view.enableFormSlide = false;
     view.showPreviewButtons();

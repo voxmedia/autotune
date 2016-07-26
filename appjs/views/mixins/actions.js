@@ -66,6 +66,7 @@ module.exports = {
 
         switch (action) {
           case 'build-and-publish':
+            view.model.set('status', 'building');
             app.view.warning(
               'Publishing... This might take a moment.', 8000);
             break;
@@ -91,7 +92,7 @@ module.exports = {
         if ( next === 'show' ) {
           this.app.router.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
-          logger.debug('got next as reload');
+          logger.debug('got next as reload', view.model.get('status'));
           return view.render();
         } else if ( next ) {
           this.app.router.navigate( next, {trigger: true} );
