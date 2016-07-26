@@ -1,0 +1,195 @@
+table.table.collection {
+  tr.m-table-heading > td {
+    padding-top: 35px;
+    text-transform: uppercase;
+    color: color(actionable);
+    border-bottom: 3px solid color(border);
+    &.bold-actions-cell{
+      text-align: right;
+      padding-right: 44px;
+    }
+  }
+  tbody > tr {
+    td {
+      padding: 10px 15px;
+      color: color(text);
+      &.text-right{
+        a{
+          &:only-of-type{
+            span{
+              margin: 0 6px;
+            }
+          }
+        }
+      }
+      a.title {
+        color: color(text);
+        display: table-cell;
+      }
+      &.group-cell{
+        color: color(actionable);
+      }
+      &:nth-child(1) {
+        width: 35%;
+      }
+    }
+  }
+  @media (max-width: 580px) and (min-width: 500px){
+    margin-top: 40px;
+  }
+  &.project-list{
+    tbody tr{
+      &.m-table-heading td.project-cell, &.m-table-heading td.bold-actions-cell{
+        color: color(actionable);
+      }
+      td{
+        color: color(actionable);
+        &.project-cell, &.bold-actions-cell{
+          color: color(text);
+        }
+        @media (max-width: $screen-sm){
+          display: block;
+          width: 100% !important;
+          border: none;
+          padding: 2px 0px;
+          font-size: 90%;
+          &.project-cell{
+            border-top: 2px solid color(border);
+            margin-top: 20px;
+            padding: 15px 0px 10px 0px;
+            font-size: 100%;
+          }
+          &.status-cell{
+            display: none;
+          }
+          &.bold-actions-cell{
+            padding: 15px 0px 0px 0px;
+          }
+          &.text-right{
+            text-align: left;
+            .at-icon{
+              width: 18px;
+              height: 18px;
+            }
+            a span{
+              margin: 0 10px;
+              &:first-of-type{
+                margin-left: 0px;
+              }
+            }
+          }
+          .glyphicons{
+            font-size: 90%;
+          }
+          .pub-time{
+            display: inline-block;
+            font-size: 100%;
+            &:before{
+              content: "- ";
+            }
+          }
+        }
+      }
+    }
+    .m-table-heading{
+      @media (max-width: $screen-sm){
+        display: none;
+      }
+    }
+  }
+}
+
+.table td:last-child {
+  white-space:nowrap;
+}
+
+$nav-break: 550px;
+.list-page-header{
+  margin-top: 25px;
+  width: 100%;
+  .new-button{
+    display: inline;
+    width: 110px;
+    @media (max-width: $nav-break){
+      margin-bottom: 30px;
+      display: block;
+    }
+  }
+  .text-right{
+    display: inline-block;
+    float: right;
+    vertical-align: top;
+    form{
+      width: inherit;
+      min-width: 408px;
+      @media (max-width: $nav-break){
+        min-width: 100%;
+      }
+    }
+    .filter-label{
+      display:inline;
+      float: left;
+      margin-left: 0px;
+      @media (max-width: $nav-break){
+        float: left;
+        display: block;
+        margin: -15px 0 5px 0;
+      }
+    }
+    .input-group{
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
+      #search{
+        max-width: 276px;
+      }
+      .btn{
+        margin-right: 0px;
+      }
+      @media (max-width: $nav-break){
+        width: 100%;
+        margin-left: 0px;
+        justify-content: flex-start;
+      }
+    }
+    .input-group-btn{
+      width: auto;
+    }
+    .filters{
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+      margin-left: 0px;
+      div{
+        flex-grow: 1;
+        select{
+          width:100%;
+        }
+        &:nth-of-type(2){
+          margin-left: 0px;
+        }
+        &#inline-filter{
+          @media (max-width: $nav-break){
+            display: none;
+          }
+        }
+      }
+    }
+    @media (max-width: $nav-break){
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      justify-content: flex-start;
+    }
+  }
+}
+
+#break-filter{
+  display: none;
+  text-align: left;
+  margin: 0px 0 10px 0px;
+  @media (max-width: $nav-break){
+    display: block;
+  }
+}

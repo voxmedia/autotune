@@ -1,26 +1,28 @@
-<div class="row m-page-heading">
-  <div class="col-xs-12">
-    <h3>Choose a blueprint</h3>
-  </div>
-</div>
-<% if( hasObjects() ) { %>
-  <% _.each(getObjects(), function(blueprint, index) { %>
-  <% if(index % 3 == 0) { %>
-  <% if(index != 0) { %></div><% } %>
-<div class="row m-blueprint-chooser">
-  <% } %>
-  <div class="col-sm-4">
-    <div class="thumbnail" style="background-image:url('<%=blueprint.get('thumb_url') %>');">
-      <h4><%=blueprint.get('title') %></h4>
-      <a href="<%=blueprint.url() %>/new_project"></a>
+<div class="container">
+  <div class="row m-page-heading list">
+    <div class="col-xs-12">
+      <h3>Choose a blueprint</h3>
     </div>
   </div>
-  <% }) %>
+  <% if( hasObjects() ) { %>
+    <% _.each(getObjects(), function(blueprint, index) { %>
+    <% if(index % 3 == 0) { %>
+    <% if(index != 0) { %></div><% } %>
+  <div class="row m-blueprint-chooser">
+    <% } %>
+    <div class="col-sm-4">
+      <div class="thumbnail" style="background-image:url('<%=blueprint.get('thumb_url') %>');">
+        <h4><%=blueprint.get('title') %></h4>
+        <a href="<%=blueprint.url() %>/new_project"></a>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="well text-center">
+    <h4>There are no blueprints ready for use.</h4>
+    <p>You must change the status of a blueprint to
+      <span class="m-status status-ok"><i class="icon-ok"></i>Ready</span> for it to appear here.</p>
+  </div>
+  <% } %>
 </div>
-<% } else { %>
-<div class="well text-center">
-  <h4>There are no blueprints ready for use.</h4>
-  <p>You must change the status of a blueprint to
-    <span class="m-status status-ok"><i class="icon-ok"></i>Ready</span> for it to appear here.</p>
-</div>
-<% } %>

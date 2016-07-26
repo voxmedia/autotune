@@ -1,49 +1,44 @@
-<div class="row m-page-heading">
-  <div class="col-xs-12 col-sm-6">
+<div class="container">
+  <div class="m-page-heading list">
     <h3>Manage blueprints</h3>
   </div>
-  <div class="col-xs-12 col-sm-6 text-right">
-    <form class="form-inline" method="get" action="/blueprints">
-      <div class="form-group">
+
+  <div class="list-page-header">
+
+    <div class="new-button">
+      <a class="btn btn-primary" href="/blueprints/new">New blueprint</a>
+    </div>
+
+    <div class="text-right">
+      <form class="form-inline" method="get" action="/blueprints">
         <label class="sr-only" for="search">Search query</label>
-        <input type="search" class="form-control"
-               name="search" id="search" placeholder="Search"
-               <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-        <% if(query.search) { %>
-          <a href="/blueprints">clear</a>
-        <% } %>
-      </div>
-    </form>
-  </div>
-</div>
-<table class="table">
-  <thead>
-    <tr>
-      <td>
-        <a class="btn btn-primary btn-xs" href="/blueprints/new">New blueprint</a>
-      </td>
-      <td class="text-right" colspan="3">
-        <form class="form-inline" method="get" action="/blueprints">
-          Filters
-          <% if(query.type || query.tag || query.status) { %>
+        <div class="input-group">
+          <input type="search" class="form-control"
+                 name="search" id="search" placeholder="Search"
+                 <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          <span class="input-group-btn">
+            <button class="btn btn-secondary" type="submit">Search</button>
+          </span>
+        </div>
+        <div id="break-filter">Filters
+          <% if(query.type || query.tag || query.status || query.search) { %>
             (<a href="/blueprints">clear</a>)
           <% } %>
           &nbsp;
+        </div>
+        <div class="filters">
+          <div id='inline-filter'>Filters
+            <% if(query.type || query.blueprint_title || query.status || query.search) { %>
+              (<a href="/blueprints">clear</a>)
+            <% } %>
+            &nbsp;
+          </div>
           <div class="select">
             <select name="type" id="type" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
             <% _.each(app.config.blueprint_types, function(type) { %>
               <option <% if(type === query.type) { %>selected<% } %>
                     value="<%=type %>"><%=type %></option>
-            <% }) %>
-            </select>
-          </div>
-          <div class="select">
-            <select name="tag" id="tag" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.tag) { %>selected<% } %>>Tag</option>
-            <% _.each(app.config.blueprint_tags, function(tag) { %>
-              <option <% if(tag.slug === query.tag) { %>selected<% } %>
-                    value="<%=tag.slug %>"><%=tag.title %></option>
             <% }) %>
             </select>
           </div>
@@ -56,60 +51,70 @@
             <% }) %>
             </select>
           </div>
-        </form>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+
+
+  <table class="table collection">
+    <thead>
+      <tr>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="m-table-heading">
+        <td>Blueprint</td>
+        <td>Status</td>
+        <td>Mode</td>
+        <td class="bold-actions-cell">Actions</td>
+      </tr>
+    <% if(getObjects().length == 0) { %>
+        <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>
+    <% }
+    _.each(getObjects(), function(item) { %>
+    <tr>
+      <td <% if(item.get('status') == 'built') { %>
+        class="ok-notice"
+        <% } else if(item.get('status') == 'broken') { %>
+        class="alert-notice"
+        <% } else { %>
+        class="info-notice"
+        <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
+      <td>
+        <% if(item.get('status') == 'built') { %>
+          <span class="label label-success"><%=item.get('status') %></span>
+        <% } else if(item.get('status') == 'broken') { %>
+          <span class="label label-danger"><%=item.get('status') %></span>
+        <% } else if(item.hasStatus('updating')) { %>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Upgrading</span>
+        <% } else { %>
+          <span class="label label-info"><%=item.get('status') %></span>
+        <% } %>
+      </td>
+      <td>
+        <% if(item.get('mode') == 'ready') { %>
+        <span class="m-status status-ok"><i class="icon-ok"></i><%=capitalize( item.get('mode') )%></span>
+        <% } else { %>
+        <span class="m-status status-info"><i class="icon-info"></i><%=capitalize( item.get('mode') )%></span>
+        <% } %>
+      </td>
+      <td class="text-right" colspan="2">
+        <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="at-icon edit-icon"></span></a>
+        <a data-tooltip="Upgrade" href="#"
+           data-action-message="Upgrading the blueprint..."
+           data-action="updateRepo" data-model="Blueprint" data-action-next="reload"
+           data-model-id="<%= item.attributes.slug %>"><span class="at-icon refresh-icon"></span></a>
+        <a data-tooltip="delete" href="#"
+           data-action-message="Blueprint deleted"
+           data-action-confirm="Are you sure you wish to delete this?"
+           data-action="destroy" data-model="Blueprint" data-action-next="reload"
+           data-model-id="<%= item.attributes.slug %>"><span class="at-icon delete-icon"></span></a>
       </td>
     </tr>
-  </thead>
-  <tbody>
-    <tr class="m-table-heading">
-      <td>Blueprint</td>
-      <td>Status</td>
-      <td>Mode</td>
-      <td class="text-right" colspan="2">Bold Actions</td>
-    </tr>
-  <% if(getObjects().length == 0) { %>
-      <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>
-  <% }
-  _.each(getObjects(), function(item) { %>
-  <tr>
-    <td <% if(item.get('mode') == 'ready') { %>
-      class="ok-notice"
-      <% } else if(item.get('status') == 'broken') { %>
-      class="alert-notice"
-      <% } else { %>
-      class="info-notice"
-      <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
-    <td>
-      <% if(item.get('status') == 'built') { %>
-        <span class="m-status"><%=capitalize( item.get('status') ) %></span>
-      <% } else if(item.get('status') == 'broken') { %>
-        <span class="m-status status-alert"><i class="icon-alert"></i><%=capitalize( item.get('status') ) %></span>
-      <% } else if(item.hasStatus('updating')) { %>
-        <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
-      <% } else { %>
-        <span class="m-status status-info"><i class="icon-info"></i><%=capitalize( item.get('status') ) %></span>
-      <% } %>
-    </td>
-    <td>
-      <% if(item.get('mode') == 'ready') { %>
-      <span class="m-status status-ok"><i class="icon-ok"></i><%=capitalize( item.get('mode') )%></span>
-      <% } else { %>
-      <span class="m-status status-info"><i class="icon-info"></i><%=capitalize( item.get('mode') )%></span>
-      <% } %>
-    </td>
-    <td class="text-right" colspan="2">
-      <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
-      <a data-tooltip="Upgrade" href="#"
-         data-action-message="Upgrading the blueprint..."
-         data-action="updateRepo" data-model="Blueprint" data-action-next="reload"
-         data-model-id="<%= item.attributes.slug %>"><span class="icon-refresh"></span></a>
-      <a data-tooltip="delete" href="#"
-         data-action-message="Blueprint deleted"
-         data-action-confirm="Are you sure you wish to delete this?"
-         data-action="destroy" data-model="Blueprint" data-action-next="reload"
-         data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
-    </td>
-  </tr>
-<% }); %>
-  </tbody>
-</table>
+  <% }); %>
+    </tbody>
+  </table>
+</div>

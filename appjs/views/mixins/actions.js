@@ -36,6 +36,10 @@ module.exports = {
       $btn.button('loading');
     }
 
+    if(action === 'build-and-publish'){
+      view.$('#projectForm form').submit();
+    }
+
     if ( model_class && model_id ) {
       if ( this.collection ) {
         logger.debug('load model from collection');
