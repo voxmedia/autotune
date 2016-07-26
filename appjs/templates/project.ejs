@@ -165,7 +165,7 @@
         <h3><%= model.get( 'title' ) %></h3>
         <hr />
         <h4>Publish</h4>
-        <button type="button" class="btn btn-primary" id="publishBtn"
+        <a type="button" class="btn btn-primary" id="publishBtn"
                 <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
@@ -177,7 +177,10 @@
                 <% } else { %>
                   >Publish now
                 <% } %>
-                </button>
+              </a>
+        <a type="button" class="btn btn-primary" id="saveBeforePublish">
+          Save project updates
+        </a>
         <% if ( model.isPublished() ) { %>
         <a class="btn btn-secondary" target="_blank" id="viewBtn"
            href="<%=model.getPublishUrl() %>">View</a>

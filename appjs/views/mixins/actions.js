@@ -56,6 +56,8 @@ module.exports = {
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
+    logger.debug('action:', action);
+    logger.debug('next:', next);
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
         if(action_message){
@@ -64,7 +66,6 @@ module.exports = {
 
         switch (action) {
           case 'build-and-publish':
-          logger.debug('b&p', new Date());
             app.view.warning(
               'Publishing... This might take a moment.', 8000);
             break;
@@ -90,6 +91,7 @@ module.exports = {
         if ( next === 'show' ) {
           this.app.router.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
+          logger.debug('got next as reload');
           return view.render();
         } else if ( next ) {
           this.app.router.navigate( next, {trigger: true} );

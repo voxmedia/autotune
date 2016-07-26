@@ -66,6 +66,8 @@ var ProjectSaveModal = Backbone.View.extend({
 
     cancel: function(){
       $('.project-save-warning').hide();
+      $('#saveBeforePublish').hide();
+      $('#publishBtn').show();
       this.trigger('cancel');
       this.teardown();
     },
@@ -97,7 +99,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change form': 'pollChange',
     'keyup #shareText': 'getTwitterCount',
     'keypress': 'pollChange',
-    'click #savePreview': 'savePreview',
+    'click #saveBeforePublish': 'savePreview',
     'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm',
     'mousedown #split-bar': 'enableFormResize',
@@ -107,6 +109,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterInit: function(options) {
     var view = this;
+    view.count = 0;
+    logger.debug('afterInit: ', view.count);
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
     if(options.query){
@@ -230,9 +234,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if(this.hasUnsavedChanges()){
       $('.project-save-warning').show().css('display', 'inline-block');
       $('.project-saved').hide();
+      $('#saveBeforePublish').show();
+      $('#publishBtn').hide();
     } else {
       $('.project-save-warning').hide();
       $('.project-saved').show().css('display', 'inline-block');
+      $('#saveBeforePublish').hide();
+      $('#publishBtn').show();
     }
 
     // Make sure the form is valid before proceeding
@@ -325,6 +333,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   savePreview: function(){
+    logger.debug('SAVE PREVIEW');
     this.$('#projectForm form').submit();
   },
 
@@ -359,8 +368,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     logger.debug('Update project status: ' + object.status, object);
     if ( object.status === 'updated' ) { return; }
     logger.debug('  ~~~  ');
-    logger.debug(object.status, this.model);
-    logger.debug('  ~~~  ');
+    logger.debug(object.status, this.model.get('status'));
     if (object.status === 'built'){
       if(!this.model.hasPreviewType('live')){
         $('#embed-preview').removeClass('loading');
@@ -373,7 +381,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     Promise
       .resolve(this.model.fetch())
       .then(function() {
-        return view.render();
+        // if(object.status === this.model.get('status')){
+        //   return view.render();
+        // }
       }).catch(function(jqXHR) {
         view.app.view.displayError(
           jqXHR.status, jqXHR.statusText, jqXHR.responseText);
@@ -392,6 +402,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   beforeRender: function() {
     $('.project-save-warning').hide();
+    $('#saveBeforePublish').hide();
     this.stopListeningForChanges();
   },
 
@@ -401,6 +412,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
+    view.count += 1;
+    logger.debug('count: ', view.count, view.model.get('status'));
 
     view.enableFormSlide = false;
     view.showPreviewButtons();
