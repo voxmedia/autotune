@@ -56,8 +56,6 @@ module.exports = {
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
-    logger.debug('action:', action);
-    logger.debug('next:', next);
     Promise.resolve( inst[camelize(action)]() )
       .then(function(resp) {
         if(action_message){

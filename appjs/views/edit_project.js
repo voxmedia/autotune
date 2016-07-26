@@ -109,8 +109,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterInit: function(options) {
     var view = this;
-    view.count = 0;
-    logger.debug('afterInit: ', view.count);
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
     if(options.query){
@@ -366,13 +364,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     // don't care about the updated step
     logger.debug('Update project status: ' + object.status, object);
     if ( object.status === 'updated' ) { return; }
-    logger.debug('  ~~~  ');
-    logger.debug(object.status, this.model.get('status'));
     if (object.status === 'built'){
       if(!this.model.hasPreviewType('live')){
         $('#embed-preview').removeClass('loading');
       }
-      // this.app.view.success('Building complete');
     }
 
     // fetch the model, re-render the view and catch errors
@@ -414,9 +409,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   afterRender: function() {
     var view = this, promises = [];
-    view.count += 1;
     view.previousStatus = view.model.get('status');
-    logger.debug('count: ', view.count, view.model.get('status'), view.model);
 
     view.enableFormSlide = false;
     view.showPreviewButtons();
