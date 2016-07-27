@@ -27,7 +27,8 @@ module.exports = {
         action_message = $btn.data('action-message'),
         next = $btn.data('action-next'),
         model_class = $btn.data('model'),
-        model_id = $btn.data('model-id');
+        model_id = $btn.data('model-id'),
+        promise;
 
     logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
@@ -36,9 +37,7 @@ module.exports = {
       $btn.button('loading');
     }
 
-    // if(action === 'build-and-publish' && view.hasUnsavedChanges()){
-    //   view.$('#projectForm form').submit();
-    // }
+
 
     if ( model_class && model_id ) {
       if ( this.collection ) {
@@ -56,15 +55,22 @@ module.exports = {
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
-    Promise.resolve( inst[camelize(action)]() )
-      .then(function(resp) {
+    if(action === 'build-and-publish' && view.hasUnsavedChanges()){
+      // view.$('#projectForm form').submit();
+      promise = view.doSubmit($('#projectForm form'));
+    } else {
+      promise = Promise.resolve();
+    }
+
+    promise.then(function(){
+      return inst[camelize(action)]();
+    }).then(function(resp) {
         if(action_message){
           app.view.success(action_message, 8000);
         }
 
         switch (action) {
           case 'build-and-publish':
-            view.model.set('status', 'building');
             app.view.warning(
               'Publishing... This might take a moment.', 8000);
             break;

@@ -62,8 +62,8 @@ var Project = Backbone.Model.extend({
    * @returns {object} jqXHR object
    **/
   buildAndPublish: function() {
-    // this.set('status', 'building');
-    // console.log('buildAndPublish', this);
+    this.set('status', 'building/publishing');
+    console.log('buildAndPublish', this);
     return Backbone.ajax({
       dataType: 'json',
       type: 'GET',

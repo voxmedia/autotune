@@ -66,8 +66,6 @@ var ProjectSaveModal = Backbone.View.extend({
 
     cancel: function(){
       $('.project-save-warning').hide();
-      $('#saveBeforePublish').hide();
-      $('#publishBtn').show();
       this.trigger('cancel');
       this.teardown();
     },
@@ -99,7 +97,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'change form': 'pollChange',
     'keyup #shareText': 'getTwitterCount',
     'keypress': 'pollChange',
-    'click #saveBeforePublish': 'savePreview',
     'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm',
     'mousedown #split-bar': 'enableFormResize',
@@ -232,13 +229,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if(this.hasUnsavedChanges()){
       $('.project-save-warning').show().css('display', 'inline-block');
       $('.project-saved').hide();
-      $('#saveBeforePublish').show();
-      $('#publishBtn').hide();
     } else {
       $('.project-save-warning').hide();
       $('.project-saved').show().css('display', 'inline-block');
-      $('#saveBeforePublish').hide();
-      $('#publishBtn').show();
     }
 
     // Make sure the form is valid before proceeding
@@ -399,7 +392,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   beforeRender: function() {
     $('.project-save-warning').hide();
-    $('#saveBeforePublish').hide();
     this.stopListeningForChanges();
   },
 
