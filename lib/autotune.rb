@@ -20,8 +20,7 @@ module Autotune
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
   # add a time buffer to account for processing
-  # MESSAGE_BUFFER = 0.5
-  MESSAGE_BUFFER = 10
+  MESSAGE_BUFFER = 0.5
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :verify_omniauth, :verify_authorization_header,
