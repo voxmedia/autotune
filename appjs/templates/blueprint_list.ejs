@@ -96,9 +96,9 @@
       </td>
       <td>
         <% if(item.get('mode') == 'ready') { %>
-        <span class="m-status status-ok"><i class="icon-ok"></i><%=capitalize( item.get('mode') )%></span>
+        <span class="label label-success"><%=capitalize( item.get('mode') )%></span>
         <% } else { %>
-        <span class="m-status status-info"><i class="icon-info"></i><%=capitalize( item.get('mode') )%></span>
+        <span class="label label-info"><%=capitalize( item.get('mode') )%></span>
         <% } %>
       </td>
       <td class="text-right" colspan="2">
