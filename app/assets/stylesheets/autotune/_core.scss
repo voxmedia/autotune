@@ -933,10 +933,7 @@ $nav-break: 550px;
       width: auto;
     }
     .filters{
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      align-items: center;
+      display: inline-block;
       margin-left: 0px;
       // .form-inline .form-control{
       //   @media (min-width: 768px){
@@ -984,6 +981,7 @@ $nav-break: 550px;
   // margin: auto;
   width:100%;
   display: flex;
+  z-index: 1;
   .pagination{
     width: initial;
     margin: 0 auto;

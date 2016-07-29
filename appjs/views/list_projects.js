@@ -14,8 +14,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   },
 
   afterRender: function() {
-    $('.selectize-target').selectize({
-      highlight: false
+    $.each($('.selectize-target'), function(k, v){
+      $(v).selectize({
+        highlight: false
+      });
     });
   },
 

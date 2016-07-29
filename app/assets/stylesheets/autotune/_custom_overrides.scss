@@ -4,13 +4,16 @@ input#search{
   float:right;
 }
 
+.filters .select {
+	margin-bottom: 5px;
+}
+
 .selectize-target,
 .selectize-control {
 	z-index: 2;
 }
 
 .selectize-input {
-	min-width: 140px;
 	background-color: color(background);
   color: color(text);
   border: 2px solid color(border);
@@ -42,7 +45,11 @@ input#search{
 }
 
 .selectize-dropdown {
-	width: 100%;
+	width: -moz-fit-content !important;
+  width: -webkit-fit-content !important;
+	width: fit-content !important;
+  margin: auto;   
+	z-index: 3;
 	.option {
 		text-align: left;
 		min-width: 100%;

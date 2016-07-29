@@ -501,6 +501,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             $( "input[name='google_doc_url']" ).after('<button type="button" id="spreadsheet-button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>');
           }
         }
+        $('div[data-alpaca-field-name="theme"] .form-control').selectize({
+          highlight: false
+        });
       }).catch(function(err) {
         console.error(err);
       }).then(function() {
