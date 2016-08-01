@@ -52,7 +52,7 @@ module Autotune
 
     def update
       @blueprint = instance
-      @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status
+      @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status, :mode
       if @blueprint.valid?
         trigger_upgrade = @blueprint.repo_url_changed?
         @blueprint.save

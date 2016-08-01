@@ -64,25 +64,30 @@
               <label for="status" class="block">Status</label>
               <div class="select">
                 <select id="status" name="status" class="form-control">
-                  <option>Change status</option>
-                  <% _.each(app.config.blueprint_statuses, function(status) { %>
-                    <option <% if( model.hasStatus(status) ) { %>selected<% } %>
-                          value="<%=status %>"><%=capitalize( status ) %></option>
-                  <% }) %>
+                <% _.each(app.config.blueprint_statuses, function(status) { %>
+                  <option <% if( model.hasStatus(status) ) { %>selected<% } %>
+                        value="<%=status %>"><%=capitalize( status ) %></option>
+                <% }) %>
                 </select>
               </div>
             </div>
             <div class="form-group">
               <div class="radio">
                 <label>
-                  <input type="radio" name="mode" id="mode" value="testing"<% if( model.mode === 'testing' ) { %> checked<% } %>>
+                  <input type="radio" name="mode" id="testing" value="testing"<% if( model.get('mode') === 'testing' ) { %> checked<% } %>><b></b>
                   Testing &mdash; This blueprint will be hidden, but available via <a href="<%=model.url() %>/new_project">New project</a>.
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input type="radio" name="mode" id="mode" value="ready"<% if( model.mode === 'ready' ) { %> checked<% } %>>
-                  Ready &mdash; This blueprint will be included in the list of choices for a new project
+                  <input type="radio" name="mode" id="ready" value="ready"<% if( model.get('mode') === 'ready' ) { %> checked<% } %>><b></b>
+                  Ready &mdash; This blueprint will be included in the list of choices for a new project.
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="mode" id="retired" value="retired"<% if( model.get('mode') === 'retired' ) { %> checked<% } %>><b></b>
+                  Retired &mdash; This blueprint is retired and should not be used.
                 </label>
               </div>
             </div>

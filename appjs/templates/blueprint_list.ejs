@@ -76,19 +76,13 @@
     <% }
     _.each(getObjects(), function(item) { %>
     <tr>
-      <td <% if(item.get('status') == 'built') { %>
-        class="ok-notice"
-        <% } else if(item.get('status') == 'broken') { %>
-        class="alert-notice"
-        <% } else { %>
-        class="info-notice"
-        <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
+      <td><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
       <td>
-        <% if(item.get('status') == 'built') { %>
+        <% if( item.hasStatus('built') ) { %>
           <span class="label label-success"><%=item.get('status') %></span>
-        <% } else if(item.get('status') == 'broken') { %>
+        <% } else if( item.hasStatus('broken') ) { %>
           <span class="label label-danger"><%=item.get('status') %></span>
-        <% } else if(item.hasStatus('updating')) { %>
+        <% } else if( item.hasStatus('updating') ) { %>
           <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Upgrading</span>
         <% } else { %>
           <span class="label label-info"><%=item.get('status') %></span>
@@ -97,6 +91,8 @@
       <td>
         <% if(item.get('mode') == 'ready') { %>
         <span class="label label-success"><%=capitalize( item.get('mode') )%></span>
+        <% } else if( item.get('mode') == 'retired' ) { %>
+        <span class="label label-default"><%=capitalize( item.get('mode') )%></span>
         <% } else { %>
         <span class="label label-info"><%=capitalize( item.get('mode') )%></span>
         <% } %>
