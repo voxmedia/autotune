@@ -504,6 +504,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         $('div[data-alpaca-field-name="theme"] .form-control').selectize({
           highlight: false
         });
+        $('div[data-alpaca-field-name="theme"] .selectize-input input').attr('placeholder','Select theme');
       }).catch(function(err) {
         console.error(err);
       }).then(function() {

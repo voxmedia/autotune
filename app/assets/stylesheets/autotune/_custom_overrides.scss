@@ -4,8 +4,17 @@ input#search{
   float:right;
 }
 
+#inline-filter {
+	display: inline-block;
+}
+
 .filters .select {
 	margin-bottom: 5px;
+	z-index: initial !important;
+	@media(max-width: 575px) {
+		width: 100% !important;
+		margin-left: 0;
+	}
 }
 
 .selectize-target,
@@ -14,6 +23,7 @@ input#search{
 }
 
 .selectize-input {
+	padding: 6px 8px;
 	background-color: color(background);
   color: color(text);
   border: 2px solid color(border);
@@ -23,7 +33,7 @@ input#search{
 	max-height: 32px !important;
   input {
   	cursor: text;
-  	width: initial !important;
+  	//width: initial !important;
   }
   &.full input {
   	max-width: 0 !important;
@@ -45,15 +55,24 @@ input#search{
 }
 
 .selectize-dropdown {
+	position: absolute;
 	width: -moz-fit-content !important;
   width: -webkit-fit-content !important;
 	width: fit-content !important;
   margin: auto;   
-	z-index: 3;
+	z-index: 5 !important;
+	opacity: .99;
+	@media(max-width: 575px) {
+		width: 100% !important;
+	}
 	.option {
 		text-align: left;
 		min-width: 100%;
 		white-space: nowrap;
+		z-index: 5;
+		@media(max-width: 575px) {
+			width: 100% !important;
+		}
 		&.selected {
 			background: none;
 		}
@@ -64,6 +83,7 @@ input#search{
 	}
 	.selectize-dropdown-content {
 		margin-left: 0;
+		z-index: 5;
 	}
 }
 
