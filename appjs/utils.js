@@ -47,5 +47,15 @@ module.exports = {
     }
 
     return ret;
+  },
+  fixSelectizeInputSizing: function(targetSelector) {
+    var childWidth = 0;
+    $.each($('.selectize-dropdown-content').children(), function(k,v){
+      if ($(this).innerWidth() > childWidth) {
+        childWidth = $(this).innerWidth();
+      }
+    });
+    targetSelector.innerWidth(childWidth);
+    targetSelector.children('input').innerWidth(childWidth);
   }
 };

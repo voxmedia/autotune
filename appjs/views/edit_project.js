@@ -5,6 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     helpers = require('../helpers'),
+    utils = require('../utils'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
     ace = require('brace'),
@@ -501,10 +502,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             $( "input[name='google_doc_url']" ).after('<button type="button" id="spreadsheet-button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>');
           }
         }
-        $('div[data-alpaca-field-name="theme"] .form-control').selectize({
-          highlight: false
-        });
-        $('div[data-alpaca-field-name="theme"] .selectize-input input').attr('placeholder','Select theme');
       }).catch(function(err) {
         console.error(err);
       }).then(function() {

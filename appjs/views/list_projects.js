@@ -4,6 +4,7 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
+    utils = require('../utils'),
     BaseView = require('./base_view');
 
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
@@ -14,25 +15,10 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
   },
 
   afterRender: function() {
-    var fixInputSizing = function() {
-      var childWidth = 0;
-      var defaultWidth = $('.selectize-input').children('input').innerWidth();
-      $.each($('.selectize-dropdown-content').children(), function(k,v){
-        if ($(this).innerWidth() > childWidth) {
-          childWidth = $(this).innerWidth();
-        }
-      });
-      $('.selectize-input').innerWidth(childWidth);
-      $('.selectize-input').children('input').innerWidth(childWidth);
-    };
-
     $('.selectize-target').selectize({
       highlight: false,
       onDropdownOpen: function(){
-        fixInputSizing();
-      },
-      onType: function() {
-        fixInputSizing();
+        utils.fixSelectizeInputSizing($('.selectize-target'));
       }
     });
   },
