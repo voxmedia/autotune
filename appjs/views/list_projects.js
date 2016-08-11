@@ -18,7 +18,7 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
     $('.selectize-target').selectize({
       highlight: false,
       onDropdownOpen: function(){
-        utils.fixSelectizeInputSizing($('.selectize-target'));
+        utils.fixSelectizeInputSizing($('.selectize-target'), $('.selectize-dropdown-content'));
       }
     });
   },

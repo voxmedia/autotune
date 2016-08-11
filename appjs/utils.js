@@ -48,9 +48,9 @@ module.exports = {
 
     return ret;
   },
-  fixSelectizeInputSizing: function(targetSelector) {
+  fixSelectizeInputSizing: function(targetSelector, targetDropdown) {
     var childWidth = 0;
-    $.each($('.selectize-dropdown-content').children(), function(k,v){
+    $.each(targetDropdown.children(), function(k,v){
       if ($(this).innerWidth() > childWidth) {
         childWidth = $(this).innerWidth();
       }
