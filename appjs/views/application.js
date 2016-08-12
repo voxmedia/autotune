@@ -15,10 +15,8 @@ require('pnotify/src/pnotify.buttons');
 require('pnotify/src/pnotify.callbacks');
 
 var Application = BaseView.extend(require('./mixins/links.js'), {
-  //className: 'container-fluid',
   template: require('../templates/application.ejs'),
   alertDefaults: {
-    // addclass: "stack-bottomright",
     stack: {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0},
     addclass: "center-top-notification",
     width: '100%',
@@ -129,7 +127,6 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
         hide: false
       });
     }
-
     noti = this.findNotification( message );
 
     return noti || new PNotify(opts);
@@ -150,16 +147,13 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   },
 
   toggleNav: function(event){
-    logger.debug('toggleNav', event);
     if($('#navbar-collapse').hasClass('in')){
-      // $('#navbar-collapse').removeClass('in');
       $('#navbar-collapse').collapse('toggle');
     }
   },
 
   savePreview: function(){
-    // this.currentView.doSubmit();
-    this.$('#projectForm form').submit();
+    this.currentView.doSubmit(this.$('#projectForm form'));
   }
 });
 

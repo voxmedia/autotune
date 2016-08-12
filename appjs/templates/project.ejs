@@ -79,7 +79,7 @@
             <div class="preview-frame">
               <!-- add classes depending on what is new or not -->
               <div id="embed-preview" class=
-              <% if (model.isNew()) { %>
+              <% if (model.isNew() && !model.hasBuildData()) { %>
                 "validation-error"
               <% } else if (!model.hasPreviewType('live') && model.hasStatus('building')) { %>
                 "building"
@@ -190,6 +190,7 @@
         <h4>Share Text</h4>
 
         <textarea id="shareText" class="form-control" rows="6"></textarea>
+        <p class="help-block">You have <span id="tweetChars"></span> characters remaining.</p>
         <p class="help-block">This text will appear when the graphic is shared via twitter or facebook.</p>
           <br />
           <br />

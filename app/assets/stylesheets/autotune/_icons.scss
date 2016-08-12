@@ -1,74 +1,47 @@
 //icons
-.text-right .glyphicon,
-[class^="icon-"] {
-  position: relative;
-  top: 2px;
+.at-icon{
+  background-size: 100%;
+  background-repeat:no-repeat;
+	background-position:center center;
   display: inline-block;
-  font-family: 'Glyphicons Halflings';
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: color(text);
-  font-size: 15px;
+  height: 15px;
+  width: 15px;
   margin: 0 6px;
-  &:not([disabled]):hover {
-    cursor: pointer;
-    color: color(primary);
-    text-decoration: none;
-  }
-  &[disabled] {
-    opacity: 0.5;
-    cursor: default;
-    &:hover {
-      color: color(disabled);
-    }
-    &:hover:before,
-    &:hover:after {
-      content: "";
-    }
-  }
 }
 
-.icon-edit {
-  &:after { content: "\e065"; }
+.alert-icon{
+  background-image: image-url('autotune/icons/alert.svg');
+  #navbar-save-container &, #save-modal &{
+    background-image: image-url('autotune/icons/alert_red.svg');
+  }
 }
-.icon-preview {
-  &:after { content: "\e105"; }
+.delete-icon{
+  background-image: image-url('autotune/icons/delete.svg');
 }
-.icon-delete {
-  &:after { content: "\e020"; }
+.dropdown-icon{
+  background-image: image-url('autotune/icons/dropdown.svg');
 }
-.icon-refresh {
-  &:after { content: "\e031"; }
+.duplicate-icon{
+  background-image: image-url('autotune/icons/duplicate.svg');
 }
- //alert icons
-.icon-ok,
-.icon-alert,
-.icon-info {
-  font-size: 11px;
-  margin: 0 3px 0 0;
+.edit-icon{
+  background-image: image-url('autotune/icons/edit.svg');
 }
-
-.icon-ok, .glyphicon-ok {
-  color: color(positive);
-  // &:after {
-  //   content: "\e013";
-  //   color: color(positive);
-  // }
+.help-icon{
+  background-image: image-url('autotune/icons/help.svg');
 }
-.icon-alert, .glyphicon-warning-sign, .glyphicon-alert {
-  color: color(negative);
-  // &:after {
-  //   content: "\e209";
-  //   color: color(negative);
-  // }
+.info-icon{
+  background-image: image-url('autotune/icons/info.svg');
 }
-.icon-info, .glyphicon-info-sign {
-  color: color(cautionary);
-  // &:after {
-  //   content: "\e086";
-  //   color: color(cautionary);
-  // }
+.ok-icon{
+  background-image: image-url('autotune/icons/ok.svg');
+  #navbar-save-container &{
+    background-image: image-url('autotune/icons/ok_green.svg');
+  }
+}
+.preview-icon{
+  background-image: image-url('autotune/icons/preview.svg');
+}
+.refresh-icon{
+  background-image: image-url('autotune/icons/refresh.svg');
 }
