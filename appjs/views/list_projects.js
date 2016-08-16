@@ -4,6 +4,7 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     models = require('../models'),
+    utils = require('../utils'),
     BaseView = require('./base_view');
 
 module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/form'), {
@@ -11,6 +12,15 @@ module.exports = BaseView.extend(require('./mixins/actions'), require('./mixins/
 
   afterInit: function() {
     this.listenForChanges();
+  },
+
+  afterRender: function() {
+    $('.selectize-target').selectize({
+      highlight: false,
+      onDropdownOpen: function(){
+        utils.fixSelectizeInputSizing($('.selectize-target'), $('.selectize-dropdown-content'));
+      }
+    });
   },
 
   listenForChanges: function() {
