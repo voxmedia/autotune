@@ -16,6 +16,7 @@ module Autotune
         :title => 'new blueprint',
         :repo_url => repo_url)
       assert_equal b.status, 'new'
+      assert_equal b.mode, 'testing'
       assert_equal b.slug, 'new-blueprint'
     end
 

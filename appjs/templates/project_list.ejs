@@ -1,4 +1,4 @@
-<div class="container" style="padding-top: 40px;">
+<div class="container projects">
   <div class="list-page-header">
     <div class="new-button">
       <a id="new-project" class="btn btn-primary"
@@ -8,7 +8,7 @@
       <form class="form-inline" method="get" action="/projects">
         <div class="input-group">
           <input type="text" class="form-control"
-                   name="search" id="search" placeholder="Search"
+                   name="search" id="search" placeholder="Search keywords"
                    <% if(query.search) { %>value="<%=query.search %>"<% } %>>
           <span class="input-group-btn">
             <button class="btn btn-secondary" type="submit">Search</button>
@@ -29,8 +29,8 @@
           </div>
           <% if ( app.themes.length > 1 ) { %>
             <div class="select">
-              <select name="theme" id="theme" class="form-control" data-auto-submit="true">
-                <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
+              <select name="theme" id="theme" class="form-control selectize-target" data-auto-submit="true" placeholder="Theme">
+                <option disabled <% if(!query.theme) { %>selected<% } %>></option>
               <% app.themes.each(function(theme) { %>
                 <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
                       value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>

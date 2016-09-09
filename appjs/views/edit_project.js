@@ -5,6 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     helpers = require('../helpers'),
+    utils = require('../utils'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
     ace = require('brace'),
@@ -500,7 +501,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         }
         if(view.model.hasPreviewType('live')){
           if(view.model.getConfig().spreadsheet_template){
-            $( "input[name='google_doc_url']" ).after('<button type="button" id="spreadsheet-button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>');
+            $( "input[name='google_doc_url']" ).after('<b><a type="button" id="spreadsheet-button" data-hook="create-spreadsheet">Create new empty spreadsheet</a></b>');
           }
         }
         view.getTwitterCount();

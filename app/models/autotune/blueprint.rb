@@ -17,6 +17,7 @@ module Autotune
     validates :title, :repo_url, :presence => true
     validates :repo_url, :uniqueness => { :case_sensitive => false }
     validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
+    validates :mode, :inclusion => { :in => Autotune::BLUEPRINT_MODES }
     after_save :pub_to_redis
 
     default_scope { order('updated_at DESC') }
@@ -26,6 +27,7 @@ module Autotune
     after_initialize do
       self.status ||= 'new'
       self.type ||= 'app'
+      self.mode ||= 'testing'
       self.config ||= {}
     end
 
@@ -59,13 +61,13 @@ module Autotune
     # Checks if the blueprint is ready for use
     # @return [Boolean] `true` if the blueprint is ready, `false` otherwise.
     def ready?
-      status == 'ready'
+      mode == 'ready'
     end
 
     # Checks if the blueprint is in testing state
     # @return [Boolean] `true` if the blueprint status is `testing`, `false` otherwise.
     def testing?
-      status == 'testing'
+      mode == 'testing'
     end
 
     # Checks if the blueprint is installed
@@ -82,10 +84,9 @@ module Autotune
 
     # Queues a job to update the blueprint repo
     def update_repo
-      final_status = ready? ? 'ready' : 'testing'
       update!(:status => 'updating')
       SyncBlueprintJob.perform_later(
-        self, :status => final_status, :update => true, :build_themes => true)
+        self, :update => true, :build_themes => true)
     rescue
       update!(:status => 'broken')
       raise
@@ -94,8 +95,8 @@ module Autotune
     # Rebuild all themeable blueprints. Used when themes are updated
     def self.rebuild_themed_blueprints
       jobs = Blueprint.all
-                      .select(&:themable?)
-                      .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true) }
+             .select(&:themable?)
+             .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true) }
 
       ActiveJob::Chain.new(*jobs).enqueue
     end
