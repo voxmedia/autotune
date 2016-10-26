@@ -292,6 +292,37 @@ module Autotune
       assert_response :forbidden
     end
 
+    test 'create, reslug and delete project' do
+      accept_json!
+      valid_auth_header!
+
+      assert_performed_jobs 3 do
+        post :create, project_data
+      end
+
+      assert_response :created, decoded_response['error']
+      assert_project_data!
+
+      newslug = decoded_response['slug'] + '-updated'
+
+      assert_performed_jobs 4 do
+        put(:update,
+            :id => decoded_response['id'],
+            :slug => newslug)
+      end
+
+      assert_response :success, decoded_response['error']
+      assert_project_data!
+
+      new_p = Project.find decoded_response['id']
+      assert_equal newslug, new_p.slug
+
+      assert_performed_jobs 2 do
+        delete :destroy, :id => decoded_response['id']
+      end
+      assert_response :no_content
+    end
+
     test 'filter projects' do
       accept_json!
       valid_auth_header!
