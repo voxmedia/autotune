@@ -142,10 +142,11 @@ namespace :autotune do
   end
 
   desc 'Reset all themes'
-  task :reset_themes => :environment do
+  task :reset_themes, [:build_blueprints] => :environment do |_, args|
+    build_arg = args[:build_blueprints] == 'true'
     puts 'Resetting all themes'
     Autotune::Theme.all.each_with_index do |t, i|
-      build_bp = i == (Autotune::Theme.count - 1)
+      build_bp = build_arg && (i == (Autotune::Theme.count - 1))
       t.update_data(:build_blueprints => build_bp)
     end
   end
