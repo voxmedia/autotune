@@ -132,6 +132,22 @@ namespace :autotune do
     end
   end
 
+  desc 'Delete google authorizations for all users and force new auths'
+  task :reset_google_credentials, [:email] => [:environment] do |_, args|
+    u = Autotune::User.find_by_email(args[:email])
+    if u.present?
+      a = u.authorizations.find_by_provider('google_oauth2')
+      if a.present?
+        puts "Deleting Google credentials for #{u.name}"
+        a.destroy
+      else
+        puts "User #{u.name} does not have Google credentials"
+      end
+    else
+      puts "Can't find user with email #{args[:email]}"
+    end
+  end
+
   desc 'Send a message to users'
   task :alert_users, [:level, :text, :timeout] => [:environment] do |_, args|
     timeout = args[:timeout].to_i.to_s == args[:timeout] ? args[:timeout].to_i : args[:timeout]
