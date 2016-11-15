@@ -65,6 +65,12 @@ module Autotune
       group.name
     end
 
+    # return parent theme name
+    def default_theme
+      return slug if is_default?
+      parent.slug
+    end
+
     # Check if this is a default theme
     def is_default?
       parent.nil?
@@ -81,7 +87,7 @@ module Autotune
       Hash[Theme.all.map { |theme|
              [
                theme.slug,
-               theme.config_data.merge({:group_slug => theme.group.slug})
+               theme.config_data.merge({:group_slug => theme.group.slug, :group_default_theme => theme.default_theme})
              ]
            }]
     end

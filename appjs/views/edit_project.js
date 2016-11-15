@@ -759,9 +759,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   copyEmbedToClipboard: function() {
-    this.$("#embed textarea").select();
-    document.execCommand('copy');
-    this.app.view.alert('Embed code copied to clipboard!');
+    // select text from
+    this.$( '#embedText' ).select();
+    try {
+      // copy text
+      document.execCommand( 'copy' );
+      this.app.view.alert( 'Embed code copied to clipboard!' );
+    } catch ( err ) {
+      this.app.view.alert( 'Please press Ctrl/Cmd+C to copy the text.' );
+    }
   },
 
   /**
