@@ -1,4 +1,4 @@
-require 'work_dir'
+require 'autoshell'
 
 module Autotune
   # setup the blueprint
@@ -12,8 +12,8 @@ module Autotune
     # do the deed
     def perform(blueprint, update: false, build_themes: false, current_user: nil)
       # Create a new repo object based on the blueprints working dir
-      repo = WorkDir.repo(blueprint.working_dir,
-                          Rails.configuration.autotune.setup_environment)
+      repo = Autoshell.new(blueprint.working_dir,
+                           :env => Rails.configuration.autotune.setup_environment)
 
       if repo.exist?
         repo.branch_from_repo_url(blueprint.repo_url)
@@ -63,8 +63,8 @@ module Autotune
       end
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
-        repo = WorkDir.repo(blueprint.working_dir,
-                            Rails.configuration.autotune.build_environment)
+        repo = Autoshell.new(blueprint.working_dir,
+                             :env => Rails.configuration.autotune.build_environment)
 
         # don't build a copy for each theme every time a project is updated
         if build_themes
@@ -112,11 +112,7 @@ module Autotune
             deployer.before_build(build_data, repo.env, current_user)
 
             # Run the build
-            repo.working_dir do
-              repo.cmd(
-                BLUEPRINT_BUILD_COMMAND,
-                :stdin_data => build_data.to_json)
-            end
+            repo.cd { |s| s.run BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json }
 
             # Upload build
             deployer.deploy(blueprint.full_deploy_dir)

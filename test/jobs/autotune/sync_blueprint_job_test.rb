@@ -41,8 +41,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal 'built', bp.status
     assert_equal 'ready', bp.mode
 
-    repo = WorkDir.repo(bp.working_dir,
-                        Rails.configuration.autotune.build_environment)
+    repo = Autoshell.new(bp.working_dir,
+                         :env => Rails.configuration.autotune.build_environment)
 
     assert_equal NO_SUBMOD, bp.version,
                  'Repo should be checked out to the correct version'
@@ -96,8 +96,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     bp.reload
 
-    repo = WorkDir.repo(bp.working_dir,
-                        Rails.configuration.autotune.build_environment)
+    repo = Autoshell.new(bp.working_dir,
+                         :env => Rails.configuration.autotune.build_environment)
 
     assert_equal TEST_HEAD, repo.version,
                  'Repo should be checked out to the correct version'
@@ -127,8 +127,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     bp.reload
 
-    repo = WorkDir.repo(bp.working_dir,
-                        Rails.configuration.autotune.build_environment)
+    repo = Autoshell.new(bp.working_dir,
+                         :env => Rails.configuration.autotune.build_environment)
 
     assert_equal MASTER_HEAD, repo.version,
                  'Repo should be checked out to the correct version'
@@ -186,8 +186,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     bp.reload
 
-    repo = WorkDir.repo(bp.working_dir,
-                        Rails.configuration.autotune.build_environment)
+    repo = Autoshell.new(bp.working_dir,
+                         :env => Rails.configuration.autotune.build_environment)
 
     assert_equal NO_SUBMOD, bp.version,
                  'Repo should be checked out to the correct version'
@@ -235,8 +235,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp = autotune_blueprints(:example)
     bp.update(:repo_url => "#{bp.repo_url}#live", :version => MASTER_HEAD)
 
-    repo = WorkDir.repo(bp.working_dir,
-                        Rails.configuration.autotune.build_environment)
+    repo = Autoshell.new(bp.working_dir,
+                         :env => Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :build_themes => true
@@ -275,7 +275,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
       skip unless deployer.is_a?(Autotune::Deployers::File)
 
-      wd = WorkDir.new deployer.deploy_path
+      wd = Autoshell.new deployer.deploy_path
 
       assert wd.exist?('index.html'),
              wd
@@ -288,8 +288,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp = autotune_blueprints(:example)
     bp.update(:repo_url => "#{bp.repo_url}", :version => MASTER_HEAD2)
 
-    repo = WorkDir.repo(bp.working_dir,
-                        Rails.configuration.autotune.build_environment)
+    repo = Autoshell.new(bp.working_dir,
+                         :env => Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp
@@ -320,8 +320,8 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp = autotune_blueprints(:example)
     bp.update(:repo_url => "#{bp.repo_url}#live", :version => MASTER_HEAD)
 
-    repo = WorkDir.repo(bp.working_dir,
-                        Rails.configuration.autotune.build_environment)
+    repo = Autoshell.new(bp.working_dir,
+                         :env => Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
       Autotune::SyncBlueprintJob.perform_later bp, :build_themes => true
@@ -359,7 +359,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
       skip unless deployer.is_a?(Autotune::Deployers::File)
 
-      wd = WorkDir.new deployer.deploy_path
+      wd = Autoshell.new deployer.deploy_path
 
       assert wd.exist?('index.html'),
              'Index.html is missing'

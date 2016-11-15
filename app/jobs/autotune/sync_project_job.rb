@@ -1,4 +1,4 @@
-require 'work_dir'
+require 'autoshell'
 
 module Autotune
   # Job that updates the project working dir
@@ -11,17 +11,17 @@ module Autotune
 
     def perform(project, update: false)
       # Create a new repo object based on the blueprints working dir
-      blueprint_dir = WorkDir.repo(
+      blueprint_dir = Autoshell.new(
         project.blueprint.working_dir,
-        Rails.configuration.autotune.setup_environment)
+        :env => Rails.configuration.autotune.setup_environment)
 
       # Make sure the blueprint exists
       raise 'Missing files!' unless blueprint_dir.exist?
 
       # Create a new repo object based on the projects working dir
-      project_dir = WorkDir.repo(
+      project_dir = Autoshell.new(
         project.working_dir,
-        Rails.configuration.autotune.setup_environment)
+        :env => Rails.configuration.autotune.setup_environment)
 
       if project_dir.exist? && update
         # Update the project files. Because of issue #218, due to
