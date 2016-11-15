@@ -305,7 +305,7 @@ module Autotune
 
       newslug = decoded_response['slug'] + '-updated'
 
-      assert_performed_jobs 4 do
+      assert_performed_jobs 5 do
         put(:update,
             :id => decoded_response['id'],
             :slug => newslug)
