@@ -5,6 +5,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models'),
     helpers = require('../helpers'),
+    utils = require('../utils'),
     logger = require('../logger'),
     BaseView = require('./base_view'),
     ace = require('brace'),
@@ -62,11 +63,9 @@ var ProjectSaveModal = Backbone.View.extend({
     renderView: function(template) {
       this.$el.html(template());
       this.$el.modal({show:false}); // dont show modal on instantiation
-      logger.debug('modal', this);
     },
 
     cancel: function(){
-      logger.debug('cancel', this);
       $('.project-save-warning').hide();
       this.trigger('cancel');
       this.teardown();
@@ -97,10 +96,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   events: {
     'change :input': 'stopListeningForChanges',
     'change form': 'pollChange',
+    'keyup #shareText': 'getTwitterCount',
     'keypress': 'pollChange',
     'click #savePreview': 'savePreview',
-    'click #preview .resize': 'resizePreview',
-    'click #saveBtn': 'handleForm'
+    'click .resize': 'resizePreview',
+    'click #saveBtn': 'handleForm',
+    'mousedown #split-bar': 'enableFormResize',
+    'mouseup': 'disableFormResize',
+    'mousemove': 'resizeForm'
   },
 
   afterInit: function(options) {
@@ -120,7 +123,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('load', function() {
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-
+      $('#navbar-save-container').show();
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
         this.listenTo(this.app, 'focus', this.focusPollChange, this);
@@ -130,6 +133,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.on('unload', function() {
       this.stopListening(this.app);
       this.stopListeningForChanges();
+      $('#navbar-save-container').hide();
       if ( this.pym ) { this.pym.remove(); }
     }, this);
   },
@@ -153,6 +157,49 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return ret;
   },
 
+  enableFormResize: function(event){
+    this.enableFormSlide = true;
+  },
+
+  disableFormResize: function(event){
+    if(this.enableFormSlide){
+      $('#embed-preview').removeClass('screen');
+      this.enableFormSlide = false;
+    }
+  },
+
+  resizeForm: function(event){
+    var view = this;
+    if(view.enableFormSlide){
+      if($(window).width() > 768){
+        $('#embed-preview').addClass('screen');
+        if(event.pageX > 320 && $(window).width() - event.pageX > 300){
+          view.formWidth = $(window).width() - event.pageX;
+          $('#form-pane').css("width", view.formWidth);
+          $('#preview-pane').css("width", event.pageX);
+          view.showPreviewButtons();
+        }
+      }
+    }
+  },
+
+  showPreviewButtons: function(){
+    $('.nav-pills button').show();
+    if($('#preview-pane').width() > 700){
+      $('.nav-pills #fluid-view').trigger('click');
+    } else if($('#preview-pane').width() > 400 && $('#preview-pane').width() < 701){
+      $('.nav-pills #fluid-view').trigger('click');
+      $('.nav-pills #medium-view').hide();
+    } else {
+      $('.nav-pills .resize#small-view').trigger('click');
+      $('.nav-pills button').hide();
+      if($(window).width() > 768){
+        $('.nav-pills .resize#small-view').show();
+      }
+    }
+    $('.nav-pills li button').show();
+  },
+
   hasUnsavedChanges: function(){
     var view = this,
         data = view.alpaca.getValue();
@@ -170,15 +217,23 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
+    this.alpaca.childrenByPropertyId["tweet_text"].setValue($('textarea#shareText').val());
+
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
         data = $form.alpaca('get').getValue();
 
+    if(view.postedPreviewData){
+      data = view.postedPreviewData;
+    }
+
     if(this.hasUnsavedChanges()){
       $('.project-save-warning').show().css('display', 'inline-block');
+      $('.project-saved').hide();
     } else {
       $('.project-save-warning').hide();
+      $('.project-saved').show().css('display', 'inline-block');
     }
 
     // Make sure the form is valid before proceeding
@@ -186,69 +241,89 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if ( !this.formValidate(this.model, $form) ) {
       // If the form isn't valid, bail
       return;
-    }
+    } else {
+      if( this.forceUpdateDataFlag ){
+        // Check the flag in case we want to force an update
+        query = '?force_update=true';
+        this.forceUpdateDataFlag = false;
+      } else if ( _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
+        // If data hasn't changed, bail
+        return;
+      }
 
-    if( this.forceUpdateDataFlag ){
-      // Check the flag in case we want to force an update
-      query = '?force_update=true';
-      this.forceUpdateDataFlag = false;
-    } else if ( _.isEqual( this.previousData, data ) && !$('#embed-preview').hasClass('loading') ) {
-      // If data hasn't changed, bail
-      return;
-    }
+      logger.debug('pollchange');
 
-    logger.debug('pollchange');
+      // stash data so we can see if it changed
+      this.previousData = data;
 
-    // stash data so we can see if it changed
-    this.previousData = data;
+      // Now that data is connected and valid, show some sort of loading indicator:
+      if($('#embed-preview.validation-error')){
+        $('#embed-preview').removeClass('validation-error').addClass('loading');
+      }
 
-    // Show some sort of loading indicator:
-    $('#embed-preview').addClass('loading');
+      return $.ajax({
+        type: "POST",
+        url: this.model.url() + "/preview_build_data" + query,
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        dataType: 'json'
+      }).then(function( data ) {
+        logger.debug('Updating live preview...');
+        var iframeLoaded = _.once(function() {
+          view.pym.sendMessage('updateData', JSON.stringify(data));
+          $('#embed-preview').removeClass('loading');
+        });
 
-    return $.ajax({
-      type: "POST",
-      url: this.model.url() + "/preview_build_data" + query,
-      data: JSON.stringify(data),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).then(function( data ) {
-      logger.debug('Updating live preview...');
-      var iframeLoaded = _.once(function() {
-        view.pym.sendMessage('updateData', JSON.stringify(data));
-        $('#embed-preview').removeClass('loading');
-      });
+        if(data.theme !== view.theme || !view.pym){
+          if(typeof data.theme !== 'undefined'){
+            view.theme = data.theme;
+            view.getTwitterCount();
+          }
+          var version = view.model.getVersion(),
+            previewSlug = view.model.isThemeable() ?
+                version :[version, view.theme].join('-'),
+            previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
-      if(data.theme !== view.theme){
-        if(typeof data.theme !== 'undefined'){
-          view.theme = data.theme;
+          if ( view.pym ) { view.pym.remove(); }
+          view.pym = new pym.Parent('embed-preview', previewUrl);
+          view.pym.iframe.onload = iframeLoaded;
+
+          // In case some dumb script hangs the loading process
+          setTimeout(iframeLoaded, 20000);
+        } else {
+          iframeLoaded();
         }
-        var version = view.model.getVersion(),
-          previewSlug = view.model.isThemeable() ?
-              version :[version, view.theme].join('-'),
-          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
-
-        if ( view.pym ) { view.pym.remove(); }
-
-        $('#embed-preview').empty();
-        view.pym = new pym.Parent('embed-preview', previewUrl);
-        view.pym.iframe.onload = iframeLoaded;
-
-        // In case some dumb script hangs the loading process
-        setTimeout(iframeLoaded, 20000);
-      } else {
-        iframeLoaded();
-      }
-    }, function(err) {
-      if ( err.status < 500 ) {
-        view.app.view.error(
-          "Can't update live preview (" +err.responseJSON.error+").", 'permanent');
-      } else {
-        view.app.view.error(
-          "Could not update live preview, please contact support.", 'permanent' );
-        logger.error(err);
-      }
-    });
+      }, function(err) {
+        if ( err.status < 500 ) {
+          view.app.view.error(
+            "Can't update live preview (" +err.responseJSON.error+").", 'permanent');
+        } else {
+          view.app.view.error(
+            "Could not update live preview, please contact support.", 'permanent' );
+          logger.error(err);
+        }
+      });
+    }
   }, 500),
+
+  getTwitterCount: function(){
+    var view = this;
+    var getTwitterHandleLength = function(slug){
+     return view.twitterHandles[slug] ? view.twitterHandles[slug].length : 0;
+    };
+
+    if ( view.model.hasBuildData() ) {
+      var maxLen = 140 - ( 26 + getTwitterHandleLength(view.theme)),
+          currentVal = maxLen - $('textarea#shareText').val().length;
+
+      $('#tweetChars').html(currentVal);
+      if(currentVal < 1){
+        $('#tweetChars').addClass('text-danger');
+      } else {
+        $('#tweetChars').removeClass('text-danger');
+      }
+    }
+  },
 
   savePreview: function(){
     this.$('#projectForm form').submit();
@@ -326,6 +401,21 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   afterRender: function() {
     var view = this, promises = [];
 
+    view.enableFormSlide = false;
+    view.showPreviewButtons();
+    $(window).resize(function(){
+      view.showPreviewButtons();
+      if(view.formWidth){
+        if($(window).width() > 768){
+          $('#form-pane').css("width", view.formWidth);
+          $('#preview-pane').css("width", $(window).width() - view.formWidth);
+        } else {
+          $('#form-pane').css("width", '100%');
+          $('#preview-pane').css("width", '100%');
+        }
+      }
+    });
+
     // autoselect embed code on focus
     this.$("#embed textarea").focus( function() { $(this).select(); } );
 
@@ -364,6 +454,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             previewUrl = '', iframeLoaded,
             previewSlug = '';
 
+        view.$('#shareText').val(formData['tweet_text']);
         view.formDataOnLoad = formData;
 
         // Callback for when iframe loads
@@ -387,9 +478,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             [view.model.getVersion(), view.theme].join('-');
           previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
 
-          if ( !view.copyProject && !view.model.hasInitialBuild() ){
-            previewUrl = previewUrl + '#new';
-          }
         } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
           // if the project is a graphic and has been built (but doesn't have live enabled)
           var previousPreviewUrl = view.model['_previousAttributes']['preview_url'];
@@ -404,16 +492,19 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
           // Setup our iframe with pym
           if ( view.pym ) { view.pym.remove(); }
-          view.pym = new pym.Parent('embed-preview', previewUrl);
-          view.pym.iframe.onload = iframeLoaded;
-
+          if ( view.formValidate(view.model, view.$('#projectForm')) ){
+            view.pym = new pym.Parent('embed-preview', previewUrl);
+            view.pym.iframe.onload = iframeLoaded;
+          }
           // In case some dumb script hangs the loading process
           setTimeout(iframeLoaded, 20000);
-
-          if ( view.togglePreview ){
-            $( "#draft-preview" ).trigger( "click" );
+        }
+        if(view.model.hasPreviewType('live')){
+          if(view.model.getConfig().spreadsheet_template){
+            $( "input[name='google_doc_url']" ).after('<b><a type="button" id="spreadsheet-button" data-hook="create-spreadsheet">Create new empty spreadsheet</a></b>');
           }
         }
+        view.getTwitterCount();
       }).catch(function(err) {
         console.error(err);
       }).then(function() {
@@ -434,9 +525,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
   renderForm: function(resolve, reject) {
     var $form = this.$('#projectForm'),
-        button_tmpl = require('../templates/project_buttons.ejs'),
         view = this,
-        form_config, availableThemes, twitterHandles, newProject, populateForm = false;
+        form_config, availableThemes, newProject, populateForm = false;
 
     if ( this.disableForm ) {
       $form.append(
@@ -466,7 +556,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         return _.contains(this.model.getConfig().themes, t.get('slug'));
       }, this)) : this.app.themes.models;
     availableThemes = availableThemes || this.app.themes.where({slug : 'generic'});
-    twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
+    this.twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
 
     if(_.isUndefined(form_config)) {
       this.app.view.error('This blueprint does not have a form!');
@@ -535,7 +625,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           "label": "Social share text",
           "constrainMaxLength": true,
           "constrainMinLength": true,
-          "showMaxLengthIndicator": true
+          "showMaxLengthIndicator": true,
+          "fieldClass": "hidden"
         }
       };
 
@@ -551,12 +642,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         options_fields['slug']['fieldClass'] = 'hidden';
       }
 
-      if(this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template){
-        var googleText = form_config.schema.properties.google_doc_url.title;
-        var newText = googleText + '<br><button type="button" data-hook="create-spreadsheet" class="btn btn-default">Get new spreadsheet</button>';
-        form_config.schema.properties.google_doc_url.title = newText;
-      }
-
       _.extend(schema_properties, form_config.schema.properties || {});
       if( form_config.options ) {
         _.extend(options_form, form_config.options.form || {});
@@ -565,7 +650,13 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       var opts = {
         "schema": {
-          "title": this.model.blueprint.get('title'),
+          "title": function(){
+            if(view.model.hasPreviewType('live')){
+              return '';
+            } else {
+              return view.model.blueprint.get('title');
+            }
+          },
           "description": this.model.getConfig().description,
           "type": "object",
           "properties": schema_properties
@@ -578,32 +669,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         "postRender": function(control) {
           view.alpaca = control;
 
-          var theme = control.childrenByPropertyId["theme"],
-             social = control.childrenByPropertyId["tweet_text"];
-
-          var getTwitterHandleLength = function(slug){
-           return twitterHandles[slug] ? twitterHandles[slug].length : 0;
-          };
-
-          if ( social && isVisible(social) ) {
-            social.schema.maxLength = 140 - ( 26 + getTwitterHandleLength(theme.getValue()));
-            social.updateMaxLengthIndicator();
-
-            if ( theme && isVisible(theme) ) {
-              $(theme.domEl).on('change', function(){
-                theme = control.childrenByPropertyId["theme"];
-                social.schema.maxLength = 140 -
-                        ( 26 + getTwitterHandleLength(theme.getValue()) );
-                social.updateMaxLengthIndicator();
-              });
-            }
-          }
-
           view.alpaca.childrenByPropertyId["slug"].setValue(
             view.model.get('slug_sans_theme') );
-
-          control.form.form.append(
-            helpers.render(button_tmpl, view.templateData()) );
 
           resolve();
         }
@@ -692,9 +759,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   copyEmbedToClipboard: function() {
-    this.$("#embed textarea").select();
-    document.execCommand('copy');
-    this.app.view.alert('Embed code copied to clipboard!');
+    // select text from
+    this.$( '#embedText' ).select();
+    try {
+      // copy text
+      document.execCommand( 'copy' );
+      this.app.view.alert( 'Embed code copied to clipboard!' );
+    } catch ( err ) {
+      this.app.view.alert( 'Please press Ctrl/Cmd+C to copy the text.' );
+    }
   },
 
   /**

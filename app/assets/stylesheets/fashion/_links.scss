@@ -1,0 +1,9 @@
+a {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+  &:focus {
+    outline: none;
+    background-color: rgba(color(primary), .2);
+  }
+}

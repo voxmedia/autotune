@@ -1,0 +1,41 @@
+//tables
+caption {
+  margin-bottom:5px;
+}
+
+th { font-weight: normal; }
+
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > thead > tr {
+  color: color(text);
+  background-color: color(background);
+}
+
+.table > thead > tr > th { border-width:0; }
+.table > tbody > tr:first-child {
+  td,
+  th { border-width:0; }
+}
+.table > thead > tr > th {
+  background-color: color(accent);
+  padding-top: $table-condensed-cell-padding;
+  padding-bottom: $table-condensed-cell-padding;
+}
+
+.table {
+  > thead > tr > th,
+  > thead > tr > td,
+  > tbody > tr > th,
+  > tbody > tr > td,
+  > tfoot > tr > th,
+  > tfoot > tr > td {
+    padding: 10px 10px;
+  }
+}
+
+.table-striped{
+  border-width:0;
+}

@@ -1,0 +1,269 @@
+form {
+  display: table;
+  width: 100%;
+}
+
+label,
+.label {
+  font-weight: 400;
+  // color: color(actionable);
+  + label {
+    margin-top: 1rem;
+  }
+  .is-horizontal & {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  &.is-small {
+    font-size: type(-2);
+  }
+}
+
+[type='search'],
+[type='text'],
+[type='email'],
+[type='password'],
+textarea,
+textarea.form-control,
+select,
+select.form-control,
+.selectize-input {
+  background-color: color(background);
+  color: color(text);
+  border: 2px solid color(border);
+  outline: 0;
+  padding: .5em;
+  display: block;
+  width: 100%;
+  // max-width:250px;
+  // float: right;
+  font-size: type(-1);
+  .p-ui-dark & {
+    border-color: color(border, dark);
+  }
+  &:focus, &:hover {
+    border-color: color(primary);
+  }
+}
+
+.form-control:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+form.form-inline{
+  vertical-align: middle;
+  div, div.form-group{
+    margin-left: 10px;
+    vertical-align: middle;
+    &:last-child{
+      margin-right: 0px;
+    }
+  }
+  .btn{
+    padding: 8px 15px;
+    margin-top: 0;
+  }
+}
+
+.input-group .input-group-btn button, .input-group .input-group-btn button:hover{
+  border-width: 2px;
+  padding: 7px 15px;
+}
+
+.input-group-btn [type="button"], .input-group-btn [type="submit"]{
+  border: 1px solid color(secondary);
+  &:last-child{
+    margin-left: -2px;
+  }
+
+}
+
+.input-group-addon{
+  border: 2px solid color(border);
+}
+
+.input-group-lg > .input-group-addon,
+.input-group-sm > .input-group-addon{
+  line-height: 1;
+}
+
+input[type='checkbox'],
+input[type='radio'],
+.input-group .input-group-addon input[type='checkbox'],
+.input-group .input-group-addon input[type='radio']{
+  position: absolute;
+  left: -999px;
+  width: 1px;
+  height: 1px;
+  top: auto;
+  overflow: hidden;
+  + b {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin: 0 1em -.15em 0;
+    border-radius: $border-radius;
+    border: 2px solid color(border);
+    cursor: pointer;
+    background-color: color(background);
+    label:hover &,
+    &:hover {
+      border-color: color(primary);
+    }
+  }
+  &:checked + b {
+    background: color(primary);
+    box-shadow: inset 0 0 0 2px color(background);
+  }
+  &:disabled + b {
+    background-color: color(border);
+    border: none;
+    cursor: default;
+  }
+  &:focus + b {
+    border-color: color(primary);
+  }
+  .p-ui-dark & {
+    + b {
+      border: 2px solid color(border, dark);
+    }
+    &:checked + b {
+      background: color(primary);
+      box-shadow: inset 0 0 0 2px color(background, dark);
+    }
+    &:disabled + b {
+      background-color: color(border, dark);
+      border: none;
+    }
+  }
+}
+
+input[type='radio'],
+.input-group .input-group-addon input[type='radio'] {
+  + b {
+    border-radius: 50%;
+  }
+}
+
+.radio-inline, .checkbox-inline{
+  display: inline;
+}
+
+//broken radio button fixes
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  margin-left: -25px;
+}
+input[type="radio"],
+input[type="checkbox"] {
+  margin: -10px 10px 0;
+}
+
+
+option {
+  font-weight: 400;
+  color: black;
+}
+
+label {
+  display: table;
+  width: 100%;
+}
+
+button,
+[type="submit"],
+[type="button"],
+a {
+  cursor: pointer;
+  // border: none;
+  // color: color(actionable);
+  display: inline-block;
+  text-align: left;
+
+  &.is-small {
+    font-size: type(-1);
+  }
+
+  &:hover, &:focus {
+    color: darken(color(actionable), 20%);
+  }
+
+  &:focus {
+    background-color: rgba(color(primary), .2);
+  }
+
+  &:active,
+  &.is-active,
+  &.ql-active {
+    color: color(primary);
+  }
+
+  .p-ui-dark & {
+    color: color(actionable, dark);
+    &:hover,
+    &:active,
+    &.is-active {
+      color: lighten(color(actionable, dark), 20%)
+    }
+  }
+
+  &.btn-default,
+  &.btn-default.active,
+  &.btn-primary,
+  &.btn-success,
+  &.btn-secondary,
+  &.btn-danger,
+  &.btn-info,
+  &.btn-warning,
+  &.btn-disabled {
+    box-sizing: border-box;
+  }
+
+  @each $type, $color in (
+      default    color(default),
+      primary    color(primary),
+      success   color(positive),
+      secondary  color(secondary),
+      danger   color(negative),
+      info color(cautionary),
+      warning color(cautionary),
+      disabled color(disabled),
+      link color(link)) {
+    &.btn-#{$type} {
+      background-color: $color;
+      border-color: $color;
+      &:hover, &:focus, &:active, &.active {
+        background: darken($color, 10%);
+        border-color: darken($color, 10%);
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        outline: 0;
+      }
+      &:active, &.active{
+        background: darken($color, 15%);
+        border-color: darken($color, 15%);
+      }
+    }
+  }
+
+  &.btn-disabled,
+  &[disabled] {
+    // background-color: color(disabled);
+    opacity: .5;
+    cursor: default;
+    &:hover {
+      // background-color: color(disabled);
+    }
+  }
+}
+
+.radio label, .checkbox label{
+  padding-left: 0px;
+}

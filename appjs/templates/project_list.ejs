@@ -1,146 +1,218 @@
-<div class="row m-page-heading">
-  <div class="col-xs-12 col-sm-6">
-    <h3>Projects</h3>
-  </div>
-  <div class="col-xs-12 col-sm-6 text-right">
-    
-  </div>
-</div>
-<table class="table projects">
-  <thead>
-    <tr>
-      <td>
-        <a id="new-project" class="btn btn-primary btn-xs"
-       href="/projects/new">New project</a>
-      </td>
-      <td class="text-right" colspan="5">
-        <form class="form-inline" method="get" action="/projects">
-          <div class="form-group">
-          Filters
-          &nbsp;
-          <% if ( app.themes.length > 1 ) { %>
-          <div class="select">
-            <select name="theme" id="theme" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.theme) { %>selected<% } %>>Theme</option>
-            <% app.themes.each(function(theme) { %>
-              <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
-                    value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>
-            <% }) %>
-            </select>
-          </div>
+<div class="container projects">
+  <div class="list-page-header">
+    <div class="new-button">
+      <a id="new-project" class="btn btn-primary"
+         href="/projects/new">New project</a>
+    </div>
+    <div class="text-right">
+      <form class="form-inline" method="get" action="/projects">
+        <div class="input-group">
+          <input type="text" class="form-control"
+                   name="search" id="search" placeholder="Search keywords"
+                   <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          <span class="input-group-btn">
+            <button class="btn btn-secondary" type="submit">Search</button>
+          </span>
+        </div>
+        <div id="break-filter">Filters
+          <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
+            (<a href="/projects">clear</a>)
           <% } %>
-          <div class="select">
-            <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.blueprint_title) { %>selected<% } %>>Blueprint</option>
-            <% _.each(app.config.blueprint_titles, function(blueprint_title) { %>
-              <option <% if(String(blueprint_title.id) === query.blueprint_title) { %>selected<% } %>
-                    value="<%=blueprint_title.id %>"><%=blueprint_title.title %></option>
-            <% }) %>
-            </select>
-          </div>
-          </div>
-          <div class="select">
-            <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.pub_status) { %>selected<% } %>>Status</option>
-            <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
-              <option <% if(pub_status === query.pub_status) { %>selected<% } %>
-                    value="<%=pub_status %>"><%=pub_status %></option>
-            <% }) %>
-            </select>
-          </div>
-            <label class="sr-only" for="search">Search query</label>
-            <div class="btn-group">
-              <input type="text" class="form-control"
-                     name="search" id="search" placeholder="Search"
-                     <% if(query.search) { %>value="<%=query.search %>"<% } %>>
-            <% if(query.search || query.theme || query.blueprint_title || query.pub_status) { %>
-              <a href="/projects">clear</a>
+          &nbsp;
+        </div>
+        <div class="filters">
+          <div id='inline-filter'>Filters
+            <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
+              (<a href="/projects">clear</a>)
             <% } %>
-            </div>
+            &nbsp;
           </div>
-        </form>
+          <% if ( app.themes.length > 1 ) { %>
+            <div class="select">
+              <select name="theme" id="theme" class="form-control selectize-target" data-auto-submit="true" placeholder="Theme">
+                <option disabled <% if(!query.theme) { %>selected<% } %>></option>
+              <% app.themes.each(function(theme) { %>
+                <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
+                      value="<%=theme.get('slug') %>"><%=theme.get('title') %></option>
+              <% }) %>
+              </select>
+            </div>
+            <% } %>
+            <div class="select">
+              <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">
+                <option disabled <% if(!query.blueprint_title) { %>selected<% } %>>Blueprint</option>
+              <% _.each(app.config.blueprint_titles, function(blueprint_title) { %>
+                <option <% if(String(blueprint_title.id) === query.blueprint_title) { %>selected<% } %>
+                      value="<%=blueprint_title.id %>"><%=blueprint_title.title %></option>
+              <% }) %>
+              </select>
+            </div>
+            <div class="select">
+              <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
+                <option disabled <% if(!query.pub_status) { %>selected<% } %>>Status</option>
+              <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
+                <option <% if(pub_status === query.pub_status) { %>selected<% } %>
+                      value="<%=pub_status %>"><%=pub_status %></option>
+              <% }) %>
+              </select>
+            </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <table class="table collection project-list">
+    <tbody>
+    <tr class="m-table-heading">
+      <td class="project-cell">Project</td>
+      <td class="author-cell">Author</td>
+      <td class="status-cell">Status</td>
+      <td class="publish-cell">Published</td>
+      <td class="theme-cell">Theme</td>
+      <td class="blueprint-cell">Blueprint</td>
+      <td class="bold-actions-cell">Actions</td>
+    </tr>
+    <% if(!hasObjects()) { %>
+    <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>
+    <% }
+     _.each(getObjects(), function(item) { %>
+     <tr>
+      <td class="project-cell">
+        <a class="title" href="<%=item.url() %>"><%= item.get('title') %></a></td>
+      <td class="author-cell">
+        <span class="small-list-view">Created by </span>
+        <%=item.get('created_by') %>
+      </td>
+      <td class="status-cell">
+        <% if ( item.hasStatus('built') ) { %>
+          <span class="label label-success"><%=item.get('status') %></span>
+        <% } else if ( item.hasStatus('broken') ) { %>
+          <span class="label label-danger"><%=item.get('status') %></span>
+        <% } else if ( item.hasStatus('building') ) { %>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%><%=item.get('status') %></span>
+        <% } else if ( item.hasStatus('updated') )  { %>
+          <span class="label label-info">Updated</span>
+        <% } else { %>
+          <span class="label label-info"><%=item.get('status') %></span>
+        <% } %>
+      </td>
+      <td class="publish-cell">
+        <% if ( item.hasUnpublishedUpdates() || item.isPublished() ) { %>
+          Published
+        <% } else { %>
+          Draft
+        <% } %>
+        <% if ( item.get('published_at') ) { %><div class="pub-time"><%=item.publishedTime() %></div><% } %>
+        <span style="margin-left: 5px;" class="small-list-view">
+          <% if ( item.hasStatus('built') ) { %>
+            <span class="label label-success">Built</span>
+          <% } else if ( item.hasStatus('broken') ) { %>
+            <span class="label label-danger">Broken</span>
+          <% } else if ( item.hasStatus('building') ) { %>
+            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Building</span>
+          <% } else { %>
+            <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
+          <% } %>
+        </span>
+      </td>
+      <td class="theme-cell">
+        <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
+        <%=app.themes.findWhere({slug: item.get('theme')}).get('title') %>
+        <% } else { %>
+        <em class="text-muted"><%=item.get('theme') %></em>
+        <% } %>
+      </td>
+      <td class="blueprint-cell"><%=item.get('blueprint_title') %></td>
+      <td class="bold-actions-cell text-right">
+
+        <a data-tooltip="edit" href="<%=item.url() %>/edit">
+          <span class="at-icon edit-icon"></span>
+        </a>
+        <a data-tooltip="Duplicate"
+           data-action-message="Project Copied"
+           data-model="Project" data-action-next="reload"
+              href="/projects/<%=item.get('slug') %>/duplicate">
+            <span class="at-icon duplicate-icon"></span>
+        </a>
+        <a data-tooltip="delete"
+           data-action-message="Project deleted"
+           data-action-confirm="Are you sure you wish to delete this?"
+           data-action="destroy" data-model="Project" data-action-next="reload"
+           data-model-id="<%= item.get('slug') %>">
+          <span class="at-icon delete-icon"></span>
+        </a>
       </td>
     </tr>
-  </thead>
-  <tbody>
+  <% }); %>
+    </tbody>
+  </table>
+  <nav>
+    <ul class="pagination">
+      <% if(collection.state.currentPage !== collection.state.firstPage){ %>
+        <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
+      <% } %>
 
-  <tr class="m-table-heading">
-    <td>Project</td>
-    <td>Author</td>
-    <td>Status</td>
-    <td>Theme</td>
-    <td>Blueprint</td>
-    <td class="text-right">Bold Actions</td>
-  </tr>
-  <% if(!hasObjects()) { %>
-  <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>
-  <% }
-   _.each(getObjects(), function(item) { %>
-   <tr>
-    <td <% if ( item.hasStatus('built') ) { %>
-      class="ok-notice"
-      <% } else if ( item.hasStatus('broken') ) { %>
-      class="alert-notice"
-      <% } else { %>
-      class="info-notice"
-      <% } %>>
-      <% if ( item.hasStatus('built') ) { %>
-        <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
-      <% } else if ( item.hasStatus('broken') ) { %>
-        <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
-      <% } else if ( item.hasStatus('building') ) { %>
-        <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
-      <% } else { %>
-        <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
-      <% } %>
-      <a href="<%=item.url() %>"><%= item.get('title') %></a></td>
-    <td><%=item.get('created_by') %></td>
-    <td>
-      <% if ( item.hasUnpublishedUpdates() ) { %>
-        <span class="text-success">Published</span>
-      <% } else if ( item.isPublished() ) { %>
-        <span class="text-success">Published</span>
-      <% } else if ( item.hasStatus('broken') ) { %>
-        <span class="text-danger">Broken</span>
-      <% } else { %>
-        <span class="text-warning">Draft</span>
-      <% } %>
-      <% if ( item.get('published_at') ) { %><br><%=item.publishedTime() %><% } %>
-    </td>
-    <td>
-      <% if ( app.themes.findWhere({slug: item.get('theme')}) ) { %>
-      <%=app.themes.findWhere({slug: item.get('theme')}).get('title') %>
-      <% } else { %>
-      <em class="text-muted"><%=item.get('theme') %></em>
-      <% } %>
-    </td>
-    <td><%=item.get('blueprint_title') %></td>
-    <td class="text-right">
+      <ul class="pagination">
 
-      <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
-    <% if ( !item.hasStatus( 'built' ) ) { %>
-      <span class="icon-preview" disabled></span>
-    <% } else if ( item.published ) { %>
-      <a data-tooltip="preview" target="_blank"
-         href="<%=item.getPublishUrl('http') %>"><span class="icon-preview"></span></a>
-    <% } else { %>
-      <a data-tooltip="preview"
-         href="<%=item.url() %>/edit?togglePreview=true"><span class="icon-preview"></span></a>
-    <% } %>
-      <a data-tooltip="delete"
-         data-action-message="Project deleted"
-         data-action-confirm="Are you sure you wish to delete this?"
-         data-action="destroy" data-model="Project" data-action-next="reload"
-         data-model-id="<%= item.get('slug') %>"><span class="icon-delete"></span></a>
-    </td>
-  </tr>
-<% }); %>
-  </tbody>
-</table>
-<nav>
-  <ul class="pager">
-    <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
-    <li>Page <%=collection.state.currentPage %></li>
-    <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
-  </ul>
-</nav>
+        <% if(collection.state.currentPage - 1 >= collection.state.firstPage){ %>
+          <li class=""><a href="<%=getPageUrl(collection.state.firstPage)%>"><%=collection.state.firstPage %><span class="sr-only"></span></a></li>
+        <% } %>
+        <% if(collection.state.currentPage - 3 > collection.state.firstPage){ %>
+          <li class="ellipses"><span>...</span></li>
+        <% } %>
+
+        <% if(collection.state.currentPage === collection.state.firstPage){ %>
+
+          <% var i = 1; %>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+          <% while(collection.state.firstPage + i <= collection.state.totalPages && i < 6) { %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% i++; %>
+          <% } %>
+
+        <% } else if(collection.state.currentPage === collection.state.lastPage){ %>
+
+          <% var i = -5; %>
+          <% while(i < 0) { %>
+            <% if(collection.state.lastPage + i > collection.state.firstPage){ %>
+              <li class=""><a href="<%=getPageUrl(collection.state.lastPage + i)%>"><%=collection.state.lastPage + i %><span class="sr-only"></span></a></li>
+            <% } %>
+            <% i++; %>
+          <% } %>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+
+        <% } else { %>
+
+          <% var i = -2; %>
+          <% while(i < 0) { %>
+            <% if(collection.state.currentPage + i > collection.state.firstPage){ %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% } %>
+            <% i++; %>
+          <% } %>
+
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+
+          <% var i = 1; %>
+          <% while(collection.state.currentPage + i <= collection.state.lastPage && i < 3) { %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% i++; %>
+          <% } %>
+
+        <% } %>
+
+
+        <% if(collection.state.lastPage - collection.state.currentPage > 2){ %>
+          <% if(collection.state.lastPage - collection.state.currentPage > 3){ %>
+          <li class="ellipses"><span>...</span></li>
+          <% } %>
+          <li class=""><a href="<%=getPageUrl(collection.state.lastPage)%>"><%=collection.state.lastPage %><span class="sr-only"></span></a></li>
+        <% } %>
+
+      </ul>
+
+      <% if(collection.state.currentPage !== collection.state.lastPage){ %>
+        <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
+      <% } %>
+    </ul>
+  </nav>
+</div>

@@ -1,0 +1,16 @@
+::-webkit-scrollbar {
+  background-color: color(accent);
+  width: 4px;
+  height: 4px;
+  .p-ui-dark & {
+    background-color: color(accent, dark);
+  }
+  .m-oembed-modal__preview & {
+    width: 0;
+    height: 0;
+  }
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color(primary);
+}

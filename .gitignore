@@ -44,3 +44,5 @@ Gemfile.lock
 .rvmrc
 
 *.log*
+
+.DS_Store

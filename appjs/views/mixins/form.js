@@ -73,21 +73,31 @@ module.exports = {
 
         return inst.save();
       }).then(function() {
-        logger.debug('form finished saving');
-
         if ( action === 'new' ) {
           app.view.success('New '+model_class+' saved');
         } else {
-          app.view.success(model_class+' updates saved');
+          if(!app.view.findNotification('Publishing...')){
+            if(model_class === 'Project'){
+              if(view.model.hasUnpublishedUpdates()){
+                app.view.info(model_class+' updates saved but not published');
+              } else {
+                app.view.success(model_class+' updates saved');
+              }
+            } else {
+              app.view.success(model_class+' updates saved');
+            }
+          }
         }
 
         return view.hook('afterSubmit');
       }).then(function() {
         logger.debug('next: '+next);
         if ( next === 'show' && action === 'new' ) {
-          var updatedFormData = view.alpaca.getValue();
-          delete updatedFormData['slug'];
-          view.formDataOnLoad = updatedFormData;
+          if(model_class === 'Project'){
+            var updatedFormData = view.alpaca.getValue();
+            delete updatedFormData['slug'];
+            view.formDataOnLoad = updatedFormData;
+          }
           app.router.navigate(inst.url(), {trigger: true});
         } else if ( next === 'show' ) {
           view.render();

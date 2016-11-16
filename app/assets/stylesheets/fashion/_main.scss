@@ -1,0 +1,56 @@
+
+.body-default {
+  background: $navbar-default-bg;
+}
+.body-inverse {
+  background: $navbar-inverse-bg;
+}
+
+main {
+  padding: 25px 0;
+  background: #fff;
+}
+
+.column {
+  margin-bottom: 25px;
+}
+
+.alert .alert-link{
+  color: $alert-success-text;
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+.label{
+  padding: .1em .5em;
+  font-size: 100%;
+  text-transform: capitalize;
+  @each $type, $color in (
+      default    color(default),
+      primary    color(primary),
+      success   color(positive),
+      secondary  color(secondary),
+      danger   color(negative),
+      info color(cautionary),
+      warning color(cautionary),
+      disabled color(disabled),
+      link color(link)) {
+    &.label-#{$type} {
+      background-color: $color;
+      // color: color(background);
+    }
+  }
+  @each $type, $color in (
+      default    $secondary-text-color,
+      primary    $primary-text-color,
+      success    $positive-text-color,
+      secondary  $secondary-text-color,
+      danger     $negative-text-color,
+      info       $cautionary-text-color,
+      warning    $cautionary-text-color,
+      disabled   $secondary-text-color) {
+    &.label-#{$type} {
+      color: $color;
+    }
+  }
+}

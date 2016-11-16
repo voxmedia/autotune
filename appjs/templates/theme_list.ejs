@@ -1,38 +1,44 @@
-<div class="row m-page-heading">
-  <div class="col-xs-12 col-sm-6">
-    <h3>Manage themes</h3>
+<div class="container">
+  <div class="row m-page-heading">
+    <div class="col-xs-12 col-sm-6">
+      <h3>Manage themes</h3>
+    </div>
+    <div class="col-xs-12 col-sm-6 text-right">
+    </div>
   </div>
-  <div class="col-xs-12 col-sm-6 text-right">
-    <form class="form-inline" method="get" action="/themes">
-      <div class="form-group">
-        <label class="sr-only" for="search">Search query</label>
-        <div class="btn-group">
+  <div class="list-page-header">
+
+    <div class="new-button">
+      <a class="btn btn-primary" href="/themes/new">New theme</a>
+    </div>
+    <div class="text-right">
+      <form class="form-inline" method="get" action="/themes">
+        <div class="input-group">
           <input type="text" class="form-control"
                  name="search" id="search" placeholder="Search"
                  <% if(query.search) { %>value="<%=query.search %>"<% } %>>
+          <span class="input-group-btn">
+            <button class="btn btn-secondary" type="submit">Search</button>
+          </span>
+        </div>
         <% if(query.search) { %>
           <a href="/themes">clear</a>
         <% } %>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="col-xs-12 col-sm-6 text-right">
-  </div>
-</div>
-<table class="table themes">
-  <thead>
-    <tr>
-      <td>
-        <a class="btn btn-primary btn-xs" href="/themes/new">New theme</a>
-      </td>
-      <td class="text-right" colspan="3">
-        <form class="form-inline" method="get" action="/themes">
+        <div id='break-filter'>
           Filters
           <% if(query.status || query.group) { %>
             (<a href="/themes">clear</a>)
           <% } %>
           &nbsp;
+        </div>
+        <div class="filters">
+          <div id='inline-filter'>
+            Filters
+            <% if(query.status || query.group) { %>
+              (<a href="/themes">clear</a>)
+            <% } %>
+            &nbsp;
+          </div>
           <% if ( app.designerGroups.length > 1 ) { %>
           <div class="select">
             <select name="group" id="group" class="form-control" data-auto-submit="true">
@@ -53,59 +59,135 @@
             <% }) %>
             </select>
           </div>
-        </form>
+        </div>
+      </form>
+    </div>
+  </div>
+  <table class="table themes collection">
+    <thead>
+      <tr>
+        <!-- <td>
+          <a class="btn btn-primary" href="/themes/new">New theme</a>
+        </td> -->
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="m-table-heading">
+        <td>Theme</td>
+        <td>Group</td>
+        <td>Status</td>
+        <td style="text-align: right;">Actions</td>
+      </tr>
+    <% if(getObjects().length == 0) { %>
+        <td class="text-center" colspan="4"><h4>No themes found</h4></td>
+    <% }
+    _.each(getObjects(), function(item) { %>
+    <tr>
+      <td <% if(item.get('status') == 'ready') { %>
+        class="ok-notice"
+        <% } else if(item.get('status') == 'broken') { %>
+        class="alert-notice"
+        <% } else { %>
+        class="info-notice"
+        <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
+      <td class="group-cell">
+        <%= item.attributes.group_name %>
+      </td>
+      <td>
+        <% if(item.get('status') == 'ready') { %>
+          <span class="label label-success"><%=item.get('status') %></span>
+        <% } else if(item.get('status') == 'broken') { %>
+          <span class="label label-danger"><%=item.get('status') %></span>
+        <% } else if(item.hasStatus('updating')) { %>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Upgrading</span>
+        <% } else { %>
+          <span class="label label-info"><%=item.get('status') %></span>
+        <% } %>
+      </td>
+      <td class="text-right" colspan="2">
+        <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="at-icon edit-icon"></span></a>
+        <a data-tooltip="delete" href="#"
+           data-action-message="Theme deleted"
+           data-action-confirm="Are you sure you wish to delete this?"
+           data-action="destroy" data-model="Theme" data-action-next="reload"
+           data-model-id="<%= item.attributes.slug %>"><span class="at-icon delete-icon"></span></a>
       </td>
     </tr>
-  </thead>
-  <tbody>
-    <tr class="m-table-heading">
-      <td>Theme</td>
-      <td>Group</td>
-      <td>Status</td>
-      <td class="text-right" colspan="2">Bold Actions</td>
-    </tr>
-  <% if(getObjects().length == 0) { %>
-      <td class="text-center" colspan="4"><h4>No themes found</h4></td>
-  <% }
-  _.each(getObjects(), function(item) { %>
-  <tr>
-    <td <% if(item.get('status') == 'ready') { %>
-      class="ok-notice"
-      <% } else if(item.get('status') == 'broken') { %>
-      class="alert-notice"
-      <% } else { %>
-      class="info-notice"
-      <% } %>><a href="<%=item.url() %>"><%= item.attributes.title %></a></td>
-    <td>
-      <%= item.attributes.group_name %>
-    </td>
-    <td>
-      <% if(item.get('status') == 'ready') { %>
-      <span class="m-status status-ok"><i class="icon-ok"></i><%=item.get('status') %></span>
-      <% } else if(item.get('status') == 'broken') { %>
-        <span class="m-status status-alert"><i class="icon-alert"></i><%=item.get('status') %></span>
-      <% } else if(item.hasStatus('updating')) { %>
-        <span class="m-status status-info"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
-      <% } else { %>
-        <span class="m-status status-info"><i class="icon-info"></i><%=item.get('status') %></span>
+  <% }); %>
+    </tbody>
+  </table>
+  <% if(collection.state.totalPages > 1){ %>
+  <nav class="previous">
+    <ul class="pagination">
+      <% if(collection.state.currentPage !== collection.state.firstPage){ %>
+        <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
       <% } %>
-    </td>
-    <td class="text-right" colspan="2">
-      <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="icon-edit"></span></a>
-      <a data-tooltip="delete" href="#"
-         data-action-message="Theme deleted"
-         data-action-confirm="Are you sure you wish to delete this?"
-         data-action="destroy" data-model="Theme" data-action-next="reload"
-         data-model-id="<%= item.attributes.slug %>"><span class="icon-delete"></span></a>
-    </td>
-  </tr>
-<% }); %>
-  </tbody>
-</table>
-<nav>
-  <ul class="pager">
-    <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
-    <li>Page <%=collection.state.currentPage %></li>
-    <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
-  </ul>
-</nav>
+
+      <ul class="pagination">
+
+        <% if(collection.state.currentPage - 1 >= collection.state.firstPage){ %>
+          <li class=""><a href="<%=getPageUrl(collection.state.firstPage)%>"><%=collection.state.firstPage %><span class="sr-only"></span></a></li>
+        <% } %>
+        <% if(collection.state.currentPage - 3 > collection.state.firstPage){ %>
+          <li class="ellipses"><span>...</span></li>
+        <% } %>
+
+        <% if(collection.state.currentPage === collection.state.firstPage){ %>
+
+          <% var i = 1; %>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+          <% while(collection.state.firstPage + i <= collection.state.totalPages && i < 6) { %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% i++; %>
+          <% } %>
+
+        <% } else if(collection.state.currentPage === collection.state.lastPage){ %>
+
+          <% var i = -5; %>
+          <% while(i < 0) { %>
+            <% if(collection.state.lastPage + i > collection.state.firstPage){ %>
+              <li class=""><a href="<%=getPageUrl(collection.state.lastPage + i)%>"><%=collection.state.lastPage + i %><span class="sr-only"></span></a></li>
+            <% } %>
+            <% i++; %>
+          <% } %>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+
+        <% } else { %>
+
+          <% var i = -2; %>
+          <% while(i < 0) { %>
+            <% if(collection.state.currentPage + i > collection.state.firstPage){ %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% } %>
+            <% i++; %>
+          <% } %>
+
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+
+          <% var i = 1; %>
+          <% while(collection.state.currentPage + i <= collection.state.lastPage && i < 3) { %>
+            <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
+            <% i++; %>
+          <% } %>
+
+        <% } %>
+
+
+        <% if(collection.state.lastPage - collection.state.currentPage > 2){ %>
+          <% if(collection.state.lastPage - collection.state.currentPage > 3){ %>
+          <li class="ellipses"><span>...</span></li>
+          <% } %>
+          <li class=""><a href="<%=getPageUrl(collection.state.lastPage)%>"><%=collection.state.lastPage %><span class="sr-only"></span></a></li>
+        <% } %>
+
+      </ul>
+
+      <% if(collection.state.currentPage !== collection.state.lastPage){ %>
+        <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
+      <% } %>
+    </ul>
+  </nav>
+  <% } %>
+</div>
+</div>

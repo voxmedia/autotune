@@ -12,7 +12,8 @@ module Autotune
   REPO_URL_RE = %r{(\w+://)?(.+@)?([\w\.]+)(:[\d]+)?/?(.*)}
   PROJECT_STATUSES = %w(new building updated built broken)
   PROJECT_PUB_STATUSES = %w(draft published)
-  BLUEPRINT_STATUSES = %w(new updating testing ready broken)
+  BLUEPRINT_STATUSES = %w(new updating built broken)
+  BLUEPRINT_MODES = %w(testing ready retired)
   THEME_STATUSES = %w(new updating ready broken)
   BLUEPRINT_TYPES = %w(graphic app)
   EDITABLE_SLUG_BLUEPRINT_TYPES = %w(app)

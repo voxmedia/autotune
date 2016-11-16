@@ -22,6 +22,7 @@ module Autotune
       @blueprints = Blueprint
       query = {}
       query[:status] = params[:status] if params[:status].present?
+      query[:mode] = params[:mode] if params[:mode].present?
       query[:tag] = params[:tag] if params[:theme].present?
       query[:type] = params[:type] if params[:type].present?
       @blueprints = @blueprints.search(params[:search]) if params[:search].present?
@@ -51,7 +52,7 @@ module Autotune
 
     def update
       @blueprint = instance
-      @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status
+      @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status, :mode
       if @blueprint.valid?
         trigger_upgrade = @blueprint.repo_url_changed?
         @blueprint.save

@@ -12,16 +12,19 @@ var $ = require('jquery'),
 PNotify.prototype.options.styling = "bootstrap3";
 // Load PNotify buttons component
 require('pnotify/src/pnotify.buttons');
+require('pnotify/src/pnotify.callbacks');
 
 var Application = BaseView.extend(require('./mixins/links.js'), {
-  className: 'container-fluid',
   template: require('../templates/application.ejs'),
   alertDefaults: {
-    addclass: "stack-bottomright",
-    stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
-    buttons: { sticker: false }
+    stack: {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0},
+    addclass: "center-top-notification",
+    width: '100%',
+    buttons: { sticker: false },
+    animate_speed: 0
   },
   events: {
+    'click ul.navbar-nav li a': 'toggleNav',
     'click #savePreview': 'savePreview'
   },
 
@@ -101,11 +104,19 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
   },
 
   alert: function(message, level, wait) {
+    var page = this;
+    this.alertDefaults.stack.context = this.$('#alert-area');
     var noti,
         opts = _.defaults({
           text: message,
           type: level || 'info',
-          delay: 8000
+          delay: 8000,
+          before_open: function(thing){
+            page.$('#alert-area').parent().addClass('has-alert');
+          },
+          after_close: function(thing){
+            page.$('#alert-area').parent().removeClass('has-alert');
+          }
         }, this.alertDefaults);
 
     if ( _.isNumber(wait) && wait > 0 ) {
@@ -116,8 +127,8 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
         hide: false
       });
     }
-
     noti = this.findNotification( message );
+
     return noti || new PNotify(opts);
   },
 
@@ -135,9 +146,14 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     }
   },
 
+  toggleNav: function(event){
+    if($('#navbar-collapse').hasClass('in')){
+      $('#navbar-collapse').collapse('toggle');
+    }
+  },
+
   savePreview: function(){
-    // this.currentView.doSubmit();
-    this.$('#projectForm form').submit();
+    this.currentView.doSubmit(this.$('#projectForm form'));
   }
 });
 

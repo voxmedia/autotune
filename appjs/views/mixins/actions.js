@@ -27,13 +27,20 @@ module.exports = {
         action_message = $btn.data('action-message'),
         next = $btn.data('action-next'),
         model_class = $btn.data('model'),
-        model_id = $btn.data('model-id');
+        model_id = $btn.data('model-id'),
+        promise;
 
     logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
     this.app.trigger('loadingStart');
     if ( $btn.hasClass('btn') ) {
       $btn.button('loading');
+    }
+
+    if(action === 'build-and-publish' && view.hasUnsavedChanges()){
+      promise = view.doSubmit($('#projectForm form'));
+    } else {
+      promise = Promise.resolve();
     }
 
     if ( model_class && model_id ) {
@@ -52,8 +59,9 @@ module.exports = {
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
-    Promise.resolve( inst[camelize(action)]() )
-      .then(function(resp) {
+    promise.then(function(){
+      return inst[camelize(action)]();
+    }).then(function(resp) {
         if(action_message){
           app.view.success(action_message, 4000);
         }
