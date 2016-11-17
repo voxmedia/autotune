@@ -65,7 +65,7 @@ module Autotune
         begin
           url = deployer.url_for('/')
           script_path = Autotune.root.join('bin', 'screenshot.js').to_s
-          repo.cd { |s| s.run 'phantomjs', script_path, get_full_url(url) }
+          repo.cd(project.deploy_dir) { |s| s.run 'phantomjs', script_path, get_full_url(url) }
 
           # Upload screens
           repo.glob('screenshots/*').each do |filename|
