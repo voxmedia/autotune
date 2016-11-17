@@ -107,7 +107,7 @@ module Autotune
           :target => publishable? ? 'preview' : 'publish',
           :current_user => current_user
         )
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -130,7 +130,7 @@ module Autotune
           :target => publishable? ? 'preview' : 'publish',
           :current_user => current_user
         )
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -153,7 +153,7 @@ module Autotune
           :target => 'publish',
           :current_user => current_user
         )
-      ).enqueue
+      ).catch(SetStatusJob.new(self, 'broken')).enqueue
     rescue
       update!(:status => 'broken')
       raise
