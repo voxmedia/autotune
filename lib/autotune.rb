@@ -12,24 +12,32 @@ module Autotune
   REPO_URL_RE = %r{(\w+://)?(.+@)?([\w\.]+)(:[\d]+)?/?(.*)}
   PROJECT_STATUSES = %w(new building updated built broken)
   PROJECT_PUB_STATUSES = %w(draft published)
-  BLUEPRINT_STATUSES = %w(new updating testing ready broken)
+  BLUEPRINT_STATUSES = %w(new updating built broken)
+  BLUEPRINT_MODES = %w(testing ready retired)
+  THEME_STATUSES = %w(new updating ready broken)
   BLUEPRINT_TYPES = %w(graphic app)
-  ROLES = %w(author editor superuser)
-
+  EDITABLE_SLUG_BLUEPRINT_TYPES = %w(app)
+  ROLES = %w(none author editor designer superuser)
   BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
   BLUEPRINT_BUILD_COMMAND = './autotune-build'
+  # add a time buffer to account for processing
+  MESSAGE_BUFFER = 0.5
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :verify_omniauth, :verify_authorization_header,
                       :google_auth_enabled, :google_auth_domain,
                       :git_ssh, :git_askpass,
-                      :redis, :faq_url, :themes)
+                      :redis, :faq_url, :generic_theme, :theme_meta_data, :get_theme_data)
 
   class << self
     delegate :redis, :to => :configuration
 
     def redis_sub
       @redis_sub ||= configuration.redis.dup
+    end
+
+    def root
+      Pathname.new(File.expand_path('../..', __FILE__))
     end
 
     def register_deployer(scheme, deployer_class)
@@ -75,9 +83,57 @@ module Autotune
       end
     end
     alias_method :config, :configuration
+
+    def can_message?
+      Autotune.redis.present?
+    end
+
+    def send_message(type, data)
+      ensure_redis
+      dt = DateTime.current
+      payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
+      redis.zadd('messages', dt.utc.to_f, payload.to_json)
+      redis.publish type, data.to_json
+      purge_messages :older_than => dt - 24.hours
+      dt
+    end
+
+    def purge_messages(older_than: nil)
+      ensure_redis
+      if older_than.nil?
+        redis.del('messages')
+      else
+        redis.zremrangebyscore('messages', '-inf', older_than.utc.to_f)
+      end
+    end
+
+    def messages(since: nil, type: nil)
+      ensure_redis
+
+      if since.nil?
+        results = redis.zrange('messages', 0, 1000)
+      else
+        results = redis.zrangebyscore('messages', since.utc.to_f - MESSAGE_BUFFER, '+inf')
+      end
+
+      results.map! { |d| ActiveSupport::JSON.decode(d) }
+
+      if type.is_a?(String)
+        results.select { |m| m['type'] == type }
+      else
+        results
+      end
+    end
+
+    private
+
+    def ensure_redis
+      raise 'Redis is not configured' if redis.nil?
+    end
   end
 end
 
 # Load deployers
 require 'autotune/deployers/file'
 require 'autotune/deployers/s3'
+

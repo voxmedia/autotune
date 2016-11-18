@@ -4,13 +4,78 @@ require 'fileutils'
 # put omniauth into test mode
 OmniAuth.config.test_mode = true
 OmniAuth.config.add_mock(:developer, OmniAuth::AuthHash.new(
-  :provider => 'developer',
-  :uid => 'test@example.com',
-  :info => { :name => 'test', :email => 'test@example.com' }
+  'provider' => 'developer',
+  'uid' => 'test@example.com',
+  'info' => { :name => 'test', :email => 'test@example.com' }
+))
+OmniAuth.config.add_mock(:google_oauth2, OmniAuth::AuthHash.new(
+  :provider => 'google_oauth2',
+  :uid => '123456789',
+  :info => {
+    :name => 'John Doe',
+    :email => 'john@company_name.com',
+    :first_name => 'John',
+    :last_name => 'Doe',
+    :image => 'https://lh3.googleusercontent.com/url/photo.jpg'
+  },
+  :credentials => {
+    :token => 'token',
+    :refresh_token => 'another_token',
+    :expires_at => 1354920555,
+    :expires => true
+  },
+  :extra => {
+    :raw_info => {
+      :sub => '123456789',
+      :email => 'user@domain.example.com',
+      :email_verified => true,
+      :name => 'John Doe',
+      :given_name => 'John',
+      :family_name => 'Doe',
+      :profile => 'https://plus.google.com/123456789',
+      :picture => 'https://lh3.googleusercontent.com/url/photo.jpg',
+      :gender => 'male',
+      :birthday => '0000-06-25',
+      :locale => 'en',
+      :hd => 'company_name.com'
+    },
+    :id_info => {
+      'iss' => 'accounts.google.com',
+      'at_hash' => 'HK6E_P6Dh8Y93mRNtsDB1Q',
+      'email_verified' => 'true',
+      'sub' => '10769150350006150715113082367',
+      'azp' => 'APP_ID',
+      'email' => 'jsmith@example.com',
+      'aud' => 'APP_ID',
+      'iat' => 1353601026,
+      'exp' => 1353604926,
+      'openid_id' => 'https://www.google.com/accounts/o8/id?id=ABCdfdswawerSDFDsfdsfdfjdsf'
+    }
+  }
 ))
 
+# Commit hashs for the test repo
+TEST_REPO = Autotune.root.join('test', 'repos', 'autotune-example-blueprint.git')
+MASTER_HEAD = 'fed20c2cd2d4563e6409af96e559945454873098'
+MASTER_HEAD1 = WITH_SUBMOD = 'e4fcd8853e284bb6a9fc53516d92448135809130'
+MASTER_HEAD2 = NO_SUBMOD = '5d1e9d5b94da6ed477845e3459981c4460f617c7'
+TEST_HEAD = '21147d5fb3b1b7c983f96effad2317accfc718ce'
+LIVE_HEAD = '5b971930c476c88d6390489d41627ee529763c55'
+LIVE_HEAD1 = '1fb3251d16ea278d04af9beec762e29c96885bf0'
+RESET_THEME_DATA = { 'updated' => 'data' }
+
 # Reset themes for testing
-Rails.configuration.autotune.themes = { :vox => 'Vox', :generic => 'Generic' }
+Rails.configuration.autotune.generic_theme = {
+  'primary-color' => '#292929',
+  'secondary-color' => '#e6e6e6',
+  'social' => {
+    'twitter-handle' => '@testhandle'
+  }
+}
+
+Rails.configuration.autotune.get_theme_data = lambda do |_theme|
+  RESET_THEME_DATA
+end
 
 # Display work_dir commands
 # require 'work_dir'
@@ -26,9 +91,13 @@ class ActiveSupport::TestCase
       "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/")
     # puts 'Working dir: ' + Rails.configuration.autotune.working_dir
     FileUtils.mkdir_p(Rails.configuration.autotune.working_dir)
+
+    @tmp_gauth_flag = Rails.configuration.autotune.google_auth_enabled
   end
 
   def teardown
+    Rails.configuration.autotune.google_auth_enabled = @tmp_gauth_flag
+
     FileUtils.rm_rf(Rails.configuration.autotune.working_dir) \
       if File.exist?(Rails.configuration.autotune.working_dir)
     %w(preview publish media).each do |dir|
@@ -36,15 +105,12 @@ class ActiveSupport::TestCase
         if File.exist?(Rails.root.join 'public', dir)
     end
 
-    assert_no_enqueued_jobs
+    assert_equal 0, enqueued_jobs.size,
+                 'There are enqueued jobs left in test teardown'
   end
 
   def mock_auth
     OmniAuth.config.mock_auth
-  end
-
-  def repo_url
-    File.expand_path('../repos/autotune-example-blueprint.git', __FILE__).to_s
   end
 end
 
@@ -73,12 +139,30 @@ class ActionController::TestCase
     assert_keys decoded_response, *args
   end
 
+  # Take a data hash and an array of keys and assert that those keys exist and
+  # have the correct value in decoded_response
+  def assert_data_values(data, *args)
+    assert_keys data, *args
+  end
+
   # Take a hash and an array of keys and assert that those keys exist
   def assert_keys(data, *args)
     assert_instance_of Hash, data
     keys = args.first.is_a?(Array) ? args.first : args
     keys.each do |k|
       assert decoded_response.key?(k.to_sym) || decoded_response.key?(k.to_s), "Should have #{k}"
+    end
+  end
+
+  # Take a hash and an array of keys and assert that the values for those keys match with response
+  def assert_values(expected_data, *args)
+    assert_instance_of Hash, expected_data
+    keys = args.first.is_a?(Array) ? args.first : args
+    keys.each do |k|
+      assert decoded_response.key?(k.to_sym) || decoded_response.key?(k.to_s), "Should have #{k}"
+      expected_val = expected_data[k.to_sym] || expected_data[k.to_s]
+      actual_value = decoded_response[k.to_sym] || decoded_response[k.to_s]
+      assert_equal expected_val, actual_value
     end
   end
 end

@@ -1,4 +1,4 @@
-require 'work_dir'
+require 'autoshell'
 require 'date'
 require 'logger'
 require 'stringio'
@@ -14,8 +14,7 @@ module Autotune
 
     unique_job :with => :payload
 
-    def perform(project, target: 'preview')
-
+    def perform(project, target: 'preview', current_user: nil)
       # Setup a new logger that logs to a string. The resulting log will
       # be saved to the output field of the project.
       out = StringIO.new
@@ -28,8 +27,9 @@ module Autotune
       project.meta.delete('error_message')
 
       # Create a new repo object based on the projects working dir
-      repo = WorkDir.repo(project.working_dir,
-                          Rails.configuration.autotune.build_environment)
+      repo = Autoshell.new(project.working_dir,
+                           :env => Rails.configuration.autotune.build_environment,
+                           :logger => outlogger)
 
       # Make sure the repo exists and is up to date (if necessary)
       raise 'Missing files!' unless repo.exist?
@@ -39,36 +39,39 @@ module Autotune
       build_data.update(
         'title' => project.title,
         'slug' => project.slug,
-        'theme' => project.theme.value)
+        'group' => project.group.slug,
+        'theme' => project.theme.slug,
+        'available_themes' => Theme.all.pluck(:slug),
+        'theme_data' => Theme.full_theme_data,
+        'build_type' => 'publish')
+
+      current_user ||= project.user
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
         target.to_sym, project, :logger => outlogger)
 
       # Run the before build deployer hook
-      deployer.before_build(build_data, repo.env)
+      deployer.before_build(build_data, repo.env, current_user)
 
       # Run the build
-      repo.working_dir do
-        outlogger.info(repo.cmd(
-          BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json))
-      end
+      repo.cd { |s| s.run(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json) }
 
       # Upload build
       deployer.deploy(project.full_deploy_dir)
 
       # Create screenshots (has to happen after upload)
-      phantom = WorkDir.phantom(project.full_deploy_dir)
-      if phantom.phantomjs? && !Rails.env.test?
+      if repo.command?('phantomjs') && !Rails.env.test?
         begin
           url = deployer.url_for('/')
-          phantom.capture_screenshot(get_full_url(url))
+          script_path = Autotune.root.join('bin', 'screenshot.js').to_s
+          repo.cd(project.deploy_dir) { |s| s.run 'phantomjs', script_path, get_full_url(url) }
 
           # Upload screens
-          phantom.screenshots.each do |filename|
+          repo.glob('screenshots/*').each do |filename|
             deployer.deploy_file(project.full_deploy_dir, filename)
           end
-        rescue ::WorkDir::CommandError => exc
+        rescue Autoshell::CommandError => exc
           logger.error(exc.message)
           outlogger.warn(exc.message)
         end
@@ -79,7 +82,7 @@ module Autotune
       project.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag
-      if exc.is_a? ::WorkDir::CommandError
+      if exc.is_a? Autoshell::CommandError
         msg = exc.message
       else
         msg = exc.message + "\n" + exc.backtrace.join("\n")

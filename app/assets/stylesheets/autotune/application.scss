@@ -4,127 +4,85 @@
  */
 @import "bootstrap-sprockets";
 @import "autotune/custom_vars";
-@import "autotune/vars";
-@import "bootstrap";
+
+// Core variables and mixins
+@import "bootstrap/mixins";
+@import "fashion/variables";
+
+// Reset and dependencies
+@import "bootstrap/normalize";
+@import "bootstrap/print";
+@import "bootstrap/glyphicons";
+
+// Core CSS
+@import "bootstrap/scaffolding";
+@import "bootstrap/type";
+@import "bootstrap/code";
+@import "bootstrap/grid";
+@import "bootstrap/tables";
+@import "bootstrap/forms";
+@import "bootstrap/buttons";
+
+// Components
+@import "bootstrap/component-animations";
+@import "bootstrap/dropdowns";
+@import "bootstrap/button-groups";
+@import "bootstrap/input-groups";
+@import "bootstrap/navs";
+@import "bootstrap/navbar";
+@import "bootstrap/breadcrumbs";
+@import "bootstrap/pagination";
+@import "bootstrap/pager";
+@import "bootstrap/labels";
+@import "bootstrap/badges";
+@import "bootstrap/jumbotron";
+@import "bootstrap/thumbnails";
+@import "bootstrap/alerts";
+@import "bootstrap/progress-bars";
+@import "bootstrap/media";
+@import "bootstrap/list-group";
+@import "bootstrap/panels";
+@import "bootstrap/responsive-embed";
+@import "bootstrap/wells";
+@import "bootstrap/close";
+
+// Components w/ JavaScript
+@import "bootstrap/modals";
+@import "bootstrap/tooltip";
+@import "bootstrap/popovers";
+@import "bootstrap/carousel";
+
+// Utility classes
+@import "bootstrap/utilities";
+@import "bootstrap/responsive-utilities";
+
+// Vox Media things
+@import "fashion/navbar";
+@import "fashion/main";
+@import "fashion/footer";
+
+// Bootstrap overrides
+@import "fashion/tooltip";
+@import "fashion/forms";
+@import "fashion/tables";
+@import "fashion/navs";
+@import "fashion/buttons";
+@import "fashion/panels";
+@import "fashion/links";
+@import "fashion/scrollbars";
+@import "fashion/typography";
+
+// Library stuff
 @import "alpaca";
 @import "pnotify";
 @import "pnotify.buttons";
 @import "bootstrap-datetimepicker";
 @import "spectrum";
+@import "selectize";
 
-// TODO: merge bootstrap_overrides, custom and the rest of this file
-@import "autotune/bootstrap_overrides";
-@import "autotune/custom";
+// Autotune stuff
+@import "autotune/core";
+@import "autotune/icons";
+@import "autotune/alpaca";
 @import "autotune/form_editor";
-
-//lets add some padding to crunched page bottoms
-#main {
-  padding-bottom: 25px;
-}
-
-#spinner {
-  width: 18px;
-  height: 18px;
-  position:relative;
-}
-#spinner img {
-  max-width:100%;
-}
-
-#nav {
-  margin: 0;
-  padding: 5px 0;
-}
-
-label.block {
-  display: block;
-}
-
-.margin-top {
-  margin-top: 35px;
-}
-
-.margin-bottom {
-  margin-bottom: 25px;
-}
-
-.alpaca-field-array.alpaca-top,
-.alpaca-field-object.alpaca-top { padding:10px 0; }
-.alpaca-form-buttons-container { text-align:left; }
-
-.tab-content {
-  margin-top:20px;
-}
-
-#screenshots img {
-  max-width: 100%;
-}
-
-#blueprint-data { height:300px; }
-
-.preview-frame {
-  margin: 25px auto;
-
-  &.large-view {
-    width:720px;
-  }
-  &.medium-view {
-    width:500px;
-  }
-  &.small-view {
-    width:320px;
-  }
-
-  iframe {
-    display:block;
-  }
-}
-
-#save-warning{
-  display: none;
-}
-
-#embed-preview {
-  position:relative;
-  border: 2px dashed #ccc;
-  .overlay { display: none; }
-
-  &.loading .overlay {
-    display:block;
-    position:absolute;
-    top:0; right:0; bottom:0; left:0;
-    background-color:rgba($black, 0.6);
-    color:white;
-    font-size:40px;
-    padding-top:40px;
-    text-align:center;
-  }
-}
-
-footer {
-  margin-top:20px;
-}
-
-.pane {
-  overflow:hidden;
-}
-
-//broken radio button fixes
-.radio label, .checkbox label {
-  padding-left: 25px;
-}
-.radio input[type="radio"],
-.radio-inline input[type="radio"],
-.checkbox input[type="checkbox"],
-.checkbox-inline input[type="checkbox"] {
-  margin-left: -25px;
-}
-input[type="radio"],
-input[type="checkbox"] {
-  margin: -10px 10px 0;
-}
-
-.navbar-nav > li { float: left; }
-
-// let the rails project override anything
-@import "autotune/custom_overrides";
+@import "custom_overrides";

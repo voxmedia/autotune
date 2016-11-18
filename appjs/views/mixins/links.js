@@ -20,6 +20,7 @@ module.exports = {
          !/^(\w+:)?\/\//.test(href) ) {
 
       if ( /^#[\w-_]+$/.test( href ) ) {
+        window.onpopstate = null;
         // handle a current page anchor link
         var $tab = this.$('.nav-tabs a[href='+href+']');
         logger.debug( 'handleLink', href );
@@ -37,7 +38,7 @@ module.exports = {
         eve.preventDefault();
         eve.stopPropagation();
         logger.debug( 'handleLink', href );
-        Backbone.history.navigate( href, { trigger: true } );
+        this.app.router.navigate( href, { trigger: true } );
       }
     }
   }

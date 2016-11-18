@@ -6,6 +6,9 @@ module Autotune
     # protect_from_forgery with: :exception
 
     before_action :require_login, :except => [:cors_preflight_check]
+    before_action :require_google_login,
+                  :except => [:cors_preflight_check],
+                  :if => :google_auth_required?
 
     before_action :cors_set_access_control_headers
 
@@ -33,11 +36,16 @@ module Autotune
       end
     end
 
+    def add_date_header
+      # Tue, 15 Nov 1994 08:12:31 GMT
+      headers['Date'] = Time.zone.now.strftime('%a, %e %b %Y %H:%M:%S %Z')
+    end
+
     # For all responses, return the CORS access control headers.
     def cors_set_access_control_headers
       headers['Access-Control-Allow-Origin'] = '*'
-      headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
-      headers['Access-Control-Allow-Headers'] = 'accept, authorization'
+      headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, OPTIONS'
+      headers['Access-Control-Allow-Headers'] = 'accept, authorization, x-requested-with, content-type'
       headers['Access-Control-Max-Age'] = '1728000'
     end
 
@@ -45,18 +53,6 @@ module Autotune
     # (control headers will be included).
     def cors_preflight_check
       render :text => '', :content_type => 'text/plain'
-    end
-
-    protected
-
-    def omniauth_path(provider, origin = nil)
-      path = "/auth/#{provider}"
-      path += "?origin=#{CGI.escape(origin)}" unless origin.blank?
-      path
-    end
-
-    def login_path(origin = nil)
-      omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
     end
 
     def current_user
@@ -74,12 +70,16 @@ module Autotune
         end
     end
 
-    def current_user=(u)
-      if u.nil?
-        session.delete(:api_key)
-      else
-        session[:api_key] = u.api_key
-      end
+    protected
+
+    def omniauth_path(provider, origin = nil)
+      path = "/auth/#{provider}"
+      path += "?origin=#{CGI.escape(origin)}" unless origin.blank?
+      path
+    end
+
+    def login_path(origin = nil)
+      omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
     end
 
     def signed_in?
@@ -87,15 +87,24 @@ module Autotune
     end
 
     def has_google_auth?
-      current_user.authorizations.find_by(:provider => 'google_oauth2').present?
+      gauth = current_user.authorizations.find_by(:provider => 'google_oauth2')
+      gauth.present? && gauth.valid_credentials?
+    end
+
+    def google_auth_required?
+      Autotune.configuration.google_auth_enabled
     end
 
     def any_roles?
-      !current_user.meta['roles'].nil? && !current_user.meta['roles'].empty?
+      current_user.meta['roles'].present? && current_user.meta['roles'].any?
     end
 
     def role?(*args)
       args.reduce { |a, e| a || current_user.meta['roles'].include?(e.to_s) }
+    end
+
+    def accepts_json?
+      Mime[:json].in?(request.accepts)
     end
 
     private
@@ -109,15 +118,8 @@ module Autotune
     end
 
     def require_login
-      if signed_in? && any_roles?
-        if Autotune.configuration.google_auth_enabled
-          return require_google_login
-        end
-        return true
-      end
-
       if signed_in?
-        render_error 'Not allowed', :forbidden
+        render_error('Not allowed', :forbidden) unless any_roles?
       else
         respond_to do |format|
           format.html { redirect_to login_path(request.fullpath) }
@@ -127,12 +129,10 @@ module Autotune
     end
 
     def require_google_login
-      return true if has_google_auth?
-      if has_google_auth?
-        render_error 'Not allowed', :forbidden
-      else
+      if signed_in? && any_roles? && !has_google_auth?
         respond_to do |format|
           format.html { render 'google_auth' }
+          format.json { render_error 'Unauthorized', :unauthorized }
         end
       end
     end
@@ -153,7 +153,7 @@ module Autotune
       # It appears Rails automatically assumes you want HTML if html or */*
       # is anywhere in the Accept header. This is not how the Accept header is
       # supposed to work.
-      if Mime[:json].in?(request.accepts)
+      if accepts_json?
         # We'll be lazy and assume the client wants JSON if application/json
         # appears in the Accept header. Then we have to force the format.
         request.format = :json

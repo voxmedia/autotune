@@ -5,18 +5,25 @@ require 'redis'
 module Autotune
   # API for projects
   class ProjectsController < ApplicationController
-    before_action :respond_to_html
-    before_action :require_superuser, :only => [:update_snapshot]
     model Project
+    skip_before_action :require_google_login,
+                       :only => [:index, :show]
+
+    before_action :only => [:index, :show] do
+      require_google_login if google_auth_required? && !accepts_json?
+    end
+
+    before_action :respond_to_html
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update, :destroy, :build, :build_and_publish] do
+    before_action :only => [:show, :update, :update_snapshot, :destroy, :build, :build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
-             current_user.role?(:editor => instance.theme.value)
+             current_user.role?(:editor => instance.group.slug) ||
+             current_user.role?(:designer => instance.group.slug)
         render_error 'Forbidden', :forbidden
       end
     end
@@ -27,22 +34,21 @@ module Autotune
 
     def index
       @projects = Project
-      # a user can have multiple authorizations
       # Filter and search query
       query = {}
 
-      query[:status] = params[:status] if params.key? :status
+      query[:status] = params[:status] if params[:status].present?
 
-      if params.key? :blueprint
+      if params[:blueprint].present?
         blueprint = Blueprint.find_by_slug(params[:blueprint])
         query[:blueprint_id] = blueprint.id
-      elsif params.key? :blueprint_id
+      elsif params[:blueprint_id].present?
         query[:blueprint_id] = params[:blueprint_id]
-      elsif params.key? :blueprint_title
+      elsif params[:blueprint_title].present?
         query[:blueprint_id] = params[:blueprint_title]
       end
 
-      if params.key? :pub_status
+      if params[:pub_status].present?
         if params[:pub_status] == 'published'
           @projects = @projects.where.not(:published_at => nil)
         else
@@ -60,16 +66,21 @@ module Autotune
         @projects = @projects.where(sql)
       end
 
-      if params.key? :theme
-        theme = Theme.find_by_value(params[:theme])
+      if params[:theme].present?
+        theme = Theme.find_by_slug(params[:theme])
         query[:theme_id] = theme.id
       end
 
+      if params[:group].present?
+        group = Group.find_by_slug(params[:group])
+        query[:group_id] = group.id
+      end
+
       unless current_user.role? :superuser
-        if current_user.role? :editor
+        if current_user.role? [:editor, :designer]
           @projects = @projects.where(
-            '(user_id = ? OR theme_id IN (?))',
-            current_user.id, current_user.editor_themes.pluck(:id))
+            '(user_id = ? OR group_id IN (?))',
+            current_user.id, current_user.editor_groups.pluck(:id))
         else
           query[:user_id] = current_user.id
         end
@@ -77,7 +88,7 @@ module Autotune
 
       @projects = @projects.where(query)
 
-      if params.key? :type
+      if params[:type].present?
         @blueprints = Blueprint
         @blueprint_ids = @blueprints.where(:type => params[:type]).pluck(:id)
         @projects = @projects.where(:blueprint_id => @blueprint_ids)
@@ -119,14 +130,18 @@ module Autotune
         @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
       end
 
-      if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_value request.POST['theme']
+      if request.POST.key? 'blueprint_version'
+        @project.blueprint_version = request.POST['blueprint_version']
+      end
 
+      if request.POST.key? 'theme'
+        @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.group = @project.theme.group
         # is this user allowed to use this theme?
         unless @project.theme.nil? ||
-               current_user.author_themes.include?(@project.theme)
+               current_user.author_groups.include?(@project.group)
           return render_error(
-            "You can't use the #{@project.theme.label} theme. Please " \
+            "You can't use the #{@project.theme.title} theme. Please " \
             'choose another theme or contact support',
             :bad_request)
         end
@@ -156,22 +171,23 @@ module Autotune
       @project.attributes = select_from_post :title, :slug, :data
 
       if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_value request.POST['theme']
+        @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.group = @project.theme.group
 
         # is this user allowed to use this theme?
         unless @project.theme.nil? ||
                current_user.author_themes.include?(@project.theme)
           return render_error(
-            "You can't use the #{@project.theme.label} theme. Please " \
+            "You can't use the #{@project.theme.title} theme. Please " \
             'choose another theme or contact support',
             :bad_request)
         end
       end
 
       # make sure data doesn't contain title, slug or theme
-      @project.data.delete('title')
-      @project.data.delete('slug')
-      @project.data.delete('theme')
+      %w(title slug theme base_url asset_base_url).each do |k|
+        @project.data.delete(k)
+      end
 
       if @project.valid?
         @project.status = 'built' if @project.live?
@@ -188,7 +204,7 @@ module Autotune
       @project = instance
       @build_data = request.POST
       if @build_data['google_doc_url'] && request.GET[:force_update]
-        cache_key = "googledoc#{@build_data['google_doc_url'].match(/[-\w]{25,}/).to_s}"
+        cache_key = "googledoc#{GoogleDocs.key_from_url(@build_data['google_doc_url'])}"
         Rails.cache.delete(cache_key)
       end
 
@@ -201,14 +217,20 @@ module Autotune
     rescue => exc
       if @project.meta.present? && @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
+      elsif exc.is_a?(Signet::AuthorizationError)
+        render_error 'There was an error authenticating your Google account', :bad_request
+        logger.error "Google Auth error: #{exc.message}"
       else
-        render_error exc.message
+        raise
       end
     end
 
     def create_spreadsheet
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
-      google_client = GoogleDocs.new(current_auth)
+      google_client = GoogleDocs.new(
+        :refresh_token => current_auth.credentials['refresh_token'],
+        :access_token => current_auth.credentials['token'],
+        :expires_at => current_auth.credentials['expires_at'])
       spreadsheet_copy = google_client.copy(request.POST['_json'])
 
       if Autotune.configuration.google_auth_domain.present?
@@ -217,8 +239,9 @@ module Autotune
       end
 
       render :json => { :google_doc_url => spreadsheet_copy[:url] }
-    rescue => exc
-      render_error exc.message
+    rescue Signet::AuthorizationError => exc
+      render_error 'There was an error authenticating your Google account', :bad_request
+      logger.error "Google Auth error: #{exc.message}"
     end
 
     def update_snapshot
@@ -244,7 +267,5 @@ module Autotune
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
     end
-
-    private
   end
 end

@@ -2,7 +2,7 @@ var test = require('../test_helper'),
     Project = require('../../appjs/models/project');
 
 test('get project', function(t) {
-  t.plan(2);
+  t.plan(3);
 
   try {
     var p = new Project({id: 'example-build-one'});
@@ -10,6 +10,8 @@ test('get project', function(t) {
     p.fetch().then(function() {
       t.equal(p.get('slug'),
               'example-build-one', 'Valid slug');
+      t.equal(p.get('title'),
+              'Example build one', 'Valid title');
     }, function(jqXHR, status, error) {
       if ( error ) {
         t.end(error);

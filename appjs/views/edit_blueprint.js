@@ -33,7 +33,7 @@ var EditBlueprint = BaseView.extend(require('./mixins/actions'), require('./mixi
   listenForChanges: function() {
     if ( !this.model.isNew() && !this.listening ) {
       logger.debug('Start listening for changes');
-      this.listenTo(this.app.listener,
+      this.listenTo(this.app.messages,
                     'change:blueprint:' + this.model.id,
                     this.updateStatus, this);
       this.listening = true;
@@ -42,11 +42,12 @@ var EditBlueprint = BaseView.extend(require('./mixins/actions'), require('./mixi
 
   stopListeningForChanges: function() {
     logger.debug('Stop listening for changes');
-    this.stopListening(this.app.listener);
+    this.stopListening(this.app.messages);
     this.listening = false;
   },
 
-  updateStatus: function(status) {
+  updateStatus: function(data) {
+    var status = data.status;
     logger.debug('Update blueprint status: ' + status);
     this.model.set('status', status);
     this.render();

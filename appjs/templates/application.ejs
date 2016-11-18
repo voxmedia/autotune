@@ -1,28 +1,43 @@
-<div class="row m-nav">
-  <div class="col-lg-8 col-lg-offset-2">
-    <nav class="navbar navbar-default" id="nav">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">Autotune</a>
-        <div class="navbar-text" id="spinner">
-          <%=render(require('./spinner.ejs'), {color:'white'})%>
-        </div>
-        <ul class="nav navbar-nav">
-          <li data-tab="projects"><a href="/projects">Projects</a></li>
-          <% if (hasRole('superuser')) { %>
-          <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>
-          <% } %>
-          <li data-tab="faq"><a href="<%=app.config.faq_url %>" target="_blank">FAQ</a></li>
-          <li data-tab="feedback"><a href="https://docs.google.com/a/voxmedia.com/forms/d/1FZGfxov-3BcclKUMa0LkpaYL_4SOmCGGvuATBgNbzdg/viewform" target="_blank">Feedback</a></li>
-        </ul>
-      </div>
-    </nav>
-  </div>
-</div>
-<div class="row">
-  <div id="flash"></div>
-  <div class="col-lg-8 col-lg-offset-2" id="main">
-    <div style="max-width:10em;margin:5em auto;">
-    <%=render(require('./spinner.ejs'))%>
+<div id="alert-area"></div>
+<nav class="navbar navbar-inverse" id="nav">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle collapsed small-nav" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand big-nav" href="/">Autotune</a>
+    <div class="navbar-text" id="spinner">
+      <%=render(require('./spinner.ejs'), {color:'white'})%>
     </div>
+    <div id="navbar-save-container">
+      <div class="project-save-warning">
+        <span class="at-icon alert-icon"></span>Your work is not saved.
+        <button type="submit" class="btn btn-primary btn-sm"
+                 id="savePreview" data-loading-text="Saving...">Save now</button>
+      </div>
+      <div class="project-saved">
+        <span class="m-status"><span class="at-icon ok-icon"></span></span>Saved
+      </div>
+    </div>
+  </div>
+  <div class="navbar-collapse collapse" id="navbar-collapse">
+    <ul class="nav navbar-nav">
+      <li class="small-nav"><a data-toggle="collapse" data-target="#navbar-collapse" class="navbar-brand" href="/"></a><a data-toggle="collapse" data-target="#navbar-collapse" href="/">Autotune</a></li>
+      <li><a data-toggle="collapse" data-target="#navbar-collapse" href="/projects">Projects</a></li>
+      <% if (hasRole('superuser')) { %>
+      <li data-tab="blueprints"><a href="/blueprints">Blueprints</a></li>
+      <% } %>
+      <% if (hasRole('superuser') || hasRole('designer')) { %>
+      <li data-tab="themes"><a href="/themes">Themes</a></li>
+      <% } %>
+      <li data-tab="faq"><a href="<%=app.config.faq_url %>" target="_blank">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+<div id="main">
+  <div style="max-width:10em;margin:5em auto;">
+    <%=render(require('./spinner.ejs'))%>
   </div>
 </div>

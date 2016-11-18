@@ -6,5 +6,7 @@ module.exports = {
   ChooseBlueprint: require('./views/choose_blueprint'),
   ListProjects: require('./views/list_projects'),
   EditProject: require('./views/edit_project'),
+  ListThemes: require('./views/list_themes'),
+  EditTheme: require('./views/edit_theme'),
   Application: require('./views/application')
 };

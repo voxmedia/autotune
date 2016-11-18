@@ -1,5 +1,3 @@
-require 'work_dir'
-
 module Autotune
   # recursively delete a filepath
   class DeleteDeployedFilesJob < ActiveJob::Base

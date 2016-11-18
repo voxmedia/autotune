@@ -28,14 +28,35 @@ module.exports = Backbone.Router.extend({
     "projects/new": "chooseBlueprint",
     "projects/:slug": "editProject",
     "projects/:slug/edit": "editProject",
-    "projects/:slug/duplicate": "duplicateProject"
+    "projects/:slug/duplicate": "duplicateProject",
+    "themes": "listThemes",
+    "themes/new": "newTheme",
+    "themes/:slug": "editTheme",
+    "themes/:slug/edit": "editTheme"
   },
+
+  navigate: function(fragment, options) {
+    var view = this.app.view.currentView;
+    if ( view && view.hasUnsavedChanges && view.hasUnsavedChanges() ) {
+      view.askToSave().then(function(okToContinue) {
+        if ( okToContinue ) {
+          Backbone.Router.prototype.navigate.call(this, fragment, options);
+          window.onbeforeunload = null;
+          $('body').removeClass('modal-open');
+        }
+      });
+    } else {
+      Backbone.Router.prototype.navigate.call(this, fragment, options);
+    }
+  },
+
 
   // This is called for every route
   everyRoute: function(route, params) {
+    logger.debug('everyRoute', route);
     this.app.trigger( 'loadingStart' );
     this.app.analyticsEvent( 'pageview' );
-    this.app.listener.start();
+    this.app.messages.start();
     if ( params ) {
       logger.debug(route, params);
     } else {
@@ -99,7 +120,7 @@ module.exports = Backbone.Router.extend({
         app = this.app, query = {}, view;
 
     if(params) { query = querystring.parse(params); }
-    query['status'] = 'ready';
+    query['mode'] = 'ready';
 
     Promise.resolve( blueprints.fetch({data: query}) ).then(function() {
       view = new views.ChooseBlueprint({
@@ -124,7 +145,7 @@ module.exports = Backbone.Router.extend({
     if (query.page) {
       jqxhr = projects.getPage(parseInt(query.page), {data: query});
     } else {
-      jqxhr = projects.getFirstPage({data: query});
+      jqxhr = projects.getFirstPage({data: query, reset: true});
     }
 
     Promise.resolve( jqxhr ).then(function() {
@@ -199,7 +220,6 @@ module.exports = Backbone.Router.extend({
       return project.blueprint.fetch();
     }).then(function() {
       old_attributes = _.clone(project.attributes);
-      logger.debug('oldies', old_attributes);
       new_attributes.blueprint_config = old_attributes.blueprint_config;
       new_attributes.blueprint_id = old_attributes.blueprint_id;
       new_attributes.blueprint_title = old_attributes.blueprint_title;
@@ -223,5 +243,63 @@ module.exports = Backbone.Router.extend({
     }).catch(function(jqXHR) {
       app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
     });
-  }
+  },
+
+  listThemes: function(params) {
+    var themes = this.app.editableThemes,
+        app = this.app, query = {}, view, jqxhr;
+
+    if(params) { query = querystring.parse(params); }
+
+    if (query.page) {
+      jqxhr = themes.getPage(parseInt(query.page), {data: query});
+    } else {
+      jqxhr = themes.getFirstPage({data: query});
+    }
+
+    Promise.resolve( jqxhr  ).then(function() {
+      view = new views.ListThemes({
+        collection: themes,
+        query: _.pick(query, 'status', 'group', 'search'),
+        app: app
+      });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+
+  editTheme: function(slug) {
+    var app = this.app, view,
+        theme = new models.Theme({ id: slug });
+
+    Promise.resolve( theme.fetch() ).then(function() {
+      var view = new views.EditTheme({ model: theme, app: app });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('themes');
+
+    }).catch(function(jqXHR) {
+      app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+    });
+  },
+
+  newTheme: function() {
+    var theme = new models.Theme(),
+        view = new views.EditTheme({ model: theme, app: this.app });
+
+    view.render();
+
+    this.app.view
+      .display( view )
+      .setTab('themes');
+
+  },
 });

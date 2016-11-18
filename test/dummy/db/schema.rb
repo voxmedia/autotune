@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151117175334) do
+ActiveRecord::Schema.define(version: 20160629175555) do
 
   create_table "autotune_authorizations", force: :cascade do |t|
     t.integer  "user_id"
@@ -48,19 +48,30 @@ ActiveRecord::Schema.define(version: 20151117175334) do
     t.text     "config"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "mode"
   end
 
   add_index "autotune_blueprints", ["slug"], name: "index_autotune_blueprints_on_slug"
   add_index "autotune_blueprints", ["status"], name: "index_autotune_blueprints_on_status"
   add_index "autotune_blueprints", ["type"], name: "index_autotune_blueprints_on_type"
 
-  create_table "autotune_blueprints_themes", id: false, force: :cascade do |t|
-    t.integer "theme_id"
-    t.integer "blueprint_id"
+  create_table "autotune_group_memberships", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "group_id"
+    t.string  "role"
   end
 
-  add_index "autotune_blueprints_themes", ["blueprint_id"], name: "index_autotune_blueprints_themes_on_blueprint_id"
-  add_index "autotune_blueprints_themes", ["theme_id"], name: "index_autotune_blueprints_themes_on_theme_id"
+  add_index "autotune_group_memberships", ["group_id"], name: "index_autotune_group_memberships_on_group_id"
+  add_index "autotune_group_memberships", ["user_id"], name: "index_autotune_group_memberships_on_user_id"
+
+  create_table "autotune_groups", force: :cascade do |t|
+    t.string  "name"
+    t.string  "slug"
+    t.integer "external_id"
+  end
+
+  add_index "autotune_groups", ["name"], name: "index_autotune_groups_on_name"
+  add_index "autotune_groups", ["slug"], name: "index_autotune_groups_on_slug"
 
   create_table "autotune_projects", force: :cascade do |t|
     t.string   "slug"
@@ -78,6 +89,7 @@ ActiveRecord::Schema.define(version: 20151117175334) do
     t.datetime "data_updated_at"
     t.integer  "theme_id"
     t.text     "meta"
+    t.integer  "group_id"
   end
 
   add_index "autotune_projects", ["blueprint_id"], name: "index_autotune_projects_on_blueprint_id"
@@ -96,9 +108,16 @@ ActiveRecord::Schema.define(version: 20151117175334) do
   add_index "autotune_tags", ["slug"], name: "index_autotune_tags_on_slug"
 
   create_table "autotune_themes", force: :cascade do |t|
-    t.string "value"
-    t.string "label"
+    t.string  "slug"
+    t.string  "title"
+    t.integer "group_id"
+    t.string  "status"
+    t.text    "data"
+    t.integer "parent_id"
   end
+
+  add_index "autotune_themes", ["parent_id"], name: "index_autotune_themes_on_parent_id"
+  add_index "autotune_themes", ["status"], name: "index_autotune_themes_on_status"
 
   create_table "autotune_users", force: :cascade do |t|
     t.string   "email"

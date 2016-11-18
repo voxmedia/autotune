@@ -27,13 +27,20 @@ module.exports = {
         action_message = $btn.data('action-message'),
         next = $btn.data('action-next'),
         model_class = $btn.data('model'),
-        model_id = $btn.data('model-id');
+        model_id = $btn.data('model-id'),
+        promise;
 
     logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
     this.app.trigger('loadingStart');
     if ( $btn.hasClass('btn') ) {
       $btn.button('loading');
+    }
+
+    if(action === 'build-and-publish' && view.hasUnsavedChanges()){
+      promise = view.doSubmit($('#projectForm form'));
+    } else {
+      promise = Promise.resolve();
     }
 
     if ( model_class && model_id ) {
@@ -52,16 +59,17 @@ module.exports = {
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
-    Promise.resolve( inst[camelize(action)]() )
-      .then(function(resp) {
+    promise.then(function(){
+      return inst[camelize(action)]();
+    }).then(function(resp) {
         if(action_message){
-          app.view.alert(action_message, 'success', false, 4000);
+          app.view.success(action_message, 4000);
         }
 
         switch (action) {
           case 'build':
-            app.view.alert(
-              'Building... This might take a moment.', 'notice', false, 16000);
+            app.view.warning(
+              'Building... This might take a moment.', 16000);
             break;
           case 'destroy':
             if ( view.collection ) {
@@ -72,11 +80,11 @@ module.exports = {
         }
 
         if ( next === 'show' ) {
-          Backbone.history.navigate( inst.url(), {trigger: true} );
+          this.app.router.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
           return view.render();
         } else if ( next ) {
-          Backbone.history.navigate( next, {trigger: true} );
+          this.app.router.navigate( next, {trigger: true} );
         } else {
           if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
           app.trigger( 'loadingStop' );

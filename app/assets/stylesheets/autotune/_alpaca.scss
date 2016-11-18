@@ -1,0 +1,334 @@
+// star for required fields? this is the easeist way to adjust that
+legend {
+  font-size:$font-size-h4;
+  font-weight: bold;
+  border-width: 0px;
+  margin-bottom: 10px;
+}
+
+.glyphicon-star:before {
+  font-family: $font-family-sans-serif;
+  content: "*";
+  margin-right: 3px;
+}
+
+// so we can keep alert box content flush
+.alert > .container-fluid {
+  padding:0;
+}
+
+td.actionbar{
+  .btn-group button {
+    margin-right: 0;
+    font-size: 1.1em;
+  }
+  .alpaca-array-actionbar{
+    position: relative;
+    vertical-align: sub;
+  }
+}
+
+.alpaca-field-object .alpaca-field-object,
+.alpaca-field-array {
+  margin-top:20px;
+  margin-bottom:20px;
+}
+.alpaca-field-array .alpaca-field-object {
+  margin-top:0;
+  z-index: 1;
+}
+
+.alpaca-field-array {
+  padding-bottom:15px;
+  // > legend {
+  //   font-size:$font-size-h4;
+  //   font-weight: bold;
+  // }
+}
+
+
+.form-group{
+  margin-bottom: 0px;
+}
+
+.alpaca-container-item {
+  position:relative;
+  padding:0px;
+  margin-bottom: 8px;
+  .alpaca-container-has-items{
+    .alpaca-container-item{
+      margin-bottom: 0px;
+      label.alpaca-control-label{
+        margin-top: 10px;
+      }
+    }
+  }
+  .alpaca-array-actionbar{
+    z-index:20;
+    position: absolute;
+    // vertical-align: middle;
+    right: 0px;
+    top: 0px;
+    .btn-default{
+      color: color(border);
+    }
+  }
+  .well{
+    padding: 0px;
+    // padding-bottom: 20px;
+    border-width: 0px;
+    -webkit-box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.25);
+    -moz-box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.15);
+    box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.25);
+    legend{
+      padding: 10px;
+      margin-bottom: 0px;
+      border: 1px solid color(background, dark);
+      font-size: $font-size-base;
+      font-weight: normal;
+      text-transform: uppercase;
+      color: color(border);
+      background-color: color(background, dark);
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      span{
+        width:50%;
+      }
+    }
+    .alpaca-container{
+      padding:10px;
+      div{
+        padding: 0px;
+      }
+      // border:0px solid color(border);
+      // border-top-width: 2px;
+      // border-radius: 0 0 3px 3px;
+    }
+    .alpaca-control.checkbox{
+      margin-left: 0px;
+    }
+    .alpaca-container-item{
+      legend{
+        border-width: 0px;
+        padding-left: 0px;
+        font-size: $font-size-base;
+        font-weight: bold;
+        text-transform: none;
+        color: color(text);
+        background-color: transparent;
+      }
+    }
+  }
+  .btn-default{
+    margin: 5px 0;
+  }
+  label{
+    display: inline-block;
+    width: initial;
+    color: color(text);
+    &.alpaca-control-label{
+      margin-top: 20px;
+    }
+    + .checkbox + .help-block{
+      padding-left: 0px;
+    }
+  }
+  legend{
+    font-size: 18px;
+  }
+  .bold-title{
+    legend.alpaca-container-label, label.control-label{
+      font-size: $font-size-h4;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  }
+}
+
+// .alpaca-array-actionbar-bottom {
+//   position:absolute;
+//   bottom:0;
+//   // right:0;
+//   left: 20px;
+// }
+//
+// .alpaca-array-actionbar-top {
+//   position:relative;
+//   top:0;
+//   right:0;
+// }
+
+.alpaca-field-hidden {
+  display:none;
+}
+
+.alpaca-field-checkbox .alpaca-control.checkbox, .alpaca-field-radio .alpaca-control.radio {
+  margin: 0 0 5px 8px;
+  // margin-bottom: 0px;
+  display:inline-block;
+}
+.alpaca-container-item{
+  .pull-left{
+    float: none;
+  }
+}
+
+.alpaca-array-actionbar {
+  .btn-default.disabled:hover,
+  .btn-default.disabled:focus,
+  .btn-default.disabled.focus,
+  .btn-default[disabled]:hover,
+  .btn-default[disabled]:focus,
+  .btn-default[disabled].focus,
+  fieldset[disabled] .btn-default:hover,
+  fieldset[disabled] .btn-default:focus,
+  fieldset[disabled] .btn-default.focus,
+  .btn-default.alpaca-button-disabled {
+    color:$btn-link-disabled-color;
+    background-color: transparent;
+    border-color: transparent;
+  }
+
+  .alpaca-array-actionbar-action{
+    padding: 5px;
+  }
+
+  .btn-default {
+    background-color: transparent;
+    border-color: transparent;
+    color: color(actionable);
+    font-size: 18px;
+    border-color: transparent;
+    margin-top: 3px;
+    &:first-of-type{
+      padding-left: 0px;
+    }
+    &:last-of-type{
+      padding-right: 10px;
+    }
+    &:hover {
+      background-color: transparent;
+      border-color: transparent;
+      color: #ffffff;
+    }
+  }
+}
+
+.alpaca-container span[data-toggle=collapse] {
+  display:block;
+  position:relative;
+}
+.alpaca-container span[data-toggle=collapse]:after {
+  // content:' Click to collapse';
+  display:inline-block;
+  margin-left:8px;
+  font-size:60%;
+  color:$headings-small-color;
+}
+.alpaca-container span[data-toggle=collapse].collapsed:after {
+  // content:' Click to expand';
+}
+
+//
+.alpaca-field-table, .alpaca-field-table .table-responsive {
+  border-width: 0px;
+  padding-top: 15px;
+  .table{
+    thead > tr > th {
+      padding: 10px 10px 10px 0px;
+      text-transform: uppercase;
+      color: color(actionable);
+      &:last-child{
+        padding-right: 0px;
+        display: none;
+      }
+    }
+  }
+  &.quiz-hide-header{
+    .table-responsive:before{
+      text-transform: uppercase;
+      content: 'Options';
+      color: color(actionable);
+    }
+    .table{
+      margin-top: 8px;
+      thead > tr > th {
+        display: none;
+      }
+    }
+  }
+  .table > tbody > tr{
+    &:first-of-type{
+      border-top: 2px solid color(border);
+    }
+    td {
+      border-width:0px;
+      padding: 10px 10px 10px 0px;
+      vertical-align: top;
+      &:last-child{
+        padding-right: 0px;
+      }
+      .alpaca-field-checkbox{
+        width: 10px;
+        margin: 0px;
+      }
+      &.actionbar{
+        padding-top: 14px;
+      }
+      .alpaca-field-checkbox{
+        padding-top: 9px;
+      }
+    }
+  }
+
+  .form-group{
+    margin-bottom: 0px;
+  }
+
+  .btn {
+    font-size:18px;
+    float:none;
+    padding:0;
+    border-width:0;
+    margin: 0px;
+    color: color(actionable);
+    &.btn-sm{
+      padding: 3px 3px;
+    }
+    &:hover{
+      color:darken(color(actionable), 15%);
+    }
+  }
+
+  tbody .alpaca-control-label { display:none; }
+}
+
+.form-group{
+  .checkbox + .help-block{
+    padding-left: 38px;
+  }
+}
+
+.help-block, .help-block .glyphicon{
+  color: color(actionable, dark);
+  i{
+    display: none;
+  }
+  &.alpaca-message{
+    margin-bottom: 0px;
+  }
+}
+
+.has-error .help-block .glyphicon{
+  color: color(negative);
+}
+
+table.table + .alpaca-array-toolbar{
+  .alpaca-array-toolbar-action.btn.btn-default.btn-sm{
+    color: #ffffff;
+    background-color: color(actionable, dark);
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-bottom: 8px;
+  }
+}

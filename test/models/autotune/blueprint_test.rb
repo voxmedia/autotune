@@ -6,6 +6,7 @@ module Autotune
     fixtures 'autotune/blueprints'
 
     test 'creating blueprints' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       assert_raises ActiveRecord::RecordInvalid do
@@ -15,6 +16,7 @@ module Autotune
         :title => 'new blueprint',
         :repo_url => repo_url)
       assert_equal b.status, 'new'
+      assert_equal b.mode, 'testing'
       assert_equal b.slug, 'new-blueprint'
     end
 
@@ -25,6 +27,7 @@ module Autotune
     end
 
     test "that slugs don't change" do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
@@ -38,6 +41,7 @@ module Autotune
     end
 
     test 'custom slugs' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
@@ -58,6 +62,7 @@ module Autotune
     end
 
     test 'automatic slugs are unique' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
@@ -72,6 +77,7 @@ module Autotune
     end
 
     test 'ensure unique slug fails gracefully' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
 
@@ -81,6 +87,7 @@ module Autotune
     end
 
     test 'delete a blueprint' do
+      repo_url = autotune_blueprints(:example).repo_url
       autotune_blueprints(:example).projects.destroy_all
       autotune_blueprints(:example).destroy
       b = Blueprint.create!(
