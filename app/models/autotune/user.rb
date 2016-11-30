@@ -3,7 +3,7 @@ module Autotune
   class User < ActiveRecord::Base
     include Searchable
     has_many :projects
-    has_many :group_memberships, -> { includes :group }
+    has_many :group_memberships, -> { includes :group }, :dependent => :destroy
     has_many :groups, :through => :group_memberships
 
     serialize :meta, JSON

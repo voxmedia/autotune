@@ -27,6 +27,12 @@ module Autotune
       File.join(working_dir, deploy_dir)
     end
 
+    def user_token_for_provider(provider)
+      if respond_to?(:user)
+        user.authorizations.find_by_provider!(provider).credentials['token']
+      end
+    end
+
     private
 
     def delete_renamed_files
