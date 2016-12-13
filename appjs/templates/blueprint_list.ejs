@@ -6,36 +6,36 @@
   <div class="list-page-header">
 
     <div class="new-button">
-      <a class="btn btn-primary" href="/blueprints/new">New blueprint</a>
+      <a class="btn btn-primary" href="/blueprints/new"> <%= I18n.t('autotune.new-blueprint') %> </a>
     </div>
 
     <div class="text-right">
       <form class="form-inline" method="get" action="/blueprints">
-        <label class="sr-only" for="search">Search query</label>
+        <label class="sr-only" for="search"> <%= I18n.t('autotune.search-query') %> </label>
         <div class="input-group">
           <input type="search" class="form-control"
-                 name="search" id="search" placeholder="Search"
+                 name="search" id="search" placeholder="<%= I18n.t('autotune.search') %>"
                  <% if(query.search) { %>value="<%=query.search %>"<% } %>>
           <span class="input-group-btn">
-            <button class="btn btn-secondary" type="submit">Search</button>
+            <button class="btn btn-secondary" type="submit"> <%= I18n.t('autotune.search') %> </button>
           </span>
         </div>
-        <div id="break-filter">Filters
+        <div id="break-filter"> <%= I18n.t('autotune.filters') %>
           <% if(query.type || query.tag || query.status || query.search) { %>
-            (<a href="/blueprints">clear</a>)
+            (<a href="/blueprints"> <%= I18n.t('autotune.clear-filters') %> </a>)
           <% } %>
           &nbsp;
         </div>
         <div class="filters">
-          <div id='inline-filter'>Filters
+          <div id='inline-filter'> <%= I18n.t('autotune.filters') %>
             <% if(query.type || query.blueprint_title || query.status || query.search) { %>
-              (<a href="/blueprints">clear</a>)
+              (<a href="/blueprints"> <%= I18n.t('autotune.clear-filters') %> </a>)
             <% } %>
             &nbsp;
           </div>
           <div class="select">
             <select name="type" id="type" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.type) { %>selected<% } %>>Type</option>
+              <option disabled <% if(!query.type) { %>selected<% } %>> <%= I18n.t('autotune.filter-type') %> </option>
             <% _.each(app.config.blueprint_types, function(type) { %>
               <option <% if(type === query.type) { %>selected<% } %>
                     value="<%=type %>"><%=type %></option>
@@ -44,7 +44,7 @@
           </div>
           <div class="select">
             <select name="status" id="status" class="form-control" data-auto-submit="true">
-              <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
+              <option disabled <% if(!query.status) { %>selected<% } %>> <%= I18n.t('autotune.filter-status') %> </option>
             <% _.each(app.config.blueprint_statuses, function(status) { %>
               <option <% if(status === query.status) { %>selected<% } %>
                     value="<%=status %>"><%=status %></option>
@@ -66,13 +66,13 @@
     </thead>
     <tbody>
       <tr class="m-table-heading">
-        <td>Blueprint</td>
-        <td>Status</td>
-        <td>Mode</td>
-        <td class="bold-actions-cell">Actions</td>
+        <td> <%= I18n.t('autotune.blueprint') %> </td>
+        <td> <%= I18n.t('autotune.status') %> </td>
+        <td> <%= I18n.t('autotune.mode') %> </td>
+        <td class="bold-actions-cell"> <%= I18n.t('autotune.actions') %> </td>
       </tr>
     <% if(getObjects().length == 0) { %>
-        <td class="text-center" colspan="4"><h4>No blueprints found</h4></td>
+        <td class="text-center" colspan="4"><h4> <%= I18n.t('autotune.no-blueprints') %> </h4></td>
     <% }
     _.each(getObjects(), function(item) { %>
     <tr>
@@ -83,7 +83,7 @@
         <% } else if( item.hasStatus('broken') ) { %>
           <span class="label label-danger"><%=item.get('status') %></span>
         <% } else if( item.hasStatus('updating') ) { %>
-          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Upgrading</span>
+          <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%> <%= I18n.t('autotune.blueprint-upgrading') %> </span>
         <% } else { %>
           <span class="label label-info"><%=item.get('status') %></span>
         <% } %>
@@ -98,14 +98,14 @@
         <% } %>
       </td>
       <td class="text-right" colspan="2">
-        <a data-tooltip="edit" href="<%=item.url() %>/edit"><span class="at-icon edit-icon"></span></a>
-        <a data-tooltip="Upgrade" href="#"
-           data-action-message="Upgrading the blueprint..."
+        <a data-tooltip="<%= I18n.t('autotune.edit-tooltip') %>" href="<%=item.url() %>/edit"><span class="at-icon edit-icon"></span></a>
+        <a data-tooltip="<%= I18n.t('autotune.upgrade-tooltip') %>" href="#"
+           data-action-message="<%= I18n.t('autotune.upgrading-message') %>"
            data-action="updateRepo" data-model="Blueprint" data-action-next="reload"
            data-model-id="<%= item.attributes.slug %>"><span class="at-icon refresh-icon"></span></a>
-        <a data-tooltip="delete" href="#"
-           data-action-message="Blueprint deleted"
-           data-action-confirm="Are you sure you wish to delete this?"
+        <a data-tooltip="<%= I18n.t('autotune.delete-tooltip') %>" href="#"
+           data-action-message="<%= I18n.t('autotune.blueprint-deleted-message') %>"
+           data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
            data-action="destroy" data-model="Blueprint" data-action-next="reload"
            data-model-id="<%= item.attributes.slug %>"><span class="at-icon delete-icon"></span></a>
       </td>
