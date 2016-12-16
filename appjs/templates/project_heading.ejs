@@ -1,21 +1,21 @@
-  <h3><% if ( model.isNew() ) { %>New Project<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+  <h3><% if ( model.isNew() ) { %> <%= I18n.t('autotune.new-project') %> <% } else { %><%=model.get( 'title' ) %><% } %></h3>
 
   <% if ( !model.isNew() ) { %>
   <p class="text-muted">
-    Status:
+    <%= I18n.t('autotune.status-header') %>
     <% if ( model.hasStatus('broken') ) { %>
-    <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+    <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.status-broken') %> </span>
     <% } else if ( !model.hasStatus('built') ) { %>
-    <span class="text-warning">Building...</span>
+    <span class="text-warning"> <%= I18n.t('autotune.status-building') %> </span>
     <% } else if ( model.hasUnpublishedUpdates() ) { %>
-      <a data-tooltip="Your Published Version Has Updates"
-         target="_blank" href="<%=model.get('publish_url') %>">Published</a> (has updates)
+      <a data-tooltip="<%= I18n.t('autotune.has-updates-tooltip') %>"
+         target="_blank" href="<%=model.get('publish_url') %>"> <%= I18n.t('autotune.published') %> </a> <%= I18n.t('autotune.has-updates') %>
     <% } else if ( model.isPublished() ) { %>
-      <a data-tooltip="View Published Preview"
-         target="_blank" href="<%=model.get('publish_url') %>">Published</a>
+      <a data-tooltip="<%= I18n.t('autotune.view-published-preview') %>"
+         target="_blank" href="<%=model.get('publish_url') %>"> <%= I18n.t('autotune.published') %> </a>
     <% } else { %>
-      <a data-tooltip="View Draft Preview"
-         target="_blank" href="<%=model.get('preview_url') %>">Draft</a>
+      <a data-tooltip="<%= I18n.t('autotune.view-draft-preview') %>"
+         target="_blank" href="<%=model.get('preview_url') %>"> <%= I18n.t('autotune.draft') %> </a>
     <% } %>
     <% if ( model.get('published_at') ) { %><br><%=model.publishedTime() %><% } %>
   </p>

@@ -46,10 +46,10 @@
                 data-action="edit" data-model-id="<%=model.get('id') %>"
                 <% } %> >
             <div class="form-group">
-              <label for="title"> <%= I18n.t('autotune.blueprint-title') %> </label>
+              <label for="title"> <%= I18n.t('autotune.title-label') %> </label>
               <input type="text" required class="form-control"
                      <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
-                     id="title" name="title" placeholder="<%= I18n.t('autotune.blueprint-title-placeholder') %>">
+                     id="title" name="title" placeholder="<%= I18n.t('autotune.title-placeholder') %>">
             </div>
             <div class="form-group">
               <label for="repo_url"> <%= I18n.t('autotune.blueprint-repo-url') %> </label>
@@ -99,11 +99,11 @@
 
               <% if ( !model.isNew() ) { %>
               <button type="button" class="btn btn-secondary"
-                      data-action-message=" <%= I18n.t('autotune.blueprint-upgrade-started') %>"
+                      data-action-message=" <%= I18n.t('autotune.upgrade-started') %>"
                       data-loading-text="<%= I18n.t('autotune.upgrading-message') %>"
                       data-action="update-repo" data-model="Blueprint"
                       data-action-next="reload"
-                      data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.blueprint-upgrade') %> </button>
+                      data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.upgrade') %> </button>
               <button type="button" class="btn btn-danger"
                       <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
                       data-action-message="<%= I18n.t('autotune.project-deleted-message') %>"

@@ -3,13 +3,13 @@
     <div class="modal-body">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="closeModal">&times;</button>
       <div>
-        <span class="at-icon alert-icon"></span><p>Your project has unsaved changes. Would you like to save your project before leaving?</p>
+        <span class="at-icon alert-icon"></span><p> <%= I18n.t('autotune.ask-unsaved-project') %> </p>
       </div>
     </div>
     <div class="modal-footer">
-      <button id="dismiss" class="btn btn-default modal-action">Discard changes</button>
+      <button id="dismiss" class="btn btn-default modal-action"> <%= I18n.t('autotune.discard-changes') %> </button>
       <button type="submit" class="btn btn-primary"
-               id="save" data-loading-text="Saving...">Save now</button>
+               id="save" data-loading-text="<%= I18n.t('autotune.saving-message') %>"> <%= I18n.t('autotune.save-now') %> </button>
     </div>
   </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->

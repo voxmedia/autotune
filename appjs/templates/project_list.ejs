@@ -2,34 +2,34 @@
   <div class="list-page-header">
     <div class="new-button">
       <a id="new-project" class="btn btn-primary"
-         href="/projects/new">New project</a>
+         href="/projects/new"> <%= I18n.t('autotune.new-project') %> </a>
     </div>
     <div class="text-right">
       <form class="form-inline" method="get" action="/projects">
         <div class="input-group">
           <input type="text" class="form-control"
-                   name="search" id="search" placeholder="Search keywords"
+                   name="search" id="search" placeholder="<%= I18n.t('autotune.search-keywords') %>"
                    <% if(query.search) { %>value="<%=query.search %>"<% } %>>
           <span class="input-group-btn">
-            <button class="btn btn-secondary" type="submit">Search</button>
+            <button class="btn btn-secondary" type="submit"> <%= I18n.t('autotune.search') %> </button>
           </span>
         </div>
-        <div id="break-filter">Filters
+        <div id="break-filter"> <%= I18n.t('autotune.filters') %>
           <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
-            (<a href="/projects">clear</a>)
+            (<a href="/projects"> <%= I18n.t('autotune.clear-filters') %> </a>)
           <% } %>
           &nbsp;
         </div>
         <div class="filters">
-          <div id='inline-filter'>Filters
+          <div id='inline-filter'> <%= I18n.t('autotune.filters') %>
             <% if(query.theme || query.blueprint_title || query.pub_status || query.search) { %>
-              (<a href="/projects">clear</a>)
+              (<a href="/projects"> <%= I18n.t('autotune.clear-filters') %> </a>)
             <% } %>
             &nbsp;
           </div>
           <% if ( app.themes.length > 1 ) { %>
             <div class="select">
-              <select name="theme" id="theme" class="form-control selectize-target" data-auto-submit="true" placeholder="Theme">
+              <select name="theme" id="theme" class="form-control selectize-target" data-auto-submit="true" placeholder="<%= I18n.t('autotune.theme-placeholder') %>">
                 <option disabled <% if(!query.theme) { %>selected<% } %>></option>
               <% app.themes.each(function(theme) { %>
                 <option <% if(theme.get('slug') == query.theme) { %>selected<% } %>
@@ -40,7 +40,7 @@
             <% } %>
             <div class="select">
               <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">
-                <option disabled <% if(!query.blueprint_title) { %>selected<% } %>>Blueprint</option>
+                <option disabled <% if(!query.blueprint_title) { %>selected<% } %>> <%= I18n.t('autotune.blueprint') %> </option>
               <% _.each(app.config.blueprint_titles, function(blueprint_title) { %>
                 <option <% if(String(blueprint_title.id) === query.blueprint_title) { %>selected<% } %>
                       value="<%=blueprint_title.id %>"><%=blueprint_title.title %></option>
@@ -49,7 +49,7 @@
             </div>
             <div class="select">
               <select name="pub_status" id="pub_status" class="form-control" data-auto-submit="true">
-                <option disabled <% if(!query.pub_status) { %>selected<% } %>>Status</option>
+                <option disabled <% if(!query.pub_status) { %>selected<% } %>> <%= I18n.t('autotune.status') %> </option>
               <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
                 <option <% if(pub_status === query.pub_status) { %>selected<% } %>
                       value="<%=pub_status %>"><%=pub_status %></option>
@@ -63,23 +63,23 @@
   <table class="table collection project-list">
     <tbody>
     <tr class="m-table-heading">
-      <td class="project-cell">Project</td>
-      <td class="author-cell">Author</td>
-      <td class="status-cell">Status</td>
-      <td class="publish-cell">Published</td>
-      <td class="theme-cell">Theme</td>
-      <td class="blueprint-cell">Blueprint</td>
-      <td class="bold-actions-cell">Actions</td>
+      <td class="project-cell">      <%= I18n.t('autotune.list-head-project') %>   </td>
+      <td class="author-cell">       <%= I18n.t('autotune.list-head-author') %>    </td>
+      <td class="status-cell">       <%= I18n.t('autotune.list-head-status') %>    </td>
+      <td class="publish-cell">      <%= I18n.t('autotune.list-head-published') %> </td>
+      <td class="theme-cell">        <%= I18n.t('autotune.list-head-theme') %>     </td>
+      <td class="blueprint-cell">    <%= I18n.t('autotune.list-head-blueprint') %> </td>
+      <td class="bold-actions-cell"> <%= I18n.t('autotune.list-head-actions') %>   </td>
     </tr>
     <% if(!hasObjects()) { %>
-    <tr><td class="text-center" colspan="6"><h4>No projects found</h4></td></tr>
+    <tr><td class="text-center" colspan="6"><h4> <%= I18n.t('autotune.no-projects-found') %> </h4></td></tr>
     <% }
      _.each(getObjects(), function(item) { %>
      <tr>
       <td class="project-cell">
         <a class="title" href="<%=item.url() %>"><%= item.get('title') %></a></td>
       <td class="author-cell">
-        <span class="small-list-view">Created by </span>
+        <span class="small-list-view"> <%= I18n.t('autotune.created-by') %> </span>
         <%=item.get('created_by') %>
       </td>
       <td class="status-cell">
@@ -90,25 +90,25 @@
         <% } else if ( item.hasStatus('building') ) { %>
           <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%><%=item.get('status') %></span>
         <% } else if ( item.hasStatus('updated') )  { %>
-          <span class="label label-info">Updated</span>
+          <span class="label label-info"> <%= I18n.t('autotune.updated') %> </span>
         <% } else { %>
           <span class="label label-info"><%=item.get('status') %></span>
         <% } %>
       </td>
       <td class="publish-cell">
         <% if ( item.hasUnpublishedUpdates() || item.isPublished() ) { %>
-          Published
+          <%= I18n.t('autotune.published') %>
         <% } else { %>
-          Draft
+          <%= I18n.t('autotune.draft') %>
         <% } %>
         <% if ( item.get('published_at') ) { %><div class="pub-time"><%=item.publishedTime() %></div><% } %>
         <span style="margin-left: 5px;" class="small-list-view">
           <% if ( item.hasStatus('built') ) { %>
-            <span class="label label-success">Built</span>
+            <span class="label label-success"> <%= I18n.t('autotune.status-built') %> </span>
           <% } else if ( item.hasStatus('broken') ) { %>
-            <span class="label label-danger">Broken</span>
+            <span class="label label-danger"> <%= I18n.t('autotune.status-broken') %> </span>
           <% } else if ( item.hasStatus('building') ) { %>
-            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Building</span>
+            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%> <%= I18n.t('autotune.status-building') %> </span>
           <% } else { %>
             <span class="m-status"><span class="glyphicon glyphicon-info-sign"></span></span>
           <% } %>
@@ -127,15 +127,15 @@
         <a data-tooltip="edit" href="<%=item.url() %>/edit">
           <span class="at-icon edit-icon"></span>
         </a>
-        <a data-tooltip="Duplicate"
-           data-action-message="Project Copied"
+        <a data-tooltip="<%= I18n.t('autotune.duplicate-tooltip') %>"
+           data-action-message="<%= I18n.t('autotune.project-copied') %>"
            data-model="Project" data-action-next="reload"
               href="/projects/<%=item.get('slug') %>/duplicate">
             <span class="at-icon duplicate-icon"></span>
         </a>
         <a data-tooltip="delete"
-           data-action-message="Project deleted"
-           data-action-confirm="Are you sure you wish to delete this?"
+           data-action-message="<%= I18n.t('autotune.project-deleted-message') %>"
+           data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
            data-action="destroy" data-model="Project" data-action-next="reload"
            data-model-id="<%= item.get('slug') %>">
           <span class="at-icon delete-icon"></span>
@@ -148,7 +148,7 @@
   <nav>
     <ul class="pagination">
       <% if(collection.state.currentPage !== collection.state.firstPage){ %>
-        <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>">Previous</a></li>
+        <li class="previous<%=hasPreviousPage() ? '' : ' disabled' %>"><a href="<%=getPreviousPageUrl()%>"> <%= I18n.t('autotune.pagination-prev') %> </a></li>
       <% } %>
 
       <ul class="pagination">
@@ -163,7 +163,7 @@
         <% if(collection.state.currentPage === collection.state.firstPage){ %>
 
           <% var i = 1; %>
-          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only"> <%= I18n.t('autotune.pagination-curr') %> </span></a></li>
           <% while(collection.state.firstPage + i <= collection.state.totalPages && i < 6) { %>
             <li class=""><a href="<%=getPageUrl(collection.state.currentPage + i)%>"><%=collection.state.currentPage + i %><span class="sr-only"></span></a></li>
             <% i++; %>
@@ -178,7 +178,7 @@
             <% } %>
             <% i++; %>
           <% } %>
-          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only"> <%= I18n.t('autotune.pagination-curr') %> </span></a></li>
 
         <% } else { %>
 
@@ -190,7 +190,7 @@
             <% i++; %>
           <% } %>
 
-          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only">(current)</span></a></li>
+          <li class="active"><a href="#"><%=collection.state.currentPage %><span class="sr-only"> <%= I18n.t('autotune.pagination-curr') %> </span></a></li>
 
           <% var i = 1; %>
           <% while(collection.state.currentPage + i <= collection.state.lastPage && i < 3) { %>
@@ -211,7 +211,7 @@
       </ul>
 
       <% if(collection.state.currentPage !== collection.state.lastPage){ %>
-        <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>">Next</a></li>
+        <li class="next<%=hasNextPage() ? '' : ' disabled' %>"><a href="<%=getNextPageUrl()%>"> <%= I18n.t('autotune.pagination-next') %> </a></li>
       <% } %>
     </ul>
   </nav>

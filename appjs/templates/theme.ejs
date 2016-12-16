@@ -4,12 +4,12 @@
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a
         href="#visual" aria-controls="visual"
-        role="tab" data-toggle="tab">Properties</a>
+        role="tab" data-toggle="tab"> <%= I18n.t('autotune.properties') %> </a>
     </li>
     <% if ( hasRole('superuser') && !model.isNew() ) { %>
     <li role="presentation"><a
         href="#code" aria-controls="code"
-        role="tab" data-toggle="tab">Developer</a></li>
+        role="tab" data-toggle="tab"> <%= I18n.t('autotune.developer') %> </a></li>
   <% } %>
   </ul>
 
@@ -20,11 +20,11 @@
       <p class="text-muted">
         Status:
         <% if(model.hasStatus('ready')) { %>
-        <span class="text-success"><i class="icon-ok"></i>Ready</span>
+        <span class="text-success"><i class="icon-ok"></i> <%= I18n.t('autotune.status-ready') %> </span>
         <% } else if(model.hasStatus('broken')) { %>
-        <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+        <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.status-broken') %> </span>
         <% } else if(model.hasStatus('updating')) { %>
-        <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+        <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <%= I18n.t('autotune.status-upgrading') %> </span>
         <% } else { %>
         <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
         <% } %>
@@ -43,23 +43,23 @@
                   data-action="edit" data-model-id="<%=model.get('id') %>"
                   <% } %> >
               <div class="form-group">
-                <label for="title">Title</label>
+                <label for="title"> <%= I18n.t('autotune.title-label') %> </label>
                 <% if(model.isDefault()) {%>
-                 <p class="text-muted">Theme name will be displayed as typed below.</p>
+                 <p class="text-muted"> <%= I18n.t('autotune.theme-name-help') %> </p>
                 <% } else {%>
-                  <p class="text-muted">Theme name will be displayed as "Group name - Theme name"</p>
+                  <p class="text-muted"> <%= I18n.t('autotune.theme-name-help-group') %> </p>
                 <% }%>
                 <input type="text" required class="form-control"
                        <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
-                       id="title" name="title" placeholder="Enter title">
+                       id="title" name="title" placeholder="<%= I18n.t('autotune.title-placeholder') %>">
               </div>
               <% if (model.isNew()) { %>
               <div class="form-group">
                 <br />
-                <label for="group_id" class="block">Group</label>
+                <label for="group_id" class="block"> <%= I18n.t('autotune.group') %> </label>
                 <div class="select">
                   <select id="group_id" name="group_id" class="form-control">
-                    <option>Select group</option>
+                    <option> <%= I18n.t('autotune.select-group') %> </option>
                     <% this.app.designerGroups.each(function(group) { %>
                         <option value="<%= group.get('id') %>" <% if ( model.get('group_id') === group.get('id') ) { %>selected<% } %>>
                           <%= group.get('name') %>
@@ -70,7 +70,7 @@
               </div>
               <% } %>
               <% if (!model.isNew()) { %>
-                <h3>Theme Data</h3>
+                <h3> <%= I18n.t('autotune.theme-data') %> </h3>
                 <% _.each(['colors','social'], function(group){ %>
                   <div class="form-group">
                   <% if (_.isObject(model.themeData(group))) { %>
@@ -113,25 +113,25 @@
               <% } %>
               <br />
               <button type="submit" class="btn btn-primary"
-                      data-loading-text="Saving...">Save changes</button>
+                      data-loading-text="<%= I18n.t('autotune.saving-message') %>"> <%= I18n.t('autotune.save-changes') %> </button>
 
               <% if ( hasRole('superuser') && !model.isNew() && model.isDefault()) { %>
               <button type="button" class="btn btn-secondary"
-                      data-action-message="Reset started"
-                      data-action-confirm="Resetting will delete all changes made to the theme. Are you sure you wish to continue?"
-                      data-loading-text="Resetting..."
+                      data-action-message="<%= I18n.t('autotune.reset-started-message') %>"
+                      data-action-confirm="<%= I18n.t('autotune.reset-confirm') %>"
+                      data-loading-text="<%= I18n.t('autotune.reset-starting-message') %>"
                       data-action="reset" data-model="Theme"
                       data-action-next="reload"
-                      data-model-id="<%=model.get('slug') %>">Reset</button>
+                      data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.reset') %> </button>
               <% } %>
               <% if ( !model.isNew() && !model.isDefault()) { %>
               <button type="button" class="btn btn-danger"
-                      data-action-message="Theme deleted"
-                      data-action-confirm="Are you sure you wish to delete this?"
-                      data-loading-text="Deleting..."
+                      data-action-message="<%= I18n.t('autotune.theme-deleted-message') %>"
+                      data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
+                      data-loading-text="<%= I18n.t('autotune.deleting-message') %>"
                       data-action="destroy"
                       data-action-next="/themes" data-model="Theme"
-                      data-model-id="<%=model.get('slug') %>">Delete</button>
+                      data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.action-delete') %> </button>
               <% } %>
             </form>
           </div>
@@ -152,37 +152,37 @@
                         <% } %> >
                     <% if(!model.isDefault()) { %>
                     <div class="form-group">
-                      <span class="label label-warning">Read only</span>
-                      <h4>Inherited data:</h4>
+                      <span class="label label-warning"> <%= I18n.t('autotune.read-only') %> </span>
+                      <h4> <%= I18n.t('autotune.inherited-data-header') %> </h4>
                       <div id="readonly-data" style="height:300px;"></div>
                     </div>
                     <% } %>
                     <br />
                     <div class="form-group">
-                      <h4>Theme data :</h4>
+                      <h4> <%= I18n.t('autotune.theme-data') %> </h4>
                       <div id="data" style="height:300px;">test test test</div>
                     </div>
                     <br />
                     <button type="submit" class="btn btn-primary"
-                            data-loading-text="Saving...">Save changes</button>
+                            data-loading-text="<%= I18n.t('autotune.saving-message') %>"> <%= I18n.t('autotune.save-changes') %> </button>
 
                     <% if ( hasRole('superuser') && !model.isNew() && model.isDefault()) { %>
                     <button type="button" class="btn btn-secondary"
-                            data-action-message="Reset started"
-                            data-action-confirm="Resetting will delete all changes made to the theme. Are you sure you wish to continue?"
-                            data-loading-text="Resetting..."
+                            data-action-message="<%= I18n.t('autotune.reset-started-message') %>"
+                            data-action-confirm="<%= I18n.t('autotune.reset-confirm') %>"
+                            data-loading-text="<%= I18n.t('autotune.reset-starting-message') %>"
                             data-action="reset" data-model="Theme"
                             data-action-next="reload"
-                            data-model-id="<%=model.get('slug') %>">Reset</button>
+                            data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.reset') %> </button>
                     <% } %>
                     <% if ( !model.isNew() && !model.isDefault()) { %>
                     <button type="button" class="btn btn-danger"
-                            data-action-message="Theme deleted"
-                            data-action-confirm="Are you sure you wish to delete this?"
-                            data-loading-text="Deleting..."
+                            data-action-message="<%= I18n.t('autotune.theme-deleted-message') %>"
+                            data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
+                            data-loading-text="<%= I18n.t('autotune.deleting-message') %>"
                             data-action="destroy"
                             data-action-next="/themes" data-model="Theme"
-                            data-model-id="<%=model.get('slug') %>">Delete</button>
+                            data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.action-delete') %> </button>
                     <% } %>
                   </form>
             </div>

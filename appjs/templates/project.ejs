@@ -4,21 +4,21 @@
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a
         href="#edit" aria-controls="edit"
-        role="tab" data-toggle="tab">Create</a></li>
+        role="tab" data-toggle="tab"> <%= I18n.t('autotune.create') %> </a></li>
     <% if ( model.isNew() ) { %>
-    <li role="presentation" class="disabled"><a>Publish</a></li>
+    <li role="presentation" class="disabled"><a> <%= I18n.t('autotune.publish') %> </a></li>
     <% } else { %>
     <li role="presentation"><a
         href="#publish" aria-controls="data"
-        role="tab" data-toggle="tab">Publish</a></li>
+        role="tab" data-toggle="tab"> <%= I18n.t('autotune.publish') %> </a></li>
     <% } %>
     <% if ( hasRole('superuser') ) { %>
       <% if ( model.isNew() ) { %>
-      <li role="presentation" class="disabled"><a>Developer</a></li>
+      <li role="presentation" class="disabled"><a> <%= I18n.t('autotune.developer') %> </a></li>
       <% } else { %>
       <li role="presentation"><a
           href="#developer" aria-controls="data"
-          role="tab" data-toggle="tab">Developer</a></li>
+          role="tab" data-toggle="tab"> <%= I18n.t('autotune.developer') %> </a></li>
       <% } %>
   <% } %>
   </ul>
@@ -42,24 +42,24 @@
           <p class="blueprint-title"><%= model.blueprint.get('title') %></p>
 
           <% if ( model.isNew() ) { %>
-            <p>Draft</p>
+            <p> <%= I18n.t('autotune.draft') %> </p>
           <% } else { %>
           <p>
             <% if ( model.hasStatus('broken') ) { %>
-            <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+            <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.status-broken') %> </span>
             <% } else if ( !model.hasStatus('built') ) { %>
-            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>Building</span>
+            <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%> <%= I18n.t('autotune.building') %> </span>
             <% } else if ( model.hasUnpublishedUpdates() ) { %>
-              <a data-tooltip="Your Published Version Has Updates"
-                 target="_blank" href="<%=model.getPublishUrl() %>">Published</a> (has updates)
+              <a data-tooltip="<%= I18n.t('autotune.has-updates-tooltip') %>"
+                 target="_blank" href="<%=model.getPublishUrl() %>"> <%= I18n.t('autotune.published') %> </a> <%= I18n.t('autotune.has-updates') %>
             <% } else if ( model.isPublished() ) { %>
-              <a data-tooltip="View Published Preview"
-                 target="_blank" href="<%=model.getPublishUrl() %>">Published</a>
+              <a data-tooltip="<%= I18n.t('autotune.view-published-preview') %>"
+                 target="_blank" href="<%=model.getPublishUrl() %>"> <%= I18n.t('autotune.published') %> </a>
             <% } else if ( model.hasType( 'graphic' ) ) { %>
-              Draft
+              <%= I18n.t('autotune.draft') %>
             <% } else { %>
-              <a data-tooltip="View Draft Preview"
-                 target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
+              <a data-tooltip="<%= I18n.t('autotune.view-draft-preview') %>"
+                 target="_blank" href="<%=model.getPreviewUrl() %>"> <%= I18n.t('autotune.draft') %> </a>
             <% } %>
             <% if ( model.get('published_at') ) { %> - <%=model.publishedTime() %><% } %>
           </p>
@@ -67,7 +67,7 @@
 
           <% if ( model.hasStatus('broken') && model.has('error_message') ) { %>
           <p class="text-danger">
-           <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
+           <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only"> <%= I18n.t('autotune.error-header') %> </span>
             <%=model.getErrorMsg() %></p>
           <% } %>
 
@@ -93,7 +93,7 @@
         </div>
         <div class="col-md-4 col-sm-5 scroll-pane" id="form-pane">
           <div id="split-bar"></div>
-          <h4>Preview</h4>
+          <h4> <%= I18n.t('autotune.preview-header') %> </h4>
           <ul class="nav nav-pills">
             <button type="button" id="small-view"
                     class="btn btn-default resize"></button>
@@ -111,9 +111,9 @@
           <div class="col-sm-8 scroll-pane" id="preview-pane">
             <h3>
                 <% if ( model.isNew() && (copyProject == false) ) {
-                  %>New Project<%
+                  %> <%= I18n.t('autotune.new-project') %> <%
                 } else if ( copyProject ) {
-                  %>New <%= model.get( 'title' ) %><%
+                  %> <%= I18n.t('autotune.new') %> <%= model.get( 'title' ) %><%
                 } else {
                   %><%= model.get( 'title' ) %><%
                 } %>
@@ -122,20 +122,20 @@
             <% if ( !model.isNew() ) { %>
             <p>
               <% if ( model.hasStatus('broken') ) { %>
-              <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+              <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.status-broken') %> </span>
               <% } else if ( !model.hasStatus('built') ) { %>
-              <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Building</span>
+              <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <%= I18n.t('autotune.building') %> </span>
               <% } else if ( model.hasUnpublishedUpdates() ) { %>
-                <a data-tooltip="Your Published Version Has Updates"
-                   target="_blank" href="<%=model.getPublishUrl() %>">Published</a> (has updates)
+                <a data-tooltip="<%= I18n.t('autotune.has-updates-tooltip') %>"
+                   target="_blank" href="<%=model.getPublishUrl() %>"> <%= I18n.t('autotune.published') %> </a> <%= I18n.t('autotune.has-updates') %>
               <% } else if ( model.isPublished() ) { %>
-                <a data-tooltip="View Published Preview"
-                   target="_blank" href="<%=model.getPublishUrl() %>">Published</a>
+                <a data-tooltip="<%= I18n.t('autotune.view-published-preview') %>"
+                   target="_blank" href="<%=model.getPublishUrl() %>"> <%= I18n.t('autotune.published') %> </a>
               <% } else if ( model.hasType( 'graphic' ) ) { %>
-                <a data-tooltip="View Draft Preview" data-toggle="tab" href="#preview">Draft</a>
+                <a data-tooltip="<%= I18n.t('autotune.view-draft-preview') %>" data-toggle="tab" href="#preview"> <%= I18n.t('autotune.draft') %> </a>
               <% } else { %>
-                <a data-tooltip="View Draft Preview"
-                   target="_blank" href="<%=model.getPreviewUrl() %>">Draft</a>
+                <a data-tooltip="<%= I18n.t('autotune.view-draft-preview') %>"
+                   target="_blank" href="<%=model.getPreviewUrl() %>"> <%= I18n.t('autotune.draft') %> </a>
               <% } %>
               <% if ( model.get('published_at') ) { %> - <%=model.publishedTime() %><% } %>
             </p>
@@ -143,7 +143,7 @@
 
             <% if ( model.hasStatus('broken') && model.has('error_message') ) { %>
             <p class="text-danger">
-             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span>
+             <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only"> <%= I18n.t('autotune.error-header') %> </span>
               <%=model.getErrorMsg() %></p>
             <% } %>
             <div id="projectForm"></div>
@@ -159,55 +159,54 @@
       <div class="container" style="padding-top: 20px;">
         <h3><%= model.get( 'title' ) %></h3>
         <hr />
-        <h4>Publish</h4>
+        <h4> <%= I18n.t('autotune.publish') %> </h4>
         <button type="button" class="btn btn-primary" id="publishBtn"
                 <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
-                data-action-message="Publishing..."
+                data-action-message="<%= I18n.t('autotune.publishing') %>"
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
                 data-model-id="<%=model.get('slug') %>"
                 <% if ( model.hasStatus('building') ) { %>
-                  style="width: 109px;">Publishing<div></div>
+                  style="width: 109px;"> <%= I18n.t('autotune.publishing') %> <div></div>
                 <% } else { %>
                   ><% if ( model.hasInitialBuild() ) { %>
-                    Publish changes now
+                    <%= I18n.t('autotune.publish-changes-now') %>
                   <% } else { %>
-                    Publish now
+                    <%= I18n.t('autotune.publish-now') %>
                   <% } %>
                 <% } %>
                 </button>
         <% if ( model.hasInitialBuild() ) { %>
         <a class="btn btn-secondary" target="_blank" id="viewBtn"
-           href="<%=model.getPublishUrl() %>">View</a>
+           href="<%=model.getPublishUrl() %>"> <%= I18n.t('autotune.view') %> </a>
         <% } %>
 
           <br />
           <br />
           <br />
         <% if (model.blueprint.hasType('graphic')){ %>
-          <h4>Share Text</h4>
+          <h4> <%= I18n.t('autotune.share-text') %> </h4>
 
           <textarea id="shareText" class="form-control" rows="6"></textarea>
-          <p class="help-block">You have <span id="tweetChars"></span> characters remaining.</p>
-          <p class="help-block">This text will appear when the graphic is shared via twitter or facebook.</p>
+          <%= I18n.t('autotune.share-text-help-block') %>
             <br />
             <br />
             <br />
-          <h4>Embed in your story</h4>
+          <h4> <%= I18n.t('autotune.embed-in-your-story') %> </h4>
 
           <% if ( model.has('embed_html') ) { %>
           <textarea class="form-control" id="embedText" rows="6" readonly><%=model.get('embed_html') %></textarea>
           <p>
             <button type="button" class="btn btn-default"
-                    data-hook="copyEmbedToClipboard">Copy embed code</button>
+                    data-hook="copyEmbedToClipboard"> <%= I18n.t('autotune.copy-embed-code') %> </button>
           </p>
           <% } else { %>
-            <textarea class="form-control" id="embedText" rows="6" placeholder="Please publish your project to receive the embed code." readonly></textarea>
+            <textarea class="form-control" id="embedText" rows="6" placeholder="<%= I18n.t('autotune.embed-placeholder') %>" readonly></textarea>
           <% } %>
           <% if ( model.has('screenshot_sm_url') ) { %>
             <br />
             <br />
-          <h4>Screenshots</h4>
+          <h4> <%= I18n.t('autotune.screenshots') %> </h4>
           <ul class="nav nav-pills">
             <li href="#large-ss" data-toggle="tab" class="active">
               <button type="button" id="fluid-view"
@@ -245,9 +244,9 @@
     <% if ( hasRole('superuser') ) { %>
     <div role="tabpanel" class="tab-pane" id="developer">
       <div class="container">
-        <p>Status:
-          <% if ( model.hasStatus('broken') ) { %><span class="label label-danger">Broken</span>
-          <% } else if ( model.hasStatus('built') ) { %><span class="label label-success">Built</span>
+        <p> <%= I18n.t('autotune.status-header') %>
+          <% if ( model.hasStatus('broken') ) { %><span class="label label-danger"> <%= I18n.t('autotune.status-broken') %> </span>
+          <% } else if ( model.hasStatus('built') ) { %><span class="label label-success"> <%= I18n.t('autotune.status.built') %> </span>
           <% } else if ( model.hasStatus('building') ) { %>
             <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>
               <%=capitalize(model.get('status')) %></span>
@@ -256,14 +255,14 @@
 
         <p>
           <button type="button" class="btn btn-primary"
-                  data-action-message="Build started" data-loading-text="Starting build..."
-                  data-action="build" data-action-next="reload">Rebuild</button>
+                  data-action-message="<%= I18n.t('autotune.build-started-message') %>" data-loading-text="<%= I18n.t('autotune.build-starting-message') %>"
+                  data-action="build" data-action-next="reload"> <%= I18n.t('autotune.rebuild') %> </button>
           <button type="button" class="btn btn-secondary"
-                  data-action-message="Upgrade started" data-loading-text="Starting upgrade..."
-                  data-action="update-snapshot" data-action-next="reload">Upgrade</button>
+                  data-action-message="<%= I18n.t('autotune.upgrade-started') %>" data-loading-text="<%= I18n.t('autotune.upgrade-starting-message') %>"
+                  data-action="update-snapshot" data-action-next="reload"> <%= I18n.t('autotune.upgrade') %> </button>
         </p>
 
-        <h4>Blueprint data:</h4>
+        <h4> <%= I18n.t('autotune.blueprint-data-header') %> </h4>
         <form data-model="Project"
               data-model-id="<%=model.isNew() ? '' : model.id %>"
               data-action="<%=model.isNew() ? 'new' : 'edit' %>"
@@ -271,11 +270,11 @@
           <p><div id="blueprint-data"></div></p>
           <p>
             <button type="submit" class="btn btn-default"
-                    data-loading-text="Saving...">Save raw data</button>
+                    data-loading-text="<%= I18n.t('autotune.saving-message') %>"> <%= I18n.t('autotune.save-raw-data') %> </button>
           </p>
         </form>
 
-        <h4>Output from last build:</h4>
+        <h4> <%= I18n.t('autotune.last-build-output-header') %> </h4>
         <pre><%=escape( model.get('output') ) %></pre>
       </div>
     </div>
