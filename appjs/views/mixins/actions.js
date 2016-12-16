@@ -69,7 +69,7 @@ module.exports = {
         switch (action) {
           case 'build':
             app.view.warning(
-              'Building... This might take a moment.', 16000);
+              I18n.t('autotune.building-wait'), 16000);
             break;
           case 'destroy':
             if ( view.collection ) {
@@ -101,7 +101,7 @@ module.exports = {
       var data = $.parseJSON( xhr.responseText );
       this.app.view.error( data.error );
     } else {
-      this.app.view.error( 'Something bad happened... Please reload and try again' );
+      this.app.view.error( I18n.t('autotune.error-message') );
     }
     logger.error("REQUEST FAILED!!", xhr);
   }
