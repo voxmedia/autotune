@@ -91,7 +91,7 @@ function App(config) {
   // Start the app once the top-level view is rendered
   var view = this.view, app = this;
   this.view.render().then(function() {
-    $('body').prepend(view.$el);
+    $('#autotune-main-body').prepend(view.$el);
     app.trigger( 'loadingStart' );
     Backbone.history.start({ pushState: true });
   });
