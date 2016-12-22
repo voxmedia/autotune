@@ -132,6 +132,22 @@ namespace :autotune do
     end
   end
 
+  desc 'Delete google authorizations for all users and force new auths'
+  task :reset_google_credentials, [:email] => [:environment] do |_, args|
+    u = Autotune::User.find_by_email(args[:email])
+    if u.present?
+      a = u.authorizations.find_by_provider('google_oauth2')
+      if a.present?
+        puts "Deleting Google credentials for #{u.name}"
+        a.destroy
+      else
+        puts "User #{u.name} does not have Google credentials"
+      end
+    else
+      puts "Can't find user with email #{args[:email]}"
+    end
+  end
+
   desc 'Send a message to users'
   task :alert_users, [:level, :text, :timeout] => [:environment] do |_, args|
     timeout = args[:timeout].to_i.to_s == args[:timeout] ? args[:timeout].to_i : args[:timeout]
@@ -142,10 +158,11 @@ namespace :autotune do
   end
 
   desc 'Reset all themes'
-  task :reset_themes => :environment do
+  task :reset_themes, [:build_blueprints] => :environment do |_, args|
+    build_arg = args[:build_blueprints] == 'true'
     puts 'Resetting all themes'
     Autotune::Theme.all.each_with_index do |t, i|
-      build_bp = i == (Autotune::Theme.count - 1)
+      build_bp = build_arg && (i == (Autotune::Theme.count - 1))
       t.update_data(:build_blueprints => build_bp)
     end
   end

@@ -27,7 +27,7 @@ module Autotune
         # Update the project files. Because of issue #218, due to
         # some weirdness in git 1.7, we can't just update the repo.
         # We have to make a new copy.
-        project_dir.destroy
+        project_dir.rm
         blueprint_dir.copy_to(project_dir.working_dir)
       elsif project_dir.exist?
         # if we're not updating, bail if we have the files

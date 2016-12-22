@@ -117,34 +117,30 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
   end
 
   test 'checkout hash' do
-    updated_submod = 'e03176388c7d1f6dd91a5856b0197d80168a57a2'
-    with_submod = '4d3dc6432b464f4d42b0e30b891824ad72ef6abb'
-    no_submod = 'fdb4b18d01461574f68cbd763731499af2da561d'
-
     in_tmpdir do |rdir|
       r = Autoshell.new rdir
       r.clone autotune_blueprints(:example).repo_url
 
-      assert_equal updated_submod, r.version
+      assert_equal MASTER_HEAD, r.version
       assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
       assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
 
-      r.commit_hash_for_checkout = with_submod
+      r.commit_hash_for_checkout = WITH_SUBMOD
       r.update
-      assert_equal with_submod, r.version
+      assert_equal WITH_SUBMOD, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
       assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
 
-      r.commit_hash_for_checkout = no_submod
+      r.commit_hash_for_checkout = NO_SUBMOD
       r.update
-      assert_equal no_submod, r.version
+      assert_equal NO_SUBMOD, r.version
       refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
       refute r.exist?('submodule/test.rb'), 'Should not have submodule test.rb'
 
       r.branch = 'master'
-      r.commit_hash_for_checkout = updated_submod
+      r.commit_hash_for_checkout = MASTER_HEAD
       r.update
-      assert_equal updated_submod, r.version
+      assert_equal MASTER_HEAD, r.version
       assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
       assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
     end

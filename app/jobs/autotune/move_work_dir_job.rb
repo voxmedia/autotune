@@ -1,4 +1,4 @@
-require 'work_dir'
+require 'autoshell'
 
 module Autotune
   # recursively delete a filepath
@@ -8,7 +8,7 @@ module Autotune
     # do the deed
     def perform(path, new_path)
       # Get a generic workdir object for the path
-      wd = WorkDir.new(path)
+      wd = Autoshell.new(path)
       wd.move_to(new_path) if wd.exist?
     end
   end

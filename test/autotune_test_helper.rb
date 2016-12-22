@@ -56,13 +56,13 @@ OmniAuth.config.add_mock(:google_oauth2, OmniAuth::AuthHash.new(
 
 # Commit hashs for the test repo
 TEST_REPO = Autotune.root.join('test', 'repos', 'autotune-example-blueprint.git')
-MASTER_HEAD = 'e03176388c7d1f6dd91a5856b0197d80168a57a2'
-MASTER_HEAD1 = WITH_SUBMOD = '4d3dc6432b464f4d42b0e30b891824ad72ef6abb'
-MASTER_HEAD2 = NO_SUBMOD = 'fdb4b18d01461574f68cbd763731499af2da561d'
-TEST_HEAD = 'b36b32c97fa027d4f86b64559377d9dd47a3530b'
-LIVE_HEAD = '23eed13c4713da0516af6ad0d33a99ee9c582fa4'
-LIVE_HEAD1 = 'c4e5571fd259be57f7e2d0ab8cc0f93a46ab9460'
-RESET_THEME_DATA = { 'updated' =>'data'}
+MASTER_HEAD = 'fed20c2cd2d4563e6409af96e559945454873098'
+MASTER_HEAD1 = WITH_SUBMOD = 'e4fcd8853e284bb6a9fc53516d92448135809130'
+MASTER_HEAD2 = NO_SUBMOD = '5d1e9d5b94da6ed477845e3459981c4460f617c7'
+TEST_HEAD = '21147d5fb3b1b7c983f96effad2317accfc718ce'
+LIVE_HEAD = '5b971930c476c88d6390489d41627ee529763c55'
+LIVE_HEAD1 = '1fb3251d16ea278d04af9beec762e29c96885bf0'
+RESET_THEME_DATA = { 'updated' => 'data' }
 
 # Reset themes for testing
 Rails.configuration.autotune.generic_theme = {
@@ -73,7 +73,7 @@ Rails.configuration.autotune.generic_theme = {
   }
 }
 
-Rails.configuration.autotune.get_theme_data = lambda do |theme|
+Rails.configuration.autotune.get_theme_data = lambda do |_theme|
   RESET_THEME_DATA
 end
 
@@ -139,7 +139,8 @@ class ActionController::TestCase
     assert_keys decoded_response, *args
   end
 
-  # Take a data hash and an array of keys and assert that those keys exist and have the correct value in decoded_response
+  # Take a data hash and an array of keys and assert that those keys exist and
+  # have the correct value in decoded_response
   def assert_data_values(data, *args)
     assert_keys data, *args
   end

@@ -3,9 +3,9 @@ module Autotune
   class Group < ActiveRecord::Base
     include Slugged
 
-    has_many :themes
-    has_and_belongs_to_many :projects
-    has_many :group_memberships
+    has_many :themes, :dependent => :destroy
+    has_many :projects
+    has_many :group_memberships, :dependent => :destroy
     has_many :users, :through => :group_memberships
 
     validates :slug, :name, :presence => true
