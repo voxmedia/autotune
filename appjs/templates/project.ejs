@@ -246,7 +246,7 @@
       <div class="container">
         <p> <%= I18n.t('autotune.status-header') %>
           <% if ( model.hasStatus('broken') ) { %><span class="label label-danger"> <%= I18n.t('autotune.status-broken') %> </span>
-          <% } else if ( model.hasStatus('built') ) { %><span class="label label-success"> <%= I18n.t('autotune.status.built') %> </span>
+          <% } else if ( model.hasStatus('built') ) { %><span class="label label-success"> <%= I18n.t('autotune.status-built') %> </span>
           <% } else if ( model.hasStatus('building') ) { %>
             <span class="label label-info"><%=render(require('./spinner.ejs'), {size:10, color:'#282E35'})%>
               <%=capitalize(model.get('status')) %></span>
