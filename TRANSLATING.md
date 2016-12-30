@@ -6,8 +6,11 @@ This library provides translation facilites using the same mechanism as the Rail
 
 ## Getting started:
 
-Copy the file _config/locale/autotune.yml_ to _config/locale/autotune-mylang.yml_ and edit as needed. Keep in mind that
+Copy the file _config/locales/autotune.yml_ to _config/locales/autotune-mylang.yml_ and edit as needed. Keep in mind that
 you *need* to change the 'en:' key to 'mylang:' in order to avoid overwriting other languages.
+
+This file can be either inside Autotune or your own application. Alternatively, you can add them inside the main
+autotune.yml file.
 
 To set the language within an initializer (for example a file under _config/initializers/locale.rb_) do:
 
