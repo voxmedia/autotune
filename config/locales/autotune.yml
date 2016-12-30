@@ -132,6 +132,7 @@ en:
     inherited-data-header:  'Inherited data:'
     theme-deleted-message:  'Theme deleted'
     manage-themes:          'Manage themes'
+    manage-blueprints:      'Manage blueprints'
     new-theme:              'New theme'
     no-themes-found:        'No themes found'
     building-wait:          'Building... This might take a moment.'
