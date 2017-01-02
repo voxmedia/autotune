@@ -22,13 +22,13 @@
       <p class="text-muted">
          <%= I18n.t('autotune.status-header') %>
         <% if(model.hasStatus('ready')) { %>
-        <span class="text-success"><i class="icon-ok"></i> <%= I18n.t('autotune.status-ready') %> </span>
+        <span class="text-success"><i class="icon-ok"></i> <%= I18n.t('autotune.filter-blueprint-status-ready') %> </span>
         <% } else if(model.hasStatus('broken')) { %>
-        <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.status-broken') %> </span>
+        <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.filter-blueprint-status-broken') %> </span>
         <% } else if(model.hasStatus('updating')) { %>
-        <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <%= I18n.t('autotune.status-upgrading') %> </span>
+        <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <%= I18n.t('autotune.filter-blueprint-status-upgrading') %> </span>
         <% } else { %>
-        <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
+        <span class="text-warning"><i class="icon-info"></i><%= I18n.t('autotune.filter-blueprint-status-' + model.get('status'), { defaultValue: capitalize(model.get('status')) }) %></span>
         <% } %>
       </p>
       <% } %>
@@ -66,7 +66,7 @@
                 <select id="status" name="status" class="form-control">
                 <% _.each(app.config.blueprint_statuses, function(status) { %>
                   <option <% if( model.hasStatus(status) ) { %>selected<% } %>
-                        value="<%=status %>"><%=capitalize( status ) %></option>
+                        value="<%=status %>"><%= I18n.t('autotune.filter-blueprint-status-' + status) %></option>
                 <% }) %>
                 </select>
               </div>
@@ -95,7 +95,7 @@
             <br />
             <div class="form-group">
               <button type="submit" class="btn btn-primary"
-                      data-loading-text="<%= I18n.t('autotune.saving-message') %>"> <%= I18n.t('autotune.saving-message') %> </button>
+                      data-loading-text="<%= I18n.t('autotune.saving-message') %>"> <%= I18n.t('autotune.save') %> </button>
 
               <% if ( !model.isNew() ) { %>
               <button type="button" class="btn btn-secondary"
@@ -106,7 +106,7 @@
                       data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.upgrade') %> </button>
               <button type="button" class="btn btn-danger"
                       <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
-                      data-action-message="<%= I18n.t('autotune.project-deleted-message') %>"
+                      data-action-message="<%= I18n.t('autotune.blueprint-deleted-message') %>"
                       data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
                       data-loading-text="<%= I18n.t('autotune.deleting-message') %>"
                       data-action="destroy"
@@ -119,7 +119,7 @@
         <div class="col-sm-6">
           <% if ( !model.isNew() ) { %>
           <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
-          <p><strong> <%= I18n.t('autotune.type-header') %> </strong> <%=model.get('type') %></p>
+          <p><strong> <%= I18n.t('autotune.type-header') %> </strong> <%= I18n.t('autotune.filter-blueprint-type-' + model.get('type'), { defaultValue: model.get('type') }) %></p>
           <% if ( model.has('config') ) { %>
           <p class="margin-bottom"><%=model.get('config').description %></p>
           <% } %>

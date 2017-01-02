@@ -15,18 +15,18 @@
 
   <div class="tab-content" style="overflow-y:scroll;">
     <div class="row m-page-heading contain">
-      <h3><% if ( model.isNew() ) { %>New Theme<% } else { %><%=model.get( 'title' ) %><% } %></h3>
+      <h3><% if ( model.isNew() ) { I18n.t('autotune.new-theme') } else { %><%=model.get( 'title' ) %><% } %></h3>
       <% if ( !model.isNew() ) { %>
       <p class="text-muted">
-        Status:
+         <%= I18n.t('autotune.status-header') %>
         <% if(model.hasStatus('ready')) { %>
-        <span class="text-success"><i class="icon-ok"></i> <%= I18n.t('autotune.status-ready') %> </span>
+        <span class="text-success"><i class="icon-ok"></i> <%= I18n.t('autotune.filter-theme-status-ready') %> </span>
         <% } else if(model.hasStatus('broken')) { %>
-        <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.status-broken') %> </span>
+        <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.filter-theme-status-broken') %> </span>
         <% } else if(model.hasStatus('updating')) { %>
-        <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <%= I18n.t('autotune.status-upgrading') %> </span>
+        <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <%= I18n.t('autotune.filter-theme-status-upgrading') %> </span>
         <% } else { %>
-        <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
+        <span class="text-warning"><i class="icon-info"></i><%= I18n.t('autotune.filter-theme-status-' + model.get('status'), { defaultValue: capitalize(model.get('status')) }) %></span>
         <% } %>
       </p>
       <% } %>

@@ -52,7 +52,7 @@
                 <option disabled <% if(!query.pub_status) { %>selected<% } %>> <%= I18n.t('autotune.status') %> </option>
               <% _.each(app.config.project_pub_statuses, function(pub_status) { %>
                 <option <% if(pub_status === query.pub_status) { %>selected<% } %>
-                      value="<%=pub_status %>"><%=pub_status %></option>
+                      value="<%=pub_status %>"><%= I18n.t('autotune.filter-project-status-' + pub_status) %></option>
               <% }) %>
               </select>
             </div>

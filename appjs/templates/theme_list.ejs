@@ -55,7 +55,7 @@
               <option disabled <% if(!query.status) { %>selected<% } %>> <%= I18n.t('autotune.status') %> </option>
             <% _.each(app.config.theme_statuses, function(status) { %>
               <option <% if(status === query.status) { %>selected<% } %>
-                    value="<%= status %>"><%= status %></option>
+                    value="<%= status %>"><%= I18n.t('autotune.filter-theme-status-' + status) %></option>
             <% }) %>
             </select>
           </div>

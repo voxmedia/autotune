@@ -38,7 +38,7 @@
               <option disabled <% if(!query.type) { %>selected<% } %>> <%= I18n.t('autotune.filter-type') %> </option>
             <% _.each(app.config.blueprint_types, function(type) { %>
               <option <% if(type === query.type) { %>selected<% } %>
-                    value="<%=type %>"><%=type %></option>
+                    value="<%=type %>"> <%= I18n.t('autotune.filter-blueprint-type-' + type) %> </option>
             <% }) %>
             </select>
           </div>
@@ -47,7 +47,7 @@
               <option disabled <% if(!query.status) { %>selected<% } %>> <%= I18n.t('autotune.filter-status') %> </option>
             <% _.each(app.config.blueprint_statuses, function(status) { %>
               <option <% if(status === query.status) { %>selected<% } %>
-                    value="<%=status %>"><%=status %></option>
+                    value="<%=status %>"><%= I18n.t('autotune.filter-blueprint-status-' + status) %></option>
             <% }) %>
             </select>
           </div>
