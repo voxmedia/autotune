@@ -1,5 +1,9 @@
 en:
   autotune:
+    notification-reload:    'Reload to see changes'
+    notification-session-expired: 'Your session has expired.'
+    notification-connection-problem: 'There was a problem connecting to the server.'
+    notification-connection-problem-verbose: 'There was a problem connecting to the server ({{error}}).'
     new-blueprint:          'New Blueprint'
     search-query:           'Search Query'
     search-keywords:        'Search keywords'

@@ -1,5 +1,9 @@
 es:
   autotune:
+    notification-reload:            'Recarga la página para ver los cambios'
+    notification-session-expired:   'Tu sesión expiró'
+    notification-connection-problem: 'Hubo un problema al conectarse con el servidor'
+    notification-connection-problem-verbose: 'Hubo un problema al conectarse con el servidor ({{error}})'
     new-blueprint:          'Nueva Herramienta'
     search-query:           'Buscar'
     search-keywords:        'Buscar'
