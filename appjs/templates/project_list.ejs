@@ -124,7 +124,7 @@
       <td class="blueprint-cell"><%=item.get('blueprint_title') %></td>
       <td class="bold-actions-cell text-right">
 
-        <a data-tooltip="edit" href="<%=item.url() %>/edit">
+        <a data-tooltip="<%= I18n.t('autotune.edit-tooltip') %>" href="<%=item.url() %>/edit">
           <span class="at-icon edit-icon"></span>
         </a>
         <a data-tooltip="<%= I18n.t('autotune.duplicate-tooltip') %>"
@@ -133,7 +133,7 @@
               href="/projects/<%=item.get('slug') %>/duplicate">
             <span class="at-icon duplicate-icon"></span>
         </a>
-        <a data-tooltip="delete"
+        <a data-tooltip="<%= I18n.t('autotune.delete-tooltip') %>"
            data-action-message="<%= I18n.t('autotune.project-deleted-message') %>"
            data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
            data-action="destroy" data-model="Project" data-action-next="reload"
