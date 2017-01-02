@@ -149,7 +149,7 @@ _.extend(App.prototype, Backbone.Events, {
    * Do something when the listener shuts down
    **/
   handleListenerStop: function() {
-    this.view.warning('Reload to see changes', true);
+    this.view.warning( I18n.t('autotune.notification-reload'), true);
   },
 
   /**
@@ -157,13 +157,13 @@ _.extend(App.prototype, Backbone.Events, {
    **/
   handleListenerError: function(error) {
     var msg;
-    this.view.clearNotification( 'Reload to see changes' );
+    this.view.clearNotification( I18n.t('autotune.notification-reload') );
     if ( error === 'auth' ) {
-      msg = 'Your session has expired.';
+      msg = I18n.t('autotune.notification-session-expired');
     } else if (error) {
-      msg = 'There was a problem connecting to the server ('+error+').';
+      msg = I18n.t('autotune.notification-connection-problem-verbose', { error: error});
     } else {
-      msg = 'There was a problem connecting to the server.';
+      msg = I18n.t('autotune.notification-connection-problem');
     }
     this.view.error(msg, true);
   },
