@@ -27,10 +27,26 @@ module Autotune
         slug_was).to_s
     end
 
+    def new_shell(**kwargs)
+      repo = Autoshell.new(working_dir, **kwargs)
+      repo.logger.formatter = proc do |severity, datetime, _progname, msg|
+        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
+      end
+      repo
+    end
+
+    def setup_shell
+      @setup_shell ||= new_shell(:env => Autotune.configuration.setup_environment)
+    end
+
+    def build_shell
+      @build_shell ||= new_shell(:env => Autotune.configuration.build_environment)
+    end
+
     private
 
     def move_working_dir
-      return if !slug_changed? || slug_was.nil? || slug == slug_was
+      return if !slug_changed? || slug_was.blank? || slug == slug_was
       MoveWorkDirJob.perform_later(working_dir_was, working_dir)
     end
 

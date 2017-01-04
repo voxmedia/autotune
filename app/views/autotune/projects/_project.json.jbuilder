@@ -2,11 +2,15 @@ json.extract!(
   project,
   :status, :id, :blueprint_id, :slug, :title, :created_at, :updated_at,
   :preview_url, :publish_url, :user_id, :published_at, :data_updated_at,
-  :blueprint_version)
+  :blueprint_version, :blueprint_repo_url, :bespoke)
 
 json.built project.built?
 json.type project.type
-json.blueprint_title project.blueprint.title
+if project.bespoke?
+  json.blueprint_title 'Bespoke'
+else
+  json.blueprint_title project.blueprint.title
+end
 json.theme project.theme.slug
 json.created_by project.user.name
 

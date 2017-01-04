@@ -8,6 +8,8 @@ module Autotune
     include Searchable
     include WorkingDir
     include Deployable
+    include Repo
+
     serialize :data, JSON
     serialize :meta, JSON
     serialize :blueprint_config, JSON
@@ -16,10 +18,17 @@ module Autotune
     belongs_to :theme
     belongs_to :group
 
+    # Alias these so some of the concerns work
+    alias_attribute :config, :blueprint_config
+    alias_attribute :version, :blueprint_version
+    alias_attribute :repo_url, :blueprint_repo_url
+
     validates_length_of :output, :maximum => 64.kilobytes - 1
-    validates :title, :blueprint, :user, :group, :theme, :presence => true
+    validates :title, :user, :group, :theme, :presence => true
+    validates :blueprint, :presence => true, :unless => :bespoke?
+    validates :blueprint_repo_url, :presence => true, :if => :bespoke?
     validates :status,
-              :inclusion => { :in => Autotune::PROJECT_STATUSES }
+              :inclusion => { :in => Autotune::STATUSES }
 
     default_scope { order('updated_at DESC') }
 
@@ -32,6 +41,7 @@ module Autotune
     after_initialize do
       self.status ||= 'new'
       self.meta ||= {}
+      self.blueprint_config ||= {}
     end
 
     before_validation do
@@ -49,8 +59,11 @@ module Autotune
       end
 
       # Make sure we stash version and config
-      self.blueprint_version ||= blueprint.version unless blueprint.nil?
-      self.blueprint_config ||= blueprint.config unless blueprint.nil?
+      if blueprint.present?
+        self.blueprint_version ||= blueprint.version
+        self.blueprint_config ||= blueprint.config
+        self.blueprint_repo_url ||= blueprint.repo_url
+      end
     end
 
     # Checks if the project is a draft. i.e. not published.
@@ -91,7 +104,7 @@ module Autotune
     # @see build
     # @see build_and_publish
     def update_snapshot(current_user = nil)
-      if blueprint_version == blueprint.version
+      if bespoke? || blueprint_version == blueprint.version
         update!(:status => 'building')
       else
         update!(
@@ -99,15 +112,19 @@ module Autotune
           :blueprint_version => blueprint.version,
           :blueprint_config => blueprint.config)
       end
-      ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :current_user => current_user),
-        SyncProjectJob.new(self, :update => true),
-        BuildJob.new(
-          self,
-          :target => publishable? ? 'preview' : 'publish',
-          :current_user => current_user
-        )
-      ).catch(SetStatusJob.new(self, 'broken')).enqueue
+
+      chain = ActiveJob::Chain.new
+      unless bespoke?
+        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
+      end
+
+      chain
+        .then(SyncProjectJob.new(self, :update => true))
+        .then(BuildJob.new(self,
+                           :target => publishable? ? 'preview' : 'publish',
+                           :current_user => current_user))
+        .catch(SetStatusJob.new(self, 'broken'))
+        .enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -121,16 +138,20 @@ module Autotune
     # @see build_and_publish
     # @see update_snapshot
     def build(current_user = nil)
-      update(:status => 'building')
-      ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :current_user => current_user),
-        SyncProjectJob.new(self),
-        BuildJob.new(
-          self,
-          :target => publishable? ? 'preview' : 'publish',
-          :current_user => current_user
-        )
-      ).catch(SetStatusJob.new(self, 'broken')).enqueue
+      update!(:status => 'building')
+
+      chain = ActiveJob::Chain.new
+      unless bespoke?
+        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
+      end
+
+      chain
+        .then(SyncProjectJob.new(self))
+        .then(BuildJob.new(self,
+                           :target => publishable? ? 'preview' : 'publish',
+                           :current_user => current_user))
+        .catch(SetStatusJob.new(self, 'broken'))
+        .enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -144,29 +165,23 @@ module Autotune
     # @see update_snapshot
     # @raise The original exception when the update fails
     def build_and_publish(current_user = nil)
-      update(:status => 'building')
-      ActiveJob::Chain.new(
-        SyncBlueprintJob.new(blueprint, :current_user => current_user),
-        SyncProjectJob.new(self),
-        BuildJob.new(
-          self,
-          :target => 'publish',
-          :current_user => current_user
-        )
-      ).catch(SetStatusJob.new(self, 'broken')).enqueue
+      update!(:status => 'building')
+
+      chain = ActiveJob::Chain.new
+      unless bespoke?
+        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
+      end
+
+      chain
+        .then(SyncProjectJob.new(self))
+        .then(BuildJob.new(self,
+                           :target => 'publish',
+                           :current_user => current_user))
+        .catch(SetStatusJob.new(self, 'broken'))
+        .enqueue
     rescue
       update!(:status => 'broken')
       raise
-    end
-
-    # Gets the directory path to which the project will be deployed to.
-    # @return [String] deployment directory path.
-    def deploy_dir
-      if blueprint_config.present? && blueprint_config['deploy_dir']
-        blueprint_config['deploy_dir']
-      else
-        'build'
-      end
     end
 
     # Gets the URL for previewing the project.
@@ -185,7 +200,7 @@ module Autotune
     # Handles when the theme changes
     # @return [String] slyg of the project without the theme.
     def slug_sans_theme
-      if theme_changed? && theme_was
+      if theme_changed? && theme_was.present?
         slug.sub(/^(#{theme.slug}|#{theme_was.slug})-/, '')
       else
         slug.sub(/^#{theme.slug}-/, '')
@@ -208,21 +223,11 @@ module Autotune
     # Type of the blueprint for the project.
     # @return [Boolean] the type of the blueprint. Eg: `graphic` or `app`
     def type
-      if blueprint_config
-        blueprint_config['type']
-      elsif blueprint
-        blueprint.type
-      elsif blueprint_id
-        Blueprint.find(blueprint_id).type
-      end
-    end
-
-    def deployed?
-      status != 'new' && blueprint_version.present?
+      blueprint_config['type'] if blueprint_config.present?
     end
 
     def installed?
-      status != 'new' && blueprint_version.present?
+      deployed?
     end
 
     # Checks if the project has built

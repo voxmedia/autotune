@@ -11,60 +11,10 @@ module Autotune
 
     # do the deed
     def perform(blueprint, update: false, build_themes: false, current_user: nil)
-      # Create a new repo object based on the blueprints working dir
-      repo = Autoshell.new(blueprint.working_dir,
-                           :env => Rails.configuration.autotune.setup_environment)
-
-      if repo.exist?
-        repo.branch_from_repo_url(blueprint.repo_url)
-        if update
-          # Update the repo
-          repo.update
-          blueprint.version = repo.version
-        elsif blueprint.status.in?(%w(testing ready)) &&
-              blueprint.version == repo.version &&
-              !build_themes
-          # The correct blueprint files are on disk, and the blueprint is not
-          # broken. And we are not rebuilding themes. Nothing to do.
-          return
-        elsif !update
-          # we're not updating, but the blueprint is broken, so set it up
-          repo.commit_hash_for_checkout = blueprint.version
-          repo.update
-        end
-      else
-        # Clone the repo
-        repo.clone(blueprint.repo_url)
-        if blueprint.version.present?
-          repo.commit_hash_for_checkout = blueprint.version
-          repo.update
-        else
-          # Track the current commit version
-          blueprint.version = repo.version
-          repo.update
-        end
-      end
-
-      # Setup the environment
-      repo.setup_environment
-
-      # Load the blueprint config file into the DB
-      blueprint.config = repo.read BLUEPRINT_CONFIG_FILENAME
-      if blueprint.config.nil?
-        raise "Can't read '%s' in blueprint '%s'" % [
-          BLUEPRINT_CONFIG_FILENAME, blueprint.slug]
-      end
-
-      # Stash the thumbnail
-      if blueprint.config['thumbnail'] && repo.exist?(blueprint.config['thumbnail'])
-        blueprint.deployer(:media).deploy_file(
-          blueprint.working_dir,
-          blueprint.config['thumbnail'])
-      end
+      return unless blueprint.sync_from_repo(update: update) || build_themes
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
-        repo = Autoshell.new(blueprint.working_dir,
-                             :env => Rails.configuration.autotune.build_environment)
+        repo = blueprint.build_shell
 
         # don't build a copy for each theme every time a project is updated
         if build_themes

@@ -118,12 +118,45 @@ module Autotune
       accept_json!
       valid_auth_header!
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         post :create, project_data
       end
 
       assert_response :created, decoded_response['error']
       assert_project_data!
+
+      assert_performed_jobs 3
+
+      new_p = Project.find decoded_response['id']
+      project_data.keys.each do |k|
+        if k == :theme
+          assert_equal Autotune::Theme.find_by_slug(project_data[k]), new_p.send(k)
+        elsif k == :preview_url
+          assert_equal '/preview/theme1-new-project', new_p.send(k)
+        elsif k == :data
+          assert_equal({ 'google_doc_id' => '1234' }, new_p.send(k))
+        else
+          assert_equal project_data[k], new_p.send(k)
+        end
+      end
+    end
+
+    test 'create bespoke project' do
+      accept_json!
+      valid_auth_header!
+
+      project_data.delete(:blueprint_id)
+      project_data[:bespoke] = true
+      project_data[:blueprint_repo_url] = TEST_REPO.to_s
+
+      perform_enqueued_jobs do
+        post :create, project_data
+      end
+
+      assert_response :created, decoded_response['error']
+      assert_project_data!
+
+      assert_performed_jobs 2
 
       new_p = Project.find decoded_response['id']
       project_data.keys.each do |k|
@@ -153,7 +186,7 @@ module Autotune
 
       title = 'Updated project'
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         put(:update,
             :id => autotune_projects(:example_one).id,
             :title => title)
@@ -161,6 +194,8 @@ module Autotune
 
       assert_response :success, decoded_response['error']
       assert_project_data!
+
+      assert_performed_jobs 3
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -172,13 +207,15 @@ module Autotune
 
       title = 'Updated project as author'
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         put(:update,
             :id => autotune_projects(:example_four).id,
             :title => title)
       end
       assert_response :success, decoded_response['error']
       assert_project_data!
+
+      assert_performed_jobs 3
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -202,13 +239,15 @@ module Autotune
 
       title = 'Updated project'
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         put(:update,
             :id => autotune_projects(:example_one).id,
             :title => title)
       end
       assert_response :success, decoded_response['error']
       assert_project_data!
+
+      assert_performed_jobs 3
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -220,13 +259,15 @@ module Autotune
 
       title = 'Updated project'
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         put(:update,
             :id => autotune_projects(:example_one).id,
             :title => title)
       end
       assert_response :success, decoded_response['error']
       assert_project_data!
+
+      assert_performed_jobs 3
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -296,16 +337,19 @@ module Autotune
       accept_json!
       valid_auth_header!
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         post :create, project_data
       end
 
       assert_response :created, decoded_response['error']
       assert_project_data!
 
+      # Jobs run: sync blueprint, sync project, build project
+      assert_performed_jobs 3
+
       newslug = decoded_response['slug'] + '-updated'
 
-      assert_performed_jobs 5 do
+      perform_enqueued_jobs do
         put(:update,
             :id => decoded_response['id'],
             :slug => newslug)
@@ -314,13 +358,29 @@ module Autotune
       assert_response :success, decoded_response['error']
       assert_project_data!
 
+      # Jobs run: move workdir, delete deployed files, sync blueprint, sync project, build project, plus 3 from above
+      assert_performed_jobs 3 + 5
+
       new_p = Project.find decoded_response['id']
       assert_equal newslug, new_p.slug
 
-      assert_performed_jobs 2 do
+      refute_equal 'new', new_p.status
+      assert new_p.blueprint.version.present?,
+             'Related blueprint should have a version'
+      assert new_p.version.present?,
+             'Project should have a version'
+      assert_equal new_p.blueprint.version, new_p.version,
+                   'Project and blueprint versions should match'
+
+      assert new_p.deployed?
+      assert new_p.installed?
+
+      perform_enqueued_jobs do
         delete :destroy, :id => decoded_response['id']
       end
       assert_response :no_content
+      # Jobs run: delete workdir, delete deployed files, plus 8 from above
+      assert_performed_jobs 3 + 5 + 2
     end
 
     test 'filter projects' do
@@ -361,12 +421,14 @@ module Autotune
       bp = autotune_blueprints(:example)
       bp.update :version => MASTER_HEAD2
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         post :create, project_data
       end
 
       assert_response :created, decoded_response['error']
       assert_project_data!
+
+      assert_performed_jobs 3
 
       bp.reload
       assert_equal MASTER_HEAD2, bp.version,
@@ -384,12 +446,14 @@ module Autotune
       bp = autotune_blueprints(:example)
       bp.update(:repo_url => "#{bp.repo_url}#live", :version => LIVE_HEAD1)
 
-      assert_performed_jobs 3 do
+      perform_enqueued_jobs do
         post :create, project_data
       end
 
       assert_response :created, decoded_response['error']
       assert_project_data!
+
+      assert_performed_jobs 3
 
       bp.reload
       assert_equal LIVE_HEAD1, bp.version,

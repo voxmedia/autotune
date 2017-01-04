@@ -28,10 +28,6 @@ module Autotune
       end
     end
 
-    def new; end
-
-    def edit; end
-
     def index
       @projects = Project
       # Filter and search query
@@ -124,28 +120,8 @@ module Autotune
 
     def create
       @project = Project.new(:user => current_user)
-      @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
 
-      if request.POST.key? 'blueprint'
-        @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
-      end
-
-      if request.POST.key? 'blueprint_version'
-        @project.blueprint_version = request.POST['blueprint_version']
-      end
-
-      if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_slug request.POST['theme']
-        @project.group = @project.theme.group
-        # is this user allowed to use this theme?
-        unless @project.theme.nil? ||
-               current_user.author_groups.include?(@project.group)
-          return render_error(
-            "You can't use the #{@project.theme.title} theme. Please " \
-            'choose another theme or contact support',
-            :bad_request)
-        end
-      end
+      return unless handle_post!
 
       unless @project.data.nil?
         # make sure data doesn't contain title, slug or theme
@@ -168,26 +144,8 @@ module Autotune
     def update
       @project = instance
       @project.user = current_user if @project.user.nil?
-      @project.attributes = select_from_post :title, :slug, :data
 
-      if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_slug request.POST['theme']
-        @project.group = @project.theme.group
-
-        # is this user allowed to use this theme?
-        unless @project.theme.nil? ||
-               current_user.author_themes.include?(@project.theme)
-          return render_error(
-            "You can't use the #{@project.theme.title} theme. Please " \
-            'choose another theme or contact support',
-            :bad_request)
-        end
-      end
-
-      # make sure data doesn't contain title, slug or theme
-      %w(title slug theme base_url asset_base_url).each do |k|
-        @project.data.delete(k)
-      end
+      return unless handle_post!
 
       if @project.valid?
         @project.status = 'built' if @project.live?
@@ -266,6 +224,40 @@ module Autotune
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    private
+
+    def handle_post!
+      @project.attributes = select_from_post(
+        :title, :slug, :bespoke, :blueprint_id, :blueprint_version,
+        :blueprint_repo_url, :data)
+
+      if request.POST.key? 'blueprint'
+        @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
+      end
+
+      if request.POST.key? 'theme'
+        @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.group = @project.theme.group
+
+        # is this user allowed to use this theme?
+        unless @project.theme.nil? ||
+               current_user.author_themes.include?(@project.theme)
+          render_error(
+            "You can't use the #{@project.theme.title} theme. Please " \
+            'choose another theme or contact support',
+            :bad_request)
+          return false
+        end
+      end
+
+      # make sure data doesn't contain title, slug or theme
+      %w(title slug theme base_url asset_base_url).each do |k|
+        @project.data.delete(k)
+      end
+
+      true
     end
   end
 end
