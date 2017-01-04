@@ -45,7 +45,7 @@
           <div class="select">
             <select name="status" id="status" class="form-control" data-auto-submit="true">
               <option disabled <% if(!query.status) { %>selected<% } %>>Status</option>
-            <% _.each(app.config.blueprint_statuses, function(status) { %>
+            <% _.each(app.config.statuses, function(status) { %>
               <option <% if(status === query.status) { %>selected<% } %>
                     value="<%=status %>"><%=status %></option>
             <% }) %>

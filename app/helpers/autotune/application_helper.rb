@@ -8,17 +8,15 @@ module Autotune
         :available_themes => current_user.nil? ? [] :
                 current_user.author_themes.as_json(:only => [:slug, :title, :id], :methods => [:group_name, :twitter_handle]),
         :user => current_user.as_json,
-        :tags => Tag.all.as_json(:only => [:title, :slug]),
-        :blueprint_titles => Blueprint.all.as_json(:only => [:title, :id]),
-        :project_statuses => Autotune::PROJECT_STATUSES,
+        :blueprint_titles => Blueprint.all.as_json(:only => [:title, :id]) + ['Bespoke', 0],
+        :statuses => Autotune::STATUSES,
         :project_pub_statuses => Autotune::PROJECT_PUB_STATUSES,
-        :blueprint_statuses => Autotune::BLUEPRINT_STATUSES,
         :blueprint_types => Autotune::BLUEPRINT_TYPES,
         :theme_statuses => Autotune::THEME_STATUSES,
         :editable_slug_types => Autotune::EDITABLE_SLUG_BLUEPRINT_TYPES,
         :spinner => ActionController::Base.helpers.asset_path('autotune/spinner.gif'),
-        :faq_url => Rails.configuration.autotune.faq_url,
-        :theme_meta_data => Rails.configuration.autotune.theme_meta_data,
+        :faq_url => Autotune.configuration.faq_url,
+        :theme_meta_data => Autotune.configuration.theme_meta_data,
         :date => Time.zone.now.strftime('%a, %e %b %Y %H:%M:%S %Z')
       }
     end

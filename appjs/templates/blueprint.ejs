@@ -64,7 +64,7 @@
               <label for="status" class="block">Status</label>
               <div class="select">
                 <select id="status" name="status" class="form-control">
-                <% _.each(app.config.blueprint_statuses, function(status) { %>
+                <% _.each(app.config.statuses, function(status) { %>
                   <option <% if( model.hasStatus(status) ) { %>selected<% } %>
                         value="<%=status %>"><%=capitalize( status ) %></option>
                 <% }) %>
