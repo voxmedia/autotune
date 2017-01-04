@@ -151,7 +151,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'pub_status', 'blueprint', 'type', 'theme', 'search'),
         app: app
       });
 

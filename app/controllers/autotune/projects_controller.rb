@@ -36,12 +36,18 @@ module Autotune
       query[:status] = params[:status] if params[:status].present?
 
       if params[:blueprint].present?
-        blueprint = Blueprint.find_by_slug(params[:blueprint])
-        query[:blueprint_id] = blueprint.id
+        if params[:blueprint] == 'bespoke'
+          query[:bespoke] = true
+        else
+          blueprint = Blueprint.find_by_slug(params[:blueprint])
+          query[:blueprint_id] = blueprint.id
+        end
       elsif params[:blueprint_id].present?
-        query[:blueprint_id] = params[:blueprint_id]
-      elsif params[:blueprint_title].present?
-        query[:blueprint_id] = params[:blueprint_title]
+        if params[:blueprint_id].to_i < 1
+          query[:bespoke] = true
+        else
+          query[:blueprint_id] = params[:blueprint_id]
+        end
       end
 
       if params[:pub_status].present?
