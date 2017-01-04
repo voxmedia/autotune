@@ -22,7 +22,8 @@ module ActiveJob
     alias_method :break_chain!, :skip_next_job!
 
     def skip_next_job?
-      @skip_next_job
+      return @skip_next_job if defined? @skip_next_job
+      @skip_next_job = false
     end
 
     def retry_job(options = {})
