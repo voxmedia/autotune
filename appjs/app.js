@@ -14,7 +14,7 @@ var $ = require('jquery'),
     Alpaca = require('./alpaca_patches'),
     Datepicker = require('eonasdan-bootstrap-datetimepicker'),
     Spectrum = require('spectrum-colorpicker'),
-    Selectize = require('../vendor/assets/javascripts/selectize'),
+    Selectize = require('selectize'),
     // Load our components and run the app
     Router = require('./router'),
     Messages = require('./messages'),
