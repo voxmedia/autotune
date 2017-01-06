@@ -6,6 +6,10 @@ module Autotune
     skip_before_action :require_login, :only => [:new, :create, :failure]
     skip_before_action :require_google_login, :only => [:new, :create, :failure]
 
+    def auth_dev_tools
+      redirect_to "http://localhost:8080/?api_key=#{current_user.api_key}"
+    end
+
     def create
       auth = Authorization.find_or_initialize_by_auth_hash(omniauth)
 

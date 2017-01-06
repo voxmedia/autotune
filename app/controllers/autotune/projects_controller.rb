@@ -164,9 +164,12 @@ module Autotune
       end
     end
 
-    def preview_build_data
+    def build_data
       @project = instance
-      @build_data = request.POST
+
+      @build_data = request.method == 'POST' ? request.POST : @project.data
+
+      # Bust google doc cache if we are forcing an update
       if @build_data['google_doc_url'] && request.GET[:force_update]
         cache_key = "googledoc#{GoogleDocs.key_from_url(@build_data['google_doc_url'])}"
         Rails.cache.delete(cache_key)
@@ -182,7 +185,7 @@ module Autotune
       if @project.meta.present? && @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
       elsif exc.is_a?(Signet::AuthorizationError)
-        render_error 'There was an error authenticating your Google account', :bad_request
+        render_error 'There was an error authenticating your Google account', :forbidden
         logger.error "Google Auth error: #{exc.message}"
       else
         raise

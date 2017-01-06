@@ -36,6 +36,10 @@ module Autotune
       20.times.map { range[rand(61)] }.join('')
     end
 
+    def regenerate_api_key
+      self.api_key = self.class.generate_api_key
+    end
+
     # Check that the user has a role, optionally check that user has role for
     # a specific theme.
     #   user.role?(:superuser) # is this user a super user?
@@ -109,6 +113,7 @@ module Autotune
       (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
     end
 
+    # TODO: this looks buggy
     def update_roles (new_roles)
       self.meta= { 'roles' => new_roles }
       save!

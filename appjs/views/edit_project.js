@@ -263,7 +263,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       return $.ajax({
         type: "POST",
-        url: this.model.url() + "/preview_build_data" + query,
+        url: this.model.url() + "/build_data" + query,
         data: JSON.stringify(data),
         contentType: 'application/json',
         dataType: 'json'
