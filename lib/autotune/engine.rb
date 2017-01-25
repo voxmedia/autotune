@@ -45,7 +45,9 @@ module Autotune
       app.config.autotune.google_auth_enabled = false
       app.config.autotune.google_auth_domain = nil
 
-      app.config.middleware.use I18n::JS::Middleware
+      if app.env.development?
+        app.config.middleware.use I18n::JS::Middleware
+      end
 
       if ENV['REDIS_URL']
         app.config.autotune.redis = Redis.new(:url => ENV['REDIS_URL'])
