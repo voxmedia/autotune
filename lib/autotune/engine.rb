@@ -1,3 +1,5 @@
+require 'i18n/js'
+
 module Autotune
   # Autotune rails app
   class Engine < ::Rails::Engine
@@ -27,6 +29,8 @@ module Autotune
       app.config.assets.precompile += %w(
         autotune/favicon.ico autotune/at_placeholder.png autotune/spinner.gif)
 
+      app.config.assets.precompile += %w( i18n.js )
+
       app.config.autotune = Config.new
 
       # Figure out where we project our blueprints
@@ -40,6 +44,8 @@ module Autotune
       app.config.autotune.faq_url = 'http://voxmedia.helpscoutdocs.com/category/19-autotune'
       app.config.autotune.google_auth_enabled = false
       app.config.autotune.google_auth_domain = nil
+
+      app.config.middleware.use I18n::JS::Middleware
 
       if ENV['REDIS_URL']
         app.config.autotune.redis = Redis.new(:url => ENV['REDIS_URL'])
