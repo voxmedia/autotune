@@ -45,7 +45,7 @@ module Autotune
       app.config.autotune.google_auth_enabled = false
       app.config.autotune.google_auth_domain = nil
 
-      if app.env.development?
+      if Rails.env.development?
         app.config.middleware.use I18n::JS::Middleware
       end
 
