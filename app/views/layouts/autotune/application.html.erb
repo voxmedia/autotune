@@ -15,7 +15,9 @@
 </head>
 <body>
 <%=render 'autotune/body_top' %>
-<%= yield %>
+<div id="autotune-main-body">
+  <%= yield %>
+</div>
 <%=render 'autotune/body_bottom' %>
 </body>
 </html>
