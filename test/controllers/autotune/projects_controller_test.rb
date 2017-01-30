@@ -146,6 +146,7 @@ module Autotune
       valid_auth_header!
 
       project_data.delete(:blueprint_id)
+      project_data.delete(:data)
       project_data[:bespoke] = true
       project_data[:blueprint_repo_url] = TEST_REPO.to_s
 

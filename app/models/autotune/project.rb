@@ -41,6 +41,7 @@ module Autotune
     after_initialize do
       self.status ||= 'new'
       self.meta ||= {}
+      self.data ||= {}
       self.blueprint_config ||= {}
     end
 
