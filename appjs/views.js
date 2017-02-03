@@ -8,5 +8,6 @@ module.exports = {
   EditProject: require('./views/edit_project'),
   ListThemes: require('./views/list_themes'),
   EditTheme: require('./views/edit_theme'),
+  FormBuilder: require('./views/form_builder'),
   Application: require('./views/application')
 };

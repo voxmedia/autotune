@@ -1,14 +1,23 @@
 /* Form editor */
+
+#form-builder {
+  padding-top: 33px;
+  margin-bottom: -25px;
+  height:100vh;
+}
+
+.has-alert #form-builder {
+  padding-top: 60px;
+}
+
+.ace_editor {
+  width:100%;
+  height:100%;
+}
+
 #schema {
-  float: right;
-  width: 50%;
-  height: 100%;
 }
 #previewWrap {
-  float: right;
-  width: 50%;
-  height: 100%;
-  padding-right:3%;
   overflow-y: auto;
 }
 #codeDiv {

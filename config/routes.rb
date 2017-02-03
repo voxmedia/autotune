@@ -49,6 +49,7 @@ Autotune::Engine.routes.draw do
   get 'messages' => 'messages#index'
   post 'messages/send' => 'messages#send_message'
 
+  get 'builder' => 'application#index'
   root 'application#index'
 
   match '/auth/:provider/callback' => 'sessions#create',  :via => [:get, :post]

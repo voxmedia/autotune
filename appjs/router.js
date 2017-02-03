@@ -32,7 +32,8 @@ module.exports = Backbone.Router.extend({
     "themes": "listThemes",
     "themes/new": "newTheme",
     "themes/:slug": "editTheme",
-    "themes/:slug/edit": "editTheme"
+    "themes/:slug/edit": "editTheme",
+    "builder": "formBuilder"
   },
 
   navigate: function(fragment, options) {
@@ -300,6 +301,15 @@ module.exports = Backbone.Router.extend({
     this.app.view
       .display( view )
       .setTab('themes');
-
   },
+
+  formBuilder: function() {
+    var view = new views.FormBuilder({ app: this.app });
+
+    view.render();
+
+    this.app.view
+      .display( view )
+      .setTab('blueprints');
+  }
 });
