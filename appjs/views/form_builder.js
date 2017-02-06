@@ -18,24 +18,32 @@ var FormBuilder = BaseView.extend({
   },
 
   afterInit: function() {
+    if ( this.model ) {
+      if ( this.model.get('blueprint_config') ) {
+        this.initialFormData = this.model.get('blueprint_config').form;
+      } else {
+        this.initialFormData = this.model.get('config').form;
+      }
+    } else {
+      this.initialFormData = {
+        "schema": {
+          "title": "Form title",
+          "description": "Form description",
+          "type": "object",
+          "properties": {
+            "title": {
+              "title": "Basic input",
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "options": { "fields": { } }
+      };
+    }
   },
 
   afterRender: function() {
-    var formData = {
-      "schema": {
-        "title": "Form title",
-        "description": "Form description",
-        "type": "object",
-        "properties": {
-          "title": {
-            "title": "Basic input",
-            "type": "string",
-            "required": true
-          }
-        }
-      },
-      "options": { "fields": { } }
-    };
     this.setSourceHeight();
 
     var editor = this.editor = ace.edit('schema');
@@ -48,7 +56,7 @@ var FormBuilder = BaseView.extend({
     editor.getSession().setMode("ace/mode/json");
     editor.renderer.setHScrollBarAlwaysVisible(false);
     editor.setShowPrintMargin(false);
-    editor.setValue( JSON.stringify( formData , null, "  " ), -1 );
+    editor.setValue( JSON.stringify( this.initialFormData , null, "  " ), -1 );
 
     var debouncedUpdatePreview = _.debounce(
       _.bind(this.updateFormPreview, this), 500);

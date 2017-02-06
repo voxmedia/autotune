@@ -303,13 +303,35 @@ module.exports = Backbone.Router.extend({
       .setTab('themes');
   },
 
-  formBuilder: function() {
-    var view = new views.FormBuilder({ app: this.app });
+  formBuilder: function(params) {
+    var view, model, query = {}, app = this.app,
+        formData = {}, fetchPromise = Promise.resolve();
 
-    view.render();
+    if(params) { query = querystring.parse(params); }
 
-    this.app.view
-      .display( view )
-      .setTab('blueprints');
+    if ( query.blueprint ) {
+      console.debug('have blueprint');
+      model = new models.Blueprint({ id: query.blueprint });
+      fetchPromise = Promise.resolve( model.fetch() );
+    } else if ( query.project ) {
+      console.debug('have model');
+      model = new models.Project({ id: query.project });
+      fetchPromise = Promise.resolve( model.fetch() );
+    }
+
+    fetchPromise.then(function() {
+      view = new views.FormBuilder({ app: app, model: model });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('blueprints');
+    }).catch(function(jqXHR) {
+      if ( jqXHR.status ) {
+        app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+      } else {
+        app.view.display500('', jqXHR);
+      }
+    });
   }
 });
