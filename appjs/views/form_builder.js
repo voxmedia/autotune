@@ -19,7 +19,7 @@ var FormBuilder = BaseView.extend({
 
   afterInit: function() {
     if ( this.model ) {
-      if ( this.model.get('blueprint_config') ) {
+      if ( this.model.has('blueprint_config') ) {
         this.initialFormData = this.model.get('blueprint_config').form;
       } else {
         this.initialFormData = this.model.get('config').form;
