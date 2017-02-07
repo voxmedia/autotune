@@ -59,11 +59,11 @@ module Autotune
         self.output = output[0, output_limit - omission.length] + omission
       end
 
-      # Make sure we stash version and config
-      if blueprint.present?
-        self.blueprint_version ||= blueprint.version
-        self.blueprint_config ||= blueprint.config
-        self.blueprint_repo_url ||= blueprint.repo_url
+      # Make sure we stash version and config if there is none present
+      if blueprint.present? && blueprint_version.blank?
+        self.blueprint_version = blueprint.version
+        self.blueprint_config = blueprint.config
+        self.blueprint_repo_url = blueprint.repo_url
       end
     end
 
