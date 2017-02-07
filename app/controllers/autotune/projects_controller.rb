@@ -129,12 +129,7 @@ module Autotune
 
       return unless handle_post!
 
-      unless @project.data.nil?
-        # make sure data doesn't contain title, slug or theme
-        @project.data.delete('title')
-        @project.data.delete('slug')
-        @project.data.delete('theme')
-      end
+      Rails.logger.debug(params[:blueprint_config])
 
       if @project.valid?
         @project.status = 'built' if @project.live?
@@ -192,20 +187,20 @@ module Autotune
       end
     end
 
-    def create_spreadsheet
+    def create_google_doc
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
       google_client = GoogleDocs.new(
         :refresh_token => current_auth.credentials['refresh_token'],
         :access_token => current_auth.credentials['token'],
         :expires_at => current_auth.credentials['expires_at'])
-      spreadsheet_copy = google_client.copy(request.POST['_json'])
+      doc_copy = google_client.copy(request.POST['google_doc_id'])
 
       if Autotune.configuration.google_auth_domain.present?
         google_client.share_with_domain(
-          spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
+          doc_copy[:id], Autotune.configuration.google_auth_domain)
       end
 
-      render :json => { :google_doc_url => spreadsheet_copy[:url] }
+      render :json => { :google_doc_url => doc_copy[:url] }
     rescue Signet::AuthorizationError => exc
       render_error 'There was an error authenticating your Google account', :bad_request
       logger.error "Google Auth error: #{exc.message}"
@@ -240,7 +235,7 @@ module Autotune
     def handle_post!
       @project.attributes = select_from_post(
         :title, :slug, :bespoke, :blueprint_id, :blueprint_version,
-        :blueprint_repo_url, :data)
+        :blueprint_repo_url, :blueprint_config, :data)
 
       if request.POST.key? 'blueprint'
         @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']

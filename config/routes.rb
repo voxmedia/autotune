@@ -41,8 +41,8 @@ Autotune::Engine.routes.draw do
        :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
   post 'projects/build_data',
        :to => 'projects#build_data'
-  post 'projects/create_spreadsheet',
-       :to => 'projects#create_spreadsheet'
+  post 'projects/create_google_doc',
+       :to => 'projects#create_google_doc'
 
   get 'changemessages' => 'changemessages#index'
 

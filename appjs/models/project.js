@@ -170,17 +170,34 @@ var Project = Backbone.Model.extend({
   },
 
   /**
+   * Return the value of the attribute from the project or blueprint
+   * @returns {object} attribute value
+   **/
+  getBlueprintAttr: function(attribute) {
+    var proj_attr = 'blueprint_' + attribute;
+    if ( this.has(proj_attr) ) {
+      return this.get(proj_attr);
+    } else if ( this.blueprint && this.blueprint.has(attribute) ) {
+      return this.blueprint.get(attribute);
+    } else {
+      return null;
+    }
+  },
+
+  /**
+   * Return the version of the blueprint
+   * @returns {string} commit hash
+   **/
+  getVersion: function() {
+    return this.getBlueprintAttr('version');
+  },
+
+  /**
    * Get the blueprint config.
    * @returns {object} The blueprint config
    **/
   getConfig: function() {
-    if ( this.has('blueprint_config') ) {
-      return this.get('blueprint_config');
-    } else if ( this.blueprint && this.blueprint.has('config') ) {
-      return this.blueprint.get('config');
-    } else {
-      throw 'This blueprint does not have a form!';
-    }
+    return this.getBlueprintAttr('config');
   },
 
   /**
@@ -188,8 +205,7 @@ var Project = Backbone.Model.extend({
    * @returns {boolean}
    **/
   hasConfig: function() {
-    return this.has('blueprint_config') ||
-      (this.blueprint && this.blueprint.has('config'));
+    return this.getConfig() !== null;
   },
 
   /**
@@ -281,21 +297,11 @@ var Project = Backbone.Model.extend({
   },
 
   /**
-   * Return the version of the blueprint
-   * @returns {string} commit hash
-   **/
-  getVersion: function() {
-    return this.get('blueprint_version') || this.blueprint.get('version');
-  },
-
-  /**
    * Checks if project is using the current version of blueprint
    * @returns {boolean}
    **/
   isCurrentVersion: function() {
-    if ( !this.get('blueprint_version') ){
-      return true;
-    }
+    if ( !this.get('blueprint_version') ) { return true; }
     return this.get('blueprint_version') === this.blueprint.get('version');
   },
 
