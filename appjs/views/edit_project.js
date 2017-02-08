@@ -102,6 +102,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'click #savePreview': 'savePreview',
     'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm',
+    'click .new-google-doc': 'createDocument',
     'mousedown #split-bar': 'enableFormResize',
     'mouseup': 'disableFormResize',
     'mousemove': 'resizeForm'
@@ -798,7 +799,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     var ss_key = $btn.data('template-id');
 
-    var ctrl = this.alpaca.childrenById( $btn.data('target') );
+    var ctrl = this.alpaca.childrenById[$btn.data('target')];
     if( ctrl.getValue().trim().length > 0 ) {
       var msg = 'This will replace the currently associated document. Click "OK" to confirm the replacement.';
       if ( !window.confirm(msg) ) { return; }
@@ -807,7 +808,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return Promise.resolve( $.ajax({
       type: "POST",
       url: model.urlRoot + "/create_google_doc",
-      data: { google_doc_id: ss_key },
+      data: JSON.stringify({ google_doc_id: ss_key }),
       contentType: 'application/json',
       dataType: 'json'
     }) ).then(
