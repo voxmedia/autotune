@@ -246,7 +246,10 @@ module Autotune
     private
 
     def check_for_updated_data
-      self.data_updated_at = DateTime.current if data_changed?
+      # Apparently attribute_changed? does not check if the attribute actually changed
+      if data_changed? && data != data_was
+        self.data_updated_at = DateTime.current
+      end
     end
 
     def pub_to_redis

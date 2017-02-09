@@ -44,6 +44,8 @@ module Autotune
 
     test 'updating a project' do
       project = autotune_projects(:example_one)
+      assert_nil project.data_updated_at
+
       project.update!(:title => 'new project')
       assert_equal project.title, 'new project'
       assert_nil project.data_updated_at
