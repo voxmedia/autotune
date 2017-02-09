@@ -34,9 +34,9 @@ module Autotune
             :refresh_token => current_auth.credentials['refresh_token'],
             :access_token => current_auth.credentials['token'],
             :expires_at => current_auth.credentials['expires_at'])
-          spreadsheet_key = GoogleDocs.key_from_url(build_data['google_doc_url'])
-          resp = google_client.find(spreadsheet_key)
-          cache_key = "googledoc#{spreadsheet_key}"
+          doc_key = GoogleDocs.key_from_url(build_data['google_doc_url'])
+          resp = google_client.find(doc_key)
+          cache_key = "googledoc#{doc_key}"
 
           if Rails.cache.exist?(cache_key)
             cache_value = Rails.cache.read(cache_key)
@@ -47,9 +47,8 @@ module Autotune
 
           if needs_update
             google_client.share_with_domain(
-              spreadsheet_key, Autotune.configuration.google_auth_domain)
-            exp_file = google_client.export_to_file(spreadsheet_key, 'xlsx')
-            ss_data = google_client.prepare_spreadsheet(exp_file)
+              doc_key, Autotune.configuration.google_auth_domain)
+            ss_data = google_client.get_doc_contents(build_data['google_doc_url'])
             build_data['google_doc_data'] = ss_data
             Rails.cache.write(cache_key, 'ss_data' => ss_data, 'version' => resp['version'])
           else

@@ -12,8 +12,12 @@ module Autotune
   class GoogleDocs
     attr_reader :client
 
+    def self.parse_url(url)
+      url.match(/^(?<base_url>https:\/\/docs.google.com\/(?:a\/(?<domain>[^\/]+)\/)?(?<type>[^\/]+)\/d\/(?<id>[-\w]{25,})).+$/)
+    end
+
     def self.key_from_url(url)
-      url.match(/[-\w]{25,}/).to_s
+      parse_url(url)['id']
     end
 
     def initialize(options)
@@ -33,6 +37,26 @@ module Autotune
 
       @_files = {}
       @_spreadsheets = {}
+    end
+
+    # Get the contents of a file from Google
+    # Takes the url of a Google Drive file and returns an object or string.
+    #
+    # @param file_id [String] URL
+    # @return [Hash,String] file contents
+    def get_doc_contents(url, format: nil)
+      parts = self.class.parse_url(url)
+      case parts['type']
+      when 'spreadsheets'
+        filename = export_to_file(parts['id'], :xlsx)
+        ret = prepare_spreadsheet(filename)
+        File.unlink(filename)
+      when 'document'
+        ret = export(parts['id'], format || :html)
+      else
+        ret = export(parts['id'], format || :txt)
+      end
+      return ret
     end
 
     # Find a Google Drive file
