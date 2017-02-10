@@ -36,14 +36,7 @@ module Autotune
 
       # Add a few extras to the build data
       build_data = project.data.deep_dup
-      build_data.update(
-        'title' => project.title,
-        'slug' => project.slug,
-        'group' => project.group.slug,
-        'theme' => project.theme.slug,
-        'available_themes' => Theme.all.pluck(:slug),
-        'theme_data' => Theme.full_theme_data,
-        'build_type' => 'publish')
+      build_data['build_type'] = 'publish'
 
       current_user ||= project.user
 

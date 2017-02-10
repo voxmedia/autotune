@@ -315,7 +315,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
      return view.twitterHandles[slug] ? view.twitterHandles[slug].length : 0;
     };
 
-    if ( view.model.hasBuildData() ) {
+    if ( view.model.hasBuildData() && $('textarea#shareText').length ) {
       var maxLen = 140 - ( 26 + getTwitterHandleLength(view.theme)),
           currentVal = maxLen - $('textarea#shareText').val().length;
 

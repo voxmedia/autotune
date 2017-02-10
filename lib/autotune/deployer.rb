@@ -57,6 +57,13 @@ module Autotune
         end
       end
 
+      build_data['title'] = project.title unless build_data['title'].present?
+      build_data['slug'] = project.slug unless build_data['slug'].present?
+      build_data['available_themes'] = Theme.all.pluck(:slug) unless build_data['available_themes'].present?
+      build_data['theme_data'] = Theme.full_theme_data unless build_data['theme_data'].present?
+      build_data['group'] = project.group.slug if project.respond_to? :group
+      build_data['theme'] = project.theme.slug if project.respond_to? :theme
+
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
     rescue GoogleDocs::GoogleDriveError => exc
