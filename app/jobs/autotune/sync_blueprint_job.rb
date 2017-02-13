@@ -42,6 +42,8 @@ module Autotune
           # if no theme is selected at this point, use any default theme
           themes = Theme.where(:parent => nil).first if themes.empty?
 
+          return if themes.empty?
+
           themes.each do |theme|
             slug = blueprint.themable? ? blueprint.version : [blueprint.version, theme.slug].join('-')
 
