@@ -220,12 +220,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
-    this.alpaca.childrenByPropertyId["tweet_text"].setValue($('textarea#shareText').val());
-
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
-        data = $form.alpaca('get').getValue();
+        tweetTextControl = this.alpaca.childrenByPropertyId["tweet_text"],
+        data = this.alpaca.getValue();
+
+    if ( tweetTextControl ) {
+      tweetTextControl.setValue($('textarea#shareText').val());
+    }
 
     if(view.postedPreviewData){
       data = view.postedPreviewData;
@@ -238,6 +241,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       $('.project-save-warning').hide();
       $('.project-saved').show().css('display', 'inline-block');
     }
+
+    // Don't do live preview stuff if this is not live previewable
+    if ( !this.model.hasPreviewType('live') ) { return; }
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
