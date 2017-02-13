@@ -2,33 +2,33 @@
 
 <% if ( model.hasType( 'app' ) ) { %>
 <button type="submit" class="btn btn-primary" id="saveBtn"
-        data-loading-text="Saving...">Save</button>
+        data-loading-text="<%= I18n.t('autotune.saving-message') %>"><%= I18n.t('autotune.save') %></button>
 <% } %>
 
 <% if ( ! model.isNew() ) { %>
   <% if ( model.isPublishable() ) { %>
     <% if ( model.hasType( 'app' ) ) { %>
     <a class="btn btn-primary" target="_blank" id="previewBtn"
-       href="<%=model.getPreviewUrl() %>">Preview</a>
+       href="<%=model.getPreviewUrl() %>"><%= I18n.t('autotune.preview') %></a>
     <% } %>
   <% } %>
 
   <a class="btn btn-secondary" id="duplicateBtn"
-          href="/projects/<%=model.get('slug') %>/duplicate">Duplicate</a>
+          href="/projects/<%=model.get('slug') %>/duplicate"><%= I18n.t('autotune.duplicate') %></a>
 
   <button type="button" class="btn btn-danger" id="deleteBtn"
           <% if ( model.hasStatus('building') ) { %>disabled="true"<% } %>
-          data-action-message="Project deleted"
-          data-action-confirm="Are you sure you wish to delete this?"
+          data-action-message="<%= I18n.t('autotune.project-deleted-message') %>"
+          data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
           data-action="destroy"
           data-action-next="/projects" data-model="Project"
-          data-model-id="<%=model.get('slug') %>">Delete</button>
+          data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.action-delete') %> </button>
 <% } %>
 </p>
 
 <p id="validation-error" class="text-danger hidden">
-  <span class="m-status status-alert"><i class="icon-alert"></i><span class="sr-only">Error:</span> You are missing required fields. Please edit and re-save.</span>
+  <span class="m-status status-alert"><i class="icon-alert"></i> <%= I18n.t('autotune.missing-fields-error') %> </span>
   </p>
 <p id="success-message" class="text-success hidden">
-  <span class="m-status status-ok"><i class="icon-ok"></i>You project has successfully saved.</span>
+  <span class="m-status status-ok"><i class="icon-ok"></i> <%= I18n.t('autotune.project-saved') %> </span>
 </p>

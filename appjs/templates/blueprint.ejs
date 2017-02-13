@@ -1,18 +1,18 @@
 <div class="container">
   <div class="m-page-heading">
-    <h3><% if ( model.isNew() ) { %>New Blueprint<% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-primary" href="<%=model.url() %>/new_project">New project</a><% } %></h3>
+    <h3><% if ( model.isNew() ) { %> <%= I18n.t('autotune.new-blueprint') %> <% } else { %><%=model.get( 'title' ) %> <a class="btn btn-sm btn-primary" href="<%=model.url() %>/new_project"> <%= I18n.t('autotune.new-project') %> </a><% } %></h3>
 
     <% if ( !model.isNew() ) { %>
     <p class="text-muted">
-      Status:
+       <%= I18n.t('autotune.status-header') %>
       <% if(model.hasStatus('ready')) { %>
-      <span class="text-success"><i class="icon-ok"></i>Ready</span>
+      <span class="text-success"><i class="icon-ok"></i> <%= I18n.t('autotune.filter-blueprint-status-ready') %> </span>
       <% } else if(model.hasStatus('broken')) { %>
-      <span class="text-danger"><i class="icon-alert"></i>Broken</span>
+      <span class="text-danger"><i class="icon-alert"></i> <%= I18n.t('autotune.filter-blueprint-status-broken') %> </span>
       <% } else if(model.hasStatus('updating')) { %>
-      <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%>Upgrading</span>
+      <span class="text-warning"><%=render(require('./spinner.ejs'), {size:10, color:'#FFA039'})%> <%= I18n.t('autotune.filter-blueprint-status-upgrading') %> </span>
       <% } else { %>
-      <span class="text-warning"><i class="icon-info"></i><%=capitalize(model.get('status')) %></span>
+      <span class="text-warning"><i class="icon-info"></i><%= I18n.t('autotune.filter-blueprint-status-' + model.get('status'), { defaultValue: capitalize(model.get('status')) }) %></span>
       <% } %>
     </p>
     <% } %>
@@ -29,27 +29,27 @@
             data-action="edit" data-model-id="<%=model.get('id') %>"
             <% } %> >
         <div class="form-group">
-          <label for="title">Title</label>
+          <label for="title"> <%= I18n.t('autotune.title-label') %> </label>
           <input type="text" required class="form-control"
                  <% if(!model.isNew()) { %>value="<%=model.get('title') %>"<% } %>
-                 id="title" name="title" placeholder="Enter title">
+                 id="title" name="title" placeholder="<%= I18n.t('autotune.title-placeholder') %>">
         </div>
         <div class="form-group">
-          <label for="repo_url">Repo url</label>
+          <label for="repo_url"> <%= I18n.t('autotune.blueprint-repo-url') %> </label>
           <input type="text" required class="form-control"
                  <% if(!model.isNew()) { %>value="<%=model.get('repo_url') %>"<% } %>
-                 id="repo_url" name="repo_url" placeholder="https://github.com/username/reponame.git#branchname">
-          <p class="help-block">You can target a branch by adding <code>#branchname</code> to the url.<p>
-          <p class="help-block">Changing the repo url will trigger an automatic upgrade of the blueprint.</p>
+                 id="repo_url" name="repo_url" placeholder="<%= I18n.t('autotune.blueprint-repo-url-placeholder') %>">
+          <p class="help-block"> <%= I18n.t('autotune.blueprint-repo-url-help-1') %> <p>
+          <p class="help-block"> <%= I18n.t('autotune.blueprint-repo-url-help-2') %> <p>
         </div>
         <% if(!model.isNew()) { %>
         <div class="form-group">
-          <label for="status" class="block">Status</label>
+          <label for="status" class="block"> <%= I18n.t('autotune.status') %> </label>
           <div class="select">
             <select id="status" name="status" class="form-control">
-            <% _.each(app.config.statuses, function(status) { %>
+            <% _.each(app.config.blueprint_statuses, function(status) { %>
               <option <% if( model.hasStatus(status) ) { %>selected<% } %>
-                    value="<%=status %>"><%=capitalize( status ) %></option>
+                    value="<%=status %>"><%= I18n.t('autotune.filter-blueprint-status-' + status) %></option>
             <% }) %>
             </select>
           </div>
@@ -58,19 +58,19 @@
           <div class="radio">
             <label>
               <input type="radio" name="mode" id="testing" value="testing"<% if( model.get('mode') === 'testing' ) { %> checked<% } %>><b></b>
-              Testing &mdash; This blueprint will be hidden, but available via <a href="<%=model.url() %>/new_project">New project</a>.
+                <%= I18n.t('autotune.blueprint-testing-help', { new_project_url: model.url() + '/new_project' }) %>
             </label>
           </div>
           <div class="radio">
             <label>
               <input type="radio" name="mode" id="ready" value="ready"<% if( model.get('mode') === 'ready' ) { %> checked<% } %>><b></b>
-              Ready &mdash; This blueprint will be included in the list of choices for a new project.
+                <%= I18n.t('autotune.blueprint-ready-help') %>
             </label>
           </div>
           <div class="radio">
             <label>
               <input type="radio" name="mode" id="retired" value="retired"<% if( model.get('mode') === 'retired' ) { %> checked<% } %>><b></b>
-              Retired &mdash; This blueprint is retired and should not be used.
+                <%= I18n.t('autotune.blueprint-retired-help') %>
             </label>
           </div>
         </div>
@@ -78,34 +78,34 @@
         <br />
         <div class="form-group">
           <button type="submit" class="btn btn-primary"
-                  data-loading-text="Saving...">Save changes</button>
+                  data-loading-text="<%= I18n.t('autotune.saving-message') %>"> <%= I18n.t('autotune.save') %> </button>
 
           <% if ( !model.isNew() ) { %>
           <button type="button" class="btn btn-secondary"
-                  data-action-message="Upgrade started"
-                  data-loading-text="Upgrading..."
+                  data-action-message=" <%= I18n.t('autotune.upgrade-started') %>"
+                  data-loading-text="<%= I18n.t('autotune.upgrading-message') %>"
                   data-action="update-repo" data-model="Blueprint"
                   data-action-next="reload"
-                  data-model-id="<%=model.get('slug') %>">Upgrade</button>
+                  data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.upgrade') %> </button>
           <button type="button" class="btn btn-danger"
                   <% if ( model.hasStatus('updating') ) { %>disabled="true"<% } %>
-                  data-action-message="Project deleted"
-                  data-action-confirm="Are you sure you wish to delete this?"
-                  data-loading-text="Deleting..."
+                  data-action-message="<%= I18n.t('autotune.blueprint-deleted-message') %>"
+                  data-action-confirm="<%= I18n.t('autotune.delete-confirm') %>"
+                  data-loading-text="<%= I18n.t('autotune.deleting-message') %>"
                   data-action="destroy"
                   data-action-next="/blueprints" data-model="Blueprint"
-                  data-model-id="<%=model.get('slug') %>">Delete</button>
+                  data-model-id="<%=model.get('slug') %>"> <%= I18n.t('autotune.action-delete') %> </button>
           <% } %>
         </div>
       </form>
     </div>
     <div class="col-sm-6">
       <% if ( !model.isNew() ) { %>
-      <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
-      <p><strong>Type:</strong> <%=model.get('type') %></p>
-      <% if ( model.has('config') ) { %>
-      <p class="margin-bottom"><%=model.get('config').description %></p>
-      <% } %>
+          <img src="<%=model.get('thumb_url') %>" alt="<%=model.get('title') %>" width="100%">
+          <p><strong> <%= I18n.t('autotune.type-header') %> </strong> <%= I18n.t('autotune.filter-blueprint-type-' + model.get('type'), { defaultValue: model.get('type') }) %></p>
+          <% if ( model.has('config') ) { %>
+          <p class="margin-bottom"><%=model.get('config').description %></p>
+          <% } %>
       <% } %>
     </div>
   </div>

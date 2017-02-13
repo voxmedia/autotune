@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row m-page-heading list">
     <div class="col-xs-12">
-      <h3>Choose a blueprint</h3>
+      <h3><%= I18n.t('autotune.choose-blueprint') %></h3>
     </div>
   </div>
   <% if( hasObjects() ) { %>
@@ -20,9 +20,8 @@
   </div>
   <% } else { %>
   <div class="well text-center">
-    <h4>There are no blueprints ready for use.</h4>
-    <p>You must change the status of a blueprint to
-      <span class="m-status status-ok"><i class="icon-ok"></i>Ready</span> for it to appear here.</p>
+    <h4> <%= I18n.t('autotune.no-blueprints-ready') %> </h4>
+    <p> <%= I18n.t('autotune.ask-promote-blueprint-to-ready') %> </p>
   </div>
   <% } %>
 </div>

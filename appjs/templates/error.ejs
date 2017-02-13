@@ -1,5 +1,5 @@
 <h3><%=status %></h3>
-<p>A bad thing happened. Please reload and try again.</p>
+<p> <%= I18n.t('autotune.error-message') %> </p>
 <% if (app.isDev()) { %>
 <pre><%=message %></pre>
 <% } %>
