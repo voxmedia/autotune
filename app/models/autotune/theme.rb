@@ -82,14 +82,20 @@ module Autotune
       config_data['social']['twitter_handle']
     end
 
+    def full_config_data
+      config_data.merge(
+        :group_slug => group.slug,
+        :group_default_theme => default_theme
+      )
+    end
+
     # get data for all themes
     def self.full_theme_data
-      Hash[Theme.all.map { |theme|
-             [
-               theme.slug,
-               theme.config_data.merge({:group_slug => theme.group.slug, :group_default_theme => theme.default_theme})
-             ]
-           }]
+      Hash[
+        Theme.all.map do |theme|
+          [ theme.slug, theme.full_config_data ]
+        end
+      ]
     end
 
     private
