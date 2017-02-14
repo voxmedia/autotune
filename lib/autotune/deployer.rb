@@ -34,6 +34,12 @@ module Autotune
             :refresh_token => current_auth.credentials['refresh_token'],
             :access_token => current_auth.credentials['token'],
             :expires_at => current_auth.credentials['expires_at'])
+
+          current_auth.credentials['refresh_token'] = google_client.auth.refresh_token
+          current_auth.credentials['token'] = google_client.auth.access_token
+          current_auth.credentials['expires_at'] = google_client.auth.expires_at
+          current_auth.save!
+
           doc_key = GoogleDocs.key_from_url(build_data['google_doc_url'])
           resp = google_client.find(doc_key)
           cache_key = "googledoc#{doc_key}"
