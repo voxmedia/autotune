@@ -71,6 +71,16 @@ module Autotune
       project.meta['error_message'] = "Error retriving google doc data: #{exc.message}"
 
       raise
+    rescue GoogleDocs::Unauthorized => exc
+      logger.error(exc)
+      project.meta['error_message'] = "Unable to retrieve Google Doc because user session expired."
+
+      raise
+    rescue GoogleDocs::Forbidden => exc
+      logger.error(exc)
+      project.meta['error_message'] = "Unable to retrieve Google Doc because user does not have access."
+
+      raise
     end
 
     # Hook to do stuff after a project is deleted
