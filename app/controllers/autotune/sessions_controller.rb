@@ -4,7 +4,7 @@ module Autotune
   # Handle authentication and user sessions
   class SessionsController < ApplicationController
     skip_before_action :require_login, :only => [:new, :create, :failure]
-    skip_before_action :require_google_login, :only => [:new, :create, :failure]
+    skip_before_action :require_google_login, :only => [:new, :create, :failure, :destroy]
 
     def auth_dev_tools
       redirect_to "http://localhost:8080/?api_key=#{current_user.api_key}"
