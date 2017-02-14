@@ -127,7 +127,7 @@ module Autotune
       end
 
       # Global role assignment
-      # If roles is an array , assign the highest privileges to all groups
+      # If roles is an array, assign the highest privileges to all groups
       if roles.is_a?(Array) && roles.any?
         role_to_assign = GroupMembership.get_best_role(roles)
         if role_to_assign.nil?
