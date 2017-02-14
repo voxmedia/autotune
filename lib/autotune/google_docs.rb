@@ -35,6 +35,12 @@ module Autotune
       auth.expires_at = options[:expires_at] if options[:expires_at].present?
       auth.expires_in = options[:expires_in] if options[:expires_in].present?
 
+      begin
+        auth.fetch_access_token!
+      rescue Signet::AuthorizationError => exc
+        raise AuthorizationError, exc.message
+      end
+
       @_files = {}
       @_spreadsheets = {}
     end
@@ -295,7 +301,10 @@ module Autotune
     class GoogleDriveError < StandardError; end
     class CreateError < GoogleDriveError; end
     class ConfigurationError < GoogleDriveError; end
+    class AuthorizationError < GoogleDriveError; end
     class ClientError < GoogleDriveError; end
+    class Unauthorized < ClientError; end
+    class Forbidden < ClientError; end
     class DoesNotExist < ClientError; end
 
     private
@@ -307,6 +316,10 @@ module Autotune
         ex = GoogleDriveError
       elsif result.response.status == 404
         ex = DoesNotExist
+      elsif result.response.status == 401
+        ex = Unauthorized
+      elsif result.response.status == 403
+        ex = Forbidden
       elsif result.response.status >= 400
         ex = ClientError
       end
