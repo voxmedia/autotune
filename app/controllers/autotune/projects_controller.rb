@@ -28,6 +28,10 @@ module Autotune
       end
     end
 
+    def new; end
+
+    def edit; end
+
     def index
       @projects = Project
       # Filter and search query
@@ -201,7 +205,7 @@ module Autotune
       end
 
       render :json => { :google_doc_url => doc_copy[:url] }
-    rescue Signet::AuthorizationError => exc
+    rescue GoogleDocs::AuthorizationError => exc
       render_error 'There was an error authenticating your Google account', :bad_request
       logger.error "Google Auth error: #{exc.message}"
     end
