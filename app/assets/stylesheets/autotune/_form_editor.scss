@@ -75,7 +75,7 @@
 }
 
 .tab-content {
-  height: 100%;
+  height: calc(100% - 66px);
   top: 66px;
   position: fixed;
   width: 100%;
@@ -137,6 +137,7 @@
   }
   .tab-content{
     top: 93px;
+    height: calc(100% - 93px);
   }
   .m-page-heading, .container.projects{
     padding-top: 68px;
