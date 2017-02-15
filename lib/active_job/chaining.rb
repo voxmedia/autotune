@@ -7,21 +7,27 @@ module ActiveJob
         begin
           block.call
           job.enqueue_success
-        rescue
+        rescue => e
           job.enqueue_fail
+          logger.error e.message
+          logger.error e.backtrace.join("\n")
           raise
         end
       end
     end
 
-    attr_accessor :skip_next_job
+    def skip_next_job!
+      @skip_next_job = true
+    end
+    alias_method :break_chain!, :skip_next_job!
 
-    def break_chain
-      self.skip_next_job = true
+    def skip_next_job?
+      return @skip_next_job if defined? @skip_next_job
+      @skip_next_job = false
     end
 
     def retry_job(options = {})
-      self.skip_next_job = true
+      @skip_next_job = true
       super
     end
 
@@ -57,7 +63,7 @@ module ActiveJob
     end
 
     def enqueue_success
-      unless skip_next_job
+      unless skip_next_job?
         logger.debug("Enqueue next: #{success_job.class}")
         success_job.enqueue
         clear_keys
@@ -65,9 +71,9 @@ module ActiveJob
     end
 
     def enqueue_fail
-      unless skip_next_job
-        logger.debug("Enqueue next: #{fail_job.class}")
-        success_job.enqueue
+      unless skip_next_job?
+        logger.debug("Enqueue fail job: #{fail_job.class}")
+        fail_job.enqueue
         clear_keys
       end
     end

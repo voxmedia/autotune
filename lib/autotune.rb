@@ -10,9 +10,10 @@ module Autotune
   AUTH_KEY_RE = /API-KEY\s+auth="?([^"]+)"?/
   # regex for verifying clonable git urls
   REPO_URL_RE = %r{(\w+://)?(.+@)?([\w\.]+)(:[\d]+)?/?(.*)}
-  PROJECT_STATUSES = %w(new building updated built broken)
+  STATUSES = %w(new updating updated building built broken)
+  #PROJECT_STATUSES = %w(new building updated built broken)
   PROJECT_PUB_STATUSES = %w(draft published)
-  BLUEPRINT_STATUSES = %w(new updating built broken)
+  #BLUEPRINT_STATUSES = %w(new updating built broken)
   BLUEPRINT_MODES = %w(testing ready retired)
   THEME_STATUSES = %w(new updating ready broken)
   BLUEPRINT_TYPES = %w(graphic app)
@@ -136,4 +137,3 @@ end
 # Load deployers
 require 'autotune/deployers/file'
 require 'autotune/deployers/s3'
-

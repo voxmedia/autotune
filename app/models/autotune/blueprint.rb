@@ -9,6 +9,8 @@ module Autotune
     include Searchable
     include WorkingDir
     include Deployable
+    include Repo
+
     serialize :config, JSON
     has_many :blueprint_tags, :dependent => :destroy
     has_many :tags, :through => :blueprint_tags
@@ -16,7 +18,7 @@ module Autotune
 
     validates :title, :repo_url, :presence => true
     validates :repo_url, :uniqueness => { :case_sensitive => false }
-    validates :status, :inclusion => { :in => Autotune::BLUEPRINT_STATUSES }
+    validates :status, :inclusion => { :in => Autotune::STATUSES }
     validates :mode, :inclusion => { :in => Autotune::BLUEPRINT_MODES }
     after_save :pub_to_redis
 
@@ -33,13 +35,13 @@ module Autotune
 
     before_validation do
       # Get the type from the config
-      self.type = config['type'].downcase if config && config['type']
+      self.type = config['type'].downcase if config.present? && config['type']
     end
 
     # Gets the thumbnail image url for the blueprint
     # @return [String] thumbnail url.
     def thumb_url
-      if config['thumbnail'] && !config['thumbnail'].empty?
+      if config['thumbnail'].present?
         deployer(:media).url_for(config['thumbnail'])
       else
         ActionController::Base.helpers.asset_path('autotune/at_placeholder.png')
@@ -70,16 +72,10 @@ module Autotune
       mode == 'testing'
     end
 
-    # Checks if the blueprint is installed
-    # @return [Boolean] `true` if the blueprint is installed, `false` otherwise.
-    def deployed?
-      status != 'new' && version.present?
-    end
-
     # Check if the blueprint is ready for themeing
     # @return [Boolean] `true` if the blueprint is not tied to specific themes, `false` otherwise
     def themable?
-      config['theme_type'].present? && config['theme_type'] == 'dynamic'
+      config['theme_type'] == 'dynamic'
     end
 
     # Queues a job to update the blueprint repo
@@ -108,14 +104,6 @@ module Autotune
     end
 
     private
-
-    def deploy_dir
-      if config.present? && config['deploy_dir']
-        config['deploy_dir']
-      else
-        'build'
-      end
-    end
 
     # Publishes status changes to redis
     def pub_to_redis

@@ -40,12 +40,18 @@ module Autotune
       query[:status] = params[:status] if params[:status].present?
 
       if params[:blueprint].present?
-        blueprint = Blueprint.find_by_slug(params[:blueprint])
-        query[:blueprint_id] = blueprint.id
+        if params[:blueprint] == 'bespoke'
+          query[:bespoke] = true
+        else
+          blueprint = Blueprint.find_by_slug(params[:blueprint])
+          query[:blueprint_id] = blueprint.id
+        end
       elsif params[:blueprint_id].present?
-        query[:blueprint_id] = params[:blueprint_id]
-      elsif params[:blueprint_title].present?
-        query[:blueprint_id] = params[:blueprint_title]
+        if params[:blueprint_id].to_i < 1
+          query[:bespoke] = true
+        else
+          query[:blueprint_id] = params[:blueprint_id]
+        end
       end
 
       if params[:pub_status].present?
@@ -124,35 +130,10 @@ module Autotune
 
     def create
       @project = Project.new(:user => current_user)
-      @project.attributes = select_from_post :title, :slug, :blueprint_id, :data
 
-      if request.POST.key? 'blueprint'
-        @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
-      end
+      return unless handle_post!
 
-      if request.POST.key? 'blueprint_version'
-        @project.blueprint_version = request.POST['blueprint_version']
-      end
-
-      if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_slug request.POST['theme']
-        @project.group = @project.theme.group
-        # is this user allowed to use this theme?
-        unless @project.theme.nil? ||
-               current_user.author_groups.include?(@project.group)
-          return render_error(
-            "You can't use the #{@project.theme.title} theme. Please " \
-            'choose another theme or contact support',
-            :bad_request)
-        end
-      end
-
-      unless @project.data.nil?
-        # make sure data doesn't contain title, slug or theme
-        @project.data.delete('title')
-        @project.data.delete('slug')
-        @project.data.delete('theme')
-      end
+      Rails.logger.debug(params[:blueprint_config])
 
       if @project.valid?
         @project.status = 'built' if @project.live?
@@ -168,26 +149,8 @@ module Autotune
     def update
       @project = instance
       @project.user = current_user if @project.user.nil?
-      @project.attributes = select_from_post :title, :slug, :data
 
-      if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_slug request.POST['theme']
-        @project.group = @project.theme.group
-
-        # is this user allowed to use this theme?
-        unless @project.theme.nil? ||
-               current_user.author_themes.include?(@project.theme)
-          return render_error(
-            "You can't use the #{@project.theme.title} theme. Please " \
-            'choose another theme or contact support',
-            :bad_request)
-        end
-      end
-
-      # make sure data doesn't contain title, slug or theme
-      %w(title slug theme base_url asset_base_url).each do |k|
-        @project.data.delete(k)
-      end
+      return unless handle_post!
 
       if @project.valid?
         @project.status = 'built' if @project.live?
@@ -200,9 +163,12 @@ module Autotune
       end
     end
 
-    def preview_build_data
+    def build_data
       @project = instance
-      @build_data = request.POST
+
+      @build_data = request.method == 'POST' ? request.POST : @project.data
+
+      # Bust google doc cache if we are forcing an update
       if @build_data['google_doc_url'] && request.GET[:force_update]
         cache_key = "googledoc#{GoogleDocs.key_from_url(@build_data['google_doc_url'])}"
         Rails.cache.delete(cache_key)
@@ -218,28 +184,34 @@ module Autotune
       if @project.meta.present? && @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
       elsif exc.is_a?(Signet::AuthorizationError)
-        render_error 'There was an error authenticating your Google account', :bad_request
+        render_error 'There was an error authenticating your Google account', :forbidden
         logger.error "Google Auth error: #{exc.message}"
       else
         raise
       end
     end
 
-    def create_spreadsheet
+    def create_google_doc
       current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
       google_client = GoogleDocs.new(
         :refresh_token => current_auth.credentials['refresh_token'],
         :access_token => current_auth.credentials['token'],
         :expires_at => current_auth.credentials['expires_at'])
-      spreadsheet_copy = google_client.copy(request.POST['_json'])
+
+      current_auth.credentials['refresh_token'] = google_client.auth.refresh_token
+      current_auth.credentials['token'] = google_client.auth.access_token
+      current_auth.credentials['expires_at'] = google_client.auth.expires_at
+      current_auth.save!
+
+      doc_copy = google_client.copy(request.POST['google_doc_id'])
 
       if Autotune.configuration.google_auth_domain.present?
         google_client.share_with_domain(
-          spreadsheet_copy[:id], Autotune.configuration.google_auth_domain)
+          doc_copy[:id], Autotune.configuration.google_auth_domain)
       end
 
-      render :json => { :google_doc_url => spreadsheet_copy[:url] }
-    rescue Signet::AuthorizationError => exc
+      render :json => { :google_doc_url => doc_copy[:url] }
+    rescue GoogleDocs::AuthorizationError => exc
       render_error 'There was an error authenticating your Google account', :bad_request
       logger.error "Google Auth error: #{exc.message}"
     end
@@ -266,6 +238,40 @@ module Autotune
       else
         render_error @project.errors.full_messages.join(', '), :bad_request
       end
+    end
+
+    private
+
+    def handle_post!
+      @project.attributes = select_from_post(
+        :title, :slug, :bespoke, :blueprint_id, :blueprint_version,
+        :blueprint_repo_url, :blueprint_config, :data)
+
+      if request.POST.key? 'blueprint'
+        @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
+      end
+
+      if request.POST.key? 'theme'
+        @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.group = @project.theme.group
+
+        # is this user allowed to use this theme?
+        unless @project.theme.nil? ||
+               current_user.author_themes.include?(@project.theme)
+          render_error(
+            "You can't use the #{@project.theme.title} theme. Please " \
+            'choose another theme or contact support',
+            :bad_request)
+          return false
+        end
+      end
+
+      # make sure data doesn't contain title, slug or theme
+      %w(title slug theme base_url asset_base_url).each do |k|
+        @project.data.delete(k)
+      end
+
+      true
     end
   end
 end

@@ -12,27 +12,56 @@ module Autotune
   class GoogleDocs
     attr_reader :client
 
+    def self.parse_url(url)
+      url.match(/^(?<base_url>https:\/\/docs.google.com\/(?:a\/(?<domain>[^\/]+)\/)?(?<type>[^\/]+)\/d\/(?<id>[-\w]{25,})).+$/)
+    end
+
     def self.key_from_url(url)
-      url.match(/[-\w]{25,}/).to_s
+      parse_url(url)['id']
+    end
+
+    def auth
+      @client.authorization
     end
 
     def initialize(options)
       @client = Google::APIClient.new
 
-      auth = client.authorization
-      auth.client_id = ENV['GOOGLE_CLIENT_ID']
-      auth.client_secret = ENV['GOOGLE_CLIENT_SECRET']
-      auth.scope =
-        'https://www.googleapis.com/auth/drive ' \
-        'https://spreadsheets.google.com/feeds/'
+      @client.authorization.update!({
+        :client_id => ENV['GOOGLE_CLIENT_ID'],
+        :client_secret => ENV['GOOGLE_CLIENT_SECRET'],
+        :scope => 'https://www.googleapis.com/auth/drive ' \
+                  'https://spreadsheets.google.com/feeds/'
+      }.update(options))
 
-      auth.refresh_token = options[:refresh_token] if options[:refresh_token].present?
-      auth.access_token = options[:access_token] if options[:access_token].present?
-      auth.expires_at = options[:expires_at] if options[:expires_at].present?
-      auth.expires_in = options[:expires_in] if options[:expires_in].present?
+      begin
+        @client.authorization.refresh! if @client.authorization.expired?
+      rescue Signet::AuthorizationError => exc
+        raise AuthorizationError, exc.message
+      end
 
       @_files = {}
       @_spreadsheets = {}
+    end
+
+    # Get the contents of a file from Google
+    # Takes the url of a Google Drive file and returns an object or string.
+    #
+    # @param file_id [String] URL
+    # @return [Hash,String] file contents
+    def get_doc_contents(url, format: nil)
+      parts = self.class.parse_url(url)
+      case parts['type']
+      when 'spreadsheets'
+        filename = export_to_file(parts['id'], :xlsx)
+        ret = prepare_spreadsheet(filename)
+        File.unlink(filename)
+      when 'document'
+        ret = export(parts['id'], format || :html)
+      else
+        ret = export(parts['id'], format || :txt)
+      end
+      return ret
     end
 
     # Find a Google Drive file
@@ -271,7 +300,10 @@ module Autotune
     class GoogleDriveError < StandardError; end
     class CreateError < GoogleDriveError; end
     class ConfigurationError < GoogleDriveError; end
+    class AuthorizationError < GoogleDriveError; end
     class ClientError < GoogleDriveError; end
+    class Unauthorized < ClientError; end
+    class Forbidden < ClientError; end
     class DoesNotExist < ClientError; end
 
     private
@@ -283,6 +315,10 @@ module Autotune
         ex = GoogleDriveError
       elsif result.response.status == 404
         ex = DoesNotExist
+      elsif result.response.status == 401
+        ex = Unauthorized
+      elsif result.response.status == 403
+        ex = Forbidden
       elsif result.response.status >= 400
         ex = ClientError
       end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160629175555) do
+ActiveRecord::Schema.define(version: 20161227165145) do
 
   create_table "autotune_authorizations", force: :cascade do |t|
     t.integer  "user_id"
@@ -78,11 +78,11 @@ ActiveRecord::Schema.define(version: 20160629175555) do
     t.string   "status"
     t.string   "title"
     t.string   "blueprint_version"
-    t.text     "data",              limit: 131072
+    t.text     "data",               limit: 131072
     t.text     "output"
     t.integer  "blueprint_id"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
     t.integer  "user_id"
     t.text     "blueprint_config"
     t.datetime "published_at"
@@ -90,6 +90,8 @@ ActiveRecord::Schema.define(version: 20160629175555) do
     t.integer  "theme_id"
     t.text     "meta"
     t.integer  "group_id"
+    t.boolean  "bespoke",                           default: false, null: false
+    t.string   "blueprint_repo_url"
   end
 
   add_index "autotune_projects", ["blueprint_id"], name: "index_autotune_projects_on_blueprint_id"

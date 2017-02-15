@@ -164,8 +164,9 @@ label.block {
   margin: 15px 0;
 }
 
-#spreadsheet-button{
+.open-url, .new-google-doc {
   margin-top: 8px;
+  font-weight:bold;
 }
 
 @keyframes ellipsis {
@@ -311,9 +312,7 @@ label.block {
     float: right;
     li {
       float: left;
-      a{
-        padding: 7px 0;
-      }
+      a { padding: 7px 0; }
       &.small-nav{
         display: none;
         a.navbar-brand{
@@ -341,7 +340,7 @@ label.block {
       }
     }
   }
-  a{
+  a {
     color: color(background);
     &:hover{
       color: darken(color(background), 20%);
@@ -472,7 +471,7 @@ label.block {
       margin-top: -4px .33em 0 .33em;
       padding: .2em .5em;
     }
-    a{
+    a {
       border-radius: 3px;
       border-color: color(text, dark);
       background-color: color(text, dark);
@@ -618,9 +617,12 @@ label.block {
   }
 }
 
+.has-alert .scroll-pane {
+  height: calc(100% - 93px);
+}
 .scroll-pane{
   padding-top: 25px;
-  height: 100%;
+  height: calc(100% - 66px);
   overflow-y: scroll;
   h4{
     margin-top: 0px;
@@ -714,7 +716,7 @@ label.block {
   }
 }
 
-#form-pane{
+#form-pane {
   background-color: color(accent);
   position:fixed;
   right:0px;

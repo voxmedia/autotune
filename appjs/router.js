@@ -32,7 +32,8 @@ module.exports = Backbone.Router.extend({
     "themes": "listThemes",
     "themes/new": "newTheme",
     "themes/:slug": "editTheme",
-    "themes/:slug/edit": "editTheme"
+    "themes/:slug/edit": "editTheme",
+    "builder": "formBuilder"
   },
 
   navigate: function(fragment, options) {
@@ -151,7 +152,7 @@ module.exports = Backbone.Router.extend({
     Promise.resolve( jqxhr ).then(function() {
       view = new views.ListProjects({
         collection: projects,
-        query: _.pick(query, 'status', 'pub_status', 'blueprint_title', 'type', 'theme', 'search'),
+        query: _.pick(query, 'status', 'pub_status', 'blueprint', 'type', 'theme', 'search'),
         app: app
       });
 
@@ -300,6 +301,37 @@ module.exports = Backbone.Router.extend({
     this.app.view
       .display( view )
       .setTab('themes');
-
   },
+
+  formBuilder: function(params) {
+    var view, model, query = {}, app = this.app,
+        formData = {}, fetchPromise = Promise.resolve();
+
+    if(params) { query = querystring.parse(params); }
+
+    if ( query.blueprint ) {
+      console.debug('have blueprint');
+      model = new models.Blueprint({ id: query.blueprint });
+      fetchPromise = Promise.resolve( model.fetch() );
+    } else if ( query.project ) {
+      console.debug('have model');
+      model = new models.Project({ id: query.project });
+      fetchPromise = Promise.resolve( model.fetch() );
+    }
+
+    fetchPromise.then(function() {
+      view = new views.FormBuilder({ app: app, model: model });
+      view.render();
+
+      app.view
+        .display( view )
+        .setTab('blueprints');
+    }).catch(function(jqXHR) {
+      if ( jqXHR.status ) {
+        app.view.displayError(jqXHR.status, jqXHR.statusText, jqXHR.responseText);
+      } else {
+        app.view.display500('', jqXHR);
+      }
+    });
+  }
 });

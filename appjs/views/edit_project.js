@@ -34,7 +34,8 @@ var ProjectSaveModal = Backbone.View.extend({
       'click #closeModal': 'closeModal',
       'click #dismiss': 'cancel',
       'click #save': 'submit',
-      'click': 'closeModal'
+      'click': 'closeModal',
+      'click .new-google-doc': 'createDocument'
     },
 
     initialize: function(options) {
@@ -101,6 +102,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     'click #savePreview': 'savePreview',
     'click .resize': 'resizePreview',
     'click #saveBtn': 'handleForm',
+    'click .new-google-doc': 'createDocument',
     'mousedown #split-bar': 'enableFormResize',
     'mouseup': 'disableFormResize',
     'mousemove': 'resizeForm'
@@ -110,9 +112,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     var view = this;
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
-    if(options.query){
-      this.togglePreview = options.query.togglePreview ? true : false;
-    }
 
     window.onbeforeunload = function(event) {
       if(view.hasUnsavedChanges()){
@@ -201,14 +200,18 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   hasUnsavedChanges: function(){
-    var view = this,
-        data = view.alpaca.getValue();
+    var view = this, data;
 
-    if(_.isEqual(view.formDataOnLoad, data) ){
-      return false;
-    } else {
-      return true;
+    if ( view.alpaca ) {
+      data = view.alpaca.getValue();
+
+      if(_.isEqual(view.formDataOnLoad, data) ){
+        return false;
+      } else {
+        return true;
+      }
     }
+    return false;
   },
 
   focusPollChange: function(){
@@ -217,12 +220,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   pollChange: _.debounce(function(){
-    this.alpaca.childrenByPropertyId["tweet_text"].setValue($('textarea#shareText').val());
-
     var view = this,
         $form = this.$('#projectForm'),
         query = '',
-        data = $form.alpaca('get').getValue();
+        tweetTextControl = this.alpaca.childrenByPropertyId["tweet_text"],
+        data = this.alpaca.getValue();
+
+    if ( tweetTextControl ) {
+      tweetTextControl.setValue($('textarea#shareText').val());
+    }
 
     if(view.postedPreviewData){
       data = view.postedPreviewData;
@@ -235,6 +241,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       $('.project-save-warning').hide();
       $('.project-saved').show().css('display', 'inline-block');
     }
+
+    // Don't do live preview stuff if this is not live previewable
+    if ( !this.model.hasPreviewType('live') ) { return; }
 
     // Make sure the form is valid before proceeding
     // Alpaca takes a loooong time to validate a complex form
@@ -263,7 +272,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       return $.ajax({
         type: "POST",
-        url: this.model.url() + "/preview_build_data" + query,
+        url: this.model.url() + "/build_data" + query,
         data: JSON.stringify(data),
         contentType: 'application/json',
         dataType: 'json'
@@ -312,7 +321,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
      return view.twitterHandles[slug] ? view.twitterHandles[slug].length : 0;
     };
 
-    if ( view.model.hasBuildData() ) {
+    if ( view.model.hasBuildData() && $('textarea#shareText').length ) {
       var maxLen = 140 - ( 26 + getTwitterHandleLength(view.theme)),
           currentVal = maxLen - $('textarea#shareText').val().length;
 
@@ -499,11 +508,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           // In case some dumb script hangs the loading process
           setTimeout(iframeLoaded, 20000);
         }
-        if(view.model.hasPreviewType('live')){
-          if(view.model.getConfig().spreadsheet_template){
-            $( "input[name='google_doc_url']" ).after('<b><a type="button" id="spreadsheet-button" data-hook="create-spreadsheet">Create new empty spreadsheet</a></b>');
-          }
-        }
+
         view.getTwitterCount();
       }).catch(function(err) {
         console.error(err);
@@ -526,7 +531,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   renderForm: function(resolve, reject) {
     var $form = this.$('#projectForm'),
         view = this,
-        form_config, availableThemes, newProject, populateForm = false;
+        form_config, availableThemes, populateForm = false;
 
     if ( this.disableForm ) {
       $form.append(
@@ -544,11 +549,6 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     });
 
-    newProject = false;
-    if ( this.model.isNew() || this.copyProject ) {
-      newProject = true;
-    }
-
     form_config = this.model.getConfig().form;
 
     availableThemes = this.model.getConfig().themes ?
@@ -559,7 +559,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
 
     if(_.isUndefined(form_config)) {
-      this.app.view.error('This blueprint does not have a form!');
+      this.app.view.error('This blueprint does not have a form!', true);
       reject('This blueprint does not have a form!');
     } else {
       var schema_properties = {
@@ -648,6 +648,14 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         _.extend(options_fields, form_config.options.fields || {});
       }
 
+      // This monkey-patches the config for google_doc_url fields to use the googledoc field control
+      if ( options_fields.google_doc_url && options_fields.google_doc_url.type === 'url' ) {
+        options_fields.google_doc_url.type = 'googledoc';
+        if ( this.model.getConfig().spreadsheet_template ) {
+          options_fields.google_doc_url.doc_template_url = this.model.getConfig().spreadsheet_template;
+        }
+      }
+
       var opts = {
         "schema": {
           "title": function(){
@@ -684,7 +692,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         populateForm = true;
       } else if (this.model.isNew() && !this.copyProject && !this.model.hasInitialBuild()){
         var uniqBuildVals = _.uniq(_.values(this.model.buildData()));
-        if (!( uniqBuildVals.length === 1 && typeof uniqBuildVals[0] === 'undefined')){
+        if (!( uniqBuildVals.length === 1 && typeof(uniqBuildVals[0]) === 'undefined')){
           populateForm = true;
         }
       }
@@ -706,8 +714,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     logger.debug('form values');
 
     if ( control ) {
+      // get data from alpaca
       data = control.getValue();
     } else {
+      // get data from the developer editor
       try {
         data = JSON.parse(this.editor.getValue());
       } catch (ex) {
@@ -715,16 +725,26 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     }
 
+    // If we're updating, only worry about title, theme, slug and data
     var vals = {
       title: data['title'],
       theme: data['theme'],
-      data:  data,
-      blueprint_id: this.model.blueprint.get('id'),
-      blueprint_version: this.model.getVersion()
+      data:  data
     };
 
-    if ( data.slug && data.slug.indexOf(data['theme']) !== 0 ) {
-      vals.slug = data['theme'] + '-' + data['slug'];
+    if ( this.model.isNew() ) {
+      // If this is a new project, we need the blueprint id. If we're
+      // duplicating a project, we need version and config too.
+      _.extend(vals, {
+        blueprint_id: this.model.getBlueprintAttr('id'),
+        blueprint_version: this.model.getVersion(),
+        blueprint_config: this.model.getConfig()
+      });
+    }
+
+    // Set our slug to start with the theme, if it doesn't already
+    if ( data.slug && data.slug.indexOf(data.theme) !== 0 ) {
+      vals.slug = data.theme + '-' + data.slug;
     }
 
     return vals;
@@ -774,30 +794,35 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
    * Create a new spreadsheet from a template
    * @returns {Promise} Promise to provide the Google Doc URL
    **/
-  createSpreadsheet: function() {
+  createDocument: function(eve) {
+    eve.preventDefault();
+    eve.stopPropagation();
+
+    var $btn = $(eve.currentTarget);
+
     var model = this.model, view = this;
-    if ( !model.getConfig().spreadsheet_template ) { return Promise.resolve(); }
+    if ( !$btn.data('template-id') ) { return; }
 
-    var ss_key = model.getConfig().spreadsheet_template.match(/[-\w]{25,}/)[0];
+    var ss_key = $btn.data('template-id');
 
-    var $input = $( "input[name='google_doc_url']" );
-    if( $input.val().length > 0 ) {
-      var msg = 'This will replace the spreadsheet link currently associated with this project. Click "OK" to confirm the replacement.';
-      if ( !window.confirm(msg) ) { return Promise.resolve(); }
+    var ctrl = this.alpaca.childrenById[$btn.data('target')];
+    if( ctrl.getValue().trim().length > 0 ) {
+      var msg = 'This will replace the currently associated document. Click "OK" to confirm the replacement.';
+      if ( !window.confirm(msg) ) { return; }
     }
 
     return Promise.resolve( $.ajax({
       type: "POST",
-      url: model.urlRoot + "/create_spreadsheet",
-      data: JSON.stringify(ss_key),
+      url: model.urlRoot + "/create_google_doc",
+      data: JSON.stringify({ google_doc_id: ss_key }),
       contentType: 'application/json',
       dataType: 'json'
     }) ).then(
       function( data ) {
-        $input
-          .val(data.google_doc_url)
+        ctrl
+          .setValue(data.google_doc_url)
+          .refreshValidationState()
           .focus();
-        view.alpaca.form.refreshValidationState(true);
       },
       function(err) {
         var msg = 'There was an error authenticating your Google account.';
@@ -806,6 +831,10 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     );
   },
+
+  isNewProject: function() {
+    return this.model.isNew() || this.copyProject;
+  }
 } );
 
 module.exports = EditProject;

@@ -39,11 +39,11 @@
             </div>
             <% } %>
             <div class="select">
-              <select name="blueprint_title" id="blueprint_title" class="form-control" data-auto-submit="true">
-                <option disabled <% if(!query.blueprint_title) { %>selected<% } %>> <%= I18n.t('autotune.blueprint') %> </option>
-              <% _.each(app.config.blueprint_titles, function(blueprint_title) { %>
-                <option <% if(String(blueprint_title.id) === query.blueprint_title) { %>selected<% } %>
-                      value="<%=blueprint_title.id %>"><%=blueprint_title.title %></option>
+              <select name="blueprint" id="blueprint" class="form-control" data-auto-submit="true">
+                <option disabled <% if(!query.blueprint) { %>selected<% } %>> <%= I18n.t('autotune.blueprint') %> </option>
+              <% _.each(app.config.blueprint_options, function(blueprint) { %>
+                <option <% if(blueprint.slug === query.blueprint) { %>selected<% } %>
+                      value="<%=blueprint.slug %>"><%=blueprint.title %></option>
               <% }) %>
               </select>
             </div>

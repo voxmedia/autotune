@@ -1,5 +1,7 @@
 "use strict";
 
+var $ = require('jquery');
+
 module.exports = {
   /**
    * Build a url for deployed files

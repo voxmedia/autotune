@@ -33,79 +33,32 @@ Autotune::Engine.routes.draw do
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
 
-  post 'projects/:id/preview_build_data',
-       :to => 'projects#preview_build_data',
+  get 'projects/:id/build_data',
+      :to => 'projects#build_data',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  post 'projects/:id/build_data',
+       :to => 'projects#build_data',
        :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
-  post 'projects/preview_build_data',
-       :to => 'projects#preview_build_data'
-  post 'projects/create_spreadsheet',
-       :to => 'projects#create_spreadsheet'
+  post 'projects/build_data',
+       :to => 'projects#build_data'
+  post 'projects/create_google_doc',
+       :to => 'projects#create_google_doc'
 
   get 'changemessages' => 'changemessages#index'
 
   get 'messages' => 'messages#index'
   post 'messages/send' => 'messages#send_message'
 
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-
-  # You can have the root of your site routed with "root"
+  get 'builder' => 'application#index'
   root 'application#index'
-
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
-
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
-
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
-
-  # Example resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
-
-  # Example resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
-
-  # Example resource route with more complex sub-resources:
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', on: :collection
-  #     end
-  #   end
-
-  # Example resource route with concerns:
-  #   concern :toggleable do
-  #     post 'toggle'
-  #   end
-  #   resources :posts, concerns: :toggleable
-  #   resources :photos, concerns: :toggleable
-
-  # Example resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
 
   match '/auth/:provider/callback' => 'sessions#create',  :via => [:get, :post]
   get '/auth/failure'              => 'sessions#failure'
   get '/logout'                    => 'sessions#destroy', :as => :logout
   get '/login'                     => 'sessions#new',     :as => :login
+  get '/auth_dev_tools'            => 'sessions#auth_dev_tools'
 
+  # Add a protected `/resque` route for checking on workers
   resque_web_constraint = lambda do |request|
     current_user = Autotune::User.find_by_api_key(
       request.env['rack.session']['api_key'])
