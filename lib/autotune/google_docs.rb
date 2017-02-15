@@ -285,6 +285,7 @@ module Autotune
     def load_table(table)
       return [] if table.length < 2
       header = table.shift # Get the header row
+      return [] if header.nil?
       # remove blank rows
       table.reject! do |row|
         row.nil? || row
