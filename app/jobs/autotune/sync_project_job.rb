@@ -46,7 +46,8 @@ module Autotune
           project.blueprint_version = project_dir.version
         elsif project_dir.version != project.blueprint_version
           # Checkout correct version and branch
-          project_dir.checkout_version(project.blueprint_version)
+          project_dir.commit_hash_for_checkout = project.blueprint_version
+          project_dir.update
           # Make sure the environment is correct for this version
           project_dir.setup_environment
           # update the config
