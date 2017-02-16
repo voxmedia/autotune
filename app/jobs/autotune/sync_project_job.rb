@@ -25,15 +25,17 @@ module Autotune
         # Create a new repo object based on the projects working dir
         project_dir = project.setup_shell
 
-        if project_dir.exist? && update
-          # Update the project files. Because of issue #218, due to
-          # some weirdness in git 1.7, we can't just update the repo.
-          # We have to make a new copy.
-          project_dir.rm
-          blueprint_dir.copy_to(project_dir.working_dir)
-        elsif project_dir.exist? && project_dir.version == project.blueprint_version
-          # if we're not updating, bail if we have the files
-          return
+        if project_dir.exist?
+          if update || project_dir.version != project.blueprint_version
+            # Update the project files. Because of issue #218, due to
+            # some weirdness in git 1.7, we can't just update the repo.
+            # We have to make a new copy.
+            project_dir.rm
+            blueprint_dir.copy_to(project_dir.working_dir)
+          elsif project_dir.version == project.blueprint_version
+            # if we're not updating, bail if we have the files
+            return
+          end
         else
           # Copy the blueprint to the project working dir.
           blueprint_dir.copy_to(project_dir.working_dir)
