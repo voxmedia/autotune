@@ -107,7 +107,7 @@ en:
     error-header:           'Error:'
     preview-header:         'Preview:'
     new:                    'New'
-    publishing:             'Publishing...'
+    publishing:             'Publishing'
     publish-now:            'Publish now'
     publish-changes-now:    'Publish changes now'
     view:                   'View'
