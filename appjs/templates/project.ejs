@@ -161,7 +161,7 @@
         <hr />
         <h4> <%= I18n.t('autotune.publish') %> </h4>
         <button type="button" class="btn btn-primary" id="publishBtn"
-                <% if ( ! model.hasInitialBuild() && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
+                <% if ( ! ( model.hasInitialBuild() && model.hasUnpublishedUpdates() ) && ! model.hasPreviewType('live') ) { %>disabled="true"<% } %>
                 data-action-message="<%= I18n.t('autotune.publishing') %>"
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
@@ -169,7 +169,7 @@
                 <% if ( model.hasStatus('building') ) { %>
                   style="width: 109px;"> <%= I18n.t('autotune.publishing') %> <div></div>
                 <% } else { %>
-                  ><% if ( model.hasInitialBuild() ) { %>
+                  ><% if ( model.hasInitialBuild() && model.hasUnpublishedUpdates() ) { %>
                     <%= I18n.t('autotune.publish-changes-now') %>
                   <% } else { %>
                     <%= I18n.t('autotune.publish-now') %>
