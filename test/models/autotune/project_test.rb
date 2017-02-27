@@ -46,10 +46,6 @@ module Autotune
       project = autotune_projects(:example_one)
       assert_nil project.data_updated_at
 
-      project.update!(:title => 'new project')
-      assert_equal project.title, 'new project'
-      assert_nil project.data_updated_at
-
       bp = autotune_blueprints(:example_two)
       project.update!(:blueprint => bp)
       assert_equal project.blueprint, bp
@@ -60,6 +56,10 @@ module Autotune
       assert_equal project.blueprint, bp
       assert_equal project.user, user
       assert_nil project.data_updated_at
+
+      project.update!(:title => 'new project')
+      assert_equal project.title, 'new project'
+      refute_nil project.data_updated_at
     end
 
     test 'data updated timestamp' do
@@ -68,7 +68,35 @@ module Autotune
       assert_nil project.data_updated_at
       project.data['foo'] = 'bar'
       project.save!
-      assert_not_nil project.data_updated_at
+      refute_nil project.data_updated_at
+    end
+
+    test 'title updated data timestamp' do
+      project = autotune_projects(:example_one)
+
+      assert_nil project.data_updated_at
+      project.update!(:title => 'new project')
+      assert_equal project.title, 'new project'
+      refute_nil project.data_updated_at
+    end
+
+    test 'slug updated data timestamp' do
+      project = autotune_projects(:example_one)
+
+      assert_nil project.data_updated_at
+      project.update!(:slug => 'change-the-slug')
+      assert_equal project.slug, 'theme1-change-the-slug'
+      refute_nil project.data_updated_at
+    end
+
+    test 'theme updated data timestamp' do
+      project = autotune_projects(:example_one)
+      theme = autotune_themes(:theme2)
+
+      assert_nil project.data_updated_at
+      project.update!(:theme => theme)
+      assert_equal project.theme, theme
+      refute_nil project.data_updated_at
     end
 
     test 'updated since publish' do

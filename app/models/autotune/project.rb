@@ -246,9 +246,12 @@ module Autotune
     private
 
     def check_for_updated_data
-      # Apparently attribute_changed? does not check if the attribute actually changed
-      if data_changed? && data != data_was
-        self.data_updated_at = DateTime.current
+      %w(data title slug theme_id data).each do |attr|
+        # Apparently attribute_changed? does not check if the attribute actually changed
+        if changes[attr].present? && changes[attr].first != changes[attr].last
+          self.data_updated_at = DateTime.current
+          break
+        end
       end
     end
 

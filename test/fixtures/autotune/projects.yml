@@ -5,7 +5,7 @@ example_one:
   slug: example-build-one
   theme: theme1
   status: new
-  data: '{"title": "Example build one"}'
+  data: '{"tweet_text": "Example build one"}'
   blueprint: example
   user: developer
   group: group1
@@ -15,7 +15,7 @@ example_two:
   slug: example-build-two
   theme: theme2
   status: new
-  data: '{"title": "Example build two"}'
+  data: '{"tweet_text": "Example build two"}'
   blueprint: example
   user: developer
   group: group2
@@ -25,7 +25,7 @@ example_three:
   slug: example-build-three
   theme: child_theme2
   status: new
-  data: '{"title": "Example build three"}'
+  data: '{"tweet_text": "Example build three"}'
   blueprint: example_two
   user: group2_author
   group: group2
@@ -35,7 +35,7 @@ example_four:
   slug: example-build-four
   theme: theme1
   status: new
-  data: '{"title": "Example build four"}'
+  data: '{"tweet_text": "Example build four"}'
   blueprint: example
   user: author
   group: group1
