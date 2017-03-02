@@ -199,8 +199,9 @@ module Autotune
 
     # Gets the slug of the project without the theme.
     # Handles when the theme changes
-    # @return [String] slyg of the project without the theme.
+    # @return [String] slug of the project without the theme.
     def slug_sans_theme
+      return if slug.nil?
       if theme_changed? && theme_was.present?
         slug.sub(/^(#{theme.slug}|#{theme_was.slug})-/, '')
       else
