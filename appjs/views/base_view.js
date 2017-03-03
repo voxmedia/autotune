@@ -6,7 +6,26 @@ var $ = require('jquery'),
     camelize = require('underscore.string/camelize'),
     models = require('../models'),
     logger = require('../logger'),
-    helpers = require('../helpers');
+    helpers = require('../helpers'),
+    diff = require('virtual-dom/diff'),
+    patch = require('virtual-dom/patch'),
+    html2hscript = require('html2hscript'),
+    h = require("virtual-dom/h"),
+    createElement = require('virtual-dom/create-element');
+
+/* Parse HTML into hscript via Promise
+ */
+function parseH(string) {
+  return new Promise(function(resolve, reject) {
+    html2hscript(string, function(err, hscript) {
+      if ( err ) {
+        reject(err);
+      } else {
+        resolve(eval('[' + hscript + ']')); // jshint ignore:line
+      }
+    });
+  });
+}
 
 var BaseView = Backbone.View.extend({
   loaded: true,
@@ -19,6 +38,8 @@ var BaseView = Backbone.View.extend({
     if (_.isObject(options)) {
       _.extend(this, _.pick(options, 'app', 'query'));
     }
+
+    this.virtualEl = this.makeRootNode();
 
     this.hook('afterInit', options);
   },
@@ -40,6 +61,30 @@ var BaseView = Backbone.View.extend({
     });
   },
 
+  makeRootNode: function(children) {
+    var attrs = {};
+    if ( this.id ) { attrs.id = this.id; }
+    if ( this.className ) { attrs.className = this.className; }
+    return h(this.tagName, attrs, children || []);
+  },
+
+  renderVirtualDom: function() {
+    var view = this;
+    var html = helpers.render( this.template, this.templateData() );
+
+    return new Promise(function(resolve, reject) {
+      html2hscript(html, function(err, hscript) {
+        if ( err ) {
+          reject(err);
+        } else {
+          resolve(
+            view.makeRootNode(eval('[' + hscript + ']')) // jshint ignore:line
+          );
+        }
+      });
+    });
+  },
+
   render: function() {
     var scrollPos = $(window).scrollTop(),
         activeTab = window.location.hash,
@@ -51,9 +96,11 @@ var BaseView = Backbone.View.extend({
     // Do some renderin'. First up: beforeRender()
     return view.hook( 'beforeRender' ).then(function() {
       // Generate the element using template and templateData()
-      view.$el.html(
-        helpers.render(
-          view.template, view.templateData() ) );
+      return view.renderVirtualDom();
+    }).then(function(virtualEl) {
+      var patches = diff(view.virtualEl, virtualEl);
+      view.el = patch(view.el, patches);
+      view.virtualEl = virtualEl;
 
       return view.hook( 'afterRender' );
     }).then(function() {
