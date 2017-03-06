@@ -13,20 +13,6 @@ var $ = require('jquery'),
     h = require("virtual-dom/h"),
     createElement = require('virtual-dom/create-element');
 
-/* Parse HTML into hscript via Promise
- */
-function parseH(string) {
-  return new Promise(function(resolve, reject) {
-    html2hscript(string, function(err, hscript) {
-      if ( err ) {
-        reject(err);
-      } else {
-        resolve(eval('[' + hscript + ']')); // jshint ignore:line
-      }
-    });
-  });
-}
-
 var BaseView = Backbone.View.extend({
   loaded: true,
   firstRender: true,
