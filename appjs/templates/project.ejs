@@ -194,7 +194,7 @@
           <h4> <%= I18n.t('autotune.embed-in-your-story') %> </h4>
 
           <% if ( model.has('embed_html') ) { %>
-          <textarea class="form-control" id="embedText" rows="6" readonly><%=model.get('embed_html') %></textarea>
+          <textarea class="form-control" id="embedText" rows="6" readonly><%=escapeHTML( model.get('embed_html') ) %></textarea>
           <p>
             <button type="button" class="btn btn-default"
                     data-hook="copyEmbedToClipboard"> <%= I18n.t('autotune.copy-embed-code') %> </button>

@@ -47,6 +47,10 @@ var BaseView = Backbone.View.extend({
     });
   },
 
+  /*
+   * Create a virtual dom node for the root element created by the Backbone
+   * view. Optionally takes an array of children virtual nodes.
+   */
   makeRootNode: function(children) {
     var attrs = {};
     if ( this.id ) { attrs.id = this.id; }
@@ -54,10 +58,17 @@ var BaseView = Backbone.View.extend({
     return h(this.tagName, attrs, children || []);
   },
 
+  /*
+   * Render the view's template and convert it into an array of virtual
+   * DOM elements. Returns a promise object.
+   */
   renderVirtualDom: function() {
     var view = this;
+    // Generate the element using template and templateData()
     var html = helpers.render( this.template, this.templateData() );
 
+    // Create a promise which converts the html string into hscript, then
+    // into virtual dom nodes
     return new Promise(function(resolve, reject) {
       html2hscript(html, function(err, hscript) {
         if ( err ) {
@@ -81,13 +92,15 @@ var BaseView = Backbone.View.extend({
 
     // Do some renderin'. First up: beforeRender()
     return view.hook( 'beforeRender' ).then(function() {
-      // Generate the element using template and templateData()
+
       return view.renderVirtualDom();
     }).then(function(virtualEl) {
       var patches = diff(view.virtualEl, virtualEl);
       view.el = patch(view.el, patches);
       view.virtualEl = virtualEl;
 
+      // Reset any button states
+      view.$('.btn').button('reset');
       return view.hook( 'afterRender' );
     }).then(function() {
       // Set a tab on the page if we have an anchor

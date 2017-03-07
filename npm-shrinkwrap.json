@@ -985,11 +985,6 @@
       "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.0.5.tgz",
       "dev": true
     },
-    "escape-html": {
-      "version": "1.0.3",
-      "from": "escape-html@>=1.0.3 <2.0.0",
-      "resolved": "https://registry.npmjs.org/escape-html/-/escape-html-1.0.3.tgz"
-    },
     "escape-string-regexp": {
       "version": "1.0.5",
       "from": "escape-string-regexp@>=1.0.2 <2.0.0",
