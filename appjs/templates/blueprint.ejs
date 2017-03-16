@@ -47,7 +47,7 @@
           <label for="status" class="block"> <%= I18n.t('autotune.status') %> </label>
           <div class="select">
             <select id="status" name="status" class="form-control">
-            <% _.each(app.config.blueprint_statuses, function(status) { %>
+            <% _.each(app.config.statuses, function(status) { %>
               <option <% if( model.hasStatus(status) ) { %>selected<% } %>
                     value="<%=status %>"><%= I18n.t('autotune.filter-blueprint-status-' + status) %></option>
             <% }) %>
@@ -57,19 +57,19 @@
         <div class="form-group">
           <div class="radio">
             <label>
-              <input type="radio" name="mode" id="testing" value="testing"<% if( model.get('mode') === 'testing' ) { %> checked<% } %>><b></b>
+              <input type="radio" name="mode" id="testing" value="testing"<% if( model.get('mode') === 'testing' ) { %> checked<% } %> /><b></b>
                 <%= I18n.t('autotune.blueprint-testing-help', { new_project_url: model.url() + '/new_project' }) %>
             </label>
           </div>
           <div class="radio">
             <label>
-              <input type="radio" name="mode" id="ready" value="ready"<% if( model.get('mode') === 'ready' ) { %> checked<% } %>><b></b>
+              <input type="radio" name="mode" id="ready" value="ready"<% if( model.get('mode') === 'ready' ) { %> checked<% } %> /><b></b>
                 <%= I18n.t('autotune.blueprint-ready-help') %>
             </label>
           </div>
           <div class="radio">
             <label>
-              <input type="radio" name="mode" id="retired" value="retired"<% if( model.get('mode') === 'retired' ) { %> checked<% } %>><b></b>
+              <input type="radio" name="mode" id="retired" value="retired"<% if( model.get('mode') === 'retired' ) { %> checked<% } %> /><b></b>
                 <%= I18n.t('autotune.blueprint-retired-help') %>
             </label>
           </div>

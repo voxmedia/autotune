@@ -38,6 +38,10 @@ module Autotune
       @blueprint = instance
     end
 
+    def edit
+      @blueprint = instance
+    end
+
     def create
       @blueprint = Blueprint.new
       @blueprint.attributes = select_from_post :title, :repo_url, :slug
