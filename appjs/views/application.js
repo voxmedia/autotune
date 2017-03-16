@@ -112,10 +112,14 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
           type: level || 'info',
           delay: 8000,
           before_open: function(thing){
+            logger.debug( 'notification is opening' );
             page.$('#alert-area').parent().addClass('has-alert');
           },
           after_close: function(thing){
-            page.$('#alert-area').parent().removeClass('has-alert');
+            logger.debug( 'notification is closed' );
+            if ( ! page.hasNotifications() ) {
+              page.$('#alert-area').parent().removeClass('has-alert');
+            }
           }
         }, this.alertDefaults);
 
@@ -130,6 +134,10 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     noti = this.findNotification( message );
 
     return noti || new PNotify(opts);
+  },
+
+  hasNotifications: function() {
+    return PNotify.notices.length > 0;
   },
 
   findNotification: function(message) {
