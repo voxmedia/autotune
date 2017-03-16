@@ -26,7 +26,7 @@
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="edit">
-      <% if (model.blueprint.hasPreviewType('live')) { %>
+      <% if (model.hasPreviewType('live')) { %>
       <div id="projectEditor" class="row">
 
         <div class="col-md-8 col-sm-7 scroll-pane" id="preview-pane">
@@ -39,7 +39,7 @@
                     class="btn btn-default resize active"></button>
           </ul>
           <br />
-          <p class="blueprint-title"><%= model.blueprint.get('title') %></p>
+          <p class="blueprint-title"><%= model.get('blueprint_title') %></p>
 
           <% if ( model.isNew() ) { %>
             <p> <%= I18n.t('autotune.draft') %> </p>
