@@ -4,7 +4,6 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     camelize = require('underscore.string/camelize'),
-    models = require('../models'),
     logger = require('../logger'),
     helpers = require('../helpers'),
     diff = require('virtual-dom/diff'),
@@ -71,6 +70,8 @@ var BaseView = Backbone.View.extend({
     // into virtual dom nodes
     return new Promise(function(resolve, reject) {
       html2hscript(html, function(err, hscript) {
+        // hscript here is a string of javascript which needs to be evaluated.
+        // The string makes use of the `h` function, which we require above.
         if ( err ) {
           reject(err);
         } else {
@@ -82,9 +83,13 @@ var BaseView = Backbone.View.extend({
     });
   },
 
+  /*
+   * Does the full render process for this view, and populate the view.el
+   * element. Calling this method will update the view without totally
+   * re-rendering it all.
+   */
   render: function() {
-    var scrollPos = $(window).scrollTop(),
-        activeTab = window.location.hash,
+    var activeTab = window.location.hash,
         view = this;
 
     // Only render if this view is loaded
@@ -92,7 +97,6 @@ var BaseView = Backbone.View.extend({
 
     // Do some renderin'. First up: beforeRender()
     return view.hook( 'beforeRender' ).then(function() {
-
       return view.renderVirtualDom();
     }).then(function(virtualEl) {
       var patches = diff(view.virtualEl, virtualEl);
@@ -113,11 +117,6 @@ var BaseView = Backbone.View.extend({
         // Reset first render flag
         logger.debug( 'first render' );
         view.firstRender = false;
-      } else {
-        // Reset scroll position
-        logger.debug('re-render; set scroll',
-                     activeTab, scrollPos, $(document).height());
-        $(window).scrollTop(scrollPos);
       }
 
       view.app.trigger( 'loadingStop' );

@@ -125,7 +125,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
-        this.listenTo(this.app, 'focus', this.focusPollChange, this);
+        this.listenTo(this.app, 'focus', this.onAppFocus, this);
       }
 
       // setup warning for closing before saving
@@ -145,7 +145,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       // Remove listers, stop listening for messages
       this.stopListening(this.app);
       this.stopListeningForChanges();
-      window.onbeforeunload = undefined;
+      delete window.onbeforeunload;
       $(window).off('resize', this.onWindowResize);
 
       $('#navbar-save-container').hide();
@@ -245,8 +245,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return false;
   },
 
-  focusPollChange: function(){
+  onAppFocus: function(){
     this.forceUpdateDataFlag = true;
+    this.showPreviewButtons();
     this.pollChange();
   },
 
