@@ -113,28 +113,59 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     this.disableForm = options.disableForm ? true : false;
     this.copyProject = options.copyProject ? true : false;
 
-    window.onbeforeunload = function(event) {
-      if(view.hasUnsavedChanges()){
-        return 'You have unsaved changes!';
-      }
-    };
+    _.bindAll(this, 'onWindowResize');
+
+    // autoselect embed code on focus
+    this.$el.on('focus', 'textarea#embedText', function() { $(this).select(); } );
 
     this.on('load', function() {
+      // Stop listening for changes during loading
       this.listenTo(this.app, 'loadingStart', this.stopListeningForChanges, this);
       this.listenTo(this.app, 'loadingStop', this.listenForChanges, this);
-      $('#navbar-save-container').show();
+
       if ( this.model.hasPreviewType('live') && this.model.getConfig().spreadsheet_template ) {
         // If we have a google spreadsheet, update preview on window focus
-        this.listenTo(this.app, 'focus', this.focusPollChange, this);
+        this.listenTo(this.app, 'focus', this.onAppFocus, this);
       }
+
+      // setup warning for closing before saving
+      window.onbeforeunload = function(event) {
+        if(view.hasUnsavedChanges()){
+          return 'You have unsaved changes!';
+        }
+      };
+
+      // window resize handler
+      $(window).on('resize', this.onWindowResize);
+
+      $('#navbar-save-container').show();
     }, this);
 
     this.on('unload', function() {
+      // Remove listers, stop listening for messages
       this.stopListening(this.app);
       this.stopListeningForChanges();
+      delete window.onbeforeunload;
+      $(window).off('resize', this.onWindowResize);
+
       $('#navbar-save-container').hide();
+
+      // Remove the pym parent object
       if ( this.pym ) { this.pym.remove(); }
     }, this);
+  },
+
+  onWindowResize: function() {
+    this.showPreviewButtons();
+    if(this.formWidth){
+      if($(window).width() > 768){
+        $('#form-pane').css("width", this.formWidth);
+        $('#preview-pane').css("width", $(window).width() - this.formWidth);
+      } else {
+        $('#form-pane').css("width", '100%');
+        $('#preview-pane').css("width", '100%');
+      }
+    }
   },
 
   askToSave: function() {
@@ -214,8 +245,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     return false;
   },
 
-  focusPollChange: function(){
+  onAppFocus: function(){
     this.forceUpdateDataFlag = true;
+    this.showPreviewButtons();
     this.pollChange();
   },
 
@@ -230,11 +262,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       tweetTextControl.setValue($('textarea#shareText').val());
     }
 
-    if(view.postedPreviewData){
+    if ( view.postedPreviewData ) {
       data = view.postedPreviewData;
     }
 
-    if(this.hasUnsavedChanges()){
+    if ( this.hasUnsavedChanges() ) {
       $('.project-save-warning').show().css('display', 'inline-block');
       $('.project-saved').hide();
     } else {
@@ -266,7 +298,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       this.previousData = data;
 
       // Now that data is connected and valid, show some sort of loading indicator:
-      if($('#embed-preview.validation-error')){
+      if ( $('#embed-preview.validation-error') ) {
         $('#embed-preview').removeClass('validation-error').addClass('loading');
       }
 
@@ -283,8 +315,8 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
           $('#embed-preview').removeClass('loading');
         });
 
-        if(data.theme !== view.theme || !view.pym){
-          if(typeof data.theme !== 'undefined'){
+        if ( data.theme !== view.theme || !view.pym ) {
+          if ( typeof data.theme !== 'undefined' ) {
             view.theme = data.theme;
             view.getTwitterCount();
           }
@@ -351,7 +383,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   listenForChanges: function() {
+    logger.debug('start listening for changes:', !this.listening);
     if ( !this.model.isNew() && !this.listening ) {
+      logger.debug('start listening for changes');
       this.listenTo(this.app.messages,
                     'change:project:' + this.model.id,
                     this.updateStatus, this);
@@ -360,14 +394,12 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   stopListeningForChanges: function() {
+    logger.debug('stop listening for changes');
     this.stopListening(this.app.messages);
     this.listening = false;
   },
 
   updateStatus: function(status) {
-    // don't care about the updated step
-    if ( status === 'updated' ) { return; }
-
     logger.debug('Update project status: ' + status);
     if (status === 'built'){
       if(!this.model.hasPreviewType('live')){
@@ -383,7 +415,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       .then(function() {
         return view.render();
       }).catch(function(jqXHR) {
-        view.app.view.displayError(
+        view.parentView.displayError(
           jqXHR.status, jqXHR.statusText, jqXHR.responseText);
       });
   },
@@ -408,107 +440,34 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   },
 
   afterRender: function() {
-    var view = this, promises = [];
+    logger.debug('in after render');
+    var view = this;
 
     view.enableFormSlide = false;
     view.showPreviewButtons();
-    $(window).resize(function(){
-      view.showPreviewButtons();
-      if(view.formWidth){
-        if($(window).width() > 768){
-          $('#form-pane').css("width", view.formWidth);
-          $('#preview-pane').css("width", $(window).width() - view.formWidth);
-        } else {
-          $('#form-pane').css("width", '100%');
-          $('#preview-pane').css("width", '100%');
-        }
-      }
-    });
-
-    // autoselect embed code on focus
-    this.$("#embed textarea").focus( function() { $(this).select(); } );
 
     // Setup editor for data field
     if ( this.app.hasRole('superuser') ) {
-      this.editor = ace.edit('blueprint-data');
-      this.editor.setShowPrintMargin(false);
-      this.editor.setTheme("ace/theme/textmate");
-      this.editor.setWrapBehavioursEnabled(true);
+      if ( !this.editor ) {
+        this.editor = ace.edit('blueprint-data');
+        this.editor.setShowPrintMargin(false);
+        this.editor.setTheme("ace/theme/textmate");
+        this.editor.setWrapBehavioursEnabled(true);
 
-      var session = this.editor.getSession();
-      session.setMode("ace/mode/json");
-      session.setUseWrapMode(true);
+        var session = this.editor.getSession();
+        session.setMode("ace/mode/json");
+        session.setUseWrapMode(true);
 
-      this.editor.renderer.setHScrollBarAlwaysVisible(false);
-
+        this.editor.renderer.setHScrollBarAlwaysVisible(false);
+      }
       this.editor.setValue(
-        JSON.stringify( this.model.buildData(), null, "  " ), -1 );
-
-      var debouncedStopListeningForChanges = _.once(
-        _.bind(this.stopListeningForChanges, this));
-      this.editor.on("change", function() {
-        logger.debug('editor content changed');
-        debouncedStopListeningForChanges();
-      });
+        JSON.stringify( this.model.formData(), null, "  " ), -1 );
     }
 
-    promises.push( new Promise( function(resolve, reject) {
-      view.renderForm(resolve, reject);
-    } ) );
-
-    return Promise.all(promises)
-      .then(function() {
-        var formData = view.alpaca.getValue(),
-            buildData = view.model.buildData(),
-            previewUrl = '', iframeLoaded,
-            previewSlug = '';
-
-        view.$('#shareText').val(formData['tweet_text']);
-        view.formDataOnLoad = formData;
-
-        // Callback for when iframe loads
-        iframeLoaded = _.once(function() {
-          logger.debug('iframeLoaded');
-          if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
-            view.pollChange();
-          } else {
-            if(!view.model.hasStatus('building')){
-              $('#embed-preview').removeClass('loading');
-            }
-          }
-        });
-
-        // Figure out preview url
-        if ( view.model.hasPreviewType('live') ) {
-          // if the project has live preview enabled
-          view.theme = view.model.get('theme') || formData['theme'] || 'custom';
-
-          previewSlug = view.model.isThemeable() ? view.model.getVersion() :
-            [view.model.getVersion(), view.theme].join('-');
-          previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
-
-        } else if ( view.model.hasType( 'graphic' ) && view.model.hasInitialBuild() ){
-          // if the project is a graphic and has been built (but doesn't have live enabled)
-          var previousPreviewUrl = view.model['_previousAttributes']['preview_url'];
-
-          if(previousPreviewUrl && previousPreviewUrl !==  view.model.get('preview_url')){
-            previewUrl = previousPreviewUrl;
-          } else {
-            previewUrl = view.model.get('preview_url');
-          }
-        }
-
-        if ( view.model.hasType( 'graphic' ) || view.model.hasPreviewType('live') ) {
-          // Setup our iframe with pym
-          if ( view.pym ) { view.pym.remove(); }
-          if ( view.formValidate(view.model, view.$('#projectForm')) ){
-            view.pym = new pym.Parent('embed-preview', previewUrl);
-            view.pym.iframe.onload = iframeLoaded;
-          }
-          // In case some dumb script hangs the loading process
-          setTimeout(iframeLoaded, 20000);
-        }
-
+    return new Promise(function(resolve, reject) {
+        view.renderForm(resolve, reject);
+      }).then(function() {
+        view.renderPreview();
         view.getTwitterCount();
       }).catch(function(err) {
         console.error(err);
@@ -528,6 +487,63 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     }
   },
 
+  renderPreview: function() {
+    var formData = this.alpaca.getValue(),
+      buildData = this.model.buildData(),
+      previewUrl = '', iframeLoaded,
+      previewSlug = '';
+
+    // Preview is already rendered
+    if ( this.pym && this.pym.iframe.parentElement ) { return; }
+
+    this.$('#shareText').val(formData['tweet_text']);
+    this.formDataOnLoad = formData;
+
+    // Callback for when iframe loads
+    var view = this;
+    iframeLoaded = _.once(function() {
+      logger.debug('iframeLoaded');
+      if ( view.model.hasPreviewType('live') && view.model.hasBuildData() ) {
+        view.pollChange();
+      } else {
+        if(!view.model.hasStatus('building')){
+          $('#embed-preview').removeClass('loading');
+        }
+      }
+    });
+
+    // Figure out preview url
+    if ( this.model.hasPreviewType('live') ) {
+      // if the project has live preview enabled
+      this.theme = this.model.get('theme') || formData['theme'] || 'custom';
+
+      previewSlug = this.model.isThemeable() ? this.model.getVersion() :
+        [this.model.getVersion(), this.theme].join('-');
+      previewUrl = this.model.blueprint.getMediaUrl( previewSlug + '/preview');
+
+    } else if ( this.model.hasType( 'graphic' ) && this.model.hasInitialBuild() ){
+      // if the project is a graphic and has been built (but doesn't have live enabled)
+      var previousPreviewUrl = this.model['_previousAttributes']['preview_url'];
+
+      if ( previousPreviewUrl && previousPreviewUrl !== this.model.get('preview_url') ){
+        previewUrl = previousPreviewUrl;
+      } else {
+        previewUrl = this.model.get('preview_url');
+      }
+    }
+
+    if ( this.model.hasType( 'graphic' ) || this.model.hasPreviewType('live') ) {
+      // Setup our iframe with pym
+      if ( this.pym ) { this.pym.remove(); }
+      if ( this.formValidate(this.model, this.$('#projectForm')) ){
+        this.pym = new pym.Parent('embed-preview', previewUrl);
+        this.pym.iframe.onload = iframeLoaded;
+      }
+      // In case some dumb script hangs the loading process
+      setTimeout(iframeLoaded, 20000);
+    }
+  },
+
   renderForm: function(resolve, reject) {
     var $form = this.$('#projectForm'),
         view = this,
@@ -538,6 +554,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
         '<div class="alert alert-warning" role="alert">Form is disabled</div>');
       return resolve();
     }
+
+    // Alpaca form is already setup
+    if ( $form.alpaca('get') ) { resolve(); }
 
     // Prevent return or enter from submitting the form
     $form.keypress(function(event){
@@ -551,6 +570,11 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
 
     form_config = this.model.getConfig().form;
 
+    if ( _.isUndefined(form_config) ) {
+      this.app.view.error('This blueprint does not have a form!', true);
+      return reject('This blueprint does not have a form!');
+    }
+
     availableThemes = this.model.getConfig().themes ?
       _.filter(this.app.themes.models, _.bind(function(t) {
         return _.contains(this.model.getConfig().themes, t.get('slug'));
@@ -558,154 +582,143 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     availableThemes = availableThemes || this.app.themes.where({slug : 'generic'});
     this.twitterHandles = _.object(this.app.themes.pluck('slug'), this.app.themes.pluck('twitter_handle'));
 
-    if(_.isUndefined(form_config)) {
-      this.app.view.error('This blueprint does not have a form!', true);
-      reject('This blueprint does not have a form!');
-    } else {
-      var schema_properties = {
-        "title": {
-          "title": "Title",
-          "type": "string",
-          "required": true
-        },
-        "theme": {
-          "title": "Theme",
-          "type": "string",
-          "required": true,
-          "default": pluckAttr(availableThemes, 'slug')[0],
-          "enum": pluckAttr(availableThemes, 'slug')
-        },
-        "slug": {
-          "title": "Slug",
-          "type": "string"
-        },
-        "tweet_text":{
-          "type": "string",
-          "minLength": 0
-        }
+    var schema_properties = {
+      "title": {
+        "title": "Title",
+        "type": "string",
+        "required": true
       },
-      options_form = {
-        "attributes": {
-          "data-model": "Project",
-          "data-model-id": this.model.isNew() ? '' : this.model.id,
-          "data-action": this.model.isNew() ? 'new' : 'edit',
-          "data-next": 'show',
-          "method": 'post'
-        }
+      "theme": {
+        "title": "Theme",
+        "type": "string",
+        "required": true,
+        "default": pluckAttr(availableThemes, 'slug')[0],
+        "enum": pluckAttr(availableThemes, 'slug')
       },
-      options_fields = {
-        "theme": {
-          "type": "select",
-          "optionLabels": _.map(availableThemes, function(t){
-               if (t.get('title') === t.get('group_name')) {
-                 return t.get('group_name');
-               }
-               return t.get('group_name') + ' - ' + t.get('title');
-             })
-        },
-        "slug": {
-          "label": "Slug",
-          "validator": function(callback){
-            var slugPattern = /^[0-9a-z\-_]{0,60}$/;
-            var slug = this.getValue();
-            if ( slugPattern.test(slug) ){
-              callback({ "status": true });
-            } else if (slugPattern.test(slug.substring(0,60))){
-              this.setValue(slug.substr(0,60));
-              callback({ "status": true });
-            } else {
-              callback({
-                "status": false,
-                "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
-              });
-            }
+      "slug": {
+        "title": "Slug",
+        "type": "string"
+      },
+      "tweet_text":{
+        "type": "string",
+        "minLength": 0
+      }
+    },
+    options_form = {
+      "attributes": {
+        "data-model": "Project",
+        "data-model-id": this.model.isNew() ? '' : this.model.id,
+        "data-action": this.model.isNew() ? 'new' : 'edit',
+        "data-next": 'show',
+        "method": 'post'
+      }
+    },
+    options_fields = {
+      "theme": {
+        "type": "select",
+        "optionLabels": _.map(availableThemes, function(t){
+             if (t.get('title') === t.get('group_name')) {
+               return t.get('group_name');
+             }
+             return t.get('group_name') + ' - ' + t.get('title');
+           })
+      },
+      "slug": {
+        "label": "Slug",
+        "validator": function(callback){
+          var slugPattern = /^[0-9a-z\-_]{0,60}$/;
+          var slug = this.getValue();
+          if ( slugPattern.test(slug) ){
+            callback({ "status": true });
+          } else if (slugPattern.test(slug.substring(0,60))){
+            this.setValue(slug.substr(0,60));
+            callback({ "status": true });
+          } else {
+            callback({
+              "status": false,
+              "message": "Must contain fewer than 60 numbers, lowercase letters, hyphens, and underscores."
+            });
           }
-        },
-        "tweet_text":{
-          "label": "Social share text",
-          "constrainMaxLength": true,
-          "constrainMinLength": true,
-          "showMaxLengthIndicator": true,
-          "fieldClass": "hidden"
         }
-      };
-
-      // if there is only one theme option, hide the dropdown
-
-      // Temporarily disabling theme drop down hiding to fix custom color bug
-      //if ( availableThemes.length === 1 ) {
-      //  options_fields['theme']['fieldClass'] = 'hidden';
-      //}
-
-      // hide slug for blueprint types that are not apps
-      if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {
-        options_fields['slug']['fieldClass'] = 'hidden';
+      },
+      "tweet_text":{
+        "label": "Social share text",
+        "constrainMaxLength": true,
+        "constrainMinLength": true,
+        "showMaxLengthIndicator": true,
+        "fieldClass": "hidden"
       }
+    };
 
-      _.extend(schema_properties, form_config.schema.properties || {});
-      if( form_config.options ) {
-        _.extend(options_form, form_config.options.form || {});
-        _.extend(options_fields, form_config.options.fields || {});
-      }
+    // if there is only one theme option, hide the dropdown
 
-      // This monkey-patches the config for google_doc_url fields to use the googledoc field control
-      if ( options_fields.google_doc_url && options_fields.google_doc_url.type === 'url' ) {
-        options_fields.google_doc_url.type = 'googledoc';
-        if ( this.model.getConfig().spreadsheet_template ) {
-          options_fields.google_doc_url.doc_template_url = this.model.getConfig().spreadsheet_template;
-        }
-      }
+    // Temporarily disabling theme drop down hiding to fix custom color bug
+    //if ( availableThemes.length === 1 ) {
+    //  options_fields['theme']['fieldClass'] = 'hidden';
+    //}
 
-      var opts = {
-        "schema": {
-          "title": function(){
-            if(view.model.hasPreviewType('live')){
-              return '';
-            } else {
-              return view.model.blueprint.get('title');
-            }
-          },
-          "description": this.model.getConfig().description,
-          "type": "object",
-          "properties": schema_properties
-        },
-        "options": {
-          "form": options_form,
-          "fields": options_fields,
-          "focus": this.firstRender
-        },
-        "postRender": function(control) {
-          view.alpaca = control;
-
-          view.alpaca.childrenByPropertyId["slug"].setValue(
-            view.model.get('slug_sans_theme') );
-
-          resolve();
-        }
-      };
-
-      if( form_config['view'] ) {
-        opts.view = form_config.view;
-      }
-
-      if(!this.model.isNew() || this.copyProject) {
-        populateForm = true;
-      } else if (this.model.isNew() && !this.copyProject && !this.model.hasInitialBuild()){
-        var uniqBuildVals = _.uniq(_.values(this.model.buildData()));
-        if (!( uniqBuildVals.length === 1 && typeof(uniqBuildVals[0]) === 'undefined')){
-          populateForm = true;
-        }
-      }
-
-      if(populateForm){
-        opts.data = this.model.formData();
-        if ( !_.contains(pluckAttr(availableThemes, 'slug'), opts.data.theme) ) {
-          opts.data.theme = pluckAttr(availableThemes, 'slug')[0];
-        }
-      }
-
-      $form.alpaca(opts);
+    // hide slug for blueprint types that are not apps
+    if ( !_.contains(this.app.config.editable_slug_types, this.model.blueprint.get('type') ) ) {
+      options_fields['slug']['fieldClass'] = 'hidden';
     }
+
+    _.extend(schema_properties, form_config.schema.properties || {});
+    if( form_config.options ) {
+      _.extend(options_form, form_config.options.form || {});
+      _.extend(options_fields, form_config.options.fields || {});
+    }
+
+    // This monkey-patches the config for google_doc_url fields to use the googledoc field control
+    if ( options_fields.google_doc_url && options_fields.google_doc_url.type === 'url' ) {
+      options_fields.google_doc_url.type = 'googledoc';
+      if ( this.model.getConfig().spreadsheet_template ) {
+        options_fields.google_doc_url.doc_template_url = this.model.getConfig().spreadsheet_template;
+      }
+    }
+
+    var opts = {
+      "schema": {
+        "title": this.model.hasPreviewType('live') ? '' : this.model.getConfig().title,
+        "description": this.model.getConfig().description,
+        "type": "object",
+        "properties": schema_properties
+      },
+      "options": {
+        "form": options_form,
+        "fields": options_fields,
+        "focus": this.firstRender
+      },
+      "postRender": function(control) {
+        view.alpaca = control;
+
+        view.alpaca.childrenByPropertyId["slug"].setValue(
+          view.model.get('slug_sans_theme') );
+
+        resolve();
+      }
+    };
+
+    if( form_config['view'] ) {
+      opts.view = form_config.view;
+    }
+
+    if(!this.model.isNew() || this.copyProject) {
+      populateForm = true;
+    } else if (this.model.isNew() && !this.copyProject && !this.model.hasInitialBuild()){
+      var uniqBuildVals = _.uniq(_.values(this.model.buildData()));
+      if (!( uniqBuildVals.length === 1 && typeof(uniqBuildVals[0]) === 'undefined')){
+        populateForm = true;
+      }
+    }
+
+    if(populateForm){
+      opts.data = this.model.formData();
+      if ( !_.contains(pluckAttr(availableThemes, 'slug'), opts.data.theme) ) {
+        opts.data.theme = pluckAttr(availableThemes, 'slug')[0];
+      }
+    }
+
+    $form.alpaca(opts);
   },
 
   formValues: function($form) {

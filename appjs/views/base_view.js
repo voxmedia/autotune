@@ -4,9 +4,13 @@ var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
     camelize = require('underscore.string/camelize'),
-    models = require('../models'),
     logger = require('../logger'),
-    helpers = require('../helpers');
+    helpers = require('../helpers'),
+    diff = require('virtual-dom/diff'),
+    patch = require('virtual-dom/patch'),
+    html2hscript = require('html2hscript'),
+    h = require("virtual-dom/h"),
+    createElement = require('virtual-dom/create-element');
 
 var BaseView = Backbone.View.extend({
   loaded: true,
@@ -19,6 +23,8 @@ var BaseView = Backbone.View.extend({
     if (_.isObject(options)) {
       _.extend(this, _.pick(options, 'app', 'query'));
     }
+
+    this.virtualEl = this.makeRootNode();
 
     this.hook('afterInit', options);
   },
@@ -40,9 +46,50 @@ var BaseView = Backbone.View.extend({
     });
   },
 
+  /*
+   * Create a virtual dom node for the root element created by the Backbone
+   * view. Optionally takes an array of children virtual nodes.
+   */
+  makeRootNode: function(children) {
+    var attrs = {};
+    if ( this.id ) { attrs.id = this.id; }
+    if ( this.className ) { attrs.className = this.className; }
+    return h(this.tagName, attrs, children || []);
+  },
+
+  /*
+   * Render the view's template and convert it into an array of virtual
+   * DOM elements. Returns a promise object.
+   */
+  renderVirtualDom: function() {
+    var view = this;
+    // Generate the element using template and templateData()
+    var html = helpers.render( this.template, this.templateData() );
+
+    // Create a promise which converts the html string into hscript, then
+    // into virtual dom nodes
+    return new Promise(function(resolve, reject) {
+      html2hscript(html, function(err, hscript) {
+        // hscript here is a string of javascript which needs to be evaluated.
+        // The string makes use of the `h` function, which we require above.
+        if ( err ) {
+          reject(err);
+        } else {
+          resolve(
+            view.makeRootNode(eval('[' + hscript + ']')) // jshint ignore:line
+          );
+        }
+      });
+    });
+  },
+
+  /*
+   * Does the full render process for this view, and populate the view.el
+   * element. Calling this method will update the view without totally
+   * re-rendering it all.
+   */
   render: function() {
-    var scrollPos = $(window).scrollTop(),
-        activeTab = window.location.hash,
+    var activeTab = window.location.hash,
         view = this;
 
     // Only render if this view is loaded
@@ -50,11 +97,14 @@ var BaseView = Backbone.View.extend({
 
     // Do some renderin'. First up: beforeRender()
     return view.hook( 'beforeRender' ).then(function() {
-      // Generate the element using template and templateData()
-      view.$el.html(
-        helpers.render(
-          view.template, view.templateData() ) );
+      return view.renderVirtualDom();
+    }).then(function(virtualEl) {
+      var patches = diff(view.virtualEl, virtualEl);
+      view.el = patch(view.el, patches);
+      view.virtualEl = virtualEl;
 
+      // Reset any button states
+      view.$('.btn').button('reset');
       return view.hook( 'afterRender' );
     }).then(function() {
       // Set a tab on the page if we have an anchor
@@ -67,11 +117,6 @@ var BaseView = Backbone.View.extend({
         // Reset first render flag
         logger.debug( 'first render' );
         view.firstRender = false;
-      } else {
-        // Reset scroll position
-        logger.debug('re-render; set scroll',
-                     activeTab, scrollPos, $(document).height());
-        $(window).scrollTop(scrollPos);
       }
 
       view.app.trigger( 'loadingStop' );
