@@ -22,6 +22,8 @@ es:
     filter-blueprint-type-graphic:    'Visualización'
     filter-blueprint-type-app:        'App'
     filter-blueprint-status-new:      'Nueva'
+    filter-blueprint-status-building: 'Construyendo'
+    filter-blueprint-status-updated:  'Actualizado'
     filter-blueprint-status-updating: 'Actualizando'
     filter-blueprint-status-upgrading: 'Actualizando'
     filter-blueprint-status-built:    'Construída'
