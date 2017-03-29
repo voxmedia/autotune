@@ -102,44 +102,20 @@ module Autotune
     # and build the new project.
     # It publishes updates on projects already published.
     # @raise The original exception when the update fails
-    # @see build
-    # @see build_and_publish
-    def update_snapshot(current_user = nil)
-      if bespoke? || blueprint_version == blueprint.version
-        update!(:status => 'building')
-      else
-        update!(
-          :status => 'building',
-          :blueprint_version => blueprint.version,
-          :blueprint_config => blueprint.config)
-      end
-
-      chain = ActiveJob::Chain.new
-      unless bespoke?
-        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
-      end
-
-      chain
-        .then(SyncProjectJob.new(self, :update => true))
-        .then(BuildJob.new(self,
-                           :target => publishable? ? 'preview' : 'publish',
-                           :current_user => current_user))
-        .catch(SetStatusJob.new(self, 'broken'))
-        .enqueue
-    rescue
-      update!(:status => 'broken')
-      raise
-    end
-
-    # Updates blueprint version and builds the project.
-    # Queues jobs to sync latest verison of blueprint, update it on the project
-    # and build the new project.
-    # It publishes updates on projects already published.
-    # @raise The original exception when the update fails
     # @see build_and_publish
     # @see update_snapshot
-    def build(current_user = nil)
-      update!(:status => 'building')
+    def build(current_user = nil, update: false, publish: false, wait_until: nil)
+      self.status = 'building'
+
+      if publish == true || ! publishable? # Published stuff is not publishable
+        target = 'publish'
+      else
+        target = 'preview'
+      end
+
+      meta['wait_until'] = wait_until if wait_until.present?
+
+      save!
 
       chain = ActiveJob::Chain.new
       unless bespoke?
@@ -147,9 +123,9 @@ module Autotune
       end
 
       chain
-        .then(SyncProjectJob.new(self))
+        .then(SyncProjectJob.new(self, :update => update))
         .then(BuildJob.new(self,
-                           :target => publishable? ? 'preview' : 'publish',
+                           :target => target,
                            :current_user => current_user))
         .catch(SetStatusJob.new(self, 'broken'))
         .enqueue
@@ -165,24 +141,24 @@ module Autotune
     # @see build
     # @see update_snapshot
     # @raise The original exception when the update fails
-    def build_and_publish(current_user = nil)
-      update!(:status => 'building')
+    def build_and_publish(current_user = nil, wait_until: nil)
+      build(current_user, publish: true, wait_until: wait_until)
+    end
 
-      chain = ActiveJob::Chain.new
-      unless bespoke?
-        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
+    # Updates blueprint version and builds the project.
+    # Queues jobs to sync latest verison of blueprint, update it on the project
+    # and build the new project.
+    # It publishes updates on projects already published.
+    # @raise The original exception when the update fails
+    # @see build
+    # @see build_and_publish
+    def update_snapshot(current_user = nil)
+      if !bespoke? && blueprint_version != blueprint.version
+        self.blueprint_version = blueprint.version
+        self.blueprint_config = blueprint.config
       end
 
-      chain
-        .then(SyncProjectJob.new(self))
-        .then(BuildJob.new(self,
-                           :target => 'publish',
-                           :current_user => current_user))
-        .catch(SetStatusJob.new(self, 'broken'))
-        .enqueue
-    rescue
-      update!(:status => 'broken')
-      raise
+      build(current_user, :update => true)
     end
 
     # Gets the URL for previewing the project.
