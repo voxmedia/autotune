@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'omniauth-google-oauth2', '~> 0.3.0'
   s.add_dependency 'autoshell', '~> 1.0.3'
   s.add_dependency 'i18n-js', '>= 3.0.0.rc11'
+  s.add_dependency 'nokogiri', '~> 1.7.1'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'pry-rails'
