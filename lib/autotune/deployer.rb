@@ -27,7 +27,7 @@ module Autotune
 
     # Hook for adjusting data and files before build
     def before_build(build_data, _env, current_user = nil)
-      if build_data['google_doc_url'] && current_user
+      if build_data['google_doc_url'].present? && current_user
         current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
         if current_auth.present?
           google_client = GoogleDocs.new(
@@ -41,24 +41,26 @@ module Autotune
           current_auth.save!
 
           doc_key = GoogleDocs.key_from_url(build_data['google_doc_url'])
-          resp = google_client.find(doc_key)
-          cache_key = "googledoc#{doc_key}"
+          if doc_key.present?
+            resp = google_client.find(doc_key)
+            cache_key = "googledoc#{doc_key}"
 
-          if Rails.cache.exist?(cache_key)
-            cache_value = Rails.cache.read(cache_key)
-            needs_update = cache_value['version'] && resp['version'] != cache_value['version']
-          else
-            needs_update = true
-          end
+            if Rails.cache.exist?(cache_key)
+              cache_value = Rails.cache.read(cache_key)
+              needs_update = cache_value['version'] && resp['version'] != cache_value['version']
+            else
+              needs_update = true
+            end
 
-          if needs_update
-            google_client.share_with_domain(
-              doc_key, Autotune.configuration.google_auth_domain)
-            ss_data = google_client.get_doc_contents(build_data['google_doc_url'])
-            build_data['google_doc_data'] = ss_data
-            Rails.cache.write(cache_key, 'ss_data' => ss_data, 'version' => resp['version'])
-          else
-            build_data['google_doc_data'] = Rails.cache.read(cache_key)['ss_data']
+            if needs_update
+              google_client.share_with_domain(
+                doc_key, Autotune.configuration.google_auth_domain)
+              ss_data = google_client.get_doc_contents(build_data['google_doc_url'])
+              build_data['google_doc_data'] = ss_data
+              Rails.cache.write(cache_key, 'ss_data' => ss_data, 'version' => resp['version'])
+            else
+              build_data['google_doc_data'] = Rails.cache.read(cache_key)['ss_data']
+            end
           end
         end
       end

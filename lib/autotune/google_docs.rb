@@ -17,7 +17,8 @@ module Autotune
     end
 
     def self.key_from_url(url)
-      parse_url(url)['id']
+      match = parse_url(url)
+      match.nil? ? nil : match['id']
     end
 
     def auth
