@@ -61,8 +61,9 @@ module Autotune
           repo.cd(project.deploy_dir) { |s| s.run 'phantomjs', script_path, get_full_url(url) }
 
           # Upload screens
-          repo.glob('screenshots/*').each do |filename|
-            deployer.deploy_file(project.full_deploy_dir, filename)
+          repo.glob(File.join(project.deploy_dir, 'screenshots/*')).each do |file_path|
+            filename = File.basename(file_path)
+            deployer.deploy_file(File.join(project.full_deploy_dir, 'screenshots'), filename)
           end
         rescue Autoshell::CommandError => exc
           logger.error(exc.message)
