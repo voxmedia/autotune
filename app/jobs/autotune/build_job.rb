@@ -62,8 +62,7 @@ module Autotune
 
           # Upload screens
           repo.glob(File.join(project.deploy_dir, 'screenshots/*')).each do |file_path|
-            filename = File.basename(file_path)
-            deployer.deploy_file(File.join(project.full_deploy_dir, 'screenshots'), filename)
+            deployer.deploy_file(project.full_deploy_dir, "screenshots/#{File.basename(file_path)}")
           end
         rescue Autoshell::CommandError => exc
           logger.error(exc.message)
