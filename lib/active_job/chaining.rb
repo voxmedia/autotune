@@ -3,6 +3,7 @@ module ActiveJob
     extend ActiveSupport::Concern
 
     included do
+      attr_accessor :cache_ttl_buffer
       around_perform :if => :chained? do |job, block|
         begin
           block.call
@@ -89,12 +90,23 @@ module ActiveJob
       Rails.cache.delete(job_key('fail'))
     end
 
+    # Cache the deets of the success and error jobs to call after this one
     def cache_job(type, job)
+      # since we set a cache item ttl, we have to make sure that the cache key
+      # doesn't time out before it's needed. Setting a 24hour ttl is fine for
+      # most jobs, but its a problem if the job is scheduled a day out.
+      # Here we use a value to buffer the ttl based on the scheduled time, and
+      # pass it along to other jobs which might have more chained methods.
+      if cache_ttl_buffer.nil?
+        self.cache_ttl_buffer = scheduled_at.present? ? scheduled_at - Time.now.to_f : 0
+      end
+      job.cache_ttl_buffer = cache_ttl_buffer
       Rails.cache.write(
-        job_key(type), job.serialize, :expires_in => 1.day)
+        job_key(type), job.serialize, :expires_in => cache_ttl_buffer + 1.day)
       job
     end
 
+    # Get the cached job object for the success or fail type
     def read_cache_job(type)
       if Rails.cache.exist?(job_key(type))
         ActiveJob::Base.deserialize(

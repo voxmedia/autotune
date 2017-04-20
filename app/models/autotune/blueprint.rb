@@ -81,7 +81,7 @@ module Autotune
     # Queues a job to update the blueprint repo
     def update_repo
       update!(:status => 'updating')
-      SyncBlueprintJob.perform_later(
+      SyncBlueprintJob.set(:queue => 'low').perform_later(
         self, :update => true, :build_themes => true)
     rescue
       update!(:status => 'broken')
@@ -94,7 +94,7 @@ module Autotune
              .select(&:themable?)
              .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true) }
 
-      ActiveJob::Chain.new(*jobs).enqueue
+      ActiveJob::Chain.new(*jobs).enqueue(:queue => 'low')
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
