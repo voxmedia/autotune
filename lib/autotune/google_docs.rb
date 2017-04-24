@@ -236,18 +236,38 @@ module Autotune
       data = {}
       xls.worksheets.each do |sheet|
         title = sheet.sheet_name
+        sheet_data = extract_data(sheet)
+
         # if the sheet is called microcopy, copy or ends with copy, we assume
         # the first column contains keys and the second contains values.
         # Like tarbell.
         if %w(microcopy copy).include?(title.downcase) ||
            title.downcase =~ /[ -_]copy$/
-          data[title] = load_microcopy(sheet.extract_data)
+          data[title] = load_microcopy(sheet_data)
         else
           # otherwise parse the sheet into a hash
-          data[title] = load_table(sheet.extract_data)
+          data[title] = load_table(sheet_data)
         end
       end
       data
+    end
+
+    # Extract the data from a spreadsheet
+    # Takes the spreadsheet object and returns the table data as an array
+    #
+    # @param sheet [Object] the spreadsheet object
+    # @return [Array] spreadsheet contents
+    def extract_data(sheet)
+      data = []
+      sheet.each do |row|
+        data_row = []
+        row && row.cells.each do |cell|
+          data_cell = cell && cell.value
+          data_row << data_cell
+        end
+        data << data_row
+      end
+      return data
     end
 
     # Take a two-dimensional array from a spreadsheet and create a hash. The first
