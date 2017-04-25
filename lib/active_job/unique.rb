@@ -7,8 +7,7 @@ module ActiveJob
 
       around_enqueue :if => :unique_key do |_job, block|
         if Rails.cache.exist?(unique_key)
-          logger.debug(
-            "Cancel enqueue; Existing unique #{unique_key}")
+          logger.debug("Cancel enqueue; Existing unique #{unique_key}")
           false
         else
           logger.debug("Enqueue unique #{unique_key}")

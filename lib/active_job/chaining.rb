@@ -6,9 +6,12 @@ module ActiveJob
       attr_accessor :cache_ttl_buffer
       around_perform :if => :chained? do |job, block|
         begin
+          logger.debug "Perform chained job #{job_id}"
           block.call
+          logger.debug "Enqueue next job #{job.success_job.job_id}"
           job.enqueue_success
         rescue => e
+          logger.debug "Enqueue fail job #{job.fail_job.job_id}"
           job.enqueue_fail
           logger.error e.message
           logger.error e.backtrace.join("\n")

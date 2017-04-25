@@ -9,6 +9,8 @@ module Autotune
       arguments.first.to_gid_param
     end
 
+    unique_job :ttl => 20.seconds, :with => :payload
+
     def perform(project, update: false)
       if project.bespoke?
         project.sync_from_repo(update: update)
