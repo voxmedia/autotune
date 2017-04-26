@@ -12,7 +12,7 @@ module Autotune
       arguments.first.to_gid_param
     end
 
-    unique_job :ttl => 20.seconds, :with => :payload
+    unique_job :with => :payload
 
     def perform(project, target: 'preview', current_user: nil)
       # Setup a new logger that logs to a string. The resulting log will

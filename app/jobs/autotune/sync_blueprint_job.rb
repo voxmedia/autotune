@@ -9,7 +9,7 @@ module Autotune
       arguments.first.to_gid_param
     end
 
-    unique_job :ttl => 20.seconds, :with => :payload
+    unique_job :with => :payload
 
     # do the deed
     def perform(blueprint, update: false, build_themes: false, current_user: nil)
