@@ -5,9 +5,15 @@ module ActiveJob
     included do
       delegate :unique_key_callback, :unique_ttl, :to => :class
 
-      around_enqueue :if => :unique_key do |_job, block|
-        if Rails.cache.exist?(unique_key)
+      around_enqueue :if => :unique_key do |job, block|
+        if (scheduled_at - Time.now.to_f) >= scheduled_unique_threshold
+          block.call
+        elsif Rails.cache.exist?(unique_key)
           logger.debug("Cancel enqueue; Existing unique #{unique_key}")
+          if respond_to?(:chained?) && chained?
+            # if this job is part of a chain, enqueue the next job
+            job.enqueue_success(:wait_until => scheduled_at)
+          end
           false
         else
           logger.debug("Enqueue unique #{unique_key}")
@@ -24,6 +30,10 @@ module ActiveJob
           block.call
         else
           logger.debug("Cancel perform; Existing unique #{unique_key}")
+          if respond_to?(:chained?) && chained?
+            # if this job is part of a chain, enqueue the next job
+            job.enqueue_success(:wait_until => scheduled_at)
+          end
           false
         end
       end
@@ -33,8 +43,9 @@ module ActiveJob
       def unique_job(**opts, &block)
         @unique_ttl = opts[:ttl] || 10.minutes
         @unique_key_callback = block_given? ? block : opts[:with]
+        @scheduled_unique_threshold = opts[:scheduled_thresold] || 1.minute
       end
-      attr_reader :unique_key_callback, :unique_ttl
+      attr_reader :unique_key_callback, :unique_ttl, :scheduled_unique_threshold
     end
 
     def unique_key
