@@ -54,7 +54,8 @@ module Autotune
       deployer.deploy(project.full_deploy_dir)
 
       # Create screenshots (has to happen after upload)
-      if repo.command?('phantomjs') && !Rails.env.test? && !project.bespoke
+      if repo.command?('phantomjs') && !Rails.env.test? && build_data['screenshot']
+        p 'screenshot fired'
         begin
           url = deployer.url_for('/')
           script_path = Autotune.root.join('bin', 'screenshot.js').to_s
