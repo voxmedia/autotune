@@ -137,7 +137,11 @@ _.extend(App.prototype, Backbone.Events, {
    * @param {string} url
    */
   setPreviewDevUrl: function(url) {
-    window.sessionStorage.setItem('previewDevUrl', url);
+    if ( url ) {
+      window.sessionStorage.setItem('previewDevUrl', url);
+    } else {
+      this.resetPreviewDevUrl();
+    }
   },
 
   /**
@@ -146,6 +150,13 @@ _.extend(App.prototype, Backbone.Events, {
    */
   getPreviewDevUrl: function() {
     return window.sessionStorage.getItem('previewDevUrl');
+  },
+
+  /**
+   * Reset live preview override url
+   */
+  resetPreviewDevUrl: function() {
+    window.sessionStorage.removeItem('previewDevUrl');
   },
 
   /**
