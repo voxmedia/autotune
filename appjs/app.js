@@ -133,6 +133,22 @@ _.extend(App.prototype, Backbone.Events, {
   },
 
   /**
+   * Override the url to load live previews from. For developing blueprints
+   * @param {string} url
+   */
+  setPreviewDevUrl: function(url) {
+    window.sessionStorage.setItem('previewDevUrl', url);
+  },
+
+  /**
+   * Get live preview override url
+   * @return {string} url
+   */
+  getPreviewDevUrl: function() {
+    return window.sessionStorage.getItem('previewDevUrl');
+  },
+
+  /**
    * Log an analytic event
    * @param {string} type - Event type (pageview)
    */
