@@ -8,22 +8,29 @@ class ActiveJobExtrasTest < ActiveJob::TestCase
 
     perform_enqueued_jobs do
       ActiveJob::Chain.new(
-        ChainJob.new,
-        ChainJob.new,
-        ChainJob.new
+        ChainJob.new('one'),
+        ChainJob.new('two'),
+        ChainJob.new('three')
       ).enqueue
     end
 
     assert_performed_jobs 3
+    assert_equal 'onetwothree',
+                 Rails.cache.read('chainjob')
+    Rails.cache.delete('chainjob')
 
     perform_enqueued_jobs do
-      ChainJob.new
-        .then(ChainJob.new)
-        .then(ChainJob.new)
-        .enqueue
+      job = ChainJob.new('four')
+      job
+        .then(ChainJob.new('five'))
+        .then(ChainJob.new('six'))
+      job.enqueue
     end
 
     assert_performed_jobs 6
+    assert_equal 'fourfivesix',
+                 Rails.cache.read('chainjob')
+    Rails.cache.delete('chainjob')
   end
 
   test 'unique job' do
