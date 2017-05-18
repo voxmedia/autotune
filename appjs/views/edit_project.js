@@ -320,10 +320,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
             view.theme = data.theme;
             view.getTwitterCount();
           }
-          var version = view.model.getVersion(),
-            previewSlug = view.model.isThemeable() ?
-                version :[version, view.theme].join('-'),
-            previewUrl = view.model.blueprint.getMediaUrl( previewSlug + '/preview');
+          var previewUrl = view.getLivePreviewUrl();
 
           if ( view.pym ) { view.pym.remove(); }
           view.pym = new pym.Parent('embed-preview', previewUrl);
@@ -490,8 +487,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
   renderPreview: function() {
     var formData = this.alpaca.getValue(),
       buildData = this.model.buildData(),
-      previewUrl = '', iframeLoaded,
-      previewSlug = '';
+      previewUrl = '', iframeLoaded;
 
     // Preview is already rendered
     if ( this.pym && this.pym.iframe.parentElement ) { return; }
@@ -516,11 +512,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
     if ( this.model.hasPreviewType('live') ) {
       // if the project has live preview enabled
       this.theme = this.model.get('theme') || formData['theme'] || 'custom';
-
-      previewSlug = this.model.isThemeable() ? this.model.getVersion() :
-        [this.model.getVersion(), this.theme].join('-');
-      previewUrl = this.model.blueprint.getMediaUrl( previewSlug + '/preview');
-
+      previewUrl = this.getLivePreviewUrl();
     } else if ( this.model.hasType( 'graphic' ) && this.model.hasInitialBuild() ){
       // if the project is a graphic and has been built (but doesn't have live enabled)
       var previousPreviewUrl = this.model['_previousAttributes']['preview_url'];
@@ -789,6 +781,15 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     }
     return valid;
+  },
+
+  getLivePreviewUrl: function() {
+    // We can use an override url for testing preview mode locally
+    if ( this.app.getPreviewDevUrl() ) { return this.app.getPreviewDevUrl(); }
+
+    var ver = this.model.getVersion();
+    var previewSlug = this.model.isThemeable() ? ver : [ver, this.theme].join('-');
+    return this.model.blueprint.getMediaUrl( previewSlug + '/preview');
   },
 
   copyEmbedToClipboard: function() {

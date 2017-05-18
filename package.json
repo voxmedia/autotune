@@ -1,7 +1,7 @@
 {
   "name": "autotune",
   "description": "Platform and UI for creating new websites and html snippets from templates stored in git repos.",
-  "version": "0.5.9",
+  "version": "0.5.10",
   "homepage": "https://github.com/voxmedia/autotune",
   "author": {
     "name": "Ryan Mark",
@@ -37,6 +37,7 @@
     "backbone.paginator": "^2.0.2",
     "bootstrap": "3.3.2",
     "brace": "0.5.1",
+    "brace-expansion": "1.1.7",
     "browserify": "5.12.1",
     "browserify-shim": "3.8.0",
     "eonasdan-bootstrap-datetimepicker": "^4.15.35",
