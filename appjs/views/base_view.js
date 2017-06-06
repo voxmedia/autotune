@@ -110,7 +110,7 @@ var BaseView = Backbone.View.extend({
       // Set a tab on the page if we have an anchor
       if ( activeTab ) {
         logger.debug( 'set tab', activeTab );
-        view.$('.nav-tabs a[href='+activeTab+']').tab('show');
+        view.$('.nav-tabs a[href="'+activeTab+'"]').tab('show');
       }
 
       if ( view.firstRender ) {
