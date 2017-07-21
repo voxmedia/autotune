@@ -1,5 +1,6 @@
 require 'tmpdir'
 require 'fileutils'
+require 'vcr'
 
 # put omniauth into test mode
 OmniAuth.config.test_mode = true
@@ -77,9 +78,10 @@ Rails.configuration.autotune.get_theme_data = lambda do |_theme|
   RESET_THEME_DATA
 end
 
-# Display work_dir commands
-# require 'work_dir'
-# WorkDir.logger.level = Logger::DEBUG
+VCR.configure do |config|
+  config.cassette_library_dir = "cassettes/autotune"
+  config.hook_into :faraday
+end
 
 # Add more helper methods to be used by all tests here...
 class ActiveSupport::TestCase

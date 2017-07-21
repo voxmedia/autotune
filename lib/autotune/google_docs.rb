@@ -24,7 +24,7 @@ module Autotune
       @client.authorization
     end
 
-    def initialize(options)
+    def initialize(options = {})
       @client = Google::APIClient.new
 
       @client.authorization.update!({
