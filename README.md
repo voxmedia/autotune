@@ -1,6 +1,8 @@
 # ![Autotune Logo](https://raw.githubusercontent.com/wiki/voxmedia/autotune/images/autotune-logo.png)
 
 
+Autotune is no longer in active development by Vox Product
+
 **Current project status**: v1.0 ALPHA!
 
 ---
