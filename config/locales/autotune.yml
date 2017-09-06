@@ -91,7 +91,7 @@ en:
     not-allowed:            'Not allowed'
     higher-access:          'You need a higher access level.'
     not-found:              'Not found'
-    not-found-description:  'I dinna ken what ye want'
+    not-found-description:  'This page is no longer available'
     preview:                'Preview'
     duplicate:              'Duplicate'
     project-saved:          'You project has successfully saved.'

@@ -9,6 +9,7 @@ html{
 
 #main {
   padding-bottom: 25px;
+  margin-top:32px;
 }
 
 .row{
@@ -30,7 +31,7 @@ html{
     margin: 0 -15px;
   }
   &.projects{
-    padding-top: 40px;
+    //padding-top: 40px;
   }
 }
 
@@ -91,7 +92,7 @@ label.block {
 
 //page headings
 .m-page-heading {
-  padding: 40px 0 0 0px;
+  padding: 20px 0 0 0px;
   &.list{
     margin-bottom: 20px;
   }
