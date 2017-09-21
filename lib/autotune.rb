@@ -1,6 +1,7 @@
 require 'autotune/engine'
 require 'redis'
 require 'uri'
+require 'ruby_dig'
 
 # Top-level autotune module
 module Autotune
