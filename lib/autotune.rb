@@ -52,8 +52,10 @@ module Autotune
       target = args.first.to_sym
       if block_given?
         @deployments[target] = block
-      else
+      elsif args.last.is_a?(Hash) || args.last.is_a?(Deployer)
         @deployments[target] = args.last
+      else
+        raise 'Invalid deployment definition'
       end
     end
 
