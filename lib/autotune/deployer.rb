@@ -71,6 +71,7 @@ module Autotune
       build_data['theme_data'] = Theme.full_theme_data unless build_data['theme_data'].present?
       build_data['group'] = project.group.slug if project.respond_to?(:group) && project.group
       build_data['theme'] = project.theme.slug if project.respond_to?(:theme) && project.theme
+      build_data['screenshot'] = true unless build_data['screenshot'].present?
 
       build_data['base_url'] = project_url
       build_data['asset_base_url'] = project_asset_url
