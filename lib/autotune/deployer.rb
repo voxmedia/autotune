@@ -135,6 +135,10 @@ module Autotune
       [try(:asset_base_url) || base_url, project.slug, extra_slug].reject(&:blank?).join('/')
     end
 
+    def take_screenshots?
+      repo.command?('phantomjs') && !Rails.env.test?
+    end
+
     def logger
       @logger ||= Rails.logger
     end
