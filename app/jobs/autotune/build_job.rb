@@ -45,7 +45,7 @@ module Autotune
         target.to_sym, project, :logger => outlogger)
 
       # Run the before build deployer hook
-      deployer.before_build(build_data, repo.env, current_user)
+      deployer.before_build(build_data, repo.env, :current_user => current_user)
 
       # Run the build
       repo.cd { |s| s.run(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json) }
@@ -71,7 +71,7 @@ module Autotune
       end
 
       # Set status and save project
-      project.published_at = DateTime.current if target.to_sym == :publish
+      project.update_published_at = true if target.to_sym == :publish
       project.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag

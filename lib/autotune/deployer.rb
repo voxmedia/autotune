@@ -25,8 +25,13 @@ module Autotune
       raise NotImplementedError
     end
 
-    # Hook for adjusting data and files before build
-    def before_build(build_data, _env, current_user = nil)
+    # Hook for preparing the deployment target before the build job is queued.
+    # Project instance is saved after this method is run.
+    def prep_target(current_user: nil); end
+
+    # Hook for updating the data to be passed to the build script. Project
+    # instance is saved after this method runs.
+    def before_build(build_data, _env, current_user: nil)
       if build_data['google_doc_url'].present? && current_user
         current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
         if current_auth.present?
