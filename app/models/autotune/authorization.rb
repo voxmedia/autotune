@@ -23,8 +23,8 @@ module Autotune
 
     def update_from_auth_hash(auth_hash)
       # update user meta as well
-      user.update_roles(roles) if preferred?
       update(auth_hash.to_hash)
+      user.update_roles(roles) if preferred?
     end
 
     def update_from_auth_hash!(auth_hash)

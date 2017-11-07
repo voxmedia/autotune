@@ -40,9 +40,9 @@ module Autotune
 
     # Gets the thumbnail image url for the blueprint
     # @return [String] thumbnail url.
-    def thumb_url
+    def thumb_url(current_user)
       if config['thumbnail'].present?
-        deployer(:media).url_for(config['thumbnail'])
+        deployer(:media, :user => current_user).url_for(config['thumbnail'])
       else
         ActionController::Base.helpers.asset_path('autotune/at_placeholder.png')
       end

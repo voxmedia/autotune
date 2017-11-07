@@ -3,8 +3,8 @@ require_dependency 'autotune/application_controller'
 module Autotune
   # Handle authentication and user sessions
   class SessionsController < ApplicationController
-    skip_before_action :require_login, :only => [:new, :create, :failure]
-    skip_before_action :require_google_login, :only => [:new, :create, :failure, :destroy]
+    skip_before_action :require_login, :only => %i[new create failure]
+    skip_before_action :require_google_login, :only => %i[new create failure destroy]
 
     def auth_dev_tools
       redirect_to "http://localhost:8080/?api_key=#{current_user.api_key}"
@@ -72,6 +72,7 @@ module Autotune
       elsif auth.persisted?
         # Visitor is trying to log in and they're already in the database
         # Update group permissions and log the user in!
+        auth.save
         auth.user.update_membership
         self.current_user = auth.user
       else

@@ -175,10 +175,10 @@ module Autotune
       end
 
       # Get the deployer object
-      deployer = @project.deployer(:preview)
+      deployer = @project.deployer(:preview, :user => current_user)
 
       # Run the before build deployer hook
-      deployer.before_build(@build_data, {}, current_user)
+      deployer.before_build(@build_data, {})
       render :json => @build_data
     rescue => exc
       if @project && @project.meta.present? && @project.meta['error_message'].present?
