@@ -3,7 +3,7 @@ require 'test_helper'
 # Test the install blueprint job
 class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
   fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes',
-           'autotune/groups'
+           'autotune/groups', 'autotune/users'
   test 'install blueprint' do
     bp = autotune_blueprints(:example)
     assert_equal 'new', bp.status
@@ -23,7 +23,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal 'built', bp.status
     assert_equal 'testing', bp.mode
 
-    assert_equal '/media/example-blueprint/thumbnail.jpg', bp.thumb_url
+    assert_equal '/media/example-blueprint/thumbnail.jpg', bp.thumb_url(autotune_users(:superuser))
   end
 
   test 'blueprint versioning' do
@@ -271,7 +271,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     Autotune::Theme.where(:parent => nil).each do |theme|
       slug = [bp.version, theme.slug].join('-')
-      deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
+      deployer = Autotune.new_deployer(:media, :project => bp, :extra_slug => slug)
 
       skip unless deployer.is_a?(Autotune::Deployers::File)
 
@@ -355,7 +355,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     Autotune::Theme.where(:parent => nil).each do |theme|
       slug = [bp.version, theme.slug].join('-')
-      deployer = Autotune.new_deployer(:media, bp, :extra_slug => slug)
+      deployer = Autotune.new_deployer(:media, :project => bp, :extra_slug => slug)
 
       skip unless deployer.is_a?(Autotune::Deployers::File)
 

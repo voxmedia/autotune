@@ -22,7 +22,7 @@ module Autotune
       @deployers ||= {}
       key = kwargs.any? ? "#{target}:#{kwargs.to_query}" : target
       @deployers[key] ||=
-        Autotune.new_deployer(target.to_sym, self, **kwargs)
+        Autotune.new_deployer(target.to_sym, **kwargs.dup.update(:project => self))
     end
 
     # Has this deployable been deployed?
@@ -48,7 +48,7 @@ module Autotune
     # @return [String] Auth token
     def user_token_for_provider(provider)
       if respond_to?(:user)
-        user.authorizations.find_by_provider!(provider).credentials['token']
+        user.authorizations.find_by!(:provider => provider).credentials['token']
       end
     end
 

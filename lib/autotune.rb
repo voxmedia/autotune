@@ -11,17 +11,15 @@ module Autotune
   AUTH_KEY_RE = /API-KEY\s+auth="?([^"]+)"?/
   # regex for verifying clonable git urls
   REPO_URL_RE = %r{(\w+://)?(.+@)?([\w\.]+)(:[\d]+)?/?(.*)}
-  STATUSES = %w(new updating updated building built broken)
-  #PROJECT_STATUSES = %w(new building updated built broken)
-  PROJECT_PUB_STATUSES = %w(draft published)
-  #BLUEPRINT_STATUSES = %w(new updating built broken)
-  BLUEPRINT_MODES = %w(testing ready retired)
-  THEME_STATUSES = %w(new updating ready broken)
-  BLUEPRINT_TYPES = %w(graphic app)
-  EDITABLE_SLUG_BLUEPRINT_TYPES = %w(app)
-  ROLES = %w(none author editor designer superuser)
-  BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'
-  BLUEPRINT_BUILD_COMMAND = './autotune-build'
+  STATUSES = %w[new updating updated building built broken].freeze
+  PROJECT_PUB_STATUSES = %w[draft published].freeze
+  BLUEPRINT_MODES = %w[testing ready retired].freeze
+  THEME_STATUSES = %w[new updating ready broken].freeze
+  BLUEPRINT_TYPES = %w[graphic app].freeze
+  EDITABLE_SLUG_BLUEPRINT_TYPES = %w[app].freeze
+  ROLES = %w[none author editor designer superuser].freeze
+  BLUEPRINT_CONFIG_FILENAME = 'autotune-config.json'.freeze
+  BLUEPRINT_BUILD_COMMAND = './autotune-build'.freeze
   # add a time buffer to account for processing
   MESSAGE_BUFFER = 0.5
 
@@ -59,16 +57,15 @@ module Autotune
       end
     end
 
-    def new_deployer(target, project = nil, **opts)
+    def new_deployer(target, **opts)
       dep = @deployments[target.to_sym]
-      dep = dep.call(project, opts) if dep.is_a? Proc
+      dep = dep.call(opts) if dep.is_a? Proc
       if dep.is_a? Hash
         parts = URI.parse(dep[:connect])
         unless @deployers.key? parts.scheme.to_sym
           raise "No deployer registered for #{parts.scheme}://"
         end
-        @deployers[parts.scheme.to_sym].new(
-          dep.dup.update(:project => project).update(opts))
+        @deployers[parts.scheme.to_sym].new(opts.dup.update(dep))
       else
         dep
       end
@@ -114,11 +111,12 @@ module Autotune
     def messages(since: nil, type: nil)
       ensure_redis
 
-      if since.nil?
-        results = redis.zrange('messages', 0, 1000)
-      else
-        results = redis.zrangebyscore('messages', since.utc.to_f - MESSAGE_BUFFER, '+inf')
-      end
+      results =
+        if since.nil?
+          redis.zrange('messages', 0, 1000)
+        else
+          redis.zrangebyscore('messages', since.utc.to_f - MESSAGE_BUFFER, '+inf')
+        end
 
       results.map! { |d| ActiveSupport::JSON.decode(d) }
 

@@ -1,8 +1,11 @@
 json.extract!(
   project,
   :status, :id, :blueprint_id, :slug, :title, :created_at, :updated_at,
-  :preview_url, :publish_url, :user_id, :published_at, :data_updated_at,
+  :user_id, :published_at, :data_updated_at,
   :blueprint_version, :blueprint_repo_url, :bespoke)
+
+json.preview_url project.preview_url(current_user)
+json.publish_url project.publish_url(current_user)
 
 json.built project.built?
 json.type project.type
@@ -16,9 +19,9 @@ json.created_by project.user.name
 
 if project.built? && (!project.live? || project.published?)
   if project.publishable? && !project.live?
-    deployer = project.deployer(:preview)
+    deployer = project.deployer(:preview, :user => current_user)
   else
-    deployer = project.deployer(:publish)
+    deployer = project.deployer(:publish, :user => current_user)
   end
 
   json.screenshot_sm_url deployer.url_for('screenshots/screenshot_s.png')

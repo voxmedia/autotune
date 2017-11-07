@@ -187,14 +187,14 @@ module Autotune
 
     # Gets the URL for previewing the project.
     # @return [String] preview URL for the project.
-    def preview_url
-      @preview_url ||= deployer(:preview).url_for('/')
+    def preview_url(current_user)
+      @preview_url ||= deployer(:preview, :user => current_user).url_for('/')
     end
 
     # Gets the URL to the published version of the project.
     # @return [String] publish URL for the project.
-    def publish_url
-      @publish_url ||= deployer(:publish).url_for('/')
+    def publish_url(current_user)
+      @publish_url ||= deployer(:publish, :user => current_user).url_for('/')
     end
 
     # Gets the slug of the project without the theme.
