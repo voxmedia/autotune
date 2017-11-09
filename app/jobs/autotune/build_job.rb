@@ -42,10 +42,10 @@ module Autotune
 
       # Get the deployer object
       deployer = Autotune.new_deployer(
-        target.to_sym, project, :logger => outlogger)
+        target.to_sym, :user => current_user, :project => project, :logger => outlogger)
 
       # Run the before build deployer hook
-      deployer.before_build(build_data, repo.env, :current_user => current_user)
+      deployer.before_build(build_data, repo.env)
 
       # Run the build
       repo.cd { |s| s.run(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json) }

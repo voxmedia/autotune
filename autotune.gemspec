@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir['test/**/*']
 
   s.add_dependency 'rails', '~> 4.2.3'
-  s.add_dependency 'omniauth', '~> 1.2.2'
+  s.add_dependency 'omniauth', '~> 1.3', '>= 1.3.2'
   s.add_dependency 'resque', '~> 1.25.2'
   s.add_dependency 'resque-scheduler', '~> 4.0.0'
   s.add_dependency 'jbuilder', '~> 2.0'
@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'omniauth-google-oauth2', '~> 0.3.0'
   s.add_dependency 'autoshell', '~> 1.0.3'
   s.add_dependency 'i18n-js', '>= 3.0.0.rc11'
-  s.add_dependency 'nokogiri', '~> 1.7.2'
+  s.add_dependency 'nokogiri', '~> 1.8.1'
   s.add_dependency 'mail', '~> 2.6.6.rc1'
   s.add_dependency 'ruby_dig', '~> 0.0.2'
 

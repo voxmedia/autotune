@@ -132,7 +132,7 @@ module Autotune
         if k == :theme
           assert_equal Autotune::Theme.find_by_slug(project_data[k]), new_p.send(k)
         elsif k == :preview_url
-          assert_equal '/preview/theme1-new-project', new_p.send(k)
+          assert_equal '/preview/theme1-new-project', new_p.send(k, autotune_users(:superuser))
         elsif k == :data
           assert_equal({ 'google_doc_id' => '1234' }, new_p.send(k))
         else
@@ -164,7 +164,7 @@ module Autotune
         if k == :theme
           assert_equal Autotune::Theme.find_by_slug(project_data[k]), new_p.send(k)
         elsif k == :preview_url
-          assert_equal '/preview/theme1-new-project', new_p.send(k)
+          assert_equal '/preview/theme1-new-project', new_p.send(k, autotune_users(:superuser))
         elsif k == :data
           assert_equal({ 'google_doc_id' => '1234' }, new_p.send(k))
         else

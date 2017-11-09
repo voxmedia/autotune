@@ -3,7 +3,7 @@ require 'test_helper'
 module Autotune
   # Tesing the Blueprint model
   class BlueprintTest < ActiveSupport::TestCase
-    fixtures 'autotune/blueprints'
+    fixtures 'autotune/blueprints', 'autotune/users'
 
     test 'creating blueprints' do
       repo_url = autotune_blueprints(:example).repo_url
@@ -101,7 +101,7 @@ module Autotune
     test 'thumb url' do
       assert_equal(
         ActionController::Base.helpers.asset_path('autotune/at_placeholder.png'),
-        autotune_blueprints(:example).thumb_url)
+        autotune_blueprints(:example).thumb_url(autotune_users(:superuser)))
     end
   end
 end

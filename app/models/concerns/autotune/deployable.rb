@@ -23,7 +23,7 @@ module Autotune
       @deployers ||= {}
       key = kwargs.any? ? "#{target}:#{kwargs.to_query}" : target
       @deployers[key] ||=
-        Autotune.new_deployer(target.to_sym, self, **kwargs)
+        Autotune.new_deployer(target.to_sym, **kwargs.dup.update(:project => self))
     end
 
     # Has this deployable been deployed?

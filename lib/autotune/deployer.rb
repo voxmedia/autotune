@@ -6,13 +6,14 @@ module Autotune
   # Autotune blueprint base deployer
   class Deployer
     attr_accessor :base_url, :connect, :project, :extra_slug
-    attr_writer :logger
+    attr_writer :logger, :user
 
     # Create a new deployer
     def initialize(kwargs)
       kwargs.each do |k, v|
         send "#{k}=".to_sym, v
       end
+      raise 'missing deployable' if kwargs[:project].nil?
     end
 
     # Deploy an entire directory
@@ -27,13 +28,13 @@ module Autotune
 
     # Hook for preparing the deployment target before the build job is queued.
     # Project instance is saved after this method is run.
-    def prep_target(current_user: nil); end
+    def prep_target; end
 
-    # Hook for updating the data to be passed to the build script. Project
+    # Hook for adjusting data and files before build. Project
     # instance is saved after this method runs.
-    def before_build(build_data, _env, current_user: nil)
-      if build_data['google_doc_url'].present? && current_user
-        current_auth = current_user.authorizations.find_by!(:provider => 'google_oauth2')
+    def before_build(build_data, _env)
+      if build_data['google_doc_url'].present? && user.present?
+        current_auth = user.authorizations.find_by!(:provider => 'google_oauth2')
         if current_auth.present?
           google_client = GoogleDocs.new(
             :refresh_token => current_auth.credentials['refresh_token'],
@@ -141,11 +142,15 @@ module Autotune
     end
 
     def take_screenshots?
-      repo.command?('phantomjs') && !Rails.env.test?
+      project.build_shell.command?('phantomjs') && !Rails.env.test?
     end
 
     def logger
       @logger ||= Rails.logger
+    end
+
+    def user
+      @user ||= project.user
     end
 
     private
