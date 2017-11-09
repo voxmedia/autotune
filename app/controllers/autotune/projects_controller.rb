@@ -138,7 +138,7 @@ module Autotune
       if @project.valid?
         @project.status = 'built' if @project.live?
         @project.save
-        @project.build unless @project.live?
+        @project.build(current_user) unless @project.live?
 
         render :show, :status => :created
       else
@@ -155,7 +155,7 @@ module Autotune
       if @project.valid?
         @project.status = 'built' if @project.live?
         @project.save
-        @project.build unless @project.live?
+        @project.build(current_user) unless @project.live?
 
         render :show
       else
@@ -217,17 +217,17 @@ module Autotune
     end
 
     def update_snapshot
-      instance.update_snapshot
+      instance.update_snapshot(current_user)
       render_accepted
     end
 
     def build
-      instance.build
+      instance.build(current_user)
       render_accepted
     end
 
     def build_and_publish
-      instance.build_and_publish
+      instance.build_and_publish(current_user)
       render_accepted
     end
 

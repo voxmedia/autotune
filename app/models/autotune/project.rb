@@ -107,14 +107,14 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build
     # @see build_and_publish
-    def update_snapshot(current_user = nil)
+    def update_snapshot(current_user)
       self.status = 'building'
       unless bespoke? || blueprint_version == blueprint.version
         self.blueprint_version = blueprint.version
         self.blueprint_config = blueprint.config
       end
 
-      deployer(publishable? ? 'preview' : 'publish').prep_target(:current_user => current_user)
+      deployer(publishable? ? 'preview' : 'publish', :user => current_user).prep_target
 
       save!
 
@@ -142,10 +142,10 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build_and_publish
     # @see update_snapshot
-    def build(current_user = nil)
+    def build(current_user)
       self.status = 'building'
 
-      deployer(publishable? ? 'preview' : 'publish').prep_target(:current_user => current_user)
+      deployer(publishable? ? 'preview' : 'publish', :user => current_user).prep_target
 
       save!
 
@@ -173,10 +173,10 @@ module Autotune
     # @see build
     # @see update_snapshot
     # @raise The original exception when the update fails
-    def build_and_publish(current_user = nil)
+    def build_and_publish(current_user)
       self.status = 'building'
 
-      deployer('publish').prep_target(:current_user => current_user)
+      deployer('publish', :user => current_user).prep_target
 
       save!
 
