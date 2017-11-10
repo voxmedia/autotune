@@ -124,7 +124,7 @@ module Autotune
       end
 
       chain
-        .then(SyncProjectJob.new(self, :update => true))
+        .then(SyncProjectJob.new(self, :update => true, :current_user => current_user))
         .then(BuildJob.new(self,
                            :target => publishable? ? 'preview' : 'publish',
                            :current_user => current_user))
@@ -155,7 +155,7 @@ module Autotune
       end
 
       chain
-        .then(SyncProjectJob.new(self))
+        .then(SyncProjectJob.new(self, :current_user => current_user))
         .then(BuildJob.new(self,
                            :target => publishable? ? 'preview' : 'publish',
                            :current_user => current_user))
@@ -186,7 +186,7 @@ module Autotune
       end
 
       chain
-        .then(SyncProjectJob.new(self))
+        .then(SyncProjectJob.new(self, :current_user => current_user))
         .then(BuildJob.new(self,
                            :target => 'publish',
                            :current_user => current_user))
@@ -275,6 +275,8 @@ module Autotune
         self.published_at = now
         self.update_published_at = false
       end
+
+      true # make sure we return true to continue the save
     end
 
     def pub_to_redis
