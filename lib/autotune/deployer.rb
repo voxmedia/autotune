@@ -33,41 +33,13 @@ module Autotune
     # Hook for adjusting data and files before build. Project
     # instance is saved after this method runs.
     def before_build(build_data, _env)
-      if build_data['google_doc_url'].present? && user.present?
-        current_auth = user.authorizations.find_by!(:provider => 'google_oauth2')
-        if current_auth.present?
-          google_client = GoogleDocs.new(
-            :refresh_token => current_auth.credentials['refresh_token'],
-            :access_token => current_auth.credentials['token'],
-            :expires_at => current_auth.credentials['expires_at'])
-
-          current_auth.credentials['refresh_token'] = google_client.auth.refresh_token
-          current_auth.credentials['token'] = google_client.auth.access_token
-          current_auth.credentials['expires_at'] = google_client.auth.expires_at
-          current_auth.save!
-
-          doc_key = GoogleDocs.key_from_url(build_data['google_doc_url'])
-          if doc_key.present?
-            resp = google_client.find(doc_key)
-            cache_key = "googledoc#{doc_key}"
-
-            if Rails.cache.exist?(cache_key)
-              cache_value = Rails.cache.read(cache_key)
-              needs_update = cache_value['version'] && resp['version'] != cache_value['version']
-            else
-              needs_update = true
-            end
-
-            if needs_update
-              google_client.share_with_domain(
-                doc_key, Autotune.configuration.google_auth_domain)
-              ss_data = google_client.get_doc_contents(build_data['google_doc_url'])
-              build_data['google_doc_data'] = ss_data
-              Rails.cache.write(cache_key, 'ss_data' => ss_data, 'version' => resp['version'])
-            else
-              build_data['google_doc_data'] = Rails.cache.read(cache_key)['ss_data']
-            end
+      if (build_data['google_doc_url'].present? || build_data['google_docs'].present?) && google_client.present?
+        if build_data['google_docs'].present?
+          build_data['google_docs'].map! do |url|
+            { 'url' => url, 'data' => google_doc_contents(build_data['google_doc_url']) }
           end
+        elsif build_data['google_doc_url'].present?
+          build_data['google_doc_data'] = google_doc_contents(build_data['google_doc_url'])
         end
       end
 
@@ -162,6 +134,53 @@ module Autotune
 
     def asset?(path)
       /\.html?$/.match(path).nil? && !/\..{1,5}$/.match(path).nil?
+    end
+
+    def google_client
+      return @google_client if defined? @google_client
+
+      return if user.blank?
+
+      current_auth = user.authorizations.find_by!(:provider => 'google_oauth2')
+
+      google_client = GoogleDocs.new(
+        :refresh_token => current_auth.credentials['refresh_token'],
+        :access_token => current_auth.credentials['token'],
+        :expires_at => current_auth.credentials['expires_at'])
+
+      current_auth.credentials['refresh_token'] = google_client.auth.refresh_token
+      current_auth.credentials['token'] = google_client.auth.access_token
+      current_auth.credentials['expires_at'] = google_client.auth.expires_at
+      current_auth.save!
+
+      @google_client = google_client
+    end
+
+    def google_doc_contents(url)
+      return if google_client.blank?
+
+      doc_key = GoogleDocs.key_from_url(url)
+      return if doc_key.blank?
+
+      cache_key = "googledoc#{doc_key}"
+
+      if Rails.cache.exist?(cache_key)
+        cache_value = Rails.cache.read(cache_key)
+        resp = google_client.find(doc_key)
+        needs_update = cache_value['version'] && resp['version'] != cache_value['version']
+      else
+        needs_update = true
+      end
+
+      if needs_update
+        google_client.share_with_domain(doc_key, Autotune.configuration.google_auth_domain)
+        ret = google_client.get_doc_contents(build_data['google_doc_url'])
+        Rails.cache.write(cache_key, 'ss_data' => ss_data, 'version' => resp['version'])
+      else
+        ret = Rails.cache.read(cache_key)['ss_data']
+      end
+
+      ret
     end
   end
 end
