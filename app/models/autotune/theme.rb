@@ -42,9 +42,9 @@ module Autotune
       parent.config_data.deep_merge(data)
     end
 
-    def update_data(build_blueprints: true)
+    def update_data(build_blueprints: true, current_user: nil)
       update!(:status => 'updating')
-      SyncThemeJob.perform_later(self, :build_blueprints => build_blueprints)
+      SyncThemeJob.perform_later(self, :build_blueprints => build_blueprints, :current_user => current_user)
     rescue
       update!(:status => 'broken')
       raise

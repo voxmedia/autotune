@@ -79,20 +79,20 @@ module Autotune
     end
 
     # Queues a job to update the blueprint repo
-    def update_repo
+    def update_repo(current_user)
       update!(:status => 'updating')
       SyncBlueprintJob.set(:queue => 'low').perform_later(
-        self, :update => true, :build_themes => true)
+        self, :update => true, :build_themes => true, :current_user => current_user)
     rescue
       update!(:status => 'broken')
       raise
     end
 
     # Rebuild all themeable blueprints. Used when themes are updated
-    def self.rebuild_themed_blueprints
+    def self.rebuild_themed_blueprints(current_user)
       jobs = Blueprint.all
              .select(&:themable?)
-             .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true) }
+             .collect { |bp| SyncBlueprintJob.new(bp, :build_themes => true, :current_user => current_user) }
 
       ActiveJob::Chain.new(*jobs).enqueue(:queue => 'low')
     end

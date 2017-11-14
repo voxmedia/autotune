@@ -339,7 +339,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                  'Repo should be checked out to the correct version'
 
     assert_performed_jobs 1 do
-      bp.update_repo
+      bp.update_repo(autotune_users(:superuser))
     end
 
     assert repo.exist?('autotune-config.json'),
@@ -376,7 +376,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal 'testing', bp.mode,
                  'Blueprint should be in testing'
 
-    bp.update_repo
+    bp.update_repo(autotune_users(:superuser))
 
     assert_equal 'updating', bp.status,
                  'Blueprint should be updating'
@@ -387,7 +387,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     clear_enqueued_jobs
     perform_enqueued_jobs do
-      bp.update_repo
+      bp.update_repo(autotune_users(:superuser))
     end
 
     assert_performed_jobs 1
@@ -406,7 +406,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal 'ready', bp.mode,
                  'Blueprint should be ready'
 
-    bp.update_repo
+    bp.update_repo(autotune_users(:superuser))
 
     assert_equal 'updating', bp.status
     assert_equal 'ready', bp.mode,
@@ -414,7 +414,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
 
     clear_enqueued_jobs
     perform_enqueued_jobs do
-      bp.update_repo
+      bp.update_repo(autotune_users(:superuser))
     end
 
     assert_performed_jobs 2

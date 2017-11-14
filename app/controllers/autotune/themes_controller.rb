@@ -79,7 +79,7 @@ module Autotune
       if @theme.valid?
         @theme.status = 'ready'
         @theme.save
-        Blueprint.rebuild_themed_blueprints
+        Blueprint.rebuild_themed_blueprints(current_user)
         render :show, :status => :created
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request
@@ -92,7 +92,7 @@ module Autotune
       if @theme.valid?
         @theme.status = 'ready'
         @theme.save
-        Blueprint.rebuild_themed_blueprints
+        Blueprint.rebuild_themed_blueprints(current_user)
         render :show
       else
         render_error @theme.errors.full_messages.join(', '), :bad_request
@@ -100,7 +100,7 @@ module Autotune
     end
 
     def reset
-      instance.update_data
+      instance.update_data(:current_user => current_user)
       render_accepted
     end
 
