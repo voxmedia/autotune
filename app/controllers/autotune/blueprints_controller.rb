@@ -47,7 +47,7 @@ module Autotune
       @blueprint.attributes = select_from_post :title, :repo_url, :slug
       if @blueprint.valid?
         @blueprint.save
-        @blueprint.update_repo
+        @blueprint.update_repo(current_user)
         render :show, :status => :created
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
@@ -60,7 +60,7 @@ module Autotune
       if @blueprint.valid?
         trigger_upgrade = @blueprint.repo_url_changed?
         @blueprint.save
-        @blueprint.update_repo if trigger_upgrade
+        @blueprint.update_repo(current_user) if trigger_upgrade
         render :show
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
@@ -68,7 +68,7 @@ module Autotune
     end
 
     def update_repo
-      instance.update_repo
+      instance.update_repo(current_user)
       render_accepted
     end
 
