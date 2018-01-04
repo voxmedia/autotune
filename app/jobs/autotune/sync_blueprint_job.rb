@@ -56,8 +56,7 @@ module Autotune
 
             # Get the deployer object
             # probably don't want this to always be preview
-            deployer = Autotune.new_deployer(
-              :media, :user => current_user, :project => blueprint, :extra_slug => slug)
+            deployer = blueprint.deployer(:media, :user => current_user, :extra_slug => slug)
 
             # Run the before build deployer hook
             deployer.before_build(build_data, repo.env)
