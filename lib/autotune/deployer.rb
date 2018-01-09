@@ -164,18 +164,19 @@ module Autotune
 
       cache_key = "googledoc#{doc_key}"
 
+      resp = google_client.find(doc_key)
       if Rails.cache.exist?(cache_key)
         cache_value = Rails.cache.read(cache_key)
-        resp = google_client.find(doc_key)
         needs_update = cache_value['version'] && resp['version'] != cache_value['version']
       else
         needs_update = true
       end
 
+      # TODO: needs test coverage
       if needs_update
         google_client.share_with_domain(doc_key, Autotune.configuration.google_auth_domain)
-        ret = google_client.get_doc_contents(build_data['google_doc_url'])
-        Rails.cache.write(cache_key, 'ss_data' => ss_data, 'version' => resp['version'])
+        ret = google_client.get_doc_contents(url)
+        Rails.cache.write(cache_key, 'ss_data' => ret, 'version' => resp['version'])
       else
         ret = Rails.cache.read(cache_key)['ss_data']
       end
