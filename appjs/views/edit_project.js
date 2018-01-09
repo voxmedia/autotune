@@ -833,10 +833,9 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       dataType: 'json'
     }) ).then(
       function( data ) {
-        ctrl
-          .setValue(data.google_doc_url)
-          .refreshValidationState()
-          .focus();
+        ctrl.setValue(data.google_doc_url);
+        ctrl.refreshValidationState();
+        ctrl.focus();
       },
       function(err) {
         var msg = 'There was an error authenticating your Google account.';
