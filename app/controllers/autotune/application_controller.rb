@@ -12,6 +12,9 @@ module Autotune
 
     before_action :cors_set_access_control_headers
 
+    rescue_from Autotune::Forbidden, :with => :handle_forbidden_ex
+    rescue_from Autotune::Unauthorized, :with => :handle_unauthorized_ex
+
     helper_method :current_user, :signed_in?, :omniauth_path, :login_path, :role?
 
     def self.model(klass = nil)
@@ -70,6 +73,15 @@ module Autotune
         end
     end
 
+    def current_user=(u)
+      @current_user = u
+      if u.nil?
+        session.delete(:api_key)
+      else
+        session[:api_key] = u.api_key
+      end
+    end
+
     protected
 
     def omniauth_path(provider, origin = nil)
@@ -87,6 +99,7 @@ module Autotune
     end
 
     def has_google_auth?
+      return unless signed_in?
       gauth = current_user.authorizations.find_by(:provider => 'google_oauth2')
       gauth.present? && gauth.valid_credentials?
     end
@@ -107,6 +120,13 @@ module Autotune
       Mime[:json].in?(request.accepts)
     end
 
+    def logout!
+      return unless signed_in?
+      a = current_user.authorizations.find_by(:provider => 'google_oauth2')
+      a.destroy if a.present?
+      self.current_user = nil
+    end
+
     private
 
     def select_from_post(*args)
@@ -115,6 +135,15 @@ module Autotune
 
     def select_from_get(*args)
       request.GET.select { |k, _| args.include? k.to_sym }
+    end
+
+    def handle_unauthorized_ex
+      logout!
+      render_error 'Unauthorized', :unauthorized
+    end
+
+    def handle_forbidden_ex
+      render_error 'Not allowed', :forbidden
     end
 
     def require_login

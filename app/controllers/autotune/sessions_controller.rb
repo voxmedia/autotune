@@ -100,17 +100,8 @@ module Autotune
     end
 
     def destroy
-      self.current_user = nil
-      render_error('You have been logged out.', :ok)
-    end
-
-    def current_user=(u)
-      @current_user = u
-      if u.nil?
-        session.delete(:api_key)
-      else
-        session[:api_key] = u.api_key
-      end
+      logout!
+      render_error('You have been logged out. <a href="/">Log in</a>.', :ok)
     end
 
     private

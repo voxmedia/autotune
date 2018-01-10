@@ -28,25 +28,44 @@ module Autotune
 
     # Hook for preparing the deployment target before the build job is queued.
     # Project instance is saved after this method is run.
-    def prep_target; end
+    def prep_target
+      # retrieve and cache google doc data now so we can handle errors
+      # immediately instead of in the job
+      build_data = project.data
+      if (build_data['google_doc_url'].present? || build_data['google_docs'].present?) && google_client.present?
+        if build_data['google_docs'].present?
+          build_data['google_docs'].each do |url|
+            google_doc_contents(url)
+          end
+        elsif build_data['google_doc_url'].present?
+          google_doc_contents(build_data['google_doc_url'])
+        end
+      end
+    rescue GoogleDocs::Unauthorized => exc
+      logger.error(exc)
+      raise Autotune::Unauthorized, 'Unable to retrieve Google Doc because user session expired.'
+    rescue GoogleDocs::Forbidden => exc
+      logger.error(exc)
+      raise Autotune::Forbidden, 'Unable to retrieve Google Doc because user does not have access.'
+    end
 
     # Hook for adjusting data and files before build. Project
     # instance is saved after this method runs.
     def before_build(build_data, _env)
-      if (build_data['google_doc_url'].present? || build_data['google_docs'].present?) && google_client.present?
+      if build_data['google_doc_url'].present? || build_data['google_docs'].present?
         if build_data['google_docs'].present?
           build_data['google_docs'].map! do |url|
-            { 'url' => url, 'data' => google_doc_contents(build_data['google_doc_url']) }
+            { 'url' => url, 'data' => cached_google_doc_contents(url) }
           end
         elsif build_data['google_doc_url'].present?
-          build_data['google_doc_data'] = google_doc_contents(build_data['google_doc_url'])
+          build_data['google_doc_data'] = cached_google_doc_contents(build_data['google_doc_url'])
         end
       end
 
-      build_data['title'] = project.title unless build_data['title'].present?
-      build_data['slug'] = project.slug unless build_data['slug'].present?
-      build_data['available_themes'] = Theme.all.pluck(:slug) unless build_data['available_themes'].present?
-      build_data['theme_data'] = Theme.full_theme_data unless build_data['theme_data'].present?
+      build_data['title'] = project.title if build_data['title'].blank?
+      build_data['slug'] = project.slug if build_data['slug'].blank?
+      build_data['available_themes'] = Theme.all.pluck(:slug) if build_data['available_themes'].blank?
+      build_data['theme_data'] = Theme.full_theme_data if build_data['theme_data'].blank?
       build_data['group'] = project.group.slug if project.respond_to?(:group) && project.group
       build_data['theme'] = project.theme.slug if project.respond_to?(:theme) && project.theme
 
@@ -59,12 +78,12 @@ module Autotune
       raise
     rescue GoogleDocs::Unauthorized => exc
       logger.error(exc)
-      project.meta['error_message'] = "Unable to retrieve Google Doc because user session expired."
+      project.meta['error_message'] = 'Unable to retrieve Google Doc because user session expired.'
 
       raise
     rescue GoogleDocs::Forbidden => exc
       logger.error(exc)
-      project.meta['error_message'] = "Unable to retrieve Google Doc because user does not have access."
+      project.meta['error_message'] = 'Unable to retrieve Google Doc because user does not have access.'
 
       raise
     end
@@ -156,6 +175,18 @@ module Autotune
       @google_client = google_client
     end
 
+    def cached_google_doc_contents(url)
+      doc_key = GoogleDocs.key_from_url(url)
+      return if doc_key.blank?
+
+      cache_key = "googledoc#{doc_key}"
+      if Rails.cache.exist?(cache_key)
+        Rails.cache.read(cache_key)['ss_data']
+      else
+        google_doc_contents(url)['ss_data']
+      end
+    end
+
     def google_doc_contents(url)
       return if google_client.blank?
 
@@ -165,6 +196,7 @@ module Autotune
       cache_key = "googledoc#{doc_key}"
 
       resp = google_client.find(doc_key)
+      cache_value = nil
       if Rails.cache.exist?(cache_key)
         cache_value = Rails.cache.read(cache_key)
         needs_update = cache_value['version'] && resp['version'] != cache_value['version']
@@ -178,7 +210,7 @@ module Autotune
         ret = google_client.get_doc_contents(url)
         Rails.cache.write(cache_key, 'ss_data' => ret, 'version' => resp['version'])
       else
-        ret = Rails.cache.read(cache_key)['ss_data']
+        ret = (cache_value || Rails.cache.read(cache_key))['ss_data']
       end
 
       ret
