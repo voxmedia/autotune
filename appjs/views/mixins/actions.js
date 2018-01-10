@@ -45,7 +45,7 @@ module.exports = {
 
     if ( model_class && model_id ) {
       if ( this.collection ) {
-        logger.debug('load model from collection');
+        logger.debug('load model '+model_id+' from collection');
         inst = this.collection.get( model_id );
       }
 

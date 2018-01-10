@@ -15,21 +15,13 @@ module Autotune
     unique_job :with => :payload
 
     def perform(project, target: 'preview', current_user: nil)
-      # Setup a new logger that logs to a string. The resulting log will
-      # be saved to the output field of the project.
-      out = StringIO.new
-      outlogger = Logger.new out
-      outlogger.formatter = proc do |severity, datetime, _progname, msg|
-        "#{datetime.strftime('%b %e %H:%M %Z')}\t#{severity}\t#{msg}\n"
-      end
-
       # Reset any previous error messages:
       project.meta.delete('error_message')
 
       # Create a new repo object based on the projects working dir
       repo = Autoshell.new(project.working_dir,
                            :env => Rails.configuration.autotune.build_environment,
-                           :logger => outlogger)
+                           :logger => project.output_logger)
 
       # Make sure the repo exists and is up to date (if necessary)
       raise 'Missing files!' unless repo.exist?
@@ -41,8 +33,7 @@ module Autotune
       current_user ||= project.user
 
       # Get the deployer object
-      deployer = Autotune.new_deployer(
-        target.to_sym, :user => current_user, :project => project, :logger => outlogger)
+      deployer = project.deployer(target.to_sym, :user => current_user)
 
       # Run the before build deployer hook
       deployer.before_build(build_data, repo.env)
@@ -71,7 +62,7 @@ module Autotune
       end
 
       # Set status and save project
-      project.published_at = DateTime.current if target.to_sym == :publish
+      project.update_published_at = true if target.to_sym == :publish
       project.status = 'built'
     rescue => exc
       # If the command failed, raise a red flag
@@ -80,14 +71,10 @@ module Autotune
       else
         msg = exc.message + "\n" + exc.backtrace.join("\n")
       end
-      logger.error(msg)
-      outlogger.error(msg)
       project.status = 'broken'
       raise
     ensure
       # Always make sure to save the log and the project
-      outlogger.close
-      project.output = out.try(:string)
       project.save!
     end
 

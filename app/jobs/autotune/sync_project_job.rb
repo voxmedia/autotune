@@ -9,9 +9,9 @@ module Autotune
       arguments.first.to_gid_param
     end
 
-    def perform(project, update: false)
+    def perform(project, update: false, current_user: nil)
       if project.bespoke?
-        project.sync_from_repo(update: update)
+        project.sync_from_repo(update: update, current_user: current_user)
       else
         # Make sure the blueprint has a version
         raise 'Missing blueprint version' if project.blueprint.version.blank?

@@ -34,15 +34,18 @@ module Autotune
 
     search_fields :title
 
-    before_save :check_for_updated_data
+    before_save :update_dates
 
     after_save :pub_to_redis
+
+    attr_accessor :update_published_at
 
     after_initialize do
       self.status ||= 'new'
       self.meta ||= {}
       self.data ||= {}
       self.blueprint_config ||= {}
+      self.update_published_at = false
     end
 
     before_validation do
@@ -104,15 +107,16 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build
     # @see build_and_publish
-    def update_snapshot(current_user = nil)
-      if bespoke? || blueprint_version == blueprint.version
-        update!(:status => 'building')
-      else
-        update!(
-          :status => 'building',
-          :blueprint_version => blueprint.version,
-          :blueprint_config => blueprint.config)
+    def update_snapshot(current_user)
+      self.status = 'building'
+      unless bespoke? || blueprint_version == blueprint.version
+        self.blueprint_version = blueprint.version
+        self.blueprint_config = blueprint.config
       end
+
+      deployer(publishable? ? 'preview' : 'publish', :user => current_user).prep_target
+
+      save!
 
       chain = ActiveJob::Chain.new
       unless bespoke?
@@ -120,7 +124,7 @@ module Autotune
       end
 
       chain
-        .then(SyncProjectJob.new(self, :update => true))
+        .then(SyncProjectJob.new(self, :update => true, :current_user => current_user))
         .then(BuildJob.new(self,
                            :target => publishable? ? 'preview' : 'publish',
                            :current_user => current_user))
@@ -138,8 +142,12 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build_and_publish
     # @see update_snapshot
-    def build(current_user = nil)
-      update!(:status => 'building')
+    def build(current_user)
+      self.status = 'building'
+
+      deployer(publishable? ? 'preview' : 'publish', :user => current_user).prep_target
+
+      save!
 
       chain = ActiveJob::Chain.new
       unless bespoke?
@@ -147,7 +155,7 @@ module Autotune
       end
 
       chain
-        .then(SyncProjectJob.new(self))
+        .then(SyncProjectJob.new(self, :current_user => current_user))
         .then(BuildJob.new(self,
                            :target => publishable? ? 'preview' : 'publish',
                            :current_user => current_user))
@@ -165,8 +173,12 @@ module Autotune
     # @see build
     # @see update_snapshot
     # @raise The original exception when the update fails
-    def build_and_publish(current_user = nil)
-      update!(:status => 'building')
+    def build_and_publish(current_user)
+      self.status = 'building'
+
+      deployer('publish', :user => current_user).prep_target
+
+      save!
 
       chain = ActiveJob::Chain.new
       unless bespoke?
@@ -174,7 +186,7 @@ module Autotune
       end
 
       chain
-        .then(SyncProjectJob.new(self))
+        .then(SyncProjectJob.new(self, :current_user => current_user))
         .then(BuildJob.new(self,
                            :target => 'publish',
                            :current_user => current_user))
@@ -246,14 +258,25 @@ module Autotune
 
     private
 
-    def check_for_updated_data
+    def update_dates
+      now = DateTime.current
+
+      # check for updated data
       %w(data title slug theme_id data).each do |attr|
         # Apparently attribute_changed? does not check if the attribute actually changed
         if changes[attr].present? && changes[attr].first != changes[attr].last
-          self.data_updated_at = DateTime.current
+          self.data_updated_at = now
           break
         end
       end
+
+      # update published_at field if the flag has been set
+      if self.update_published_at
+        self.published_at = now
+        self.update_published_at = false
+      end
+
+      true # make sure we return true to continue the save
     end
 
     def pub_to_redis

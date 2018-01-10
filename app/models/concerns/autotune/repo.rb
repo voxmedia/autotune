@@ -13,7 +13,7 @@ module Autotune
     # run in the context of a job.
     # @param [Boolean] <update> Force an update from the remote repo url
     # @return [Boolean] True if anything was updated
-    def sync_from_repo(update: false)
+    def sync_from_repo(update: false, current_user: nil)
       raise 'Repo URL is missing' if repo_url.blank?
 
       repo = setup_shell
@@ -26,7 +26,7 @@ module Autotune
           # Update the repo
           repo.update
           self.version = repo.version
-        elsif status.in?(%w(built updated)) && version == repo.version
+        elsif status.in?(%w[built updated]) && version == repo.version
           return false # no syncing occurs
         elsif version.present?
           # we're not updating, but the repo is broken, so set it up
@@ -64,10 +64,10 @@ module Autotune
 
       # Stash the thumbnail
       if config['thumbnail'].present? && repo.exist?(config['thumbnail'])
-        deployer(:media).deploy_file(working_dir, config['thumbnail'])
+        deployer(:media, :user => current_user).deploy_file(working_dir, config['thumbnail'])
       end
 
-      return true
+      true
     end
   end
 end

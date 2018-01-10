@@ -29,6 +29,9 @@ module Autotune
                       :git_ssh, :git_askpass,
                       :redis, :faq_url, :generic_theme, :theme_meta_data, :get_theme_data)
 
+  class Unauthorized < StandardError; end
+  class Forbidden < StandardError; end
+
   class << self
     delegate :redis, :to => :configuration
 

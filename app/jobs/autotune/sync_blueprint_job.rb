@@ -11,7 +11,7 @@ module Autotune
 
     # do the deed
     def perform(blueprint, update: false, build_themes: false, current_user: nil)
-      return unless blueprint.sync_from_repo(update: update) || build_themes
+      return unless blueprint.sync_from_repo(update: update, current_user: current_user) || build_themes
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
         repo = blueprint.build_shell
@@ -21,23 +21,22 @@ module Autotune
           sample_data = repo.read(blueprint.config['sample_data'])
           sample_data.delete('base_url')
           sample_data.delete('asset_base_url')
-          sample_data.delete('available_themes') unless sample_data['available_themes'].blank?
-          sample_data.delete('theme_data') unless sample_data['theme_data'].blank?
+          sample_data.delete('available_themes') if sample_data['available_themes'].present?
+          sample_data.delete('theme_data') if sample_data['theme_data'].present?
 
           # add themes data if this blueprint support themeing
           if blueprint.themable?
-            sample_data.merge!(
-              'available_themes' => Theme.all.pluck(:slug),
-              'theme_data' => Theme.full_theme_data
-            )
+            sample_data['available_themes'] = Theme.all.pluck(:slug)
+            sample_data['theme_data'] = Theme.full_theme_data
           end
 
           # if no theme list is available, pick the first theme
-          if blueprint.config['themes'].blank?
-            themes = blueprint.themable? ? [Theme.first] : Theme.where(:parent => nil)
-          else # get supported themes
-            themes = Theme.where(:slug => blueprint.config['themes'])
-          end
+          themes =
+            if blueprint.config['themes'].blank?
+              blueprint.themable? ? [Theme.first] : Theme.where(:parent => nil)
+            else # get supported themes
+              Theme.where(:slug => blueprint.config['themes'])
+            end
 
           # if no theme is selected at this point, use any default theme
           themes = Theme.where(:parent => nil).first if themes.empty?
@@ -57,8 +56,7 @@ module Autotune
 
             # Get the deployer object
             # probably don't want this to always be preview
-            deployer = Autotune.new_deployer(
-              :media, :user => current_user, :project => blueprint, :extra_slug => slug)
+            deployer = blueprint.deployer(:media, :user => current_user, :extra_slug => slug)
 
             # Run the before build deployer hook
             deployer.before_build(build_data, repo.env)
