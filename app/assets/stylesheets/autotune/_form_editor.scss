@@ -1,10 +1,15 @@
 /* Form editor */
 
 #form-builder {
-  padding-top: 33px;
-  margin-bottom: -25px;
-  height:100vh;
+  height:calc(100vh - 33px);
+  margin-bottom:-32px;
 }
+
+#form-builder .scroll-pane { height: 100%; }
+
+#form-builder #preview-pane { padding:0; position:static; }
+#form-builder #form-pane { position:static; }
+#form-builder #split-bar { top:0; }
 
 .has-alert #form-builder {
   padding-top: 60px;

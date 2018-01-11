@@ -46,6 +46,7 @@ var FormBuilder = BaseView.extend({
   afterRender: function() {
     this.setSourceHeight();
 
+    var self = this;
     var editor = this.editor = ace.edit('schema');
 
     editor.setOptions({
@@ -58,12 +59,11 @@ var FormBuilder = BaseView.extend({
     editor.setShowPrintMargin(false);
     editor.setValue( JSON.stringify( this.initialFormData , null, "  " ), -1 );
 
-    var debouncedUpdatePreview = _.debounce(
-      _.bind(this.updateFormPreview, this), 500);
-
-    editor.on("change", function() {
-      logger.debug('editor content changed');
-      debouncedUpdatePreview();
+    // Can't do this on change because alpaca tries to steal focus, and theres
+    // no way to disable that behavior
+    editor.on("blur", function() {
+      logger.debug('blur editor');
+      self.updateFormPreview();
     });
 
     this.updateFormPreview();
@@ -114,6 +114,7 @@ var FormBuilder = BaseView.extend({
       $previewDiv.empty();
     }
 
+    var self = this;
     var config = {
       schema: schema,
       options: options,
