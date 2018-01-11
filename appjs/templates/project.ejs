@@ -259,6 +259,7 @@
           <button type="button" class="btn btn-secondary"
                   data-action-message="<%= I18n.t('autotune.upgrade-started') %>" data-loading-text="<%= I18n.t('autotune.upgrade-starting-message') %>"
                   data-action="update-snapshot" data-action-next="reload"> <%= I18n.t('autotune.upgrade') %> </button>
+          <a class="btn btn-secondary" href="/builder?project=<%=model.get('slug')%>"> <%= I18n.t('autotune.form-builder') %> </a>
         </p>
 
         <h4> <%= I18n.t('autotune.blueprint-data-header') %> </h4>
