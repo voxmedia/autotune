@@ -159,20 +159,23 @@
       <div class="container" style="padding-top: 20px;">
         <h3><%= model.get( 'title' ) %></h3>
         <hr />
+        <button type="button" class="btn btn-primary"
+                data-action-message="<%= I18n.t('autotune.build-started-message') %>" data-loading-text="<%= I18n.t('autotune.build-starting-message') %>"
+                data-action="build" data-action-next="reload"> <%= I18n.t('autotune.rebuild') %> </button>
+        <br/>
+        <br/>
         <h4> <%= I18n.t('autotune.publish') %> </h4>
         <button type="button" class="btn btn-primary" id="publishBtn"
                 data-action-message="<%= I18n.t('autotune.publishing') %>"
                 data-action="build-and-publish" data-model="Project"
                 data-action-next="reload"
-                data-model-id="<%=model.get('slug') %>"
+                data-model-id="<%=model.get('slug') %>">
                 <% if ( model.hasStatus('building') ) { %>
-                  style="width: 109px;"> <%= I18n.t('autotune.publishing') %> <div></div>
+                  <%= I18n.t('autotune.publishing') %> <div></div>
+                <% } else if ( model.isPublished() ) { %>
+                  <%= I18n.t('autotune.publish-changes-now') %>
                 <% } else { %>
-                  ><% if ( model.isPublished() ) { %>
-                    <%= I18n.t('autotune.publish-changes-now') %>
-                  <% } else { %>
-                    <%= I18n.t('autotune.publish-now') %>
-                  <% } %>
+                  <%= I18n.t('autotune.publish-now') %>
                 <% } %>
                 </button>
         <% if ( model.hasInitialBuild() ) { %>
@@ -253,12 +256,10 @@
         </p>
 
         <p>
-          <button type="button" class="btn btn-primary"
-                  data-action-message="<%= I18n.t('autotune.build-started-message') %>" data-loading-text="<%= I18n.t('autotune.build-starting-message') %>"
-                  data-action="build" data-action-next="reload"> <%= I18n.t('autotune.rebuild') %> </button>
           <button type="button" class="btn btn-secondary"
                   data-action-message="<%= I18n.t('autotune.upgrade-started') %>" data-loading-text="<%= I18n.t('autotune.upgrade-starting-message') %>"
                   data-action="update-snapshot" data-action-next="reload"> <%= I18n.t('autotune.upgrade') %> </button>
+          <a class="btn btn-secondary" href="/builder?project=<%=model.get('slug')%>"> <%= I18n.t('autotune.form-builder') %> </a>
         </p>
 
         <h4> <%= I18n.t('autotune.blueprint-data-header') %> </h4>

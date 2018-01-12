@@ -49,7 +49,7 @@ es:
     no-blueprints-ready:    'No hay herramientas listas para usar.'
     ask-promote-blueprint-to-ready: 'Debe cambiar el estado de la herramienta a <span class="m-status status-ok"><i class="icon-ok"></i>Listo</span> para que aparezca aquí.'
     blueprint-info:         'Datos de la herramienta'
-    form-builder:           'Form Builder'
+    form-builder:           'Editar formulario'
     new-project:            'Nuevo Proyecto'
     status-header:          'Estado:'
     status-ready:           'Listo'
