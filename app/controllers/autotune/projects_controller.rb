@@ -121,7 +121,7 @@ module Autotune
           projects_url(:page => @projects.previous_page, :per_page => per_page), 'prev']
       end
       headers['Link'] = links.join(', ')
-      headers['X-Total'] = @projects.count
+      headers['X-Total'] = @projects.count.to_s
     end
 
     def show

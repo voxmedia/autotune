@@ -61,7 +61,7 @@ module Autotune
           themes_url(:page => @themes.previous_page, :per_page => per_page), 'prev']
       end
       headers['Link'] = links.join(', ')
-      headers['X-Total'] = @themes.count
+      headers['X-Total'] = @themes.count.to_s
     end
 
     def show
