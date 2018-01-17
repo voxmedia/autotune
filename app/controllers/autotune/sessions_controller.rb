@@ -101,7 +101,7 @@ module Autotune
 
     def destroy
       logout!
-      render_error('You have been logged out. <a href="/">Log in</a>.', :ok)
+      render_error('You have been logged out. <a href="/">Log in</a>.'.html_safe, :ok)
     end
 
     private
