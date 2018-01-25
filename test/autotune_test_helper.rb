@@ -96,7 +96,7 @@ class ActiveSupport::TestCase
   end
 
   def teardown
-    Rails.configuration.autotune.google_auth_enabled = @tmp_gauth_flag
+    Rails.configuration.autotune.google_auth_enabled = defined?(@tmp_gauth_flag) ? @tmp_gauth_flag : nil
 
     FileUtils.rm_rf(Rails.configuration.autotune.working_dir) \
       if File.exist?(Rails.configuration.autotune.working_dir)

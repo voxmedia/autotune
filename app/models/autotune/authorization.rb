@@ -37,7 +37,7 @@ module Autotune
     end
 
     def roles
-      @_roles_cached ? @roles : reload_roles
+      defined?(@_roles_cached) && @_roles_cached ? @roles : reload_roles
     end
 
     def verified?

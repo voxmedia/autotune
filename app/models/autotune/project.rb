@@ -224,7 +224,7 @@ module Autotune
     # Gets the old theme if it was changed.
     # @return [Theme] Old theme if it was changed. `nil` if the theme was not changed.
     def theme_was
-      return @theme_was if @theme_was && @theme_was.id == theme_id_was
+      return @theme_was if defined?(@theme_was) && @theme_was && @theme_was.id == theme_id_was
       @theme_was = theme_id_was.nil? ? nil : Theme.find(theme_id_was)
     end
 
