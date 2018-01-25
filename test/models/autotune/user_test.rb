@@ -18,7 +18,6 @@ class Autotune::UserTest < ActiveSupport::TestCase
     assert_equal u1, u2
     assert_equal u1.id, u2.id
     assert_equal u1.name, u2.name
-    assert_equal u1.authorizations.first, u1.authorizations.first
   end
 
   test 'find or create by auth hash' do
