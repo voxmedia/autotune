@@ -8,6 +8,9 @@ var $ = require('jquery'),
     logger = require('../../logger'),
     helpers = require('../../helpers');
 
+/* Actions view mixin
+ * Generic handler for action buttons that do something to a model.
+ */
 module.exports = {
   events: {
     'click button[data-action], a[data-action]': 'handleAction'
@@ -16,6 +19,7 @@ module.exports = {
   handleAction: function(eve) {
     eve.preventDefault();
     eve.stopPropagation();
+
     var inst, view = this, app = this.app,
         $btn = $(eve.currentTarget),
         action = $btn.data('action'),
@@ -23,7 +27,8 @@ module.exports = {
         action_message = $btn.data('action-message'),
         next = $btn.data('action-next'),
         model_class = $btn.data('model'),
-        model_id = $btn.data('model-id');
+        model_id = $btn.data('model-id'),
+        promise;
 
     logger.debug('action-next-'+ next);
     logger.debug('action-' + action);
@@ -32,9 +37,15 @@ module.exports = {
       $btn.button('loading');
     }
 
+    if(action === 'build-and-publish' && view.hasUnsavedChanges()){
+      promise = view.doSubmit($('#projectForm form'));
+    } else {
+      promise = Promise.resolve();
+    }
+
     if ( model_class && model_id ) {
       if ( this.collection ) {
-        logger.debug('load model from collection');
+        logger.debug('load model '+model_id+' from collection');
         inst = this.collection.get( model_id );
       }
 
@@ -44,17 +55,21 @@ module.exports = {
     } else {
       inst = this.model;
     }
+    logger.debug(inst);
 
     if ( action_confirm && !window.confirm( action_confirm ) ) { return; }
 
-    Promise.resolve( inst[camelize(action)]() )
-      .then(function(resp) {
-        app.view.alert(action_message, 'success', false, 4000);
+    promise.then(function(){
+      return inst[camelize(action)]();
+    }).then(function(resp) {
+        if(action_message){
+          app.view.success(action_message, 4000);
+        }
 
         switch (action) {
           case 'build':
-            app.view.alert(
-              'Building... This might take a moment.', 'notice', false, 16000);
+            app.view.warning(
+              I18n.t('autotune.building-wait'), 16000);
             break;
           case 'destroy':
             if ( view.collection ) {
@@ -65,11 +80,14 @@ module.exports = {
         }
 
         if ( next === 'show' ) {
-          Backbone.history.navigate( inst.url(), {trigger: true} );
+          this.app.router.navigate( inst.url(), {trigger: true} );
         } else if ( next === 'reload' ) {
           return view.render();
         } else if ( next ) {
-          Backbone.history.navigate( next, {trigger: true} );
+          this.app.router.navigate( next, {trigger: true} );
+        } else {
+          if ( $btn.hasClass('btn') ) { $btn.button( 'reset' ); }
+          app.trigger( 'loadingStop' );
         }
       }).catch(function(error) {
         view.handleRequestError( error );
@@ -83,9 +101,8 @@ module.exports = {
       var data = $.parseJSON( xhr.responseText );
       this.app.view.error( data.error );
     } else {
-      this.app.view.error( 'Something bad happened... Please reload and try again' );
+      this.app.view.error( I18n.t('autotune.error-message') );
     }
     logger.error("REQUEST FAILED!!", xhr);
-  },
-
+  }
 };

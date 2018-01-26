@@ -1,0 +1,66 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+developer_group_one:
+  user: developer
+  group: group1
+  role: superuser
+
+developer_group_two:
+  user: developer
+  group: group2
+  role: superuser
+
+superuser_group_one:
+  user: superuser
+  group: group1
+  role: superuser
+
+superuser_group_two:
+  user: superuser
+  group: group2
+  role: superuser
+
+author_group_one:
+  user: author
+  group: group1
+  role: author
+
+author_group_two:
+  user: author
+  group: group2
+  role: author
+
+designer_group_one:
+  user: designer
+  group: group1
+  role: designer
+
+designer_group_two:
+  user: designer
+  group: group2
+  role: designer
+
+editor_group_one:
+  user: editor
+  group: group1
+  role: editor
+
+editor_group_two:
+  user: editor
+  group: group2
+  role: editor
+
+group1_editor_group_one:
+  user: group1_editor
+  group: group1
+  role: editor
+
+group2_author_group_two:
+  user: group2_author
+  group: group2
+  role: author
+
+group1_designer_group_one:
+  user: group1_designer
+  group: group1
+  role: designer

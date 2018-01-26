@@ -1,4 +1,4 @@
-require 'work_dir'
+require 'autoshell'
 
 module Autotune
   # Job that updates the project working dir
@@ -9,59 +9,60 @@ module Autotune
       arguments.first.to_gid_param
     end
 
-    def perform(project, update: false)
-      # Setup a new log model to track the duration of this job and its output
-      log = Log.new(:label => 'sync-project', :project => project)
-
-      # Create a new repo object based on the blueprints working dir
-      blueprint_dir = WorkDir.repo(
-        project.blueprint.working_dir,
-        Rails.configuration.autotune.setup_environment)
-      blueprint_dir.logger = log.logger
-
-      # Make sure the blueprint exists
-      raise 'Missing files!' unless blueprint_dir.exist?
-
-      # Create a new repo object based on the projects working dir
-      project_dir = WorkDir.repo(
-        project.working_dir,
-        Rails.configuration.autotune.setup_environment)
-      project_dir.logger = log.logger
-
-      if project_dir.exist? && update
-        # Update the project files. Because of issue #218, due to
-        # some weirdness in git 1.7, we can't just update the repo.
-        # We have to make a new copy.
-        project_dir.destroy
-        blueprint_dir.copy_to(project_dir.working_dir)
-      elsif project_dir.exist?
-        # if we're not updating, bail if we have the files
-        return
+    def perform(project, update: false, current_user: nil)
+      if project.bespoke?
+        project.sync_from_repo(update: update, current_user: current_user)
       else
-        # Copy the blueprint to the project working dir.
-        blueprint_dir.copy_to(project_dir.working_dir)
+        # Make sure the blueprint has a version
+        raise 'Missing blueprint version' if project.blueprint.version.blank?
+
+        # Create a new repo object based on the blueprints working dir
+        blueprint_dir = project.blueprint.setup_shell
+
+        # Make sure the blueprint exists
+        raise 'Missing files!' unless blueprint_dir.exist?
+
+        # Create a new repo object based on the projects working dir
+        project_dir = project.setup_shell
+
+        if project_dir.exist?
+          if update || project_dir.version != project.blueprint_version
+            # Update the project files. Because of issue #218, due to
+            # some weirdness in git 1.7, we can't just update the repo.
+            # We have to make a new copy.
+            project_dir.rm
+            blueprint_dir.copy_to(project_dir.working_dir)
+          elsif project_dir.version == project.blueprint_version
+            # if we're not updating, bail if we have the files
+            return
+          end
+        else
+          # Copy the blueprint to the project working dir.
+          blueprint_dir.copy_to(project_dir.working_dir)
+        end
+
+        if project.blueprint_version.blank?
+          # project version is blank, so we assume HEAD and save it now
+          project.blueprint_version = project_dir.version
+        elsif project_dir.version != project.blueprint_version
+          # Checkout correct version and branch
+          project_dir.commit_hash_for_checkout = project.blueprint_version
+          project_dir.update
+          # Make sure the environment is correct for this version
+          project_dir.setup_environment
+          # update the config
+          project.blueprint_config = project_dir.read(BLUEPRINT_CONFIG_FILENAME)
+        end
       end
 
-      if project_dir.commit_hash != project.blueprint_version
-        # checkout the right git version
-        project_dir.switch(project.blueprint_version)
-        # Make sure the environment is correct for this version
-        project_dir.setup_environment
-        # update the status
-        project.blueprint_config = project_dir.read(BLUEPRINT_CONFIG_FILENAME)
-      end
-
-      # update the status
+      # Project is now updated
       project.status = 'updated'
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
-      log.error(exc)
       project.status = 'broken'
       raise
     ensure
-      # Always make sure to save the log and the project
-      log.save!
       project.save!
     end
   end

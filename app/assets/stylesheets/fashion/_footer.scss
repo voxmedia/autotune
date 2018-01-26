@@ -1,0 +1,39 @@
+.footer {
+  min-height: 150px;
+  padding: 25px 0;
+  color: $gray;
+  a {
+    color: $gray;
+    &:hover {
+      color: $gray-dark;
+    }
+  }
+  ul {
+    @include list-unstyled;
+    margin-bottom: 25px;
+    li {
+      margin-bottom: 5px;
+    }
+  }
+  .copyright {
+    float: right;
+    text-align: right;
+    font-size: 0.85em;
+    @media (max-width: $screen-md-min) {
+      float: none;
+      text-align: left;
+    }
+    img {
+      width: 150px;
+    }
+  }
+}
+.footer-inverse {
+  color: $gray-light;
+  a {
+    color: $gray-light;
+    &:hover {
+      color: $gray-lighter;
+    }
+  }
+}

@@ -5,7 +5,9 @@ AllCops:
   Exclude:
     - 'db/migrate/**/*'
     - 'vendor/**/*'
-  RunRailsCops: true
+
+Rails:
+  Enabled: true
 
 Style/HashSyntax:
   EnforcedStyle: hash_rockets

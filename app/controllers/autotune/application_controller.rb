@@ -6,8 +6,14 @@ module Autotune
     # protect_from_forgery with: :exception
 
     before_action :require_login, :except => [:cors_preflight_check]
+    before_action :require_google_login,
+                  :except => [:cors_preflight_check],
+                  :if => :google_auth_required?
 
     before_action :cors_set_access_control_headers
+
+    rescue_from Autotune::Forbidden, :with => :handle_forbidden_ex
+    rescue_from Autotune::Unauthorized, :with => :handle_unauthorized_ex
 
     helper_method :current_user, :signed_in?, :omniauth_path, :login_path, :role?
 
@@ -33,11 +39,16 @@ module Autotune
       end
     end
 
+    def add_date_header
+      # Tue, 15 Nov 1994 08:12:31 GMT
+      headers['Date'] = Time.zone.now.strftime('%a, %e %b %Y %H:%M:%S %Z')
+    end
+
     # For all responses, return the CORS access control headers.
     def cors_set_access_control_headers
       headers['Access-Control-Allow-Origin'] = '*'
-      headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
-      headers['Access-Control-Allow-Headers'] = 'accept, authorization'
+      headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, OPTIONS'
+      headers['Access-Control-Allow-Headers'] = 'accept, authorization, x-requested-with, content-type'
       headers['Access-Control-Max-Age'] = '1728000'
     end
 
@@ -45,6 +56,30 @@ module Autotune
     # (control headers will be included).
     def cors_preflight_check
       render :text => '', :content_type => 'text/plain'
+    end
+
+    def current_user
+      @current_user ||=
+        if session[:api_key].present?
+          User.find_by_api_key(session[:api_key])
+        elsif request.headers['Authorization'].present?
+          if request.headers['Authorization'] =~ AUTH_KEY_RE
+            # $~ is the match object from the last regex ^
+            User.find_by_api_key($~[1])
+          elsif Autotune.config.verify_authorization_header.is_a?(Proc)
+            Autotune.config.verify_authorization_header.call(
+              request.headers['Authorization'])
+          end
+        end
+    end
+
+    def current_user=(u)
+      @current_user = u
+      if u.nil?
+        session.delete(:api_key)
+      else
+        session[:api_key] = u.api_key
+      end
     end
 
     protected
@@ -59,37 +94,37 @@ module Autotune
       omniauth_path(Rails.configuration.omniauth_preferred_provider, origin)
     end
 
-    def current_user
-      @current_user ||= begin
-        if session[:api_key].present?
-          User.find_by_api_key(session[:api_key])
-        elsif request.headers['Authorization'] =~ AUTH_KEY_RE
-          api_key_m = AUTH_KEY_RE.match(request.headers['Authorization'])
-          User.find_by_api_key(api_key_m[1])
-        else
-          nil
-        end
-      end
-    end
-
-    def current_user=(u)
-      if u.nil?
-        session.delete(:api_key)
-      else
-        session[:api_key] = u.api_key
-      end
-    end
-
     def signed_in?
       current_user.present?
     end
 
+    def has_google_auth?
+      return unless signed_in?
+      gauth = current_user.authorizations.find_by(:provider => 'google_oauth2')
+      gauth.present? && gauth.valid_credentials?
+    end
+
+    def google_auth_required?
+      Autotune.configuration.google_auth_enabled
+    end
+
     def any_roles?
-      !current_user.meta['roles'].nil? && !current_user.meta['roles'].empty?
+      current_user.meta['roles'].present? && current_user.meta['roles'].any?
     end
 
     def role?(*args)
       args.reduce { |a, e| a || current_user.meta['roles'].include?(e.to_s) }
+    end
+
+    def accepts_json?
+      Mime[:json].in?(request.accepts)
+    end
+
+    def logout!
+      return unless signed_in?
+      a = current_user.authorizations.find_by(:provider => 'google_oauth2')
+      a.destroy if a.present?
+      self.current_user = nil
     end
 
     private
@@ -102,13 +137,30 @@ module Autotune
       request.GET.select { |k, _| args.include? k.to_sym }
     end
 
+    def handle_unauthorized_ex
+      logout!
+      render_error 'Unauthorized', :unauthorized
+    end
+
+    def handle_forbidden_ex
+      render_error 'Not allowed', :forbidden
+    end
+
     def require_login
-      return true if signed_in? && any_roles?
       if signed_in?
-        render_error 'Not allowed', :forbidden
+        render_error('Not allowed', :forbidden) unless any_roles?
       else
         respond_to do |format|
           format.html { redirect_to login_path(request.fullpath) }
+          format.json { render_error 'Unauthorized', :unauthorized }
+        end
+      end
+    end
+
+    def require_google_login
+      if signed_in? && any_roles? && !has_google_auth?
+        respond_to do |format|
+          format.html { render 'google_auth' }
           format.json { render_error 'Unauthorized', :unauthorized }
         end
       end
@@ -130,7 +182,7 @@ module Autotune
       # It appears Rails automatically assumes you want HTML if html or */*
       # is anywhere in the Accept header. This is not how the Accept header is
       # supposed to work.
-      if Mime[:json].in?(request.accepts)
+      if accepts_json?
         # We'll be lazy and assume the client wants JSON if application/json
         # appears in the Accept header. Then we have to force the format.
         request.format = :json

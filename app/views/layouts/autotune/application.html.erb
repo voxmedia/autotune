@@ -10,12 +10,23 @@
   <title>Autotune</title>
 
   <%=stylesheet_link_tag 'autotune/application', media: 'all' %>
+
+  <%=javascript_include_tag 'i18n' %>
+  <%=javascript_include_tag 'translations' %>
+  <script type="text/javascript">
+    I18n.defaultLocale = "<%= I18n.default_locale %>";
+    I18n.locale = "<%= I18n.locale %>";
+    I18n.fallbacks = true;
+  </script>
+
   <%=javascript_include_tag 'autotune/application' %>
   <%=render 'autotune/head_bottom' %>
 </head>
 <body>
 <%=render 'autotune/body_top' %>
-<%= yield %>
+<div id="autotune-main-body">
+  <%= yield %>
+</div>
 <%=render 'autotune/body_bottom' %>
 </body>
 </html>

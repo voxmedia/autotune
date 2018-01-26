@@ -2,8 +2,8 @@
 
 var $ = require('jquery'),
     _ = require('underscore'),
+    tinycolor = require('tinycolor2'),
     querystring = require('querystring'),
-    escape = require('escape-html'),
     _string = require('underscore.string');
 
 module.exports = {
@@ -56,7 +56,14 @@ module.exports = {
   },
 
   /**********
+   * Theme editor helpers
+   */
+  isColor: function(color){
+    return tinycolor(color).isValid();
+  },
+
+  /**********
    * Expose other stuff as helpers
    */
-  escape: escape
+  escape: _string.escapeHTML
 };

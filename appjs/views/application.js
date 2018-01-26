@@ -12,14 +12,20 @@ var $ = require('jquery'),
 PNotify.prototype.options.styling = "bootstrap3";
 // Load PNotify buttons component
 require('pnotify/src/pnotify.buttons');
+require('pnotify/src/pnotify.callbacks');
 
 var Application = BaseView.extend(require('./mixins/links.js'), {
-  className: 'container-fluid',
   template: require('../templates/application.ejs'),
   alertDefaults: {
-    addclass: "stack-bottomright",
-    stack: { dir1: "up", dir2: "left", firstpos1: 25, firstpos2: 25 },
-    buttons: { sticker: false }
+    stack: {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0},
+    addclass: "center-top-notification",
+    width: '100%',
+    buttons: { sticker: false },
+    animate_speed: 0
+  },
+  events: {
+    'click ul.navbar-nav li a': 'toggleNav',
+    'click #savePreview': 'savePreview'
   },
 
   afterInit: function() {
@@ -33,6 +39,7 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     this.currentView = view;
     this.currentView.load(this);
     logger.debug('displaying view', view, this.$('#main'));
+    if ( window ) { $(window).scrollTop(0); }
     this.$('#main').empty().append(view.$el);
     return this;
   },
@@ -80,38 +87,81 @@ var Application = BaseView.extend(require('./mixins/links.js'), {
     return this;
   },
 
-  error: function(message) {
-    return this.alert(message, 'error');
+  error: function(message, wait) {
+    return this.alert(message, 'error', wait);
   },
 
-  warning: function(message) {
-    return this.alert(message, 'notice');
+  warning: function(message, wait) {
+    return this.alert(message, 'notice', wait);
   },
 
-  success: function(message) {
-    return this.alert(message, 'success');
+  success: function(message, wait) {
+    return this.alert(message, 'success', wait);
   },
 
-  alert: function(message, level, permanent, wait) {
+  info: function(message, wait) {
+    return this.alert(message, 'info', wait);
+  },
+
+  alert: function(message, level, wait) {
+    var page = this;
+    this.alertDefaults.stack.context = this.$('#alert-area');
     var noti,
         opts = _.defaults({
           text: message,
           type: level || 'info',
-          delay: wait || 8000
+          delay: 8000,
+          before_open: function(thing){
+            logger.debug( 'notification is opening' );
+            page.$('#alert-area').parent().addClass('has-alert');
+          },
+          after_close: function(thing){
+            logger.debug( 'notification is closed' );
+            if ( ! page.hasNotifications() ) {
+              page.$('#alert-area').parent().removeClass('has-alert');
+            }
+          }
         }, this.alertDefaults);
 
-    if ( permanent ) {
+    if ( _.isNumber(wait) && wait > 0 ) {
+      opts['delay'] = wait;
+    } else if ( wait === true || wait === 'permanent' || wait === 0 ) {
       _.extend(opts, {
         buttons: { closer: false, sticker: false },
         hide: false
       });
     }
+    noti = this.findNotification( message );
 
-    return new PNotify(opts);
+    return noti || new PNotify(opts);
   },
 
-  clearAlerts: function() {
-    return PNotify.removeAll();
+  hasNotifications: function() {
+    return PNotify.notices.length > 0;
+  },
+
+  findNotification: function(message) {
+    return _.find(PNotify.notices, function(notify) {
+      return notify.options.text === message;
+    } );
+  },
+
+  clearNotification: function(message) {
+    if ( message ) {
+      return this.findNotification( message );
+    } else {
+      return PNotify.removeAll();
+    }
+  },
+
+  toggleNav: function(event){
+    if($('#navbar-collapse').hasClass('in')){
+      $('#navbar-collapse').collapse('toggle');
+    }
+  },
+
+  savePreview: function(){
+    this.currentView.doSubmit(this.$('#projectForm form'));
   }
 });
 

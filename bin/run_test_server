@@ -1,0 +1,38 @@
+#!/bin/bash
+
+export PATH=./node_modules/.bin:$PATH
+export RAILS_ENV=test
+
+if [ -z "$TEST" ]; then
+  tests="testjs/*/test_*.js"
+else
+  tests=$TEST
+fi
+
+if [ -z "$BROWSER" ]; then
+  browser="electron"
+else
+  browser=$BROWSER
+fi
+
+bundle exec rake db:drop db:create db:migrate db:fixtures:load > /dev/null
+
+(
+  cd ./test/dummy
+  export REDIS_URL='redis://localhost:6789'
+  exec bundle exec rails s -p 3033 -e test
+) & server=$!
+
+( exec redis-server --port 6789 > /dev/null ) & redis_server=$!
+
+function finish {
+  kill -s INT $server $redis_server
+}
+trap finish EXIT
+
+sleep 4
+
+if ps -p $server > /dev/null && ps -p $redis_server > /dev/null
+then
+  browserify --debug $tests | browser-run -b $browser | tap-spec
+fi

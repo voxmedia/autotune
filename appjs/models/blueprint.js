@@ -2,6 +2,7 @@
 
 var Backbone = require('backbone'),
     _ = require('underscore'),
+    utils = require('../utils'),
     ProjectCollection = require('./project_collection');
 
 var Blueprint = Backbone.Model.extend({
@@ -50,6 +51,13 @@ var Blueprint = Backbone.Model.extend({
     return _.reduce( arguments, _.bind(iteratee, this), false );
   },
 
+  hasPreviewType: function() {
+    var iteratee = function(m, i) {
+      return m || this.get('config')['preview_type'] === i;
+    };
+    return _.reduce( arguments, _.bind(iteratee, this), false );
+  },
+
   /**
    * Does this project have a form?
    * @returns {boolean}
@@ -71,6 +79,19 @@ var Blueprint = Backbone.Model.extend({
       type: 'GET',
       url: this.url() + '/update_repo'
     });
+  },
+
+  /**
+   * Get the url for one of the built projects (preview or publish).
+   * @param {string} type - Type of the url (preview, publish)
+   * @param {string} preferredProto - Protocol to use if possible (http, https)
+   * @param {string} path - include this path in the URL
+   * @returns {string} url
+   **/
+  getMediaUrl: function(path) {
+    if ( !this.has('media_url') ) { return ''; }
+
+    return utils.buildUrl( this.get('media_url'), path );
   }
 });
 

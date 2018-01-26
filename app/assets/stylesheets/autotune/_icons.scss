@@ -1,0 +1,47 @@
+//icons
+.at-icon{
+  background-size: 100%;
+  background-repeat:no-repeat;
+	background-position:center center;
+  display: inline-block;
+  height: 15px;
+  width: 15px;
+  margin: 0 6px;
+}
+
+.alert-icon{
+  background-image: image-url('autotune/icons/alert.svg');
+  #navbar-save-container &, #save-modal &{
+    background-image: image-url('autotune/icons/alert_red.svg');
+  }
+}
+.delete-icon{
+  background-image: image-url('autotune/icons/delete.svg');
+}
+.dropdown-icon{
+  background-image: image-url('autotune/icons/dropdown.svg');
+}
+.duplicate-icon{
+  background-image: image-url('autotune/icons/duplicate.svg');
+}
+.edit-icon{
+  background-image: image-url('autotune/icons/edit.svg');
+}
+.help-icon{
+  background-image: image-url('autotune/icons/help.svg');
+}
+.info-icon{
+  background-image: image-url('autotune/icons/info.svg');
+}
+.ok-icon{
+  background-image: image-url('autotune/icons/ok.svg');
+  #navbar-save-container &{
+    background-image: image-url('autotune/icons/ok_green.svg');
+  }
+}
+.preview-icon{
+  background-image: image-url('autotune/icons/preview.svg');
+}
+.refresh-icon{
+  background-image: image-url('autotune/icons/refresh.svg');
+}

@@ -3,25 +3,29 @@ require_dependency 'autotune/application_controller'
 module Autotune
   # API for blueprints
   class BlueprintsController < ApplicationController
+    model Blueprint
+    skip_before_action :require_google_login,
+                       :only => [:index, :show]
+
+    before_action :only => [:index, :show] do
+      require_google_login if google_auth_required? && !accepts_json?
+    end
+
     before_action :respond_to_html
     before_action :require_superuser, :only => [:create, :update, :update_repo, :destroy]
-    model Blueprint
 
     rescue_from ActiveRecord::UnknownAttributeError do |exc|
       render_error exc.message, :bad_request
     end
 
-    def new; end
-
-    def edit; end
-
     def index
       @blueprints = Blueprint
       query = {}
-      query[:status] = params[:status] if params.key? :status
-      query[:tag] = params[:tag] if params.key? :theme
-      query[:type] = params[:type] if params.key? :type
-      @blueprints = @blueprints.search(params[:search], :title) if params.key? :search
+      query[:status] = params[:status] if params[:status].present?
+      query[:mode] = params[:mode] if params[:mode].present?
+      query[:tag] = params[:tag] if params[:theme].present?
+      query[:type] = params[:type] if params[:type].present?
+      @blueprints = @blueprints.search(params[:search]) if params[:search].present?
 
       if query.empty?
         @blueprints = @blueprints.all
@@ -34,12 +38,16 @@ module Autotune
       @blueprint = instance
     end
 
+    def edit
+      @blueprint = instance
+    end
+
     def create
       @blueprint = Blueprint.new
       @blueprint.attributes = select_from_post :title, :repo_url, :slug
       if @blueprint.valid?
         @blueprint.save
-        @blueprint.update_repo
+        @blueprint.update_repo(current_user)
         render :show, :status => :created
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
@@ -48,9 +56,11 @@ module Autotune
 
     def update
       @blueprint = instance
-      @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status
+      @blueprint.attributes = select_from_post :title, :repo_url, :slug, :status, :mode
       if @blueprint.valid?
+        trigger_upgrade = @blueprint.repo_url_changed?
         @blueprint.save
+        @blueprint.update_repo(current_user) if trigger_upgrade
         render :show
       else
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
@@ -58,7 +68,7 @@ module Autotune
     end
 
     def update_repo
-      instance.update_repo
+      instance.update_repo(current_user)
       render_accepted
     end
 
@@ -74,7 +84,5 @@ module Autotune
         render_error @blueprint.errors.full_messages.join(', '), :bad_request
       end
     end
-
-    def builder; end
   end
 end

@@ -11,7 +11,7 @@ gem 'autotune',
 # Setup foreman
 file 'Procfile', <<-CODE
 redis: redis-server
-resque_worker: bundle exec rake environment resque:work QUEUE=default TERM_CHILD=1
+resque_worker: bundle exec rake environment resque:work QUEUE=default,low TERM_CHILD=1
 rails: bundle exec unicorn_rails -p 3000 -c config/unicorn.rb
 CODE
 
@@ -68,11 +68,59 @@ Autotune.configure do |conf|
     'ENV' => Rails.env
   }
 
-  # Enabled blueprint themes
-  conf.themes = {
-  # :theme_name  => 'Nice display name',
-    :generic     => 'Generic',
-    :mynewsorg   => 'My news organization'
+  # Theme meta data
+  conf.theme_meta_data = {
+    'colors' => {
+      'primary_color' => {
+        'friendly_name' => 'Primary color',
+        'helper_text' => 'Dominant color for the theme'
+      },
+      'secondary_color' => {
+        'friendly_name' => 'Secondary color',
+        'helper_text' => 'Secondary color for the theme'
+      },
+      'button_bg_color' => {
+        'friendly_name' => 'Button background color',
+        'helper_text' => 'Color for buttons'
+      },
+      'button_bg_color_hover' => {
+        'friendly_name' => 'Button background hover color',
+        'helper_text' => 'Color for hover state of buttons'
+      },
+      'button_font_color' => {
+        'friendly_name' => 'Button font color',
+        'helper_text' => 'Color for text on buttons'
+      }
+    },
+    'social' => {
+      'twitter_handle' => {
+        'friendly_name' => 'Twitter account',
+        'helper_text' => 'Used for via @ text for shares'
+      }
+    }
+  }
+
+  # Generic theme data
+  conf.generic_theme = {
+    'colors' => {
+      'primary_color' => ' #444444',
+      'secondary_color' => ' #444444',
+      'button_bg_color' => ' #444444',
+      'button_bg_color_hover' => 'darken($button-bg-color, 4%)',
+      'button_font_color' => 'white'
+
+    },
+    'fonts' => {
+      'font_css' => '',
+      'body_font_family' => 'Georgia Regular, serif',
+      'header_font_family' => 'Georgia Bold, serif',
+      'button_font_family' => 'Georgia Regular, serif',
+      'header_font_weight' => 700,
+      'button_font_weight' => 'normal'
+    },
+    'social' => {
+      'twitter_handle' => 'voxmediainc'
+    }
   }
 end
 
@@ -133,20 +181,41 @@ Autotune.config.verify_omniauth = lambda do |omniauth|
   return [:superuser] # or return true
   # refuse access to a user
   # return false
+  # give designer access
+  # return [:designer]
   # give editor access
   # return [:editor]
   # give author access
   # return [:author]
+  # give designer access to specific themes
+  # return :designer => ['My newsorg']
   # give author access to specific themes
-  # return :author => [:mynewsorg]
+  # return :author => ['My newsorg']
   # give editor access to specific themes
-  # return :editor => [:mynewsorg, :generic]
+  # return :editor => ['My newsorg', 'Generic']
+end
+
+# -------------------------------
+# Theme data customization
+# -------------------------------
+# Getting data for themes is defined as a callback here that you can customize
+# It is recommended that you merge the final theme data with generic theme to
+# make sure that all theme variables are available in all themes
+
+Autotune.config.get_theme_data = lambda do |theme|
+   Autotune.config.generic_theme
 end
 CODE
 
 file 'config/unicorn.rb', <<-CODE
 worker_processes 6
 timeout 90
+CODE
+
+file 'config/theme_map.yml', <<-CODE
+---
+- name: Generic
+  theme: generic
 CODE
 
 # add engine routes

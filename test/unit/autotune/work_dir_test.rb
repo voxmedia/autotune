@@ -1,27 +1,28 @@
 require 'test_helper'
-require 'work_dir'
+require 'autoshell'
 
 # Test the WorkDir classes; Repo and Snapshot
 class Autotune::WorkDirTest < ActiveSupport::TestCase
+  fixtures 'autotune/blueprints'
   test 'setup repo' do
     in_tmpdir do |dir|
-      r = WorkDir.repo dir
+      r = Autoshell.new dir
 
       # working dir is empty, so
-      assert !r.ruby?, "Shouldn't have ruby"
-      assert !r.python?, "Shouldn't have python"
-      assert !r.node?, "Shouldn't have node"
-      assert !r.git?, "Shouldn't have git"
-      assert !r.exist?, "Shouldn't exist"
-      assert !r.dir?, "Shouldn't be a dir"
+      refute r.ruby?, "Shouldn't have ruby"
+      refute r.python?, "Shouldn't have python"
+      refute r.node?, "Shouldn't have node"
+      refute r.git?, "Shouldn't have git"
+      refute r.exist?, "Shouldn't exist"
+      refute r.dir?, "Shouldn't be a dir"
       assert r.read(Autotune::BLUEPRINT_CONFIG_FILENAME).nil?, 'Should not have a config file'
 
       # clone git url
-      r.clone repo_url
+      r.clone autotune_blueprints(:example).repo_url
 
       assert r.ruby?, 'Should have ruby'
-      assert !r.python?, "Shouldn't have python"
-      assert !r.node?, "Shouldn't have node"
+      refute r.python?, "Shouldn't have python"
+      refute r.node?, "Shouldn't have node"
       assert r.git?, 'Should have git'
       assert r.exist?, 'Should exist'
       assert r.dir?, 'Should be a dir'
@@ -50,29 +51,29 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
 
   test 'copy repo' do
     in_tmpdir do |rdir|
-      r = WorkDir.repo rdir
-      r.clone repo_url
+      r = Autoshell.new rdir
+      r.clone autotune_blueprints(:example).repo_url
       r.setup_environment
 
       in_tmpdir do |sdir|
-        s = WorkDir.repo sdir
+        s = Autoshell.new sdir
 
         # working dir is empty, so
-        assert !s.ruby?, "Shouldn't have ruby"
-        assert !s.python?, "Shouldn't have python"
-        assert !s.node?, "Shouldn't have node"
-        assert !s.git?, "Shouldn't have git"
-        assert !s.exist?, "Shouldn't exist"
-        assert !s.dir?, "Shouldn't be a dir"
-        assert !s.environment?, 'Should not have an environment'
+        refute s.ruby?, "Shouldn't have ruby"
+        refute s.python?, "Shouldn't have python"
+        refute s.node?, "Shouldn't have node"
+        refute s.git?, "Shouldn't have git"
+        refute s.exist?, "Shouldn't exist"
+        refute s.dir?, "Shouldn't be a dir"
+        refute s.environment?, 'Should not have an environment'
 
         # create a snapshot!
         r.copy_to s.working_dir
 
         # now should have stuff
         assert s.ruby?, 'Should have ruby'
-        assert !s.python?, "Shouldn't have python"
-        assert !s.node?, "Shouldn't have node"
+        refute s.python?, "Shouldn't have python"
+        refute s.node?, "Shouldn't have node"
         assert s.git?, 'Should have git'
         assert s.exist?, 'Should exist'
         assert s.dir?, 'Should be a dir'
@@ -81,13 +82,11 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
         assert r.exist?('autotune-build'), 'Should have build script'
 
         # make sure we can't copy a snapshot twice
-        assert_raises WorkDir::CommandError do
+        assert_raises Autoshell::CommandError do
           r.copy_to s.working_dir
         end
 
-        s.working_dir do
-          s.cmd('./autotune-build', :stdin_data => { :foo => 'bar' })
-        end
+        s.cd { s.run('./autotune-build', :stdin_data => { :foo => 'bar' }) }
 
         # checkout a different branch in the repo
         s.switch 'test'
@@ -114,6 +113,36 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
         s.setup_environment
         assert s.environment?, 'Should have environment'
       end
+    end
+  end
+
+  test 'checkout hash' do
+    in_tmpdir do |rdir|
+      r = Autoshell.new rdir
+      r.clone autotune_blueprints(:example).repo_url
+
+      assert_equal MASTER_HEAD, r.version
+      assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
+      assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
+
+      r.commit_hash_for_checkout = WITH_SUBMOD
+      r.update
+      assert_equal WITH_SUBMOD, r.version
+      refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
+      assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
+
+      r.commit_hash_for_checkout = NO_SUBMOD
+      r.update
+      assert_equal NO_SUBMOD, r.version
+      refute r.exist?('submodule/testfile'), 'Should not have submodule testfile'
+      refute r.exist?('submodule/test.rb'), 'Should not have submodule test.rb'
+
+      r.branch = 'master'
+      r.commit_hash_for_checkout = MASTER_HEAD
+      r.update
+      assert_equal MASTER_HEAD, r.version
+      assert r.exist?('submodule/testfile'), 'Should have submodule testfile'
+      assert r.exist?('submodule/test.rb'), 'Should have submodule test.rb'
     end
   end
 

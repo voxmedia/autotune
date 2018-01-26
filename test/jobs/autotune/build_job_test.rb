@@ -1,8 +1,11 @@
 require 'test_helper'
+require 'autoshell'
 
 # test the project job
 class Autotune::BuildJobTest < ActiveJob::TestCase
-  fixtures 'autotune/users', 'autotune/blueprints', 'autotune/projects', 'autotune/themes'
+  fixtures 'autotune/users', 'autotune/blueprints', 'autotune/projects',
+           'autotune/themes', 'autotune/groups'
+
   test 'building' do
     b = autotune_projects(:example_one)
 
@@ -32,7 +35,7 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
     assert File.exist?(Rails.root.join('public', 'preview', b.slug, 'index.html')),
            'Built file should be deployed to public/preview'
 
-    snapshot = WorkDir.repo(b.working_dir)
+    snapshot = Autoshell.new(b.working_dir)
 
     assert snapshot.exist?, 'Snapshot should exist'
     assert snapshot.git?, 'Snapshot should be a git repo'
