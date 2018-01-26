@@ -12,7 +12,6 @@ module Autotune
     included do
       after_destroy :delete_deployed_files, :if => :deployed?
       after_save :delete_renamed_files, :if => :deployed?
-      before_save :deployer_before_save
     end
 
     # Get a deployer for a specfic target
@@ -56,12 +55,11 @@ module Autotune
     # Get the contents of the logger as a string and reset the logger
     # @return [String] The log
     def dump_output_logger!
-      if defined?(@output_logger) && @output_logger.present?
-        @output_logger.close
-        str = @output_logger_str.try(:string)
-        @output_logger = nil
-        str if str.present?
-      end
+      return '' unless defined?(@output_logger) && @output_logger.present?
+      @output_logger.close
+      str = @output_logger_str.try(:string)
+      @output_logger = nil
+      str.present? ? str : ''
     end
 
     def output_logger
@@ -79,15 +77,6 @@ module Autotune
     end
 
     private
-
-    def deployer_before_save
-      if respond_to? :output
-        # Always make sure to save the log
-        str = dump_output_logger!
-        self.output = str if str.present?
-      end
-      true
-    end
 
     def delete_renamed_files
       return if !slug_changed? || slug_was.blank? || slug == slug_was

@@ -64,13 +64,16 @@ module Autotune
       # Set status and save project
       project.update_published_at = true if target.to_sym == :publish
       project.status = 'built'
+      project.output = project.dump_output_logger!
     rescue => exc
+      project.output = project.dump_output_logger!
       # If the command failed, raise a red flag
       if exc.is_a? Autoshell::CommandError
         msg = exc.message
       else
         msg = exc.message + "\n" + exc.backtrace.join("\n")
       end
+      project.output += "\n#{msg}"
       project.status = 'broken'
       raise
     ensure

@@ -160,6 +160,9 @@ module Autotune
       assert_performed_jobs 2
 
       new_p = Project.find decoded_response['id']
+
+      assert new_p.output.length > 50
+
       project_data.keys.each do |k|
         if k == :theme
           assert_equal Autotune::Theme.find_by_slug(project_data[k]), new_p.send(k)
