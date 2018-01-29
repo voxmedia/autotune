@@ -183,7 +183,7 @@ module Autotune
       if Rails.cache.exist?(cache_key)
         Rails.cache.read(cache_key)['ss_data']
       else
-        google_doc_contents(url)['ss_data']
+        google_doc_contents(url)
       end
     end
 
