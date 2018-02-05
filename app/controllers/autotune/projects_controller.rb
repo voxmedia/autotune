@@ -169,7 +169,7 @@ module Autotune
       @build_data = request.method == 'POST' ? request.POST : @project.data
 
       # Bust google doc cache if we are forcing an update
-      if @build_data['google_doc_url'] && request.GET[:force_update]
+      if @build_data['google_doc_url'].present? && request.GET[:force_update]
         cache_key = "googledoc#{GoogleDocs.key_from_url(@build_data['google_doc_url'])}"
         Rails.cache.delete(cache_key)
       end
@@ -196,7 +196,8 @@ module Autotune
       google_client = GoogleDocs.new(
         :refresh_token => current_auth.credentials['refresh_token'],
         :access_token => current_auth.credentials['token'],
-        :expires_at => current_auth.credentials['expires_at'])
+        :expires_at => current_auth.credentials['expires_at']
+      )
 
       current_auth.credentials['refresh_token'] = google_client.auth.refresh_token
       current_auth.credentials['token'] = google_client.auth.access_token
@@ -207,7 +208,8 @@ module Autotune
 
       if Autotune.configuration.google_auth_domain.present?
         google_client.share_with_domain(
-          doc_copy[:id], Autotune.configuration.google_auth_domain)
+          doc_copy[:id], Autotune.configuration.google_auth_domain
+        )
       end
 
       render :json => { :google_doc_url => doc_copy[:url] }

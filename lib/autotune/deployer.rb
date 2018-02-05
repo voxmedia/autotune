@@ -52,14 +52,12 @@ module Autotune
     # Hook for adjusting data and files before build. Project
     # instance is saved after this method runs.
     def before_build(build_data, _env)
-      if build_data['google_doc_url'].present? || build_data['google_docs'].present?
-        if build_data['google_docs'].present?
-          build_data['google_docs'].map! do |url|
-            { 'url' => url, 'data' => cached_google_doc_contents(url) }
-          end
-        elsif build_data['google_doc_url'].present?
-          build_data['google_doc_data'] = cached_google_doc_contents(build_data['google_doc_url'])
+      if build_data['google_docs'].present?
+        build_data['google_docs'].map! do |url|
+          { 'url' => url, 'data' => google_doc_contents(url) }
         end
+      elsif build_data['google_doc_url'].present?
+        build_data['google_doc_data'] = google_doc_contents(build_data['google_doc_url'])
       end
 
       build_data['title'] = project.title if build_data['title'].blank?
@@ -113,10 +111,10 @@ module Autotune
 
     def deploy_path
       d_path = [parts.path, project.slug, extra_slug].reject(&:blank?).join('/')
-      if parts.path.length > 0
+      if parts.path.empty?
         d_path
       else
-        '/'+d_path
+        '/' + d_path
       end
     end
 
@@ -165,7 +163,8 @@ module Autotune
       google_client = GoogleDocs.new(
         :refresh_token => current_auth.credentials['refresh_token'],
         :access_token => current_auth.credentials['token'],
-        :expires_at => current_auth.credentials['expires_at'])
+        :expires_at => current_auth.credentials['expires_at']
+      )
 
       current_auth.credentials['refresh_token'] = google_client.auth.refresh_token
       current_auth.credentials['token'] = google_client.auth.access_token
@@ -173,18 +172,6 @@ module Autotune
       current_auth.save!
 
       @google_client = google_client
-    end
-
-    def cached_google_doc_contents(url)
-      doc_key = GoogleDocs.key_from_url(url)
-      return if doc_key.blank?
-
-      cache_key = "googledoc#{doc_key}"
-      if Rails.cache.exist?(cache_key)
-        Rails.cache.read(cache_key)['ss_data']
-      else
-        google_doc_contents(url)
-      end
     end
 
     def google_doc_contents(url)
