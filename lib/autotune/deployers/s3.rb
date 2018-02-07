@@ -9,7 +9,7 @@ module Autotune
       def deploy(source)
         deployer = S3deploy::Deployer.new(
           :dist_dir => source, :bucket => parts.host,
-          :app_path => deploy_path, :logger => logger)
+          :app_path => deploy_path.sub(%r{^/}, ''), :logger => logger)
         deployer.deploy!
       end
 
@@ -17,7 +17,7 @@ module Autotune
       def deploy_file(source, path)
         deployer = S3deploy::Deployer.new(
           :dist_dir => source, :bucket => parts.host,
-          :app_path => deploy_path, :logger => logger)
+          :app_path => deploy_path.sub(%r{^/}, ''), :logger => logger)
         deployer.deploy_file!(path)
       end
 
@@ -25,7 +25,7 @@ module Autotune
       def delete!(*)
         deployer = S3deploy::Deployer.new(
           :dist_dir => '', :bucket => parts.host,
-          :app_path => deploy_path, :logger => logger)
+          :app_path => deploy_path.sub(%r{^/}, ''), :logger => logger)
         deployer.delete!
       end
 
