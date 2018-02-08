@@ -28,6 +28,7 @@ module Autotune
       assert_equal '//example.com/example-build-one', d.project_url
       assert_equal '//example.com/example-build-one', d.project_asset_url
       assert_equal '/example-build-one', d.deploy_path
+      assert_equal '/example-build-one', d.asset_deploy_path
 
       d = Deployer.new(
         :base_url => '//example.com/one',
@@ -37,6 +38,7 @@ module Autotune
       assert_equal '//example.com/one/example-build-one', d.project_url
       assert_equal '//example.com/one/example-build-one', d.project_asset_url
       assert_equal '/one/example-build-one', d.deploy_path
+      assert_equal '/one/example-build-one', d.asset_deploy_path
     end
 
     test 'url generation' do

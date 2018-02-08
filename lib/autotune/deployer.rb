@@ -5,7 +5,7 @@ require 'date'
 module Autotune
   # Autotune blueprint base deployer
   class Deployer
-    attr_accessor :base_url, :connect, :project, :extra_slug
+    attr_accessor :base_url, :connect, :asset_base_url, :asset_connect, :project, :extra_slug, :ignore_slug
     attr_writer :logger, :user
 
     # Create a new deployer
@@ -110,24 +110,43 @@ module Autotune
     end
 
     def deploy_path
-      d_path = [parts.path, project.slug, extra_slug].reject(&:blank?).join('/')
-      if parts.path.empty?
-        d_path
-      else
-        '/' + d_path
-      end
+      p = build_path_from_parts(parts.path, project.slug)
+      p =~ %r{^/} ? p : "/#{p}"
     end
 
     def old_deploy_path
-      [parts.path, project.slug_was].join('/') if project.slug_changed?
+      p = build_path_from_parts(parts.path, project.slug_was)
+      p =~ %r{^/} ? p : "/#{p}"
+    end
+
+    def asset_deploy_path
+      if asset_connect.present?
+        p = build_path_from_parts(asset_parts.path, project.slug)
+        p =~ %r{^/} ? p : "/#{p}"
+      else
+        deploy_path
+      end
+    end
+
+    def old_asset_deploy_path
+      if asset_connect.present?
+        p = build_path_from_parts(asset_parts.path, project.slug_was)
+        p =~ %r{^/} ? p : "/#{p}"
+      else
+        old_deploy_path
+      end
     end
 
     def project_url
-      [base_url, project.slug, extra_slug].reject(&:blank?).join('/')
+      build_path_from_parts(base_url, project.slug)
     end
 
     def project_asset_url
-      [try(:asset_base_url) || base_url, project.slug, extra_slug].reject(&:blank?).join('/')
+      if asset_base_url.present?
+        build_path_from_parts(asset_base_url, project.slug)
+      else
+        project_url
+      end
     end
 
     def take_screenshots?
@@ -144,9 +163,26 @@ module Autotune
 
     private
 
+    def build_path_from_parts(path, slug)
+      path_parts = []
+      path_parts << path if path.present?
+      path_parts << slug if !ignore_slug && slug.present?
+      path_parts << extra_slug if extra_slug.present?
+      path_parts.join('/')
+    end
+
     # Get the parts of the connect url
     def parts
       @parts ||= URI.parse(connect)
+    end
+
+    def asset_parts
+      @asset_parts ||=
+        if asset_connect.present?
+          URI.parse(asset_connect)
+        else
+          parts
+        end
     end
 
     def asset?(path)
