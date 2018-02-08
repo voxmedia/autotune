@@ -13,9 +13,9 @@ module Autotune
         :connect => 'foo://test',
         :project => p)
 
-      assert_equal d.base_url, '//example.com'
-      assert_equal d.connect, 'foo://test'
-      assert_equal d.project, p
+      assert_equal '//example.com', d.base_url
+      assert_equal 'foo://test', d.connect
+      assert_equal p, d.project
     end
 
     test 'urls' do
@@ -25,9 +25,18 @@ module Autotune
         :connect => 'foo://test',
         :project => p)
 
-      assert_equal d.project_url, '//example.com/example-build-one'
-      assert_equal d.project_asset_url, '//example.com/example-build-one'
-      assert_equal d.deploy_path, '/example-build-one'
+      assert_equal '//example.com/example-build-one', d.project_url
+      assert_equal '//example.com/example-build-one', d.project_asset_url
+      assert_equal '/example-build-one', d.deploy_path
+
+      d = Deployer.new(
+        :base_url => '//example.com/one',
+        :connect => 'foo://test/one',
+        :project => p)
+
+      assert_equal '//example.com/one/example-build-one', d.project_url
+      assert_equal '//example.com/one/example-build-one', d.project_asset_url
+      assert_equal '/one/example-build-one', d.deploy_path
     end
 
     test 'url generation' do
