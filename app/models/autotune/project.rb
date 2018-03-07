@@ -262,16 +262,20 @@ module Autotune
       now = DateTime.current
 
       # check for updated data
-      %w(data title slug theme_id data).each do |attr|
-        # Apparently attribute_changed? does not check if the attribute actually changed
-        if changes[attr].present? && changes[attr].first != changes[attr].last
-          self.data_updated_at = now
-          break
+      %w[data title slug theme_id].each do |attr|
+        begin
+          # Apparently attribute_changed? does not check if the attribute actually changed
+          if changes[attr].present? && changes[attr].first != changes[attr].last
+            self.data_updated_at = now
+            break
+          end
+        rescue Encoding::UndefinedConversionError => exc
+          raise "#{exc.message} in field #{attr}"
         end
       end
 
       # update published_at field if the flag has been set
-      if self.update_published_at
+      if update_published_at
         self.published_at = now
         self.update_published_at = false
       end
