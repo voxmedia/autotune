@@ -270,7 +270,7 @@ module Autotune
             break
           end
         rescue Encoding::UndefinedConversionError => exc
-          raise "#{exc.message} in field '#{attr}', #{changes[attr]}"
+          raise "#{exc.message} in field #{attr}"
         end
       end
 
