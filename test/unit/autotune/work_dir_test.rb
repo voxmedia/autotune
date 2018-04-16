@@ -1,12 +1,17 @@
 require 'test_helper'
 require 'autoshell'
 
+# The voxmedia ruby docker image kind effs up bundler, so we have reset defaults
+TEST_ENV = {
+  'BUNDLE_GEMFILE' => 'Gemfile',
+}
+
 # Test the WorkDir classes; Repo and Snapshot
 class Autotune::WorkDirTest < ActiveSupport::TestCase
   fixtures 'autotune/blueprints'
   test 'setup repo' do
     in_tmpdir do |dir|
-      r = Autoshell.new dir
+      r = Autoshell.new dir, :env => TEST_ENV
 
       # working dir is empty, so
       refute r.ruby?, "Shouldn't have ruby"
@@ -51,12 +56,12 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
 
   test 'copy repo' do
     in_tmpdir do |rdir|
-      r = Autoshell.new rdir
+      r = Autoshell.new rdir, :env => TEST_ENV
       r.clone autotune_blueprints(:example).repo_url
       r.setup_environment
 
       in_tmpdir do |sdir|
-        s = Autoshell.new sdir
+        s = Autoshell.new sdir, :env => TEST_ENV
 
         # working dir is empty, so
         refute s.ruby?, "Shouldn't have ruby"
@@ -118,7 +123,7 @@ class Autotune::WorkDirTest < ActiveSupport::TestCase
 
   test 'checkout hash' do
     in_tmpdir do |rdir|
-      r = Autoshell.new rdir
+      r = Autoshell.new rdir, :env => TEST_ENV
       r.clone autotune_blueprints(:example).repo_url
 
       assert_equal MASTER_HEAD, r.version
