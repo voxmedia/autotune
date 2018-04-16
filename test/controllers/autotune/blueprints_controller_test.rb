@@ -149,6 +149,8 @@ module Autotune
 
       bp = autotune_blueprints(:example)
 
+      assert bp.present?, 'Example blueprint fixture should exist'
+
       title = 'Updated blueprint'
 
       assert_performed_jobs 1 do
