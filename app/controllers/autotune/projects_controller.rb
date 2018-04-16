@@ -183,9 +183,10 @@ module Autotune
     rescue => exc
       if @project && @project.meta.present? && @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
-      elsif exc.is_a?(Signet::AuthorizationError)
-        render_error 'There was an error authenticating your Google account', :forbidden
+      elsif exc.is_a?(Signet::AuthorizationError) || exc.is_a?(GoogleDocs::AuthorizationError)
         logger.error "Google Auth error: #{exc.message}"
+        logout!
+        render_error 'There was an error authenticating your Google account, please reload to re-authenticate with Google.', :bad_request
       else
         raise
       end
@@ -214,23 +215,36 @@ module Autotune
 
       render :json => { :google_doc_url => doc_copy[:url] }
     rescue GoogleDocs::AuthorizationError => exc
-      render_error 'There was an error authenticating your Google account', :bad_request
       logger.error "Google Auth error: #{exc.message}"
+      logout!
+      render_error 'There was an error authenticating your Google account, please reload to re-authenticate with Google.', :bad_request
     end
 
     def update_snapshot
       instance.update_snapshot(current_user)
       render_accepted
+    rescue GoogleDocs::AuthorizationError => exc
+      logger.error "Google Auth error: #{exc.message}"
+      logout!
+      render_error 'There was an error authenticating your Google account, please reload to re-authenticate with Google.', :bad_request
     end
 
     def build
       instance.build(current_user)
       render_accepted
+    rescue GoogleDocs::AuthorizationError => exc
+      logger.error "Google Auth error: #{exc.message}"
+      logout!
+      render_error 'There was an error authenticating your Google account, please reload to re-authenticate with Google.', :bad_request
     end
 
     def build_and_publish
       instance.build_and_publish(current_user)
       render_accepted
+    rescue GoogleDocs::AuthorizationError => exc
+      logger.error "Google Auth error: #{exc.message}"
+      logout!
+      render_error 'There was an error authenticating your Google account, please reload to re-authenticate with Google.', :bad_request
     end
 
     def destroy
