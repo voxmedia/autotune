@@ -57,7 +57,7 @@ module Autotune
           end
         rescue Autoshell::CommandError => exc
           logger.error(exc.message)
-          outlogger.warn(exc.message)
+          project.output_logger.warn(exc.message)
         end
       end
 
