@@ -14,6 +14,8 @@ module Autotune
 
     rescue_from Autotune::Forbidden, :with => :handle_forbidden_ex
     rescue_from Autotune::Unauthorized, :with => :handle_unauthorized_ex
+    rescue_from Signet::AuthorizationError, :with => :handle_google_auth_ex
+    rescue_from GoogleDocs::AuthorizationError, :with => :handle_google_auth_ex
 
     helper_method :current_user, :signed_in?, :omniauth_path, :login_path, :role?
 
@@ -144,6 +146,12 @@ module Autotune
 
     def handle_forbidden_ex
       render_error 'Not allowed', :forbidden
+    end
+
+    def handle_google_auth_ex(exc)
+      logger.error "Google Auth error: #{exc.message}"
+      logout!
+      render_error 'There was an error authenticating your Google account, please reload to re-authenticate with Google.', :bad_request
     end
 
     def require_login
