@@ -168,17 +168,12 @@ module Autotune
 
       @build_data = request.method == 'POST' ? request.POST : @project.data
 
-      # Bust google doc cache if we are forcing an update
-      if @build_data['google_doc_url'].present? && request.GET[:force_update]
-        cache_key = "googledoc#{GoogleDocs.key_from_url(@build_data['google_doc_url'])}"
-        Rails.cache.delete(cache_key)
-      end
-
       # Get the deployer object
       deployer = @project.deployer(:preview, :user => current_user)
 
       # Run the before build deployer hook
-      deployer.before_build(@build_data, {})
+      # set an env var to bust google doc cache if we are forcing an update
+      deployer.before_build(@build_data, 'FORCE_UPDATE' => request.GET[:force_update].nil?)
       render :json => @build_data
     rescue
       if @project && @project.meta.present? && @project.meta['error_message'].present?

@@ -31,16 +31,9 @@ module Autotune
     def prep_target
       # retrieve and cache google doc data now so we can handle errors
       # immediately instead of in the job
-      build_data = project.data
-      if (build_data['google_doc_url'].present? || build_data['google_docs'].present?) && google_client.present?
-        if build_data['google_docs'].present?
-          build_data['google_docs'].each do |url|
-            google_doc_contents(url)
-          end
-        elsif build_data['google_doc_url'].present?
-          google_doc_contents(build_data['google_doc_url'])
-        end
-      end
+      return if google_client.blank?
+
+      google_doc_urls.each { |doc| google_doc_contents(doc[:url], doc[:format]) }
     rescue GoogleDocs::Unauthorized => exc
       logger.error(exc)
       raise Autotune::Unauthorized, 'Unable to retrieve Google Doc because user session expired.'
@@ -51,13 +44,22 @@ module Autotune
 
     # Hook for adjusting data and files before build. Project
     # instance is saved after this method runs.
-    def before_build(build_data, _env)
-      if build_data['google_docs'].present?
-        build_data['google_docs'].map! do |url|
-          { 'url' => url, 'data' => google_doc_contents(url) }
+    def before_build(build_data, env)
+      google_doc_urls(build_data).each do |doc|
+        if env['FORCE_UPDATE']
+          cache_key = "googledoc#{GoogleDocs.key_from_url(doc[:url])}#{doc[:format]}"
+          Rails.cache.delete cache_key
         end
-      elsif build_data['google_doc_url'].present?
-        build_data['google_doc_data'] = google_doc_contents(build_data['google_doc_url'])
+        key = doc[:key]
+        doc_content = google_doc_contents(doc[:url], doc[:format])
+
+        # place the result in the right location
+        if key.include? 'google_docs'
+          build_data[key].push('url' => doc[:url], 'data' => doc_content).shift
+        else
+          target = key.gsub('url', 'data')
+          build_data[target] = doc_content
+        end
       end
 
       build_data['title'] = project.title if build_data['title'].blank?
@@ -71,7 +73,7 @@ module Autotune
       build_data['asset_base_url'] = project_asset_url
     rescue GoogleDocs::GoogleDriveError => exc
       logger.error(exc)
-      project.meta['error_message'] = "Error retriving google doc data: #{exc.message}"
+      project.meta['error_message'] = "Error retrieving google doc data: #{exc.message}"
 
       raise
     rescue GoogleDocs::Unauthorized => exc
@@ -210,13 +212,13 @@ module Autotune
       @google_client = google_client
     end
 
-    def google_doc_contents(url)
+    def google_doc_contents(url, format)
       return if google_client.blank?
 
       doc_key = GoogleDocs.key_from_url(url)
       return if doc_key.blank?
 
-      cache_key = "googledoc#{doc_key}"
+      cache_key = "googledoc#{doc_key}#{format}"
 
       resp = google_client.find(doc_key)
       cache_value = nil
@@ -230,13 +232,49 @@ module Autotune
       # TODO: needs test coverage
       if needs_update
         google_client.share_with_domain(doc_key, Autotune.configuration.google_auth_domain)
-        ret = google_client.get_doc_contents(url)
+        format = format.to_sym unless format.nil?
+        ret = google_client.get_doc_contents(url, :format => format)
         Rails.cache.write(cache_key, 'ss_data' => ret, 'version' => resp['version'])
       else
         ret = (cache_value || Rails.cache.read(cache_key))['ss_data']
       end
 
       ret
+    end
+
+    # @param [String] key: A config key for google doc
+    # @return [String] Output format specified by the key
+    # Examples:
+    #   google_doc_format('google_docs_text') # => 'text'
+    #   google_doc_format('google_doc_url') # => nil
+    #   google_doc_format('google_doc_url_foo') # => 'foo'
+    def google_doc_format(key)
+      return if key.nil?
+      format = key[/^google_docs?(_url)?_?([a-z]*)$/, 2]
+      format.empty? ? nil : format
+    end
+
+    # Gets an array of all google doc urls and settings in the project's data or the parameter
+    # @param data [Hash] Optional data to override project.data
+    # @return [Array] A single dimensional array with all doc urls, formats and config keys
+    def google_doc_urls(data = nil)
+      build_data = data || project.data
+      return if build_data.nil?
+
+      docs = []
+
+      # Flatten the data to get an array of all doc urls, formats and config keys
+      build_data.select { |k, _v| k[/google_doc/] }.each do |key, val|
+        next if val.blank?
+        format = google_doc_format(key)
+        if val.is_a? String
+          docs.push(:url => val, :format => format, :key => key)
+        else
+          val.each { |v| docs.push(:url => v, :format => format, :key => key) }
+        end
+      end
+
+      docs
     end
   end
 end
