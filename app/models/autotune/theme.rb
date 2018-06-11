@@ -89,6 +89,7 @@ module Autotune
       )
     end
 
+    # TODO: this creates a lot of database activity
     # get data for all themes
     def self.full_theme_data
       Hash[

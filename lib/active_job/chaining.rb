@@ -63,18 +63,18 @@ module ActiveJob
       @fail_job ||= read_cache_job('fail')
     end
 
-    def enqueue_success
+    def enqueue_success(options = {})
       unless skip_next_job?
         logger.debug("Enqueue next: #{success_job.class}")
-        success_job.enqueue
+        success_job.enqueue(options)
         clear_keys
       end
     end
 
-    def enqueue_fail
+    def enqueue_fail(options = {})
       unless skip_next_job?
         logger.debug("Enqueue fail job: #{fail_job.class}")
-        fail_job.enqueue
+        fail_job.enqueue(options)
         clear_keys
       end
     end

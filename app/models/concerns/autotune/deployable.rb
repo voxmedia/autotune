@@ -22,7 +22,7 @@ module Autotune
       @deployers ||= {}
       key = kwargs.any? ? "#{target}:#{kwargs.to_query}" : target
       @deployers[key] ||=
-        Autotune.new_deployer(target.to_sym, **kwargs.dup.update(:project => self, :logger => output_logger))
+        Autotune.new_deployer(target.to_sym, :project => self, :logger => output_logger, **kwargs)
     end
 
     # Has this deployable been deployed?
@@ -59,7 +59,7 @@ module Autotune
       @output_logger.close
       str = @output_logger_str.try(:string)
       @output_logger = nil
-      str.present? ? str : ''
+      str.presence || ''
     end
 
     def output_logger

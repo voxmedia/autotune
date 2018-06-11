@@ -5,23 +5,48 @@ require 'stringio'
 
 module Autotune
   # project a blueprint
-  class BuildJob < ActiveJob::Base
+  class ProjectJob < ActiveJob::Base
     queue_as :default
 
-    lock_job :retry => 20.seconds do
-      arguments.first.to_gid_param
-    end
-
+    # Job uniqueness should be checked first
     unique_job :with => :payload
 
-    def perform(project, target: 'preview', current_user: nil)
+    def perform(project, update: false, target: :preview, current_user: nil)
+      return retry_job :wait => 10 if project.file_lock?
+      project.file_lock!
+
+      project.update!(:status => 'building')
+
+      # Make sure we have the files we need to build
+      if project.bespoke?
+        project.sync_from_remote(:update => update, :current_user => current_user)
+      else
+        # make sure blueprint is synced before syncing from it
+        if project.blueprint.needs_sync?
+          if project.blueprint.file_lock?
+            # if the blueprint needs sync but is currently locked, clear our
+            # project file lock and retry the entire job
+            project.file_unlock!
+            return retry_job :wait => 10
+          end
+          project.blueprint.with_file_lock do |bp|
+            bp.sync_from_remote(:current_user => current_user)
+            bp.save!
+          end
+        end
+
+        project.sync_from_blueprint(:update => update)
+      end
+
+      # make sure we have our arguments properly set
+      target = target.to_sym
+      current_user ||= project.user
+
       # Reset any previous error messages:
       project.meta.delete('error_message')
 
       # Create a new repo object based on the projects working dir
-      repo = Autoshell.new(project.working_dir,
-                           :env => Rails.configuration.autotune.build_environment,
-                           :logger => project.output_logger)
+      repo = project.build_shell
 
       # Make sure the repo exists and is up to date (if necessary)
       raise 'Missing files!' unless repo.exist?
@@ -30,10 +55,8 @@ module Autotune
       build_data = project.data.deep_dup
       build_data['build_type'] = 'publish'
 
-      current_user ||= project.user
-
       # Get the deployer object
-      deployer = project.deployer(target.to_sym, :user => current_user)
+      deployer = project.deployer(target, :user => current_user)
 
       # Run the before build deployer hook
       deployer.before_build(build_data, repo.env)
@@ -62,22 +85,24 @@ module Autotune
       end
 
       # Set status and save project
-      project.update_published_at = true if target.to_sym == :publish
+      project.update_published_at = true if target == :publish
       project.status = 'built'
       project.output = project.dump_output_logger!
     rescue => exc
       project.output = project.dump_output_logger!
       # If the command failed, raise a red flag
-      if exc.is_a? Autoshell::CommandError
-        msg = exc.message
-      else
-        msg = exc.message + "\n" + exc.backtrace.join("\n")
-      end
+      msg = \
+        if exc.is_a? Autoshell::CommandError
+          exc.message
+        else
+          exc.message + "\n" + exc.backtrace.join("\n")
+        end
       project.output += "\n#{msg}"
       project.status = 'broken'
       raise
     ensure
-      # Always make sure to save the log and the project
+      # Always make sure to release the file lock and save the project
+      project.file_unlock!
       project.save!
     end
 

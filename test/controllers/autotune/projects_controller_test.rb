@@ -125,7 +125,7 @@ module Autotune
       assert_response :created, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 3
+      assert_performed_jobs 1
 
       new_p = Project.find decoded_response['id']
       project_data.keys.each do |k|
@@ -157,7 +157,7 @@ module Autotune
       assert_response :created, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 2
+      assert_performed_jobs 1
 
       new_p = Project.find decoded_response['id']
 
@@ -199,7 +199,7 @@ module Autotune
       assert_response :success, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 3
+      assert_performed_jobs 1
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -219,7 +219,7 @@ module Autotune
       assert_response :success, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 3
+      assert_performed_jobs 1
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -251,7 +251,7 @@ module Autotune
       assert_response :success, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 3
+      assert_performed_jobs 1
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -271,7 +271,7 @@ module Autotune
       assert_response :success, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 3
+      assert_performed_jobs 1
 
       new_p = Project.find decoded_response['id']
       assert_equal title, new_p.title
@@ -348,8 +348,8 @@ module Autotune
       assert_response :created, decoded_response['error']
       assert_project_data!
 
-      # Jobs run: sync blueprint, sync project, build project
-      assert_performed_jobs 3
+      # Jobs run: project
+      assert_performed_jobs 1
 
       newslug = decoded_response['slug'] + '-updated'
 
@@ -362,8 +362,8 @@ module Autotune
       assert_response :success, decoded_response['error']
       assert_project_data!
 
-      # Jobs run: move workdir, delete deployed files, sync blueprint, sync project, build project, plus 3 from above
-      assert_performed_jobs 3 + 5
+      # Jobs run: move workdir, delete deployed files, project, plus 1 from above
+      assert_performed_jobs 1 + 3
 
       new_p = Project.find decoded_response['id']
       assert_equal newslug, new_p.slug
@@ -383,8 +383,8 @@ module Autotune
         delete :destroy, :id => decoded_response['id']
       end
       assert_response :no_content
-      # Jobs run: delete workdir, delete deployed files, plus 8 from above
-      assert_performed_jobs 3 + 5 + 2
+      # Jobs run: delete workdir, delete deployed files, plus 4 from above
+      assert_performed_jobs 1 + 3 + 2
     end
 
     test 'filter projects' do
@@ -432,7 +432,7 @@ module Autotune
       assert_response :created, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 3
+      assert_performed_jobs 1
 
       bp.reload
       assert_equal MASTER_HEAD2, bp.version,
@@ -457,7 +457,7 @@ module Autotune
       assert_response :created, decoded_response['error']
       assert_project_data!
 
-      assert_performed_jobs 3
+      assert_performed_jobs 1
 
       bp.reload
       assert_equal LIVE_HEAD1, bp.version,

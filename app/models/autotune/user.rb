@@ -113,9 +113,9 @@ module Autotune
       (roles.is_a?(Array) || roles.is_a?(Hash)) && roles.any?
     end
 
-    # TODO: this looks buggy
-    def update_roles (new_roles)
-      self.meta= { 'roles' => new_roles }
+    def update_roles(new_roles)
+      self.meta ||= {}
+      self.meta['roles'] = new_roles
       save!
     end
 
@@ -156,7 +156,7 @@ module Autotune
       # handle the case where it is a hash but not superuser
       if roles.is_a?(Hash) && roles.any?
         stale_ids = group_memberships.pluck(:id)
-        [:author, :editor, :designer].each do |r|
+        %i[author editor designer].each do |r|
           next if roles[r.to_s].nil?
           roles[r.to_s].each do |g|
             group = Group.find_or_create_by(:name => g)
@@ -170,7 +170,7 @@ module Autotune
         end
       end
       # delete all memberships that weren't updated
-      group_memberships.where(id: stale_ids).delete_all unless stale_ids.empty?
+      group_memberships.where(:id => stale_ids).delete_all unless stale_ids.empty?
       save
     end
 
