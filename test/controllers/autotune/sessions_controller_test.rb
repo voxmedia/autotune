@@ -3,7 +3,8 @@ require 'test_helper'
 module Autotune
   # Test sessions controller
   class SessionsControllerTest < ActionController::TestCase
-    fixtures 'autotune/users', 'autotune/authorizations'
+    fixtures 'autotune/users', 'autotune/authorizations',
+             'autotune/groups', 'autotune/themes'
     test 'login' do
       get :new
       assert_response :success
@@ -35,6 +36,7 @@ module Autotune
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
       assert_redirected_to root_path
+      assert_enqueued_jobs 0
 
       u = Autotune::Authorization.find_by_auth_hash(mock_auth[provider.to_sym]).user
 
@@ -46,6 +48,7 @@ module Autotune
       @request.env['omniauth.auth'] = mock_auth[:google_oauth2]
       get :create, :provider => 'google_oauth2'
       assert_response :bad_request
+      assert_enqueued_jobs 0
     end
 
     test 'add secondary provider' do
@@ -55,6 +58,7 @@ module Autotune
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
       assert_redirected_to root_path
+      assert_enqueued_jobs 0
 
       @request.env['omniauth.auth'] = mock_auth[:google_oauth2]
       get :create, :provider => 'google_oauth2'
@@ -67,9 +71,11 @@ module Autotune
 
     test 'add preferred provider' do
       provider = Rails.configuration.omniauth_preferred_provider
+
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
       assert_redirected_to root_path
+      assert_enqueued_jobs 0
 
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
@@ -85,6 +91,7 @@ module Autotune
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
       assert_redirected_to root_path
+      assert_enqueued_jobs 0
 
       @request.env['omniauth.auth'] = mock_auth[:google_oauth2]
       get :create, :provider => 'google_oauth2'
@@ -109,10 +116,12 @@ module Autotune
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
       assert_redirected_to root_path
+      assert_enqueued_jobs 0
 
       @request.env['omniauth.auth'] = mock_auth[:google_oauth2]
       get :create, :provider => 'google_oauth2'
       assert_redirected_to root_path
+      assert_enqueued_jobs 0
 
       u = Autotune::Authorization.find_by_auth_hash(mock_auth[provider.to_sym]).user
 
@@ -132,12 +141,14 @@ module Autotune
       @request.env['omniauth.auth'] = mock_auth[provider.to_sym]
       get :create, :provider => provider.to_s
       assert_redirected_to root_path
+      assert_enqueued_jobs 0
 
       @controller = Autotune::ApplicationController.new
       get :index
       assert_response :ok
       assert_match 'Please authenticate with Google', response.body,
                    'Should display message about logging in with Google'
+      assert_enqueued_jobs 0
 
       Autotune.config.google_auth_enabled = tmp
     end

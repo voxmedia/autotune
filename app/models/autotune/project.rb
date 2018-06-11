@@ -118,18 +118,7 @@ module Autotune
 
       save!
 
-      chain = ActiveJob::Chain.new
-      unless bespoke?
-        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
-      end
-
-      chain
-        .then(SyncProjectJob.new(self, :update => true, :current_user => current_user))
-        .then(BuildJob.new(self,
-                           :target => publishable? ? 'preview' : 'publish',
-                           :current_user => current_user))
-        .catch(SetStatusJob.new(self, 'broken'))
-        .enqueue
+      ProjectJob.new(self, :update => true, :current_user => current_user).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -149,18 +138,7 @@ module Autotune
 
       save!
 
-      chain = ActiveJob::Chain.new
-      unless bespoke?
-        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
-      end
-
-      chain
-        .then(SyncProjectJob.new(self, :current_user => current_user))
-        .then(BuildJob.new(self,
-                           :target => publishable? ? 'preview' : 'publish',
-                           :current_user => current_user))
-        .catch(SetStatusJob.new(self, 'broken'))
-        .enqueue
+      ProjectJob.new(self, :current_user => current_user).enqueue
     rescue
       update!(:status => 'broken')
       raise
@@ -180,18 +158,7 @@ module Autotune
 
       save!
 
-      chain = ActiveJob::Chain.new
-      unless bespoke?
-        chain.then(SyncBlueprintJob.new(blueprint, :current_user => current_user))
-      end
-
-      chain
-        .then(SyncProjectJob.new(self, :current_user => current_user))
-        .then(BuildJob.new(self,
-                           :target => 'publish',
-                           :current_user => current_user))
-        .catch(SetStatusJob.new(self, 'broken'))
-        .enqueue
+      ProjectJob.new(self, :current_user => current_user).enqueue
     rescue
       update!(:status => 'broken')
       raise

@@ -2,22 +2,28 @@ require 'autoshell'
 
 module Autotune
   # setup the blueprint
-  class SyncBlueprintJob < ActiveJob::Base
+  class BlueprintJob < ActiveJob::Base
     queue_as :default
-
-    lock_job :retry => 20.seconds do
-      arguments.first.to_gid_param
-    end
 
     # do the deed
     def perform(blueprint, update: false, build_themes: false, current_user: nil)
-      return unless blueprint.sync_from_repo(update: update, current_user: current_user) || build_themes
+      return retry_job :wait => 10 if blueprint.file_lock?
+      blueprint.file_lock!
+
+      blueprint.update!(:status => 'updating')
+
+      if update || blueprint.needs_sync?
+        blueprint.sync_from_remote(:update => update, :current_user => current_user)
+      end
 
       if blueprint.config['preview_type'] == 'live' && blueprint.config['sample_data']
         repo = blueprint.build_shell
 
         # don't build a copy for each theme every time a project is updated
         if build_themes
+          # TODO: Here we could make a temp copy of the working dir and release
+          # the file lock while we build every theme.
+
           sample_data = repo.read(blueprint.config['sample_data'])
           sample_data.delete('base_url')
           sample_data.delete('asset_base_url')
@@ -39,9 +45,9 @@ module Autotune
             end
 
           # if no theme is selected at this point, use any default theme
-          themes = Theme.where(:parent => nil).first if themes.empty?
+          themes = Theme.where(:parent => nil).first if themes.blank?
 
-          return if themes.empty?
+          return if themes.blank?
 
           themes.each do |theme|
             slug = blueprint.themable? ? blueprint.version : [blueprint.version, theme.slug].join('-')
@@ -78,6 +84,8 @@ module Autotune
       blueprint.status = 'broken'
       raise
     ensure
+      # Always make sure to release the file lock and save the blueprint
+      blueprint.file_unlock!
       blueprint.save!
     end
   end

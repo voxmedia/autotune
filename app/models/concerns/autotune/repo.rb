@@ -9,11 +9,21 @@ module Autotune
   module Repo
     extend ActiveSupport::Concern
 
+    # Checks if we need to sync files for this repo. Should only be run in the
+    # context of a job.
+    # @return [Boolean] True if a sync is needed
+    def needs_sync?
+      repo = setup_shell
+      return false if repo.exist? && version == repo.version
+      true
+    end
+
     # Sync files from a remote repo to the local file system. Should only be
     # run in the context of a job.
     # @param [Boolean] <update> Force an update from the remote repo url
+    # @param [Autotune::User] <current_user> User account used to upload thumbnails
     # @return [Boolean] True if anything was updated
-    def sync_from_repo(update: false, current_user: nil)
+    def sync_from_remote(update: false, current_user: nil)
       raise 'Repo URL is missing' if repo_url.blank?
 
       repo = setup_shell
@@ -56,8 +66,8 @@ module Autotune
       # Load the config file into the DB
       new_config = repo.read BLUEPRINT_CONFIG_FILENAME
       if new_config.blank?
-        raise "Can't read '%s' in %s '%s'" % [
-          BLUEPRINT_CONFIG_FILENAME, self.class.model_name.human, slug]
+        model_name = self.class.model_name.human
+        raise "Can't read '#{BLUEPRINT_CONFIG_FILENAME}' in #{model_name} '#{slug}'"
       else
         self.config = new_config
       end
@@ -65,6 +75,57 @@ module Autotune
       # Stash the thumbnail
       if config['thumbnail'].present? && repo.exist?(config['thumbnail'])
         deployer(:media, :user => current_user).deploy_file(working_dir, config['thumbnail'])
+      end
+
+      true
+    end
+
+    # Sync files from a local blueprint repo directory. Should only be run in
+    # the context of a job.
+    # @param [Boolean] <update> Force an update from the remote repo url
+    # @return [Boolean] True if anything was updated
+    def sync_from_blueprint(update: false)
+      raise 'No related blueprint' unless defined?(blueprint) && blueprint.present?
+
+      # Make sure the blueprint has a version
+      raise "Can't sync repo from blueprint, missing version" if blueprint.version.blank?
+
+      # Create a new repo object based on the blueprints working dir
+      blueprint_dir = blueprint.setup_shell
+
+      # Make sure the blueprint exists
+      raise 'Missing files!' unless blueprint_dir.exist?
+
+      # Create a new repo object based on the projects working dir
+      project_dir = setup_shell
+
+      if project_dir.exist?
+        if update || project_dir.version != blueprint_version
+          # Update the project files. Because of issue #218, due to
+          # some weirdness in git 1.7, we can't just update the repo.
+          # We have to make a new copy.
+          project_dir.rm
+          blueprint_dir.copy_to(project_dir.working_dir)
+        elsif project_dir.version == blueprint_version
+          # if we're not updating, bail if we have the files
+          return
+        end
+      else
+        # Copy the blueprint to the project working dir.
+        blueprint_dir.copy_to(project_dir.working_dir)
+      end
+
+      if blueprint_version.blank?
+        # project version is blank, so we assume HEAD and save it now
+        self.blueprint_version = project_dir.version
+      elsif project_dir.version != blueprint_version
+        # Checkout correct version and branch
+        project_dir.commit_hash_for_checkout = blueprint_version
+        project_dir.update
+        # Make sure the environment is correct for this version
+        project_dir.setup_environment
+        # update the config
+        self.blueprint_config = project_dir.read(BLUEPRINT_CONFIG_FILENAME)
       end
 
       true

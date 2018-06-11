@@ -1,10 +1,9 @@
 require 'test_helper'
-require 'autoshell'
 
-# test the project job
-class Autotune::BuildJobTest < ActiveJob::TestCase
-  fixtures 'autotune/users', 'autotune/blueprints', 'autotune/projects',
-           'autotune/themes', 'autotune/groups'
+# test the job for updating projects
+class Autotune::ProjectJobTest < ActiveJob::TestCase
+  fixtures 'autotune/blueprints', 'autotune/projects',
+           'autotune/users', 'autotune/themes', 'autotune/groups', 'autotune/group_memberships'
 
   test 'building' do
     b = autotune_projects(:example_one)
@@ -15,14 +14,10 @@ class Autotune::BuildJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      ActiveJob::Chain.new(
-        Autotune::SyncBlueprintJob.new(b.blueprint),
-        Autotune::SyncProjectJob.new(b),
-        Autotune::BuildJob.new(b)
-      ).enqueue
+      Autotune::ProjectJob.perform_later(b)
     end
 
-    assert_performed_jobs 3
+    assert_performed_jobs 1
 
     b.reload
 

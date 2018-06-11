@@ -249,7 +249,7 @@ module Autotune
     test 'build and publish' do
       project = autotune_projects(:example_one)
 
-      assert_performed_jobs 3 do
+      assert_performed_jobs 1 do
         project.build_and_publish(autotune_users(:superuser))
       end
     end
@@ -257,7 +257,7 @@ module Autotune
     test 'build' do
       project = autotune_projects(:example_one)
 
-      assert_performed_jobs 3 do
+      assert_performed_jobs 1 do
         project.build(autotune_users(:superuser))
       end
     end
@@ -265,7 +265,7 @@ module Autotune
     test 'upgrayyyyyde' do
       project = autotune_projects(:example_one)
 
-      assert_performed_jobs 3 do
+      assert_performed_jobs 1 do
         project.update_snapshot(autotune_users(:superuser))
       end
     end

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 # Test the install blueprint job
-class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
+class Autotune::BlueprintJobTest < ActiveJob::TestCase
   fixtures 'autotune/blueprints', 'autotune/projects', 'autotune/themes',
            'autotune/groups', 'autotune/users'
   test 'install blueprint' do
@@ -12,7 +12,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_performed_jobs 0
 
     perform_enqueued_jobs do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     assert_performed_jobs 1
@@ -33,7 +33,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     assert_equal 'new', bp.status
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -56,7 +56,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp.update(:version => WITH_SUBMOD)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -71,7 +71,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
            'Should not have submodule testfile'
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :update => 'true'
+      Autotune::BlueprintJob.perform_later bp, :update => 'true'
     end
 
     bp.reload
@@ -91,7 +91,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp.update(:repo_url => "#{bp.repo_url}#test")
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -122,7 +122,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp = autotune_blueprints(:example)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -151,7 +151,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp.update(:repo_url => "#{bp.repo_url}#test")
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later(bp, :update => true)
+      Autotune::BlueprintJob.perform_later(bp, :update => true)
     end
 
     bp.reload
@@ -181,7 +181,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
       :repo_url => "#{bp.repo_url}#master", :version => NO_SUBMOD)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -201,7 +201,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
     bp.update(:version => WITH_SUBMOD)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -216,7 +216,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
            'Should not have submodule testfile'
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :update => true
+      Autotune::BlueprintJob.perform_later bp, :update => true
     end
 
     bp.reload
@@ -239,7 +239,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                          :env => Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :build_themes => true
+      Autotune::BlueprintJob.perform_later bp, :build_themes => true
     end
 
     assert repo.exist?('autotune-config.json'),
@@ -254,7 +254,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                  'Repo should be checked out to the correct version'
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later(
+      Autotune::BlueprintJob.perform_later(
         bp, :update => true, :build_themes => true)
     end
 
@@ -292,7 +292,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                          :env => Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -304,7 +304,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                  'Model should have correct version saved'
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp
+      Autotune::BlueprintJob.perform_later bp
     end
 
     bp.reload
@@ -324,7 +324,7 @@ class Autotune::SyncBlueprintJobTest < ActiveJob::TestCase
                          :env => Rails.configuration.autotune.build_environment)
 
     assert_performed_jobs 1 do
-      Autotune::SyncBlueprintJob.perform_later bp, :build_themes => true
+      Autotune::BlueprintJob.perform_later bp, :build_themes => true
     end
 
     assert repo.exist?('autotune-config.json'),
