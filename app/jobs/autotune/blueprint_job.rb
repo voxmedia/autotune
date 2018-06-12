@@ -7,8 +7,7 @@ module Autotune
 
     # do the deed
     def perform(blueprint, update: false, build_themes: false, current_user: nil)
-      return retry_job :wait => 10 if blueprint.file_lock?
-      blueprint.file_lock!
+      return retry_job :wait => 10 unless blueprint.file_lock!
 
       blueprint.update!(:status => 'updating')
 

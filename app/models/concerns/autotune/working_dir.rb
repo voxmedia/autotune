@@ -47,28 +47,18 @@ module Autotune
     # Creates a lock entry for the working_dir in the cache.
     # @return [Boolean] True if a lock was created
     def file_lock!
-      raise "Can't obtain lock #{file_lock_key}" if file_lock?
-      logger.debug "Obtained lock #{file_lock_key}"
-      Rails.cache.write(file_lock_key, id)
-    end
-
-    # Check if there is a lock entry for this working_dir
-    # @return [Boolean] True if a lock exists
-    def file_lock?
-      Rails.cache.exist?(file_lock_key)
+      Autotune.lock!(file_lock_key)
     end
 
     # Release the lock for this working_dir
     # @return [Boolean] True if the lock was deleted
     def file_unlock!
-      logger.debug "Released lock #{file_lock_key}"
-      Rails.cache.delete(file_lock_key)
+      Autotune.unlock!(file_lock_key)
     end
 
     # Obtain file lock and execute given block and remove lock
     def with_file_lock
-      file_lock!
-      yield self
+      yield file_lock!
     ensure
       file_unlock!
     end

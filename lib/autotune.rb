@@ -2,6 +2,7 @@ require 'autotune/engine'
 require 'redis'
 require 'uri'
 require 'ruby_dig'
+require 'securerandom'
 
 # Top-level autotune module
 module Autotune
@@ -31,6 +32,7 @@ module Autotune
 
   class Unauthorized < StandardError; end
   class Forbidden < StandardError; end
+  class LockError < StandardError; end
 
   class << self
     delegate :redis, :to => :configuration
@@ -127,6 +129,36 @@ module Autotune
         results.select { |m| m['type'] == type }
       else
         results
+      end
+    end
+
+    def lock!(name)
+      ensure_redis
+      raise 'Empty lock name' if name.blank?
+      if redis.setnx("lock:#{name}", Time.now.to_i)
+        Rails.logger.debug "Obtained lock #{name}"
+        true
+      else
+        Rails.logger.debug "Can't obtain lock #{name}"
+        false
+      end
+    end
+
+    def lock?(name)
+      ensure_redis
+      raise 'Empty lock name' if name.blank?
+      redis.exists("lock:#{name}")
+    end
+
+    def unlock!(name)
+      ensure_redis
+      raise 'Empty lock name' if name.blank?
+      if redis.del("lock:#{name}") > 0
+        Rails.logger.debug "Released lock #{name}"
+        true
+      else
+        Rails.logger.debug "Lock doesn't exist; Can't release #{name}"
+        false
       end
     end
 

@@ -9,16 +9,8 @@ module Autotune
     queue_as :default
 
     def perform(project, update: false, target: :preview, current_user: nil)
-      if unique_lock?
-        logger.debug("Cancel perform; Existing unique #{unique_lock_key}")
-        return
-      elsif project.file_lock?
-        logger.debug("Retry job in 10s; Can't obtain lock #{project.file_lock_key}")
-        return retry_job :wait => 10
-      end
-
-      unique_lock!
-      project.file_lock!
+      return unless unique_lock!
+      return retry_job :wait => 10 unless project.file_lock!
 
       project.update!(:status => 'building')
 
@@ -28,15 +20,16 @@ module Autotune
       else
         # make sure blueprint is synced before syncing from it
         if project.blueprint.needs_sync?
-          if project.blueprint.file_lock?
-            # if the blueprint needs sync but is currently locked, clear our
-            # project file lock and retry the entire job
-            project.file_unlock!
-            return retry_job :wait => 10
-          end
-          project.blueprint.with_file_lock do |bp|
-            bp.sync_from_remote(:current_user => current_user)
-            bp.save!
+          project.blueprint.with_file_lock do |has_lock|
+            if has_lock
+              project.blueprint.sync_from_remote(:current_user => current_user)
+              project.blueprint.save!
+            else
+              # if the blueprint needs sync but is currently locked, clear our
+              # project file lock and retry the entire job
+              project.file_unlock!
+              return retry_job :wait => 10 unless has_lock
+            end
           end
         end
 
@@ -127,18 +120,11 @@ module Autotune
     end
 
     def unique_lock!
-      raise "Can't obtain unique lock #{unique_lock_key}" if unique_lock?
-      logger.debug "Obtained unique lock #{unique_lock_key}"
-      Rails.cache.write(unique_lock_key, job_id)
-    end
-
-    def unique_lock?
-      Rails.cache.exist?(unique_lock_key)
+      Autotune.lock!(unique_lock_key)
     end
 
     def unique_unlock!
-      logger.debug "Released unique lock #{unique_lock_key}"
-      Rails.cache.delete(unique_lock_key)
+      Autotune.unlock!(unique_lock_key)
     end
   end
 end
