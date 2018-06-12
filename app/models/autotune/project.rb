@@ -158,7 +158,7 @@ module Autotune
 
       save!
 
-      ProjectJob.new(self, :target => :publish, :current_user => current_user).enqueue
+      ProjectJob.new(self, :target => 'publish', :current_user => current_user).enqueue
     rescue
       update!(:status => 'broken')
       raise
