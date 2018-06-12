@@ -8,11 +8,16 @@ module Autotune
   class ProjectJob < ActiveJob::Base
     queue_as :default
 
-    # Job uniqueness should be checked first
-    unique_job :with => :payload
-
     def perform(project, update: false, target: :preview, current_user: nil)
-      return retry_job :wait => 10 if project.file_lock?
+      if unique_lock?
+        logger.debug("Cancel perform; Existing unique #{unique_lock_key}")
+        return
+      elsif project.file_lock?
+        logger.debug("Retry job in 10s; Can't obtain lock #{project.file_lock_key}")
+        return retry_job :wait => 10
+      end
+
+      unique_lock!
       project.file_lock!
 
       project.update!(:status => 'building')
@@ -102,6 +107,7 @@ module Autotune
       raise
     ensure
       # Always make sure to release the file lock and save the project
+      unique_unlock!
       project.file_unlock!
       project.save!
     end
@@ -111,6 +117,28 @@ module Autotune
     def get_full_url(url)
       return url if url.start_with?('http')
       url.start_with?('//') ? 'http:' + url : 'http://localhost:3000' + url
+    end
+
+    def unique_lock_key
+      return @unique_lock_key if defined?(@unique_lock_key) && @unique_lock_key.present?
+
+      deserialize_arguments_if_needed
+      @unique_lock_key ||= "unique:#{Digest::SHA1.hexdigest(serialize_arguments(arguments).to_s)}"
+    end
+
+    def unique_lock!
+      raise "Can't obtain unique lock #{unique_lock_key}" if unique_lock?
+      logger.debug "Obtained unique lock #{unique_lock_key}"
+      Rails.cache.write(unique_lock_key, job_id)
+    end
+
+    def unique_lock?
+      Rails.cache.exist?(unique_lock_key)
+    end
+
+    def unique_unlock!
+      logger.debug "Released unique lock #{unique_lock_key}"
+      Rails.cache.delete(unique_lock_key)
     end
   end
 end

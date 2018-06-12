@@ -73,11 +73,11 @@ module Autotune
       file_unlock!
     end
 
-    private
-
     def file_lock_key
       "filelock:#{working_dir}"
     end
+
+    private
 
     def move_working_dir
       return if !slug_changed? || slug_was.blank? || slug == slug_was
