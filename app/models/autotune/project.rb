@@ -133,12 +133,13 @@ module Autotune
     # @see update_snapshot
     def build(current_user)
       self.status = 'building'
+      target = publishable? ? 'preview' : 'publish'
 
-      deployer(publishable? ? 'preview' : 'publish', :user => current_user).prep_target
+      deployer(target, :user => current_user).prep_target
 
       save!
 
-      ProjectJob.new(self, :current_user => current_user).enqueue
+      ProjectJob.new(self, :target => target, :current_user => current_user).enqueue
     rescue
       update!(:status => 'broken')
       raise
