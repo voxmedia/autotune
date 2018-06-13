@@ -1,9 +1,13 @@
 #!/bin/bash
 
+echo You should run this and do a release BEFORE makeing changes to master
+
 if ! git diff-index --quiet HEAD --; then
   echo You must commit all your changes before updating the version
   exit 1
 fi
+
+command -v jq >/dev/null 2>&1 || { echo >&2 "Missing jq. Please install jq."; exit 1; }
 
 old_version=$(jq '.version' package.json | tr -d '"')
 
@@ -19,8 +23,6 @@ if [ "$old_version" = "$version" ]; then
 fi
 
 echo Updating version to $version
-
-command -v jq >/dev/null 2>&1 || { echo >&2 "Missing jq. Please install jq."; exit 1; }
 
 { rm package.json && jq --arg version $version '.version |= $version' > package.json; } < package.json
 
