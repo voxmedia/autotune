@@ -77,15 +77,20 @@ module Autotune
 
       # Blueprint is now built
       blueprint.status = 'built'
+
+      # Always make sure to release the file lock and save the blueprint
+      blueprint.file_unlock!
+      blueprint.save!
     rescue => exc
       # If the command failed, raise a red flag
       logger.error(exc)
       blueprint.status = 'broken'
-      raise
-    ensure
+
       # Always make sure to release the file lock and save the blueprint
       blueprint.file_unlock!
       blueprint.save!
+
+      raise
     end
   end
 end

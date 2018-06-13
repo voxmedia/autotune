@@ -86,6 +86,11 @@ module Autotune
       project.update_published_at = true if target == :publish
       project.status = 'built'
       project.output = project.dump_output_logger!
+
+      # Always make sure to release the file lock and save the project
+      unique_unlock!
+      project.file_unlock!
+      project.save!
     rescue => exc
       project.output = project.dump_output_logger!
       # If the command failed, raise a red flag
@@ -97,12 +102,13 @@ module Autotune
         end
       project.output += "\n#{msg}"
       project.status = 'broken'
-      raise
-    ensure
+
       # Always make sure to release the file lock and save the project
       unique_unlock!
       project.file_unlock!
       project.save!
+
+      raise
     end
 
     private
