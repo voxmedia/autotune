@@ -218,6 +218,28 @@ module Autotune
       output.present?
     end
 
+    def repeat_build_key
+      "repeat_build:#{to_gid_param}"
+    end
+
+    def repeat_build!(until_time)
+      now = Time.current
+      if until_time > now
+        Rails.cache.write(repeat_build_key, until_time.to_i,
+                          :expires_in => until_time.to_i - now.to_i)
+      else
+        raise 'Invalid time to repeat until'
+      end
+    end
+
+    def cancel_repeat_build!
+      Rails.cache.delete(repeat_build_key)
+    end
+
+    def repeat_build?
+      Rails.cache.read(repeat_build_key).to_i >= Time.current.to_i
+    end
+
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
     # different name.
     def self.inheritance_column

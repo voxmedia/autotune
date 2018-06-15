@@ -217,7 +217,15 @@ module Autotune
       render_accepted
     end
 
+    def cancel_repeat_build
+      instance.cancel_repeat_build!
+      render_accepted
+    end
+
     def build
+      if params[:repeat_until].present?
+        instance.repeat_build!(Time.zone.at(params[:repeat_until].to_i))
+      end
       instance.build(current_user)
       render_accepted
     end

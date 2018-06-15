@@ -32,6 +32,9 @@ Autotune::Engine.routes.draw do
   get 'projects/:id/duplicate',
       :to => 'application#index',
       :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
+  get 'projects/:id/cancel_repeat_build',
+      :to => 'projects#cancel_repeat_build',
+      :constraints => { :id => Autotune::SLUG_OR_ID_REGEX }
 
   get 'projects/:id/build_data',
       :to => 'projects#build_data',

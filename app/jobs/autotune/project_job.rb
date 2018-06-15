@@ -91,6 +91,8 @@ module Autotune
       unique_unlock!
       project.file_unlock!
       project.save!
+
+      project.build(current_user) if project.repeat_build?
     rescue => exc
       project.output = project.dump_output_logger!
       # If the command failed, raise a red flag
@@ -107,6 +109,8 @@ module Autotune
       unique_unlock!
       project.file_unlock!
       project.save!
+
+      project.build(current_user) if project.repeat_build?
 
       raise
     end

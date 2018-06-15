@@ -135,12 +135,24 @@ module Autotune
     def lock!(name)
       ensure_redis
       raise 'Empty lock name' if name.blank?
-      if redis.setnx("lock:#{name}", Time.now.to_i)
-        Rails.logger.debug "Obtained lock #{name}"
-        true
+
+      ret = \
+        if redis.setnx("lock:#{name}", Time.now.to_i)
+          Rails.logger.debug "Obtained lock #{name}"
+          true
+        else
+          Rails.logger.debug "Can't obtain lock #{name}"
+          false
+        end
+
+      if block_given?
+        begin
+          yield ret
+        ensure
+          unlock!(name)
+        end
       else
-        Rails.logger.debug "Can't obtain lock #{name}"
-        false
+        ret
       end
     end
 
