@@ -90,11 +90,11 @@ module Autotune
 
     # Rebuild all themeable blueprints. Used when themes are updated
     def self.rebuild_themed_blueprints(current_user = nil)
-      jobs = Blueprint.all
-             .select(&:themable?)
-             .collect { |bp| BlueprintJob.new(bp, :build_themes => true, :current_user => current_user) }
-
-      ActiveJob::Chain.new(*jobs).enqueue(:queue => 'low')
+      Blueprint.all.select(&:themable?).each do |bp|
+        BlueprintJob
+          .new(bp, :build_themes => true, :current_user => current_user)
+          .enqueue(:queue => 'low')
+      end
     end
 
     # Rails reserves the column `type` for itself. Here we tell Rails to use a
