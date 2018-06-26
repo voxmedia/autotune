@@ -179,6 +179,7 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(@build_data, {})
+      deployer.after_before_build(@build_data, {})
       render :json => @build_data
     rescue
       if @project && @project.meta.present? && @project.meta['error_message'].present?

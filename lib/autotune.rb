@@ -26,6 +26,7 @@ module Autotune
 
   Config = Struct.new(:working_dir, :build_environment, :setup_environment,
                       :verify_omniauth, :verify_authorization_header,
+                      :deployer_after_before_build, :deployer_after_prep_target,
                       :google_auth_enabled, :google_auth_domain,
                       :git_ssh, :git_askpass,
                       :redis, :faq_url, :generic_theme, :theme_meta_data, :get_theme_data)

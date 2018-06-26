@@ -58,6 +58,8 @@ module Autotune
 
       # Run the before build deployer hook
       deployer.before_build(build_data, repo.env)
+      # and the customizable after hook
+      deployer.after_before_build(build_data, repo.env)
 
       # Run the build
       repo.cd { |s| s.run(BLUEPRINT_BUILD_COMMAND, :stdin_data => build_data.to_json) }

@@ -114,7 +114,9 @@ module Autotune
         self.blueprint_config = blueprint.config
       end
 
-      deployer(publishable? ? 'preview' : 'publish', :user => current_user).prep_target
+      dep = deployer(publishable? ? 'preview' : 'publish', :user => current_user)
+      dep.prep_target
+      dep.after_prep_target
 
       save!
 
@@ -135,7 +137,9 @@ module Autotune
       self.status = 'building'
       target = publishable? ? 'preview' : 'publish'
 
-      deployer(target, :user => current_user).prep_target
+      dep = deployer(target, :user => current_user)
+      dep.prep_target
+      dep.after_prep_target
 
       save!
 
@@ -155,7 +159,9 @@ module Autotune
     def build_and_publish(current_user)
       self.status = 'building'
 
-      deployer('publish', :user => current_user).prep_target
+      dep = deployer('publish', :user => current_user)
+      dep.prep_target
+      dep.after_prep_target
 
       save!
 

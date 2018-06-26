@@ -49,6 +49,12 @@ module Autotune
       raise Autotune::Forbidden, 'Unable to retrieve Google Doc because user does not have access.'
     end
 
+    def after_prep_target
+      if Rails.configuration.autotune.deployer_after_prep_target.is_a?(Proc)
+        Rails.configuration.autotune.deployer_after_prep_target.call(self)
+      end
+    end
+
     # Hook for adjusting data and files before build. Project
     # instance is saved after this method runs.
     def before_build(build_data, _env)
@@ -84,6 +90,12 @@ module Autotune
       project.meta['error_message'] = 'Unable to retrieve Google Doc because user does not have access.'
 
       raise
+    end
+
+    def after_before_build(build_data, env)
+      if Rails.configuration.autotune.deployer_after_before_build.is_a?(Proc)
+        Rails.configuration.autotune.deployer_after_before_build.call(self, build_data, env)
+      end
     end
 
     # Hook to do stuff after a project is deleted
