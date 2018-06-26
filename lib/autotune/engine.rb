@@ -19,12 +19,6 @@ module Autotune
     # Will paginate for paginated active records
     require 'will_paginate'
 
-    # Some active job magic
-    require 'active_job/chaining'
-    require 'active_job/locking'
-    require 'active_job/unique'
-    require 'active_job/chain'
-
     initializer 'autotune.init', :before => :load_config_initializers do |app|
       app.config.assets.precompile += %w(
         autotune/favicon.ico autotune/at_placeholder.png autotune/spinner.gif)
