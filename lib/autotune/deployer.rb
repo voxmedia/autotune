@@ -170,7 +170,8 @@ module Autotune
     end
 
     def user
-      @user ||= project.user
+      return @user if defined?(@user)
+      @user = project.user if project.present? && project.respond_to?(:user)
     end
 
     private
