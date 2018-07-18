@@ -213,26 +213,36 @@ module Autotune
       render :json => { :google_doc_url => doc_copy[:url] }
     end
 
-    def update_snapshot
-      instance.update_snapshot(current_user)
-      render_accepted
-    end
-
     def cancel_repeat_build
       instance.cancel_repeat_build!
       render_accepted
     end
 
     def build
+      kwargs = {}
       if params[:repeat_until].present?
-        instance.repeat_build!(Time.zone.at(params[:repeat_until].to_i))
+        kwargs[:repeat_until] = Time.zone.at(params[:repeat_until].to_i)
       end
-      instance.build(current_user)
+      if params[:wait_until].present?
+        kwargs[:wait_until] = Time.zone.at(params[:wait_until].to_i)
+      end
+      if params[:publish].present? && params[:publish]
+        kwargs[:publish] = true
+      end
+      if params[:update].present? && params[:update]
+        kwargs[:update] = true
+      end
+      instance.build(current_user, kwargs)
       render_accepted
     end
 
     def build_and_publish
-      instance.build_and_publish(current_user)
+      instance.build(current_user, :publish => True)
+      render_accepted
+    end
+
+    def update_snapshot
+      instance.build(current_user, :update => True)
       render_accepted
     end
 

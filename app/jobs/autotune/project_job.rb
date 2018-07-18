@@ -18,8 +18,8 @@ module Autotune
       if project.bespoke?
         project.sync_from_remote(:update => update, :current_user => current_user)
       else
-        # make sure blueprint is synced before syncing from it
         if project.blueprint.needs_sync?
+        # make sure blueprint is synced before syncing from it
           project.blueprint.with_file_lock do |has_lock|
             if has_lock
               project.blueprint.sync_from_remote(:current_user => current_user)
@@ -94,8 +94,8 @@ module Autotune
       project.file_unlock!
       project.save!
 
-      project.build(current_user) if project.repeat_build?
-    rescue => exc
+      project.build(current_user, :publish => target == :publish) if project.repeat_build?
+    rescue StandardError => exc
       project.output = project.dump_output_logger!
       # If the command failed, raise a red flag
       msg = \
@@ -112,9 +112,13 @@ module Autotune
       project.file_unlock!
       project.save!
 
-      project.build(current_user) if project.repeat_build?
+      project.build(current_user, :publish => target == :publish) if project.repeat_build?
 
       raise
+    end
+
+    def unique_lock?
+      Autotune.lock?(unique_lock_key)
     end
 
     private
