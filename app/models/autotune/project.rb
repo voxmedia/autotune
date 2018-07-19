@@ -137,7 +137,7 @@ module Autotune
       else
         job.enqueue
       end
-    rescue
+    rescue StandardError
       update!(:status => 'broken')
       raise
     end
@@ -159,7 +159,7 @@ module Autotune
     # @raise The original exception when the update fails
     # @see build
     def update_snapshot(current_user)
-      build(current_user, update: true)
+      build(current_user, :update => true)
     end
 
     # Gets the URL for previewing the project.
