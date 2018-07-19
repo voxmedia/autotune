@@ -96,7 +96,7 @@ module Autotune
     end
 
     def send_message(type, data)
-      ensure_redis
+      ensure_redis!
       dt = DateTime.current
       payload = { 'type' => type, 'time' => dt.utc.to_f, 'data' => data }
       redis.zadd('messages', dt.utc.to_f, payload.to_json)
@@ -106,7 +106,7 @@ module Autotune
     end
 
     def purge_messages(older_than: nil)
-      ensure_redis
+      ensure_redis!
       if older_than.nil?
         redis.del('messages')
       else
@@ -115,7 +115,7 @@ module Autotune
     end
 
     def messages(since: nil, type: nil)
-      ensure_redis
+      ensure_redis!
 
       results =
         if since.nil?
@@ -134,7 +134,7 @@ module Autotune
     end
 
     def lock!(name)
-      ensure_redis
+      ensure_redis!
       raise 'Empty lock name' if name.blank?
 
       ret = \
@@ -158,13 +158,13 @@ module Autotune
     end
 
     def lock?(name)
-      ensure_redis
+      ensure_redis!
       raise 'Empty lock name' if name.blank?
       redis.exists("lock:#{name}")
     end
 
     def unlock!(name)
-      ensure_redis
+      ensure_redis!
       raise 'Empty lock name' if name.blank?
       if redis.del("lock:#{name}") > 0
         Rails.logger.debug "Released lock #{name}"
@@ -177,7 +177,7 @@ module Autotune
 
     private
 
-    def ensure_redis
+    def ensure_redis!
       raise 'Redis is not configured' if redis.nil?
     end
   end

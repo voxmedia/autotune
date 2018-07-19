@@ -105,46 +105,39 @@ module Autotune
     # and build the new project.
     # It publishes updates on projects already published.
     # @raise The original exception when the update fails
-    # @see build
     # @see build_and_publish
-    def update_snapshot(current_user)
+    # @see update_snapshot
+    def build(current_user, update: false, publish: false, repeat_until: nil, wait_until: nil)
       self.status = 'building'
-      unless bespoke? || blueprint_version == blueprint.version
+
+      # If this is a blueprint-based project and an update is requested, update
+      # the version and config data from the blueprint
+      if update && !bespoke? && blueprint_version != blueprint.version
         self.blueprint_version = blueprint.version
         self.blueprint_config = blueprint.config
       end
 
-      dep = deployer(publishable? ? 'preview' : 'publish', :user => current_user)
-      dep.prep_target
-      dep.after_prep_target
-
-      save!
-
-      ProjectJob.new(self, :update => true, :current_user => current_user).enqueue
-    rescue
-      update!(:status => 'broken')
-      raise
-    end
-
-    # Updates blueprint version and builds the project.
-    # Queues jobs to sync latest verison of blueprint, update it on the project
-    # and build the new project.
-    # It publishes updates on projects already published.
-    # @raise The original exception when the update fails
-    # @see build_and_publish
-    # @see update_snapshot
-    def build(current_user)
-      self.status = 'building'
-      target = publishable? ? 'preview' : 'publish'
+      target = publishable? && !publish ? 'preview' : 'publish'
 
       dep = deployer(target, :user => current_user)
       dep.prep_target
       dep.after_prep_target
 
+      job = ProjectJob.new(
+        self, :update => update, :target => target, :current_user => current_user
+      )
+      return if job.unique_lock?
+
       save!
 
-      ProjectJob.new(self, :target => target, :current_user => current_user).enqueue
-    rescue
+      repeat_build!(Time.zone.at(repeat_until.to_i)) if repeat_until.present?
+
+      if wait_until
+        job.enqueue(:wait_until => wait_until)
+      else
+        job.enqueue
+      end
+    rescue StandardError
       update!(:status => 'broken')
       raise
     end
@@ -154,21 +147,19 @@ module Autotune
     # Queues jobs to sync latest verison of blueprint, update it on the project
     # and build the new project.
     # @see build
-    # @see update_snapshot
     # @raise The original exception when the update fails
     def build_and_publish(current_user)
-      self.status = 'building'
+      build(current_user, :publish => true)
+    end
 
-      dep = deployer('publish', :user => current_user)
-      dep.prep_target
-      dep.after_prep_target
-
-      save!
-
-      ProjectJob.new(self, :target => 'publish', :current_user => current_user).enqueue
-    rescue
-      update!(:status => 'broken')
-      raise
+    # Updates blueprint version and builds the project.
+    # Queues jobs to sync latest verison of blueprint, update it on the project
+    # and build the new project.
+    # It publishes updates on projects already published.
+    # @raise The original exception when the update fails
+    # @see build
+    def update_snapshot(current_user)
+      build(current_user, :update => true)
     end
 
     # Gets the URL for previewing the project.
