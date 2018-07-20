@@ -237,12 +237,12 @@ module Autotune
     end
 
     def build_and_publish
-      instance.build(current_user, :publish => True)
+      instance.build(current_user, :publish => true)
       render_accepted
     end
 
     def update_snapshot
-      instance.build(current_user, :update => True)
+      instance.build(current_user, :update => true)
       render_accepted
     end
 
