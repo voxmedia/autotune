@@ -7,9 +7,9 @@ module Autotune
   class ProjectsController < ApplicationController
     model Project
     skip_before_action :require_google_login,
-                       :only => [:index, :show]
+                       :only => %i[index show]
 
-    before_action :only => [:index, :show] do
+    before_action :only => %i[index show] do
       require_google_login if google_auth_required? && !accepts_json?
     end
 
@@ -19,7 +19,7 @@ module Autotune
       render_error exc.message, :bad_request
     end
 
-    before_action :only => [:show, :update, :update_snapshot, :destroy, :build, :build_and_publish] do
+    before_action :only => %i[show update update_snapshot destroy build build_and_publish] do
       unless current_user.role?(:superuser) ||
              instance.user == current_user ||
              current_user.role?(:editor => instance.group.slug) ||
@@ -43,7 +43,7 @@ module Autotune
         if params[:blueprint] == 'bespoke'
           query[:bespoke] = true
         else
-          blueprint = Blueprint.find_by_slug(params[:blueprint])
+          blueprint = Blueprint.find_by(:slug => params[:blueprint])
           query[:blueprint_id] = blueprint.id
         end
       elsif params[:blueprint_id].present?
@@ -55,11 +55,12 @@ module Autotune
       end
 
       if params[:pub_status].present?
-        if params[:pub_status] == 'published'
-          @projects = @projects.where.not(:published_at => nil)
-        else
-          @projects = @projects.where(:published_at => nil)
-        end
+        @projects = \
+          if params[:pub_status] == 'published'
+            @projects.where.not(:published_at => nil)
+          else
+            @projects.where(:published_at => nil)
+          end
       end
 
       if params[:search].present?
@@ -73,20 +74,21 @@ module Autotune
       end
 
       if params[:theme].present?
-        theme = Theme.find_by_slug(params[:theme])
+        theme = Theme.find_by(:slug => params[:theme])
         query[:theme_id] = theme.id
       end
 
       if params[:group].present?
-        group = Group.find_by_slug(params[:group])
+        group = Group.find_by(:slug => params[:group])
         query[:group_id] = group.id
       end
 
       unless current_user.role? :superuser
-        if current_user.role? [:editor, :designer]
+        if current_user.role? %i[editor designer]
           @projects = @projects.where(
             '(user_id = ? OR group_id IN (?))',
-            current_user.id, current_user.editor_groups.pluck(:id))
+            current_user.id, current_user.editor_groups.pluck(:id)
+          )
         else
           query[:user_id] = current_user.id
         end
@@ -106,19 +108,24 @@ module Autotune
       link_str = '<%s>; rel="%s"'
       links = [
         link_str % [
-          projects_url(:page => @projects.current_page, :per_page => per_page), 'page'],
+          projects_url(:page => @projects.current_page, :per_page => per_page), 'page'
+        ],
         link_str % [
-          projects_url(:page => 1, :per_page => per_page), 'first'],
+          projects_url(:page => 1, :per_page => per_page), 'first'
+        ],
         link_str % [
-          projects_url(:page => @projects.total_pages, :per_page => per_page), 'last']
+          projects_url(:page => @projects.total_pages, :per_page => per_page), 'last'
+        ]
       ]
       if @projects.next_page
         links << link_str % [
-          projects_url(:page => @projects.next_page, :per_page => per_page), 'next']
+          projects_url(:page => @projects.next_page, :per_page => per_page), 'next'
+        ]
       end
       if @projects.previous_page
         links << link_str % [
-          projects_url(:page => @projects.previous_page, :per_page => per_page), 'prev']
+          projects_url(:page => @projects.previous_page, :per_page => per_page), 'prev'
+        ]
       end
       headers['Link'] = links.join(', ')
       headers['X-Total'] = @projects.count.to_s
@@ -181,7 +188,7 @@ module Autotune
       deployer.before_build(@build_data, {})
       deployer.after_before_build(@build_data, {})
       render :json => @build_data
-    rescue
+    rescue StandardError
       if @project && @project.meta.present? && @project.meta['error_message'].present?
         render_error @project.meta['error_message'], :bad_request
       else
@@ -260,14 +267,15 @@ module Autotune
     def handle_post!
       @project.attributes = select_from_post(
         :title, :slug, :bespoke, :blueprint_id, :blueprint_version,
-        :blueprint_repo_url, :blueprint_config, :data)
+        :blueprint_repo_url, :blueprint_config, :data
+      )
 
       if request.POST.key? 'blueprint'
-        @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
+        @project.blueprint = Blueprint.find :slug => request.POST['blueprint']
       end
 
       if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_slug request.POST['theme']
+        @project.theme = Theme.find :slug => request.POST['theme']
         @project.group = @project.theme.group
 
         # is this user allowed to use this theme?
@@ -276,13 +284,14 @@ module Autotune
           render_error(
             "You can't use the #{@project.theme.title} theme. Please " \
             'choose another theme or contact support',
-            :bad_request)
+            :bad_request
+          )
           return false
         end
       end
 
       # make sure data doesn't contain title, slug or theme
-      %w(title slug theme base_url asset_base_url).each do |k|
+      %w[title slug theme base_url asset_base_url].each do |k|
         @project.data.delete(k)
       end
 
