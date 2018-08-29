@@ -133,12 +133,13 @@ module Autotune
       end
     end
 
-    def lock!(name)
+    def lock!(name, ttl: 1.hour)
       ensure_redis!
       raise 'Empty lock name' if name.blank?
 
       ret = \
         if redis.setnx("lock:#{name}", Time.now.to_i)
+          redis.expire("lock:#{name}", ttl) # sometimes the lock doesn't get released
           Rails.logger.debug "Obtained lock #{name}"
           true
         else
