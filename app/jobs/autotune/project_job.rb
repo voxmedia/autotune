@@ -8,11 +8,43 @@ module Autotune
   class ProjectJob < ActiveJob::Base
     queue_as :default
 
-    def perform(project, update: false, target: :preview, current_user: nil)
+    def perform(project, update: false, target: :preview, current_user: nil, convert_to_blueprint: false)
       return unless unique_lock!
       return retry_job :wait => 10 unless project.file_lock!
 
       project.update!(:status => 'building')
+
+      # Are we gonna convert this project to a blueprint?
+      if convert_to_blueprint.present?
+        if project.bespoke?
+          # Convert a bespoke project to a blueprint project
+          # Does the blueprint for this repo already exist?
+          blueprint = Blueprint.find_by(:repo_url => project.blueprint_repo_url)
+          # Otherwise create a new blueprint
+          if blueprint.blank?
+            blueprint = Blueprint.create!(
+              :title => "#{project.title} (Converted)",
+              :slug => "#{project.slug}-converted",
+              :repo_url => project.blueprint_repo_url,
+              :version => project.blueprint_version,
+              :config => project.blueprint_config
+            )
+          end
+
+          # Change the project from bespoke to blueprint-based
+          project.blueprint_repo_url = nil
+          project.bespoke = false
+          project.blueprint = blueprint
+          # Don't force an update because the repo has not changed
+        elsif convert_to_blueprint.is_a? Blueprint
+          # Change the blueprint used by this project
+          project.blueprint = blueprint
+          # and force an update to make sure the project will work in case the
+          # repo has changed.
+          # TODO: don't force an update if the repo url hasn't changed
+          update = true
+        end
+      end
 
       # Make sure we have the files we need to build
       if project.bespoke?

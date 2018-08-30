@@ -232,6 +232,9 @@ module Autotune
       if params[:update].present? && params[:update]
         kwargs[:update] = true
       end
+      if params[:convert_to_blueprint].present? && params[:convert_to_blueprint]
+        kwargs[:convert_to_blueprint] = true
+      end
       instance.build(current_user, kwargs)
       render_accepted
     end

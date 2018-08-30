@@ -176,6 +176,49 @@ module Autotune
       end
     end
 
+    test 'convert bespoke project' do
+      accept_json!
+      valid_auth_header!
+
+      Project.destroy_all
+      Blueprint.destroy_all
+
+      pdata = {
+        :title => 'New project',
+        :slug => "#{autotune_themes(:theme1).slug} New project".parameterize,
+        :user_id => autotune_users(:developer).id,
+        :theme => autotune_themes(:theme1).slug,
+        :preview_url => '',
+        :bespoke => true,
+        :blueprint_repo_url => TEST_REPO.to_s
+      }
+
+      perform_enqueued_jobs do
+        post :create, pdata
+      end
+
+      assert_response :created, decoded_response['error']
+
+      assert_performed_jobs 1
+
+      new_p = Project.find decoded_response['id']
+      assert_nil new_p.blueprint_id
+
+      perform_enqueued_jobs do
+        get :build, :id => new_p.id, :convert_to_blueprint => true
+      end
+
+      assert_performed_jobs 2
+
+      new_p.reload
+      refute_nil new_p.blueprint_id
+      refute_nil new_p.blueprint
+      assert_equal "#{new_p.title} (Converted)", new_p.blueprint.title
+      assert_equal "#{new_p.slug}-converted", new_p.blueprint.slug
+      assert_equal TEST_REPO.to_s, new_p.blueprint.repo_url
+      assert_equal new_p.blueprint_version, new_p.blueprint.version
+    end
+
     test 'create project not allowed' do
       accept_json!
       valid_auth_header! :group2_author
