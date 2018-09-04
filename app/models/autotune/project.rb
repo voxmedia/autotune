@@ -101,7 +101,7 @@ module Autotune
     end
 
     # Updates blueprint version and builds the project.
-    # Queues jobs to sync latest verison of blueprint, update it on the project
+    # Queues jobs to sync latest version of blueprint, update it on the project
     # and build the new project.
     # It publishes updates on projects already published.
     # @raise The original exception when the update fails
@@ -112,6 +112,19 @@ module Autotune
               repeat_until: nil, wait_until: nil, convert_to_blueprint: nil)
       # First check to see if there already is a lock on this job
       target = publishable? && !publish ? 'preview' : 'publish'
+      self.status = 'building'
+
+      # If this is a blueprint-based project and an update is requested, update
+      # the version and config data from the blueprint
+      if update && !bespoke? && blueprint_version != blueprint.version
+        self.blueprint_version = blueprint.version
+        self.blueprint_config = blueprint.config
+      end
+
+      dep = deployer(target, :user => current_user)
+      dep.prep_target
+      dep.after_prep_target
+
       job = ProjectJob.new(
         self,
         :update => update,
@@ -121,33 +134,18 @@ module Autotune
       )
       raise 'Build cancelled, another build is already queued or running' if job.unique_lock?
 
-      begin
-        self.status = 'building'
+      save!
 
-        # If this is a blueprint-based project and an update is requested, update
-        # the version and config data from the blueprint
-        if update && !bespoke? && blueprint_version != blueprint.version
-          self.blueprint_version = blueprint.version
-          self.blueprint_config = blueprint.config
-        end
+      repeat_build!(Time.zone.at(repeat_until.to_i)) if repeat_until.present?
 
-        dep = deployer(target, :user => current_user)
-        dep.prep_target
-        dep.after_prep_target
-
-        save!
-
-        repeat_build!(Time.zone.at(repeat_until.to_i)) if repeat_until.present?
-
-        if wait_until
-          job.enqueue(:wait_until => wait_until)
-        else
-          job.enqueue
-        end
-      rescue StandardError
-        update!(:status => 'broken')
-        raise
+      if wait_until
+        job.enqueue(:wait_until => wait_until)
+      else
+        job.enqueue
       end
+    rescue StandardError
+      update!(:status => 'broken')
+      raise
     end
     # rubocop:enable Metrics/ParameterLists
 
