@@ -109,7 +109,8 @@ module Autotune
     # @see update_snapshot
     # rubocop:disable Metrics/ParameterLists
     def build(current_user, update: false, publish: false,
-              repeat_until: nil, wait_until: nil, convert_to_blueprint: nil)
+              repeat_until: nil, wait_until: nil,
+              convert_to_blueprint: nil, convert_to_bespoke: nil)
       # First check to see if there already is a lock on this job
       target = publishable? && !publish ? 'preview' : 'publish'
       self.status = 'building'
@@ -130,7 +131,8 @@ module Autotune
         :update => update,
         :target => target,
         :current_user => current_user,
-        :convert_to_blueprint => convert_to_blueprint
+        :convert_to_blueprint => convert_to_blueprint,
+        :convert_to_bespoke => convert_to_bespoke
       )
       raise 'Build cancelled, another build is already queued or running' if job.unique_lock?
 

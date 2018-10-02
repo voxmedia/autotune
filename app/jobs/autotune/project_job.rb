@@ -8,14 +8,15 @@ module Autotune
   class ProjectJob < ActiveJob::Base
     queue_as :default
 
-    def perform(project, update: false, target: :preview, current_user: nil, convert_to_blueprint: false)
+    def perform(project, update: false, target: :preview, current_user: nil,
+                convert_to_blueprint: false, convert_to_bespoke: false)
       return unless unique_lock!
       return retry_job :wait => 10 unless project.file_lock!
 
       project.update!(:status => 'building')
 
-      # Are we gonna convert this project to a blueprint?
       if convert_to_blueprint.present?
+        # Are we gonna convert this project to a blueprint?
         if project.bespoke?
           # Convert a bespoke project to a blueprint project
           # Does the blueprint for this repo already exist?
@@ -44,6 +45,13 @@ module Autotune
           # TODO: don't force an update if the repo url hasn't changed
           update = true
         end
+      elsif convert_to_bespoke.present?
+        # Are we gonna convert this project to bespoke?
+        unless project.bespoke?
+          # It's not already bespoke, so convert it!
+          project.bespoke = true
+          project.blueprint_repo_url = project.blueprint.repo_url
+        end
       end
 
       # Make sure we have the files we need to build
@@ -51,7 +59,7 @@ module Autotune
         project.sync_from_remote(:update => update, :current_user => current_user)
       else
         if project.blueprint.needs_sync?
-        # make sure blueprint is synced before syncing from it
+          # make sure blueprint is synced before syncing from it
           project.blueprint.with_file_lock do |has_lock|
             if has_lock
               project.blueprint.sync_from_remote(:current_user => current_user)

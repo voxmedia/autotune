@@ -235,6 +235,9 @@ module Autotune
       if params[:convert_to_blueprint].present? && params[:convert_to_blueprint]
         kwargs[:convert_to_blueprint] = true
       end
+      if params[:convert_to_bespoke].present? && params[:convert_to_bespoke]
+        kwargs[:convert_to_bespoke] = true
+      end
       instance.build(current_user, kwargs)
       render_accepted
     end
@@ -265,7 +268,7 @@ module Autotune
         :title, :slug, :bespoke, :blueprint_id, :blueprint_version,
         :blueprint_repo_url, :blueprint_config, :data)
 
-      if request.POST.key? 'blueprint'
+      if request.POST.key?('blueprint') && !@project.bespoke?
         @project.blueprint = Blueprint.find_by_slug request.POST['blueprint']
       end
 
