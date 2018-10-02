@@ -47,6 +47,12 @@ module Autotune
     rescue GoogleDocs::Forbidden => exc
       logger.error(exc)
       raise Autotune::Forbidden, 'Unable to retrieve Google Doc because user does not have access.'
+    rescue OAuth2::Error => exc
+      if exc.code == 'invalid_grant'
+        raise Autotune::Unauthorized, "Google Auth: #{exc.description}"
+      else
+        raise
+      end
     end
 
     def after_prep_target

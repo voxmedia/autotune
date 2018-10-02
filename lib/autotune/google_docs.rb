@@ -9,11 +9,13 @@ require 'json'
 require 'date'
 
 module Autotune
+  # Wrapper around the official google client, for grabbing content from google
+  # documents
   class GoogleDocs
     attr_reader :client
 
     def self.parse_url(url)
-      url.match(/^(?<base_url>https:\/\/docs.google.com\/(?:a\/(?<domain>[^\/]+)\/)?(?<type>[^\/]+)\/d\/(?<id>[-\w]{25,})).+$/)
+      url.match(%r{^(?<base_url>https:\/\/docs.google.com\/(?:a\/(?<domain>[^\/]+)\/)?(?<type>[^\/]+)\/d\/(?<id>[-\w]{25,})).+$})
     end
 
     def self.key_from_url(url)
@@ -62,7 +64,7 @@ module Autotune
       else
         ret = export(parts['id'], format || :txt)
       end
-      return ret
+      ret
     end
 
     # Find a Google Drive file
