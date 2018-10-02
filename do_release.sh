@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo You should run this and do a release BEFORE makeing changes to master
+echo You should run this and do a release BEFORE making changes to master
 
 if ! git diff-index --quiet HEAD --; then
-  echo You must commit all your changes before updating the version
+  echo You must have a clean repo with no changes or staged commits before updating the version
   exit 1
 fi
 
