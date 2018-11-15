@@ -15,7 +15,7 @@ module Autotune
 
     before_action :respond_to_html
 
-    rescue_from ActiveRecord::UnknownAttributeError do |exc|
+    rescue_from ActiveRecord::UnknownAttributeError, Autotune::LockError do |exc|
       render_error exc.message, :bad_request
     end
 

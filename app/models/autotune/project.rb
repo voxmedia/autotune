@@ -111,6 +111,10 @@ module Autotune
     def build(current_user, update: false, publish: false,
               repeat_until: nil, wait_until: nil,
               convert_to_blueprint: nil, convert_to_bespoke: nil)
+
+      # Is this project in the middle of being migrated?
+      return if meta['migration_started'] == true
+
       # First check to see if there already is a lock on this job
       target = publishable? && !publish ? 'preview' : 'publish'
       self.status = 'building'
@@ -134,20 +138,22 @@ module Autotune
         :convert_to_blueprint => convert_to_blueprint,
         :convert_to_bespoke => convert_to_bespoke
       )
-      raise 'Build cancelled, another build is already queued or running' if job.unique_lock?
+      raise Autotune::LockError, 'Build cancelled, another build is already queued or running' if job.unique_lock?
 
-      save!
+      begin
+        save!
 
-      repeat_build!(Time.zone.at(repeat_until.to_i)) if repeat_until.present?
+        repeat_build!(Time.zone.at(repeat_until.to_i)) if repeat_until.present?
 
-      if wait_until
-        job.enqueue(:wait_until => wait_until)
-      else
-        job.enqueue
+        if wait_until
+          job.enqueue(:wait_until => wait_until)
+        else
+          job.enqueue
+        end
+      rescue StandardError
+        update!(:status => 'broken')
+        raise
       end
-    rescue StandardError
-      update!(:status => 'broken')
-      raise
     end
     # rubocop:enable Metrics/ParameterLists
 
