@@ -1,7 +1,7 @@
 {
   "name": "autotune",
   "description": "Platform and UI for creating new websites and html snippets from templates stored in git repos.",
-  "version": "0.7.16",
+  "version": "0.7.17",
   "homepage": "https://github.com/voxmedia/autotune",
   "author": {
     "name": "Ryan Mark",
