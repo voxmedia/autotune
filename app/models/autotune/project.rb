@@ -194,6 +194,7 @@ module Autotune
     # @return [String] slug of the project without the theme.
     def slug_sans_theme
       return if slug.nil?
+      return slug if theme.nil?
       if theme_changed? && theme_was.present?
         slug.sub(/^(#{theme.slug}|#{theme_was.slug})-/, '')
       else
