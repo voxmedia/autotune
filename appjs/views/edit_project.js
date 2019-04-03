@@ -524,7 +524,7 @@ var EditProject = BaseView.extend(require('./mixins/actions'), require('./mixins
       }
     }
 
-    if ( this.model.hasType( 'graphic' ) || this.model.hasPreviewType('live') ) {
+    if ( this.model.hasPreviewType('live') ) {
       // Setup our iframe with pym
       if ( this.pym ) { this.pym.remove(); }
       if ( this.formValidate(this.model, this.$('#projectForm')) ){
