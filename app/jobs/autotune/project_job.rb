@@ -112,6 +112,18 @@ module Autotune
         begin
           script_path = Autotune.root.join('bin', 'screenshot.js').to_s
           if project.screenshots == 'all'
+            repo.cd(project.deploy_dir) do
+              repo.glob('**/*.html').each do |file_path|
+                web_path = "/#{file_path}".sub(/index\.html$/, '')
+                path_slug = web_path.gsub(/(\.html$|^\/|\/$)/, '').sub(/\//, '_')
+                url = deployer.url_for(web_path)
+                if web_path == '/'
+                  repo.run 'phantomjs', script_path, get_full_url(url)
+                else
+                  repo.run 'phantomjs', script_path, path_slug, get_full_url(url)
+                end
+              end
+            end
           else
             url = deployer.url_for('/')
             repo.cd(project.deploy_dir) { |s| s.run 'phantomjs', script_path, get_full_url(url) }
@@ -168,7 +180,7 @@ module Autotune
 
     def get_full_url(url)
       return url if url.start_with?('http')
-      url.start_with?('//') ? 'http:' + url : 'http://localhost:3000' + url
+      url.start_with?('//') ? 'http:' + url : 'http://localhost:3456' + url
     end
 
     def unique_lock_key
