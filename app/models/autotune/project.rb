@@ -100,6 +100,16 @@ module Autotune
       blueprint_config.present? && blueprint_config['preview_type'] == 'live'
     end
 
+    # What kind of screenshots do we want for this project?
+    # @return [String] 'none', 'index' or 'all'
+    def screenshots
+      if blueprint_config.present? && blueprint_config['screenshots'].in?(%w[none index all])
+        return blueprint_config['screenshots']
+      else
+        return 'index'
+      end
+    end
+
     # Updates blueprint version and builds the project.
     # Queues jobs to sync latest version of blueprint, update it on the project
     # and build the new project.

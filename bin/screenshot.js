@@ -5,24 +5,54 @@ var WebPage = require('webpage'),
     finishedJobs = 0,
     TIMEOUT = 90;
 
+if (typeof Object.assign != 'function') {
+  // Must be writable: true, enumerable: false, configurable: true
+  Object.defineProperty(Object, "assign", {
+    value: function assign(target, varArgs) { // .length of function is 2
+      'use strict';
+      if (target == null) { // TypeError if undefined or null
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+
+      var to = Object(target);
+
+      for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+
+        if (nextSource != null) { // Skip over if undefined or null
+          for (var nextKey in nextSource) {
+            // Avoid bugs when hasOwnProperty is shadowed
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+      return to;
+    },
+    writable: true,
+    configurable: true
+  });
+}
+
 // All the sizes to screenshot.
 // Note: PhantomJs uses the heights specified here as a min-height criteria
 var screenshots = [
   {'dimensions' : [970,300],
     'pixelRatio': 2,
-    'filename': './screenshots/screenshot_l@2.png'},
+    'filename': './screenshots/{prefix}screenshot_l@2.png'},
   {'dimensions' : [970,300],
-    'filename': './screenshots/screenshot_l.png'},
+    'filename': './screenshots/{prefix}screenshot_l.png'},
   {'dimensions' : [720,300],
-    'filename': './screenshots/screenshot_m.png'},
+    'filename': './screenshots/{prefix}screenshot_m.png'},
   {'dimensions' : [720,300],
     'pixelRatio': 2,
-    'filename': './screenshots/screenshot_m@2.png'},
+    'filename': './screenshots/{prefix}screenshot_m@2.png'},
   {'dimensions' : [400,200],
-    'filename': './screenshots/screenshot_s.png'},
+    'filename': './screenshots/{prefix}screenshot_s.png'},
   {'dimensions' : [400,200],
     'pixelRatio': 2,
-    'filename': './screenshots/screenshot_s@2.png'}
+    'filename': './screenshots/{prefix}screenshot_s@2.png'}
 ];
 
 function done() {
@@ -63,7 +93,8 @@ function resourceErrorCB(resourceError) {
 
 function captureScreen(opts){
   var page = WebPage.create(),
-      finished = false;
+      finished = false,
+      address = opts.address;
   page.viewportSize = {
     width: opts.dimensions[0] * (opts.pixelRatio || 1),
     height: opts.dimensions[1] * (opts.pixelRatio || 1)
@@ -82,9 +113,15 @@ function captureScreen(opts){
   page.onResourceTimeout = resourceTimeoutCB;
 
   page.onCallback = function(data) {
+    var filename = opts.filename;
+    if ( opts.name ) {
+      filename = filename.replace('{prefix}', opts.name);
+    } else {
+      filename = filename.replace('{prefix}', '');
+    }
     if ( data === 'gtg' ) {
-      console.log('Saving image ' + opts.filename);
-      page.render(opts.filename);
+      console.log('Saving image ' + filename);
+      page.render(filename);
       page.close();
       done();
     }
@@ -112,8 +149,15 @@ function captureScreen(opts){
   };
 }
 
+var args = System.args.slice(1);
+var name = '';
+var addr = args[0];
+if ( args.length > 1 ) {
+  name = args[0] + '_';
+  addr = args[1];
+}
 screenshots.forEach(function(s) {
-  captureScreen(s);
+  captureScreen(Object.assign({address: addr, name: name}, s));
 });
 
 // In case something hangs, kill it all after 90 seconds

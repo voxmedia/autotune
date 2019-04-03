@@ -108,11 +108,14 @@ module Autotune
       deployer.deploy(project.full_deploy_dir)
 
       # Create screenshots (has to happen after upload)
-      if deployer.take_screenshots?
+      if deployer.take_screenshots? && project.screenshots.in?(%w[index all])
         begin
-          url = deployer.url_for('/')
           script_path = Autotune.root.join('bin', 'screenshot.js').to_s
-          repo.cd(project.deploy_dir) { |s| s.run 'phantomjs', script_path, get_full_url(url) }
+          if project.screenshots == 'all'
+          else
+            url = deployer.url_for('/')
+            repo.cd(project.deploy_dir) { |s| s.run 'phantomjs', script_path, get_full_url(url) }
+          end
 
           # Upload screens
           repo.glob(File.join(project.deploy_dir, 'screenshots/*')).each do |file_path|
