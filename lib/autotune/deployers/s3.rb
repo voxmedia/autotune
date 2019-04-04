@@ -31,11 +31,9 @@ module Autotune
 
       # Get the url to a file
       def url_for(path)
-        if path =~ /\.\w{1,8}$/
-          super
-        else
-          super + '/'
-        end
+        ret = super
+        return ret if ret =~ /(\.\w{1,8}|\/)$/
+        ret + '/'
       end
     end
   end
