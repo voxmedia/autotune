@@ -216,6 +216,7 @@ module Autotune
       current_auth = user.authorizations.find_by!(:provider => 'google_oauth2')
 
       google_client = GoogleDocs.new(
+        :user_id => current_auth.uid,
         :refresh_token => current_auth.credentials['refresh_token'],
         :access_token => current_auth.credentials['token'],
         :expires_at => current_auth.credentials['expires_at']

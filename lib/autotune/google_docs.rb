@@ -1,12 +1,12 @@
 require 'uri'
-require 'google/api_client'
-require 'google/api_client/client_secrets'
-require 'google/api_client/auth/installed_app'
-require 'google/api_client/auth/storage'
-require 'google/api_client/auth/storages/file_store'
+require 'googleauth'
+require 'googleauth/user_authorizer'
+require 'googleauth/token_store'
+require 'google/apis/drive_v2'
 require 'fileutils'
 require 'json'
 require 'date'
+require 'stringio'
 
 module Autotune
   # Wrapper around the official google client, for grabbing content from google
@@ -28,20 +28,27 @@ module Autotune
     end
 
     def initialize(options)
-      @client = Google::APIClient.new
-
-      @client.authorization.update!({
+      scope = [
+        'https://www.googleapis.com/auth/drive',
+        'https://spreadsheets.google.com/feeds/'
+      ]
+      client_id = Google::Auth::ClientId.new(ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'])
+      token_store = HashTokenStore.new(options[:user_id].to_sym => MultiJson.dump({
         :client_id => ENV['GOOGLE_CLIENT_ID'],
-        :client_secret => ENV['GOOGLE_CLIENT_SECRET'],
-        :scope => 'https://www.googleapis.com/auth/drive ' \
-                  'https://spreadsheets.google.com/feeds/'
-      }.update(options))
+        :access_token => options[:access_token],
+        :refresh_token => options[:refresh_token],
+        :scope => scope,
+        :expiration_time_millis => options[:expires_at].to_i * 1000
+      }))
+      authorizer = Google::Auth::UserAuthorizer.new(client_id, scope, token_store)
 
-      begin
-        @client.authorization.refresh! if @client.authorization.expired?
-      rescue Signet::AuthorizationError => exc
-        raise AuthorizationError, exc.message
+      credentials = authorizer.get_credentials(options[:user_id])
+      if credentials.nil?
+        raise AuthorizationError, 'Unable to obtain Google Authorization'
       end
+
+      @client = Google::Apis::DriveV2::DriveService.new
+      @client.authorization = credentials
 
       @_files = {}
       @_spreadsheets = {}
@@ -77,17 +84,10 @@ module Autotune
     def find(file_id)
       return @_files[file_id] unless @_files[file_id].nil?
 
-      drive = @client.discovered_api('drive', 'v2')
-
       # get the file metadata
-      resp = @client.execute(
-        :api_method => drive.files.get,
-        :parameters => { :fileId => file_id })
+      resp = @client.get_file(file_id)
 
-      # die if there's an error
-      handle_errors resp
-
-      @_files[file_id] = resp.data
+      @_files[file_id] = resp
     end
 
     # Export a file
@@ -97,27 +97,16 @@ module Autotune
     # @param type [:excel, :text, :html] export type
     # @return [String] file contents
     def export(file_id, type)
-      # watch(file_id)
-      list_resp = find(file_id)
-
       # decide which mimetype we want
       mime = mime_for(type).content_type
 
-      # Grab the export url.
-      if list_resp['exportLinks'] && list_resp['exportLinks'][mime]
-        uri = list_resp['exportLinks'][mime]
-      else
-        raise "Google doesn't support exporting file id #{file_id} to #{type}"
-      end
-
-      # get the export
-      get_resp = @client.execute(:uri => uri)
-
-      # die if there's an error
-      handle_errors get_resp
+      # Create a buffer to write the file contents to`
+      io = StringIO.new
+      @client.export_file(file_id, mime, :download_dest => io)
+      ret = io.string
 
       # contents
-      get_resp.body
+      io.string
     end
 
     # Export a file and save to disk
@@ -128,19 +117,13 @@ module Autotune
     # @param filename [String] where to save the spreadsheet
     # @return [String] path to the excel file
     def export_to_file(file_id, type, filename = nil)
-      contents = export(file_id, type)
+      # decide which mimetype we want
+      mime = mime_for(type).content_type
 
-      if filename.nil?
-        # get a temporary file. The export is binary, so open the tempfile in
-        # write binary mode
-        fp = Tempfile.create(
-          ['googledoc', ".#{type}"], :binmode => mime_for(type.to_s).binary?)
-        filename = fp.path
-        fp.write(contents)
-        fp.close
-      else
-        open(filename, 'wb') { |f| f.write(contents) }
-      end
+      filename ||= "#{Dir.tmpdir}/googledoc-#{file_id}-#{Time.now.to_i}.#{type}"
+
+      @client.export_file(file_id, mime, :download_dest => filename)
+
       filename
     end
 
@@ -150,24 +133,19 @@ module Autotune
     # @param title [String] title for the newly created file
     # @return [Hash] hash containing the id/key and url of the new file
     def copy(file_id, title = nil, visibility = :private)
-      drive = @client.discovered_api('drive', 'v2')
-
       if title.nil?
-        copied_file = drive.files.copy.request_schema.new
+        copied_file = Google::Apis::DriveV2::File.new
       else
-        copied_file = drive.files.copy.request_schema.new(
-          'title' => title, 'writersCanShare' => true)
+        copied_file = Google::Apis::DriveV2::File.new(
+          :title => title, :writers_can_share => true)
       end
-      cp_resp = @client.execute(
-        :api_method => drive.files.copy,
-        :body_object => copied_file,
-        :parameters => {
-          :fileId => file_id, :visibility => visibility.to_s.upcase })
+      new_file = @client.copy_file(
+        file_id,
+        copied_file,
+        :visibility => visibility.to_s.upcase
+      )
 
-      # die if there's an error
-      handle_errors cp_resp
-
-      { :id => cp_resp.data['id'], :url => cp_resp.data['alternateLink'] }
+      { :id => new_file.id, :url => new_file.alternate_link }
     end
     alias_method :copy_doc, :copy
 
@@ -178,44 +156,25 @@ module Autotune
     end
 
     def check_permission(file_id, domain)
-      drive = @client.discovered_api('drive', 'v2')
-      cp_resp = @client.execute(
-        :api_method => drive.permissions.list,
-        :parameters => { :fileId => file_id })
+      perms = @client.list_permissions(file_id)
 
       has_permission = false
-      cp_resp.data.items.each do |item|
-        if item['type'] == 'domain' && item['domain'] == domain
+      perms.items.each do |perm|
+        if perm.type == 'domain' && perm.domain == domain
           has_permission = true
-        elsif item['type'] == 'anyone'
+        elsif perm.type == 'anyone'
           has_permission = true
         end
       end
 
-      if cp_resp.error?
-        raise CreateError, cp_resp.error_message
-      else
-        return has_permission
-      end
+      has_permission
     end
 
     def insert_permission(file_id, value, perm_type, role)
-      drive = @client.discovered_api('drive', 'v2')
-      new_permission = {
-        'value' => value,
-        'type' => perm_type,
-        'role' => role
-      }
-      cp_resp = @client.execute(
-        :api_method => drive.permissions.insert,
-        :body_object => new_permission,
-        :parameters => { :fileId => file_id })
-
-      if cp_resp.error?
-        raise CreateError, cp_resp.error_message
-      else
-        return cp_resp.data
-      end
+      new_permission = Google::Apis::DriveV2::Permission.new(
+        :value => value, :type => perm_type, :role => role
+      )
+      @client.insert_permission(file_id, new_permission)
     end
 
     # Get the mime type from a file extension
@@ -310,9 +269,32 @@ module Autotune
     class Forbidden < ClientError; end
     class DoesNotExist < ClientError; end
 
+    class HashTokenStore < Google::Auth::TokenStore
+      def initialize(tokens)
+        @store = tokens.with_indifferent_access
+      end
+
+      def load(id)
+        @store[id]
+      end
+
+      def store(id, token)
+        @store[id] = token
+      end
+
+      def delete(id)
+        @store.delete(id)
+      end
+
+      def to_h
+        @store
+      end
+    end
+
     private
 
     def handle_errors(result)
+      puts result
       return if result.success?
       # die if there's an error
       if result.response.status >= 500
