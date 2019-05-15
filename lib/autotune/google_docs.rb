@@ -33,7 +33,7 @@ module Autotune
         'https://spreadsheets.google.com/feeds/'
       ]
       client_id = Google::Auth::ClientId.new(ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'])
-      token_store = HashTokenStore.new(options[:user_id].to_sym => MultiJson.dump({
+      token_store = HashTokenStore.new(options[:user_id] => MultiJson.dump({
         :client_id => ENV['GOOGLE_CLIENT_ID'],
         :access_token => options[:access_token],
         :refresh_token => options[:refresh_token],
