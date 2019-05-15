@@ -99,6 +99,8 @@ module Autotune
       # Create a new repo object based on the projects working dir
       project_dir = setup_shell
 
+      # check if the directory already exists on disk, make sure it's updated,
+      # or copy the code from the blueprint
       if project_dir.exist?
         if update || project_dir.version != blueprint_version
           # Update the project files. Because of issue #218, due to
@@ -106,9 +108,6 @@ module Autotune
           # We have to make a new copy.
           project_dir.rm
           blueprint_dir.copy_to(project_dir.working_dir)
-        elsif project_dir.version == blueprint_version
-          # if we're not updating, bail if we have the files
-          return
         end
       else
         # Copy the blueprint to the project working dir.
@@ -122,11 +121,12 @@ module Autotune
         # Checkout correct version and branch
         project_dir.commit_hash_for_checkout = blueprint_version
         project_dir.update
-        # Make sure the environment is correct for this version
-        project_dir.setup_environment
         # update the config
         self.blueprint_config = project_dir.read(BLUEPRINT_CONFIG_FILENAME)
       end
+
+      # Make sure the environment is correct for this version
+      project_dir.setup_environment
 
       true
     end
