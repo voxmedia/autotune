@@ -47,6 +47,12 @@ module Autotune
     rescue GoogleDocs::Forbidden => exc
       logger.error(exc)
       raise Autotune::Forbidden, 'Unable to retrieve Google Doc because user does not have access.'
+    rescue OAuth2::Error => exc
+      if exc.code == 'invalid_grant'
+        raise Autotune::Unauthorized, "Google Auth: #{exc.description}"
+      else
+        raise
+      end
     end
 
     def after_prep_target
@@ -210,6 +216,7 @@ module Autotune
       current_auth = user.authorizations.find_by!(:provider => 'google_oauth2')
 
       google_client = GoogleDocs.new(
+        :user_id => current_auth.uid,
         :refresh_token => current_auth.credentials['refresh_token'],
         :access_token => current_auth.credentials['token'],
         :expires_at => current_auth.credentials['expires_at']
@@ -231,11 +238,11 @@ module Autotune
 
       cache_key = "googledoc#{doc_key}"
 
-      resp = google_client.find(doc_key)
+      file = google_client.find(doc_key)
       cache_value = nil
       if Rails.cache.exist?(cache_key)
         cache_value = Rails.cache.read(cache_key)
-        needs_update = cache_value['version'] && resp['version'] != cache_value['version']
+        needs_update = cache_value['version'] && file.version != cache_value['version']
       else
         needs_update = true
       end
@@ -244,7 +251,7 @@ module Autotune
       if needs_update
         google_client.share_with_domain(doc_key, Autotune.configuration.google_auth_domain)
         ret = google_client.get_doc_contents(url)
-        Rails.cache.write(cache_key, 'ss_data' => ret, 'version' => resp['version'])
+        Rails.cache.write(cache_key, 'ss_data' => ret, 'version' => file.version)
       else
         ret = (cache_value || Rails.cache.read(cache_key))['ss_data']
       end
