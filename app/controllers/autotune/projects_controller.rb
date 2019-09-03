@@ -274,7 +274,13 @@ module Autotune
       end
 
       if request.POST.key? 'theme'
-        @project.theme = Theme.find_by_slug request.POST['theme']
+        theme = Theme.find_by_slug request.POST['theme']
+        if theme.blank?
+          render_error("Can't find theme \"#{request.POST['theme']}\"", :bad_request)
+          return false
+        end
+
+        @project.theme = theme
         @project.group = @project.theme.group
 
         # is this user allowed to use this theme?
