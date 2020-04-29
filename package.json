@@ -45,7 +45,7 @@
     "eonasdan-bootstrap-datetimepicker": "^4.15.35",
     "handlebars": "4.0.5",
     "html2hscript": "^2.0.1",
-    "jquery": "3.2.1",
+    "jquery": "3.5.0",
     "jquery-ui": "1.10.5",
     "markdown": "0.5.0",
     "node-underscorify": "0.0.14",
