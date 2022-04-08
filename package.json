@@ -40,7 +40,7 @@
     "brace-expansion": "1.1.7",
     "browserify": "5.12.1",
     "browserify-shim": "3.8.0",
-    "moment": "2.19.3",
+    "moment": "2.29.2",
     "moment-timezone": "^0.4.0",
     "eonasdan-bootstrap-datetimepicker": "^4.15.35",
     "handlebars": "4.0.5",
