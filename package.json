@@ -46,7 +46,7 @@
     "handlebars": "4.0.5",
     "html2hscript": "^2.0.1",
     "jquery": "3.2.1",
-    "jquery-ui": "1.10.5",
+    "jquery-ui": "1.13.2",
     "markdown": "0.5.0",
     "node-underscorify": "0.0.14",
     "pnotify": "git://github.com/sciactive/pnotify.git#2.1.0",
