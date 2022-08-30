@@ -41,7 +41,7 @@
     "browserify": "5.12.1",
     "browserify-shim": "3.8.0",
     "moment": "2.19.3",
-    "moment-timezone": "^0.4.0",
+    "moment-timezone": "^0.5.35",
     "eonasdan-bootstrap-datetimepicker": "^4.15.35",
     "handlebars": "4.0.5",
     "html2hscript": "^2.0.1",
