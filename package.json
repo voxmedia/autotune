@@ -35,7 +35,7 @@
     "alpaca": "git://github.com/voxmedia/alpaca.git#dev",
     "backbone": "1.2.3",
     "backbone.paginator": "^2.0.2",
-    "bootstrap": "3.3.2",
+    "bootstrap": "3.4.1",
     "brace": "0.5.1",
     "brace-expansion": "1.1.7",
     "browserify": "5.12.1",
